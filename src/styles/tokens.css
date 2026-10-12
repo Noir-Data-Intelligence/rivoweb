@@ -1,0 +1,153 @@
+/*
+ * Rivo — tokens de identidade visual (v1, 2026-10-12)
+ *
+ * Gerado a partir do guia em `identidade/README.md`. Formato compatível com
+ * shadcn/ui + Tailwind: cada token é um triplo HSL, consumido como
+ * `hsl(var(--primary))` ou `hsl(var(--primary) / 0.5)`.
+ *
+ * Duas camadas:
+ *   --marca-*   cores do símbolo, literais, iguais nos dois temas. Só para marca
+ *               (logótipo, login, ecrãs vazios). Nunca em dados nem em UI.
+ *   o resto     cores de função, afinadas por tema. É isto que a UI usa.
+ *
+ * Tema escuro: classe `.dark` no <html> (next-themes, attribute="class").
+ *
+ * Contrastes (WCAG) verificados: texto ≥ 4.5:1, texto secundário ≥ 4.5:1,
+ * séries de gráfico ≥ 3:1 sobre o cartão, paleta de gráficos validada para
+ * daltonismo (protan/deutan/tritan) nos dois temas.
+ */
+
+@layer base {
+  :root {
+    /* Marca — fixas, iguais nos dois temas (extraídas do símbolo) */
+    --marca-tinta:   240 30% 15%; /* #1A1A30 */
+    --marca-ciano:   194 78% 53%; /* #28B9E5 */
+    --marca-azul:    210 51% 52%; /* #4886C3 */
+    --marca-indigo:  232 33% 50%; /* #5661A9 */
+    --marca-violeta: 262 31% 47%; /* #6F539E */
+    --marca-gradiente: linear-gradient(90deg, #28B9E5 0%, #4886C3 50%, #5661A9 100%);
+
+    /* Forma */
+    --radius: 0.5rem;          /* 8px — controlos */
+    --radius-card: 0.75rem;    /* 12px — cartões */
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+    --shadow-sm: 0 1px 2px hsl(240 30% 15% / 0.05);
+    --shadow-md: 0 4px 16px -4px hsl(240 30% 15% / 0.10), 0 1px 2px hsl(240 30% 15% / 0.04);
+
+    /* Função — tema claro */
+    --background:                240 23% 97%; /* #F7F7FA */
+    --foreground:                240 30% 15%; /* #1A1A30 */
+    --card:                      0 0% 100%; /* #FFFFFF */
+    --card-foreground:           240 30% 15%; /* #1A1A30 */
+    --popover:                   0 0% 100%; /* #FFFFFF */
+    --popover-foreground:        240 30% 15%; /* #1A1A30 */
+    --primary:                   212 58% 44%; /* #2F6CB0 */
+    --primary-foreground:        0 0% 100%; /* #FFFFFF */
+    --primary-hover:             212 59% 38%; /* #285D99 */
+    --secondary:                 240 17% 94%; /* #EEEEF3 */
+    --secondary-foreground:      240 30% 15%; /* #1A1A30 */
+    --muted:                     240 17% 95%; /* #F1F1F5 */
+    --muted-foreground:          240 11% 41%; /* #5D5D73 */
+    --subtle-foreground:         240 10% 58%; /* #8A8AA0 */
+    --accent:                    212 62% 96%; /* #EEF4FB */
+    --accent-foreground:         212 62% 32%; /* #1F4F86 */
+    --border:                    240 17% 91%; /* #E4E4EC */
+    --input:                     240 13% 85%; /* #D4D4DE */
+    --ring:                      210 51% 52%; /* #4886C3 */
+    --destructive:               1 61% 48%; /* #C4322F */
+    --destructive-foreground:    0 0% 100%; /* #FFFFFF */
+    --success:                   153 71% 26%; /* #137046 */
+    --success-soft:              148 39% 94%; /* #E8F5EE */
+    --warning:                   33 92% 33%; /* #A15C07 */
+    --warning-soft:              38 87% 94%; /* #FDF3E2 */
+    --danger:                    1 61% 48%; /* #C4322F */
+    --danger-soft:               0 73% 96%; /* #FCECEC */
+    --info:                      195 91% 30%; /* #076F92 */
+    --info-soft:                 195 67% 94%; /* #E6F5FA */
+    --ai:                        262 31% 47%; /* #6F539E */
+    --ai-soft:                   264 42% 95%; /* #F2EEF8 */
+    --sidebar:                   0 0% 100%; /* #FFFFFF */
+    --sidebar-foreground:        240 16% 29%; /* #3D3D55 */
+    --sidebar-active:            212 62% 96%; /* #EEF4FB */
+    --sidebar-active-foreground: 212 62% 32%; /* #1F4F86 */
+    --sidebar-border:            240 17% 91%; /* #E4E4EC */
+    --chart-1:                   212 54% 50%; /* #3B7BC4 */
+    --chart-2:                   31 75% 45%; /* #C8741C */
+    --chart-3:                   171 79% 34%; /* #129A86 */
+    --chart-4:                   262 35% 52%; /* #7A5BB0 */
+    --chart-5:                   340 47% 55%; /* #C2557A */
+    --chart-neutral:             240 12% 74%; /* #B4B4C4 */
+    --chart-grid:                240 16% 94%; /* #EDEDF2 */
+  }
+
+  .dark {
+    --background:                240 27% 8%; /* #0F0F1A */
+    --foreground:                240 23% 94%; /* #ECECF3 */
+    --card:                      240 25% 12%; /* #171726 */
+    --card-foreground:           240 23% 94%; /* #ECECF3 */
+    --popover:                   240 23% 15%; /* #1E1E30 */
+    --popover-foreground:        240 23% 94%; /* #ECECF3 */
+    --primary:                   211 68% 62%; /* #5B9BE0 */
+    --primary-foreground:        240 27% 8%; /* #0F0F1A */
+    --primary-hover:             211 70% 69%; /* #79AEE7 */
+    --secondary:                 240 26% 18%; /* #22223A */
+    --secondary-foreground:      240 23% 94%; /* #ECECF3 */
+    --muted:                     240 24% 15%; /* #1C1C2E */
+    --muted-foreground:          240 12% 67%; /* #A1A1B5 */
+    --subtle-foreground:         240 9% 51%; /* #76768D */
+    --accent:                    218 40% 18%; /* #1C2A42 */
+    --accent-foreground:         211 70% 80%; /* #A9CBF0 */
+    --border:                    240 21% 19%; /* #26263A */
+    --input:                     240 18% 25%; /* #33334A */
+    --ring:                      211 68% 62%; /* #5B9BE0 */
+    --destructive:               2 74% 60%; /* #E5534F */
+    --destructive-foreground:    0 0% 100%; /* #FFFFFF */
+    --success:                   151 50% 53%; /* #4CC38A */
+    --success-soft:              151 34% 12%; /* #14291F */
+    --warning:                   37 76% 60%; /* #E6A94A */
+    --warning-soft:              36 40% 12%; /* #2C2213 */
+    --danger:                    2 80% 70%; /* #F07A76 */
+    --danger-soft:               357 31% 14%; /* #2E1819 */
+    --info:                      194 79% 61%; /* #4CC4EA */
+    --info-soft:                 199 49% 12%; /* #10252F */
+    --ai:                        257 50% 70%; /* #A18BD8 */
+    --ai-soft:                   256 29% 15%; /* #221C33 */
+    --sidebar:                   240 24% 10%; /* #13131F */
+    --sidebar-foreground:        240 15% 76%; /* #B9B9CB */
+    --sidebar-active:            218 40% 18%; /* #1C2A42 */
+    --sidebar-active-foreground: 212 71% 91%; /* #D6E6F8 */
+    --sidebar-border:            240 26% 18%; /* #22223A */
+    --chart-1:                   212 59% 55%; /* #4A88D0 */
+    --chart-2:                   32 66% 46%; /* #C47A28 */
+    --chart-3:                   169 73% 38%; /* #1AA88F */
+    --chart-4:                   258 48% 59%; /* #8466C9 */
+    --chart-5:                   342 49% 61%; /* #CC6B88 */
+    --chart-neutral:             240 14% 34%; /* #4A4A62 */
+    --chart-grid:                240 25% 18%; /* #23233A */
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 8px 24px -6px hsl(0 0% 0% / 0.5);
+  }
+
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+
+  body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    font-size: 0.875rem;          /* 14px — base da aplicação */
+    line-height: 1.5;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Números alinhados em toda a parte onde há dados */
+  table, .num, [data-num] { font-variant-numeric: tabular-nums; }
+
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
