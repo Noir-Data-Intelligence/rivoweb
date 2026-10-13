@@ -111,7 +111,8 @@ test.describe("notificações", () => {
     await page.goto("/conta");
     const caixa = page.getByLabel("Receber também por e-mail");
     await expect(caixa).toBeChecked();
-    await caixa.uncheck();
+    await caixa.click();
+    await expect(caixa).not.toBeChecked();
     await expect(page.getByText("Preferência guardada.")).toBeVisible();
     expect(api.escritas("PUT", "/notifications/me/preferences").map((p) => p.corpo)).toEqual([{ emailEnabled: false }]);
   });
