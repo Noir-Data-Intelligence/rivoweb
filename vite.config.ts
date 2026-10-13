@@ -7,10 +7,17 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
 
   // Sem VITE_API_URL, um build de produção falha (§2 do plano). Os previews da
-  // Vercel constroem com a variável vazia de propósito (D10), por isso o valor
-  // vazio é aceite, mas a ausência total não.
+  // Vercel constroem sem API de propósito (D10); como a Vercel não aceita
+  // variáveis vazias, lá a ausência vale como vazio. Fora da Vercel, usar
+  // VITE_API_URL= (vazio) para um build sem API.
+  if (env.VITE_API_URL === undefined && process.env.VERCEL_ENV === "preview") {
+    env.VITE_API_URL = "";
+    process.env.VITE_API_URL = "";
+  }
   if (mode === "production" && env.VITE_API_URL === undefined && !process.env.VITEST) {
-    throw new Error("VITE_API_URL não está definido. Use VITE_API_URL= (vazio) para um build sem API.");
+    throw new Error(
+      `VITE_API_URL não está definido${process.env.VERCEL_ENV ? ` (Vercel: ${process.env.VERCEL_ENV})` : ""}. Use VITE_API_URL= (vazio) para um build sem API.`,
+    );
   }
   if (env.VITE_API_URL && !/^https:\/\/[^/]+$|^http:\/\/localhost:\d+$/.test(env.VITE_API_URL)) {
     throw new Error("VITE_API_URL tem de ser https://<host> (sem barra final) ou http://localhost:<porto>.");
