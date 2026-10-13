@@ -1454,5 +1454,9 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   admin local) e trocar e repor a preferência de e-mail. **Resolver um alerta
   não foi verificado localmente**: a base local não tem dados que abram
   alertas; está coberto no e2e com a API simulada. Nenhuma escrita em produção.
-- **Testes:** 93 unitários; 40 cenários e2e × 3 motores.
-- **Por fazer:** publicar e confirmar no domínio da Vercel.
+- **Testes:** 96 unitários; 40 cenários e2e × 3 motores.
+- **Em produção (2026-10-13):** publicado em `https://rivoweb-coral.vercel.app`.
+  Smoke no browser com o SuperAdmin (F0, F1 e F2) e **por perfil** com as 9
+  contas de QA (`tests/e2e/leitura/perfis.spec.ts`): o menu de cada perfil é
+  exactamente o esperado e cada página do menu abre sem erro. Só leituras,
+  login e logout. **F2 aceite** do lado técnico.
