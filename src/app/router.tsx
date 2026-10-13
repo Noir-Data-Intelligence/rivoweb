@@ -6,6 +6,7 @@ import { ErroDeRota, NaoEncontrado } from "@/features/sistema/paginas";
 import { CarregandoPagina } from "@/ui/Layout";
 import type { Requisito } from "@/lib/auth/permissions";
 import { AreaAutenticada, Exige } from "./guardas";
+import { REQUISITO_PAGINA as R } from "./requisitos";
 import { registarRotas } from "./rotasConhecidas";
 
 function preguicoso(carregar: () => Promise<{ default: ComponentType }>) {
@@ -71,22 +72,16 @@ export const rotas: RouteObject[] = [
               { index: true, element: preguicoso(() => import("@/features/dashboard/pages/Painel")) },
               { path: "conta", element: preguicoso(minhaConta) },
               { path: "notificacoes", element: preguicoso(notificacoes) },
-              { path: "dashboard", element: protegido("dashboard.overview.read", () => import("@/features/dashboard/pages/Executivo")) },
-              { path: "alertas", element: protegido("alerts.alerts.read", () => import("@/features/alertas/pages/Alertas")) },
+              { path: "dashboard", element: protegido(R["/dashboard"], () => import("@/features/dashboard/pages/Executivo")) },
+              { path: "alertas", element: protegido(R["/alertas"], () => import("@/features/alertas/pages/Alertas")) },
               // F1 — administração de acesso e núcleo organizacional (§5.1, §5.2).
-              { path: "utilizadores", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizadores")) },
-              { path: "utilizadores/:userId", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizador")) },
-              {
-                path: "configuracoes",
-                element: protegido(
-                  { anyOf: ["fiscal.tax_entity.read", "identity.users.write", "approval.policies.read"] },
-                  () => import("@/features/administracao/pages/Configuracoes"),
-                ),
-              },
-              { path: "colaboradores", element: protegido("hr.employees.read", () => import("@/features/rh/pages/Colaboradores")) },
-              { path: "colaboradores/:employeeId", element: protegido("hr.employees.read", () => import("@/features/rh/pages/Colaborador")) },
-              { path: "departamentos", element: protegido("hr.departments.read", () => import("@/features/rh/pages/Departamentos")) },
-              { path: "cargos", element: protegido("hr.positions.read", () => import("@/features/rh/pages/Cargos")) },
+              { path: "utilizadores", element: protegido(R["/utilizadores"], () => import("@/features/administracao/pages/Utilizadores")) },
+              { path: "utilizadores/:userId", element: protegido(R["/utilizadores"], () => import("@/features/administracao/pages/Utilizador")) },
+              { path: "configuracoes", element: protegido(R["/configuracoes"], () => import("@/features/administracao/pages/Configuracoes")) },
+              { path: "colaboradores", element: protegido(R["/colaboradores"], () => import("@/features/rh/pages/Colaboradores")) },
+              { path: "colaboradores/:employeeId", element: protegido(R["/colaboradores"], () => import("@/features/rh/pages/Colaborador")) },
+              { path: "departamentos", element: protegido(R["/departamentos"], () => import("@/features/rh/pages/Departamentos")) },
+              { path: "cargos", element: protegido(R["/cargos"], () => import("@/features/rh/pages/Cargos")) },
             ],
           },
         ],

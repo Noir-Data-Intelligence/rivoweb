@@ -5,6 +5,7 @@
  */
 import type { LucideIcon } from "lucide-react";
 import { BellRing, BriefcaseBusiness, Building2, Gauge, Home, KeyRound, Settings, UserCog, Users } from "lucide-react";
+import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
 export type EntradaMenu = {
@@ -20,17 +21,17 @@ export type EntradaMenu = {
 export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
   backoffice: [
     { caminho: "/", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
-    { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: "dashboard.overview.read" },
-    { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: "alerts.alerts.read" },
-    { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: "hr.employees.read", grupo: "Pessoas" },
-    { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: "hr.departments.read", grupo: "Pessoas" },
-    { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: "hr.positions.read", grupo: "Pessoas" },
-    { caminho: "/utilizadores", titulo: "Utilizadores", icone: KeyRound, requer: "identity.users.read", grupo: "Administração" },
+    { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: R["/dashboard"] },
+    { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: R["/alertas"] },
+    { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: R["/colaboradores"], grupo: "Pessoas" },
+    { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: R["/departamentos"], grupo: "Pessoas" },
+    { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: R["/cargos"], grupo: "Pessoas" },
+    { caminho: "/utilizadores", titulo: "Utilizadores", icone: KeyRound, requer: R["/utilizadores"], grupo: "Administração" },
     {
       caminho: "/configuracoes",
       titulo: "Configurações",
       icone: Settings,
-      requer: { anyOf: ["fiscal.tax_entity.read", "identity.users.write", "approval.policies.read"] },
+      requer: R["/configuracoes"],
       grupo: "Administração",
     },
   ],

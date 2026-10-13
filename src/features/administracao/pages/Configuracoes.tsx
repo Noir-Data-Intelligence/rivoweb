@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/mini";
+import { CARTOES_CONFIGURACOES } from "@/app/requisitos";
 import { Can, useUtilizador } from "@/features/identity";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
 import { eApiError } from "@/lib/api/problem";
@@ -336,13 +337,13 @@ export default function Configuracoes() {
     <>
       <PageHeader titulo="Configurações" descricao="Governação, dados da empresa e correio." />
       <div className="flex flex-col gap-6">
-        <Can requer="fiscal.tax_entity.read">
+        <Can requer={CARTOES_CONFIGURACOES.dadosEmpresa}>
           <DadosDaEmpresa />
         </Can>
-        <Can requer={{ allOf: ["identity.roles.read", "approval.policies.read"] }}>
+        <Can requer={CARTOES_CONFIGURACOES.governacao}>
           <Governacao />
         </Can>
-        <Can requer="identity.users.write">
+        <Can requer={CARTOES_CONFIGURACOES.correio}>
           <Correio />
         </Can>
       </div>
