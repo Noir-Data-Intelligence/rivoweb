@@ -29,6 +29,9 @@ export const REQUISITO_PAGINA = {
   "/recibos": "finance.receipts.read",
   "/a-receber": "finance.invoices.read",
   "/facturacao": { anyOf: ["finance.invoices.read", "fiscal.rates.read"] },
+  // F4 — aprovações (§5.5).
+  "/aprovacoes": "approval.requests.read",
+  "/politicas-aprovacao": "approval.policies.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Criar documentos: escrever facturas e escolher o cliente. */

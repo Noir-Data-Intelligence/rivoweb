@@ -1,6 +1,6 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F3** concluídas e publicadas em
+> **Estado:** fases **F0 a F4** concluídas e publicadas em
 > `https://rivoweb-coral.vercel.app` · actualizado a 2026-10-13.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
@@ -22,11 +22,11 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Configurações, Facturação |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Alertas |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Configurações, Facturação |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
@@ -59,6 +59,12 @@ AM = AssetManager.
 | Nome do cliente associado à conta | — | — | — | — | — | — | — | — | — | ✓ ² |
 | Cargo actual (da ficha ligada) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Dashboard executivo** | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| **Aprovações** | | | | | | | | | | |
+| Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Ver os nomes de quem pediu e de quem decide | ✓ | ✓ | — | — ⁷ | — ⁷ | — | — | — | — | — |
+| Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
 | Resolver alertas; criar, rever e desactivar regras; avaliar agora | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -107,6 +113,9 @@ Recursos Humanos.»
 ² Só se a conta estiver associada a um cliente; sem associação, o portal diz
 «Esta conta não está associada a um cliente. Fale com a empresa.»
 ³ Excepto em contas SuperAdmin, que só um SuperAdmin gere.
+⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já interveio não decide outra vez (BR-4).
+⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
+⁷ Vêem «Colaborador» (ou «Você»): os pedidos só trazem ids e estes perfis não lêem colaboradores (B19).
 ⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 
 ---
@@ -183,6 +192,25 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Dashboard executivo**
 - Receita, despesa, resultado, a receber e a pagar do período; evolução mensal;
   os clientes que mais facturaram.
+
+**Aprovações**
+- Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
+  **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
+  pagamento, requisição de compra, folha de salários, contagem de inventário).
+- Ficha: estado, quem pediu, passos com o modo (basta um ou todos os ocupantes
+  do cargo) e o prazo, aprovadores e decisões com notas.
+- **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
+  motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
+  mostra o estado actual. Numa atribuição de cargo aprovada, o cargo fica em
+  vigor de imediato.
+- **Cancelar** os próprios pedidos enquanto estão abertos.
+- O contador «Aprovações à sua espera» do Início abre a caixa.
+
+**Políticas de aprovação**
+- Ver as políticas (processo, departamento, faixa de valores, verificação de
+  orçamento, passos por cargo).
+- **Criar** (passos por ordem, cada um com cargo com autoridade, modo e prazo
+  em horas) e **desactivar**.
 
 **Alertas**
 - Ver alertas (abertos ou todos) e **resolvê-los**.
@@ -300,6 +328,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Início**
 - Resumo pessoal e indicadores de **Finanças**.
 
+**Aprovações**
+- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin.
+  Vê «Colaborador» em vez dos nomes (B19).
+
 **Alertas**
 - Ver alertas e regras.
 
@@ -324,6 +356,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Dashboard executivo**
 - Como no Admin.
+
+**Aprovações**
+- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin.
+  Vê «Colaborador» em vez dos nomes (B19).
 
 **Alertas**
 - Ver, **resolver**; regras: **criar**, **rever**, **desactivar** e
@@ -390,7 +426,6 @@ entra neste documento quando estiver publicada.
 
 | Fase | Área |
 |---|---|
-| F4 | Aprovações (caixa de decisão; hoje só aparece a contagem no Início) |
 | F5 | Tesouraria, despesas, contas a pagar, pedidos de pagamento, carregamento de ficheiros |
 | F6 | Fiscal e contabilidade |
 | F7 | RH completo e portal do colaborador (férias, recibos, documentos) |

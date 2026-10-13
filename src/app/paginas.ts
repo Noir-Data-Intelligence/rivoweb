@@ -44,6 +44,10 @@ export const PAGINAS = {
   recibo: () => de(import("@/features/facturacao/pages/Recibos"), (m) => m.FichaRecibo),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
+  // F4
+  aprovacoes: () => import("@/features/aprovacoes/pages/Caixa"),
+  pedidoAprovacao: () => import("@/features/aprovacoes/pages/Pedido"),
+  politicas: () => import("@/features/aprovacoes/pages/Politicas"),
 } satisfies Record<string, () => Modulo>;
 
 export type NomePagina = keyof typeof PAGINAS;

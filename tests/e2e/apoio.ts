@@ -105,6 +105,11 @@ export async function entrar(page: Page, email = "admin@teste.local", { navegar 
 }
 
 export async function semViolacoesAxe(page: Page): Promise<void> {
+  // Sem estados passageiros: o axe media cores a meio de `transition-colors`
+  // (depois de mudar o tema, com o rato por cima de um botão) e acusava
+  // contraste que nenhum dos estados finais tem.
+  await page.mouse.move(0, 0);
+  await page.addStyleTag({ content: "*, *::before, *::after { transition: none !important; animation: none !important; }" });
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   const graves = r.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
   expect(graves.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);

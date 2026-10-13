@@ -99,6 +99,10 @@ export const rotas: RouteObject[] = [
               { path: "recibos/:receiptId", element: protegido(R["/recibos"], pagina("recibo")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
+              // F4 — aprovações (§5.5).
+              { path: "aprovacoes", element: protegido(R["/aprovacoes"], pagina("aprovacoes")) },
+              { path: "aprovacoes/:requestId", element: protegido(R["/aprovacoes"], pagina("pedidoAprovacao")) },
+              { path: "politicas-aprovacao", element: protegido(R["/politicas-aprovacao"], pagina("politicas")) },
             ],
           },
         ],

@@ -61,11 +61,15 @@ const LEITURAS = [
   "/finance/receipts?page=1&pageSize=25",
   "/finance/proformas",
   "/finance/receivables/overdue",
+  // F4
+  "/approval/requests?page=1&pageSize=25",
+  "/approval/policies",
 ];
 // Leituras de detalhe a partir do primeiro elemento de uma listagem.
 const DETALHES = [
   ["/hr/employees?page=1&pageSize=25", "employeeId", ["/hr/employees/{id}", "/hr/employees/{id}/account-history"]],
   ["/hr/positions?page=1&pageSize=25", "positionId", ["/hr/positions/{id}/assignments"]],
+  ["/approval/requests?page=1&pageSize=25", "requestId", ["/approval/requests/{id}", "/approval/requests/{id}/history"]],
 ];
 // 403/404 aceites: conta sem ficha de colaborador; dados da empresa por declarar.
 const ACEITES = { "/portal/me": [403], "/fiscal/tax-entity": [404] };

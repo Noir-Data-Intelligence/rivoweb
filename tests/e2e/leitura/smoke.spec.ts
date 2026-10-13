@@ -11,7 +11,7 @@ const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 test.skip(process.env.RIVO_SMOKE_PRODUCAO !== "1", "Só com RIVO_SMOKE_PRODUCAO=1.");
 
-test("login → ecrãs da F0 à F3 → logout, sem escritas", async ({ page }) => {
+test("login → ecrãs da F0 à F4 → logout, sem escritas", async ({ page }) => {
   const bloqueados: string[] = [];
   await page.route(`${API}/**`, async (route) => {
     const req = route.request();
@@ -49,6 +49,9 @@ test("login → ecrãs da F0 à F3 → logout, sem escritas", async ({ page }) =
     ["/recibos", "Recibos"],
     ["/a-receber", "A receber"],
     ["/facturacao", "Configuração da facturação"],
+    // F4
+    ["/aprovacoes", "Aprovações"],
+    ["/politicas-aprovacao", "Políticas de aprovação"],
   ] as const) {
     await page.goto(caminho);
     await expect(page.getByRole("heading", { name: titulo, level: 1 })).toBeVisible();

@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BellRing, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { BellRing, CheckSquare, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -22,6 +22,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
   backoffice: [
     { caminho: "/", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
     { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: R["/dashboard"] },
+    { caminho: "/aprovacoes", titulo: "Aprovações", icone: CheckSquare, requer: R["/aprovacoes"] },
     { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: R["/alertas"] },
     { caminho: "/clientes", titulo: "Clientes", icone: Handshake, requer: R["/clientes"], grupo: "Vendas" },
     { caminho: "/facturas", titulo: "Facturas", icone: FileText, requer: R["/facturas"], grupo: "Vendas" },
@@ -41,6 +42,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
       grupo: "Administração",
     },
     { caminho: "/facturacao", titulo: "Facturação", icone: SlidersHorizontal, requer: R["/facturacao"], grupo: "Administração" },
+    { caminho: "/politicas-aprovacao", titulo: "Políticas de aprovação", icone: ListChecks, requer: R["/politicas-aprovacao"], grupo: "Administração" },
   ],
   colaborador: [{ caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
   cliente: [{ caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],

@@ -42,6 +42,9 @@ function Contador({ rotulo, valor, icone: Icone, para }: { rotulo: string; valor
 
 export function ResumoPessoal({ prefixo }: { prefixo: string }) {
   const meu = useMeuPainel();
+  const { pode } = useUtilizador();
+  // A caixa de aprovações está no backoffice (prefixo «/»).
+  const podeAprovacoes = prefixo === "/" && pode("approval.requests.read");
   if (meu.isPending) {
     return (
       <div className="grid gap-3 sm:grid-cols-2" aria-label="A carregar o painel">
@@ -55,7 +58,7 @@ export function ResumoPessoal({ prefixo }: { prefixo: string }) {
     <div className="flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <Contador rotulo="Notificações por ler" valor={Number(meu.data.unreadNotifications)} icone={Bell} para={`${prefixo}notificacoes`} />
-        <Contador rotulo="Aprovações à sua espera" valor={Number(meu.data.pendingApprovals)} icone={CheckSquare} />
+        <Contador rotulo="Aprovações à sua espera" valor={Number(meu.data.pendingApprovals)} icone={CheckSquare} {...(podeAprovacoes ? { para: "/aprovacoes" } : {})} />
       </div>
       <Anuncios anuncios={meu.data.announcements} />
     </div>

@@ -1503,3 +1503,32 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   correcto, e importação com `;`. **Nenhum documento fiscal emitido em
   produção.**
 - **Testes:** 103 unitários; 50 cenários e2e × 3 motores.
+
+### F4 — o que mudou face ao plano, e porquê
+
+| Tema | Plano | Execução | Porquê |
+|---|---|---|---|
+| Caixa | `pendingFor` | «À minha espera» (por omissão) usa o colaborador da conta, lido de `/dashboard/me`; «Todos» lista sem filtro; filtro por tipo | `/dashboard/me` não exige permissão. Sem ficha ligada, a caixa própria explica que só um colaborador decide |
+| Decidir | `{ action, notes }` | Aprovar, Rejeitar ou Pedir esclarecimento; rejeitar e pedir esclarecimento exigem notas | Quem submeteu lê o motivo |
+| Quem pediu | — | Não vê os botões de decisão, mesmo ocupando o cargo aprovador; vê «Cancelar o pedido» | **Encontrado na base local:** a aprovadora promovida a si própria via os botões, e o servidor recusaria sempre (BR-2) |
+| 409 | Recarrega e mostra «Outra pessoa decidiu primeiro» | O aviso fica ao nível da página | **Encontrado na base local:** o 409 recarregava, o pedido fechado escondia o cartão e o aviso desaparecia com ele |
+| Depois de decidir | B14 | Numa atribuição de cargo, quem pode atribuir cargos antecipa `…/approval-outcome` (melhor esforço; o processo de fundo aplica em 60 s). Os outros processos aplicam-se nos ecrãs das suas fases | B14 respondido: idempotentes |
+| Nomes | — | Só quem lê colaboradores vê nomes; os outros vêem «Colaborador» ou «Você» | Os pedidos só trazem ids (B19) |
+| Acessibilidade no e2e | — | O auxiliar do axe afasta o rato e desliga transições antes de medir | O axe media o botão a meio de `transition-colors` depois de mudar o tema e acusava contraste que os estados finais não têm |
+
+### F4 — estado
+
+- **Ecrãs:** caixa de aprovações (à minha espera, todos, por tipo), ficha do
+  pedido (estado, passos com modo e prazo, aprovadores, decisões com notas,
+  decidir, cancelar o próprio), políticas de aprovação (lista, criar com
+  processo, departamento, faixa de valores, verificação de orçamento e passos
+  por cargo; desactivar). O contador «Aprovações à sua espera» do Início abre a
+  caixa.
+- **Leituras em produção:** 469 pedidos e 7 políticas lidos a 2026-10-13, com
+  ficha e histórico (200).
+- **Escritas:** verificadas **na base local** (`f4-escritas.spec.ts`), com dois
+  colaboradores: a atribuição de um cargo com autoridade vai para aprovação
+  (202); quem pediu não decide (403, BR-2, também sem botões) e cancela;
+  decisão simultânea em duas abas (409, aviso visível); depois da aprovação, o
+  cargo fica em vigor no RH. Nenhuma decisão em produção.
+- **Testes:** 103 unitários; 57 cenários e2e × 3 motores.
