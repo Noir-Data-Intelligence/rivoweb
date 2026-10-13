@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BellRing, BriefcaseBusiness, Building2, Gauge, Home, KeyRound, Settings, UserCog, Users } from "lucide-react";
+import { BellRing, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -23,6 +23,12 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
     { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: R["/dashboard"] },
     { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: R["/alertas"] },
+    { caminho: "/clientes", titulo: "Clientes", icone: Handshake, requer: R["/clientes"], grupo: "Vendas" },
+    { caminho: "/facturas", titulo: "Facturas", icone: FileText, requer: R["/facturas"], grupo: "Vendas" },
+    { caminho: "/proformas", titulo: "Pró-formas", icone: FileClock, requer: R["/proformas"], grupo: "Vendas" },
+    { caminho: "/notas-credito", titulo: "Notas de crédito", icone: FileMinus, requer: R["/notas-credito"], grupo: "Vendas" },
+    { caminho: "/recibos", titulo: "Recibos", icone: Receipt, requer: R["/recibos"], grupo: "Vendas" },
+    { caminho: "/a-receber", titulo: "A receber", icone: Hourglass, requer: R["/a-receber"], grupo: "Vendas" },
     { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: R["/colaboradores"], grupo: "Pessoas" },
     { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: R["/departamentos"], grupo: "Pessoas" },
     { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: R["/cargos"], grupo: "Pessoas" },
@@ -34,6 +40,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
       requer: R["/configuracoes"],
       grupo: "Administração",
     },
+    { caminho: "/facturacao", titulo: "Facturação", icone: SlidersHorizontal, requer: R["/facturacao"], grupo: "Administração" },
   ],
   colaborador: [{ caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
   cliente: [{ caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],

@@ -1,6 +1,6 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0, F1 e F2** concluídas e publicadas em
+> **Estado:** fases **F0 a F3** concluídas e publicadas em
 > `https://rivoweb-coral.vercel.app` · actualizado a 2026-10-13.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
@@ -22,13 +22,13 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Alertas, Configurações |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Configurações, Facturação |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Alertas |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas |
-| **Sales** (Vendas) | Gestão (`/`) | Início |
+| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início |
 | **Cliente** | Portal do cliente (`/cliente`) | Início |
@@ -62,6 +62,24 @@ AM = AssetManager.
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
 | Resolver alertas; criar, rever e desactivar regras; avaliar agora | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| **Clientes** | | | | | | | | | | |
+| Ver a lista (com inactivos) e a ficha, com contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| **Facturas** | | | | | | | | | | |
+| Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| Nova factura: rascunhos FT, FR e ND, e emitir | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | — ⁴ | — | — | — |
+| Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Emitir notas de crédito a partir da factura | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Registar recebimentos (recibos) a partir da factura | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Notas de crédito e recibos:** ver listas, fichas e PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| **Pró-formas:** ver | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| **Pró-formas:** criar, converter em factura e anular | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| **A receber:** facturas vencidas em aberto | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| **Facturação:** ver séries e canais de pagamento | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| **Facturação:** abrir séries; criar e rever canais | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Facturação:** ver as taxas de IVA | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Colaboradores** | | | | | | | | | | |
 | Ver a lista e a ficha | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Admitir; corrigir nome; mudar contactos, departamento e estado | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -89,6 +107,7 @@ Recursos Humanos.»
 ² Só se a conta estiver associada a um cliente; sem associação, o portal diz
 «Esta conta não está associada a um cliente. Fale com a empresa.»
 ³ Excepto em contas SuperAdmin, que só um SuperAdmin gere.
+⁴ A Sales não lê as taxas de IVA: vê o líquido, e o IVA calcula-se na emissão (B16).
 
 ---
 
@@ -174,6 +193,43 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   cliente a terminar, contratos de trabalho a terminar, documentos de
   identificação a caducar, férias por decidir perto do início.
 
+**Clientes**
+- Lista paginada (nome, NIF, cidade, tipo, estado), com ou sem inactivos.
+- **Registar** (nome, NIF, morada de facturação, cidade, país, e-mail, telefone,
+  sector, sítio, pessoa de contacto, tipo) e **importar de um CSV** separado por
+  vírgulas (Nome, NIF, Morada, Cidade, Pais), com o resultado linha a linha.
+- Ficha: **corrigir os dados** (o NIF não se corrige), **desactivar e
+  reactivar**, **eliminar** (só sem história; com história oferece desactivar),
+  **contactos** (criar, rever, remover; decide compras; contacto de facturação)
+  e ligação às facturas do cliente.
+
+**Facturas**
+- Emitidas: lista paginada com filtros por cliente e por datas.
+- **Nova factura** (rascunho): cliente ou consumidor final; tipo FT, FR
+  (factura-recibo, com meio de pagamento) ou ND (nota de débito, sobre uma
+  factura em vigor do mesmo cliente); série; moeda (AOA, USD, EUR);
+  vencimento; condições; retenção na fonte; linhas (descrição, quantidade,
+  preço, imposto); notas internas. Totais previstos com a taxa em vigor.
+  **Guardar rascunho**, **eliminar rascunho**, **emitir** com confirmação («fica
+  registado e não se apaga») e escolha da data.
+- Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido, em
+  aberto), **PDF**, **enviar ao cliente** por e-mail, **nota de crédito** (com
+  as quantidades a creditar e o motivo), **registar recebimento** (valor, meio,
+  data, notas) e **anular** com motivo.
+- Um clique duplo nunca emite dois documentos.
+
+**Notas de crédito** e **Recibos**
+- Listas (recibos com filtro por datas) e fichas com **PDF**, **enviar ao
+  cliente** e **anular**.
+
+**Pró-formas**
+- Lista por estado (em aberto, convertidas, anuladas) e detalhe.
+- **Criar** (cliente registado ou destinatário sem registo, validade, moeda,
+  linhas, notas), **converter** em factura ou factura-recibo e **anular**.
+
+**A receber**
+- Facturas vencidas com saldo em aberto, dias de atraso e totais por moeda.
+
 **Colaboradores**
 - Lista paginada (nome, n.º, departamento, admissão, conta ligada, estado).
 - **Admitir** (nome, departamento, data, e-mail, telefone, n.º mecanográfico).
@@ -202,6 +258,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   razão (fica na trilha); **enviar ligação de recuperação**; **definir uma
   password** por outra pessoa, atrás de confirmação. Não pode desactivar a
   própria conta.
+
+**Facturação** (configuração)
+- **Séries de numeração**: ver e **abrir** (tipo e código).
+- **Canais de pagamento**: ver, **criar** e **rever** (nome, mecanismo, origem,
+  activo).
+- **Taxas de IVA**: só leitura, com as versões em vigor.
 
 **Configurações**
 - **Dados da empresa** (razão social, NIF, endereço, cidade, país, nome
@@ -238,6 +300,18 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Alertas**
 - Ver alertas e regras.
 
+**Facturas**
+- Ver as emitidas, a ficha, o saldo e o **PDF**.
+- **Anular**, emitir **notas de crédito** e **registar recebimentos** a partir
+  da factura. Não cria facturas, não envia ao cliente e não abre a ficha do
+  cliente.
+
+**Notas de crédito**, **Recibos**, **Pró-formas** e **A receber**
+- Ver (listas, fichas e PDF); **anular** notas de crédito e recibos.
+
+**Facturação**
+- Ver séries, canais de pagamento e taxas de IVA.
+
 **Configurações**
 - Só **Dados da empresa**: ver, **declarar** e **corrigir**.
 
@@ -262,6 +336,28 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 ### Sales (Vendas)
 **Início**
 - Resumo pessoal e indicadores de **Finanças** e de **Vendas**.
+
+**Clientes**
+- Tudo o que o Admin faz em Clientes (ver, registar, importar, corrigir,
+  desactivar, eliminar sem história, contactos).
+
+**Facturas**
+- Ver; **nova factura** (rascunhos FT, FR, ND) e **emitir**. Vê o líquido; o
+  IVA calcula-se na emissão (não lê as taxas).
+- **PDF** e **enviar ao cliente**. Não anula, não emite notas de crédito nem
+  regista recebimentos.
+
+**Notas de crédito** e **Recibos**
+- Ver, **PDF** e **enviar ao cliente**.
+
+**Pró-formas**
+- Ver, **criar**, **converter** em factura e **anular**.
+
+**A receber**
+- Ver as vencidas.
+
+**Facturação**
+- Ver séries e canais de pagamento.
 
 ### ProjectManager (Gestão de projectos)
 **Início**
@@ -291,7 +387,6 @@ entra neste documento quando estiver publicada.
 
 | Fase | Área |
 |---|---|
-| F3 | Clientes e facturação |
 | F4 | Aprovações (caixa de decisão; hoje só aparece a contagem no Início) |
 | F5 | Tesouraria, despesas, contas a pagar, pedidos de pagamento, carregamento de ficheiros |
 | F6 | Fiscal e contabilidade |

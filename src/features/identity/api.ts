@@ -2,9 +2,10 @@
  * Hooks de identidade. Os ecrãs usam estes hooks e nunca o cliente HTTP
  * directamente (§1.3).
  */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSyncExternalStore } from "react";
 import { queryClient } from "@/app/queryClient";
+import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { hojeIso } from "@/lib/format/data";
@@ -37,7 +38,7 @@ export function useMe() {
 }
 
 export function useEntrar() {
-  return useMutation({
+  return useEscrita({
     mutationFn: async (dados: { email: string; password: string }) => {
       const r = await ler(api.POST("/identity/login", { body: dados }));
       queryClient.clear();
@@ -62,27 +63,27 @@ export function sair(motivo: MotivoFim = "saiu"): void {
 }
 
 export function usePedirRecuperacao() {
-  return useMutation({
+  return useEscrita({
     mutationFn: (email: string) => enviar(api.POST("/identity/password-recovery", { body: { email } })),
   });
 }
 
 export function useConcluirRecuperacao() {
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { userId: string; token: string; password: string }) =>
       enviar(api.POST("/identity/password-recovery/completion", { body: dados })),
   });
 }
 
 export function useAceitarConvite() {
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { userId: string; token: string; password: string }) =>
       enviar(api.POST("/identity/invitations/acceptance", { body: dados })),
   });
 }
 
 export function useMudarPassword() {
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { currentPassword: string; newPassword: string }) =>
       enviar(api.POST("/identity/me/password", { body: dados })),
   });
@@ -97,7 +98,7 @@ export function useSessoesActivas() {
 
 export function useTerminarSessao() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (sessionId: string) =>
       enviar(api.POST("/identity/me/sessions/{sessionId}/revocation", { params: { path: { sessionId } } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.sessoes }),

@@ -2,7 +2,8 @@
  * Administração de acesso e configurações (§5.1). Os ecrãs usam estes hooks e
  * nunca o cliente HTTP directamente (§1.3).
  */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler } from "@/lib/api/client";
 import { eApiError } from "@/lib/api/problem";
 import type { components } from "@/lib/api/schema";
@@ -42,7 +43,7 @@ export function usePerfis(activo = true) {
 
 export function useConvidar() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { email: string; profile: string }) => ler(api.POST("/identity/invitations", { body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.utilizadores }),
   });
@@ -50,7 +51,7 @@ export function useConvidar() {
 
 export function useMudarEstadoConta() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ userId, active, reason }: { userId: string; active: boolean; reason: string }) =>
       enviar(api.POST("/identity/users/{userId}/status", { params: { path: { userId } }, body: { active, reason } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.utilizadores }),
@@ -59,7 +60,7 @@ export function useMudarEstadoConta() {
 
 export function useAtribuirPerfil() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ userId, profile }: { userId: string; profile: string }) =>
       enviar(api.POST("/identity/users/{userId}/roles", { params: { path: { userId } }, body: { profile } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.utilizadores }),
@@ -69,7 +70,7 @@ export function useAtribuirPerfil() {
 /** Retirar um perfil termina as sessões da pessoa (ADR-070). */
 export function useRetirarPerfil() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ userId, profile }: { userId: string; profile: string }) =>
       enviar(api.POST("/identity/users/{userId}/roles/{profile}/removal", { params: { path: { userId, profile } } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.utilizadores }),
@@ -78,7 +79,7 @@ export function useRetirarPerfil() {
 
 /** Reposição por um administrador: termina todas as sessões da pessoa (ADR-059/065). */
 export function useReporPassword() {
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ userId, newPassword }: { userId: string; newPassword: string }) =>
       enviar(api.POST("/identity/users/{userId}/password-reset", { params: { path: { userId } }, body: { newPassword } })),
   });
@@ -86,7 +87,7 @@ export function useReporPassword() {
 
 /** O caminho por omissão: a própria pessoa recebe a ligação e define a password. */
 export function useEnviarLigacaoRecuperacao() {
-  return useMutation({
+  return useEscrita({
     mutationFn: (email: string) => enviar(api.POST("/identity/password-recovery", { body: { email } })),
   });
 }
@@ -117,14 +118,14 @@ export function useDadosEmpresa(activo = true) {
 
 export function useGuardarDadosEmpresa() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: PedidoDadosEmpresa) => ler(api.PUT("/fiscal/tax-entity", { body: dados })),
     onSuccess: (r) => qc.setQueryData(chaves.empresa, r),
   });
 }
 
 export function useTestarCorreio() {
-  return useMutation({
+  return useEscrita({
     mutationFn: () => ler(api.POST("/debug/email/test")),
   });
 }

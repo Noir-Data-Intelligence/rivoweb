@@ -1,30 +1,55 @@
 # Pedidos ao backend
 
 > 2026-10-13 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `4f48955` (PRs #94 a #98 fundidos). O resto do que
-> foi pedido já está atendido e publicado.
+> Revisto contra `main` @ `c725f40`. O B15 (nome duplicado devolve 500) está
+> resolvido no `main` (PR #99); sai desta lista quando for publicado.
 
-## B15 — Nome duplicado de departamento ou cargo devolve `500`
+## B16 — O rascunho de factura não calcula o IVA
 
-**Estado:** em aberto (nada em `main` trata o caso).
+**Facto:** `GET /finance/invoice-drafts/{id}` devolve as linhas com
+`taxPercentage: null` e `tax: 0`, e `netTotal` só com o líquido
+(`ManageInvoiceDrafts.Apply` cria `DraftLine` sem taxa). O IVA só se determina
+ao emitir.
 
-Criar um departamento com um nome que já existe responde **500** («Ocorreu um
-erro no servidor»). No log da API local:
+**Consequência:** quem emite e não tem `fiscal.rates.read` (o perfil **Sales**)
+não vê o IVA nem o total antes de emitir: o front mostra «IVA calculado na
+emissão». O Admin vê a previsão porque o front lê as taxas.
 
-```
-SqlException: Cannot insert duplicate key row in object 'hr.department'
-with unique index 'ix_department_name'.
-```
+**Pedido:** ao gravar o rascunho, determinar a taxa de cada linha (à data de
+hoje, ou à data prevista) e devolver `taxPercentage`, `tax`, e também
+`taxTotal` e `grossTotal` no `InvoiceDraftView`. O front passa a mostrar os
+totais do servidor antes de emitir, para todos os perfis.
 
-O cargo tem o mesmo índice único (`position.HasIndex(p => p.Name).IsUnique()`
-em `HrDbContext.cs`), também sem tratamento. Corrigir (`PUT`) um ou outro para
-um nome já usado cai no mesmo erro.
+## B17 — O saldo da factura ignora a retenção na fonte
 
-**Pedido:** responder `409` com Problem Details e um `detail` legível (por
-exemplo «Já existe um departamento com este nome.») em `POST` e `PUT` de
-`/hr/departments` e `/hr/positions`. Vale a pena rever outros índices únicos
-sem tratamento, como o dos benefícios (`benefit.HasIndex(b => b.Name)`).
+**Facto (base local):** factura de 2 500,25 Kz de líquido, IVA 350,04 Kz,
+retenção 6,5 % = 162,52 Kz, **a pagar 2 687,77 Kz**. Depois de um recibo de
+1 000,00 Kz, `GET /finance/sales-invoices/{id}/balance` devolve
+`invoiced: 2850.29`, `outstanding: 1850.29`. `GetInvoiceBalance` usa
+`GrossTotal`; a retenção nunca entra.
 
-**No front, até lá:** o formulário avisa antes de enviar se o nome já existe na
-lista carregada (até 200 registos). Não cobre duas pessoas a criar o mesmo nome
-ao mesmo tempo.
+**Consequência:** uma factura com retenção **nunca fica liquidada** com
+recibos: o cliente paga 2 687,77 e ficam 162,52 em aberto para sempre (e a
+factura aparece em «A receber», nos alertas de vencidas e no dashboard). E o
+recibo aceita receber mais do que o valor a pagar.
+
+**Pedido:** decidir como se fecha a parte retida (por exemplo: o saldo usa
+`AmountPayable`; ou um registo próprio do certificado de retenção que liquida a
+diferença) e aplicar o mesmo em `/balance`, `/receivables/overdue` e no
+dashboard. Até lá, o front avisa na ficha que o saldo inclui a retenção.
+
+## B18 — Importação CSV só aceita vírgula
+
+**Facto:** `CsvDocument` separa por vírgula. O Excel em português (Angola,
+Portugal) grava CSV com **ponto e vírgula**, e o ficheiro é recusado com «O
+cabeçalho tem de incluir as colunas…».
+
+**Pedido:** detectar o separador pelo cabeçalho (`;` ou `,`). O front já diz
+que o separador é a vírgula.
+
+## Nota operacional (não é defeito)
+
+`GET /fiscal/tax-entity` em produção responde **404**: os dados fiscais da
+empresa não estão declarados desde a recriação da base. Emitir documentos
+fiscais em produção precisa deles. Declaram-se em Configurações › Dados da
+empresa (Admin ou Finance).

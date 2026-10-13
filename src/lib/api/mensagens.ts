@@ -12,8 +12,12 @@ export function mensagemErro(e: unknown): MensagemErro {
   if (e.tipo === "tempo") return { titulo: "O servidor demorou demasiado a responder.", detalhe: "Tente de novo.", codigoSuporte: null };
   const codigo = e.traceId;
   switch (e.status) {
-    case 400:
-      return { titulo: e.title ?? "Há dados por corrigir.", detalhe: e.detail, codigoSuporte: null };
+    case 400: {
+      // O título genérico do ASP.NET não diz nada; o motivo vem em `errors`.
+      const motivos = Object.values(e.errors).flat().join(" ");
+      const generico = !e.title || /validation errors occurred/i.test(e.title);
+      return { titulo: generico ? "Há dados por corrigir." : (e.title as string), detalhe: e.detail ?? (motivos || null), codigoSuporte: null };
+    }
     case 401:
       return { titulo: "A sessão terminou. Entre de novo.", detalhe: null, codigoSuporte: null };
     case 403:

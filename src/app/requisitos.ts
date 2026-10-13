@@ -21,6 +21,17 @@ export const REQUISITO_PAGINA = {
   "/cargos": "hr.positions.read",
   "/utilizadores": "identity.users.read",
   "/configuracoes": { anyOf: Object.values(CARTOES_CONFIGURACOES) },
+  // F3 — clientes e facturação (§5.4).
+  "/clientes": "commercial.customers.read",
+  "/facturas": "finance.invoices.read",
+  "/proformas": "finance.invoices.read",
+  "/notas-credito": "finance.invoices.read",
+  "/recibos": "finance.receipts.read",
+  "/a-receber": "finance.invoices.read",
+  "/facturacao": { anyOf: ["finance.invoices.read", "fiscal.rates.read"] },
 } as const satisfies Record<string, Requisito>;
+
+/** Criar documentos: escrever facturas e escolher o cliente. */
+export const REQUISITO_NOVA_FACTURA = { allOf: ["finance.invoices.write", "commercial.customers.read"] } as const satisfies Requisito;
 
 export type PaginaProtegida = keyof typeof REQUISITO_PAGINA;

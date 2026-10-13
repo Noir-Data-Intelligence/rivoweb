@@ -2,8 +2,9 @@
  * Notificações (§5.3). Sem tempo real (B11): o sino actualiza por polling de
  * 60 s, só com o documento visível e interacção nos últimos 5 min.
  */
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { podeFazerPolling } from "@/lib/auth/actividade";
@@ -57,7 +58,7 @@ export function useNotificacoes(p: { pagina: number; tamanho: number; soPorLer: 
 
 export function useMarcarLida() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (notificationId: string) => enviar(api.POST("/notifications/{notificationId}/read", { params: { path: { notificationId } } })),
     onSettled: () => qc.invalidateQueries({ queryKey: chaves.todas }),
   });
@@ -65,7 +66,7 @@ export function useMarcarLida() {
 
 export function useMarcarTodasLidas() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: () => ler(api.POST("/notifications/read-all")),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: chaves.todas });
@@ -83,7 +84,7 @@ export function usePreferencias() {
 
 export function useGuardarPreferencias() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (emailEnabled: boolean) => enviar(api.PUT("/notifications/me/preferences", { body: { emailEnabled } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.preferencias }),
   });

@@ -12,10 +12,15 @@ const API_SIMULADA = "http://localhost:5080";
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
+  // Localmente, muitos Firefox em paralelo esgotavam o compositor por software
+  // (GraphicsCriticalError, SWGL) e falhavam testes que passam sozinhos.
+  workers: process.env.CI ? undefined : 4,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { trace: "retain-on-failure", locale: "pt-AO", timezoneId: "Africa/Luanda" },
+  // Três motores em paralelo numa só máquina: 5 s davam esperas falhadas por carga.
+  expect: { timeout: 10_000 },
   webServer: {
     command: "node scripts/serve-dist.mjs",
     url: "http://localhost:4173/entrar",

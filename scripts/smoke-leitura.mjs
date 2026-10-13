@@ -49,6 +49,18 @@ const LEITURAS = [
   "/notifications/me/preferences",
   "/alerts/rules",
   "/alerts/events?openOnly=true&limit=200",
+  // F3
+  "/commercial/customers?page=1&pageSize=25",
+  "/finance/series?page=1&pageSize=50",
+  "/finance/payment-channels",
+  "/fiscal/tax-rates?page=1&pageSize=50",
+  `/fiscal/tax-rates/determination?taxCode=NOR&taxPointDate=${HOJE}`,
+  "/finance/invoice-drafts",
+  "/finance/sales-invoices?page=1&pageSize=25",
+  "/finance/credit-notes?page=1&pageSize=25",
+  "/finance/receipts?page=1&pageSize=25",
+  "/finance/proformas",
+  "/finance/receivables/overdue",
 ];
 // Leituras de detalhe a partir do primeiro elemento de uma listagem.
 const DETALHES = [

@@ -1,5 +1,6 @@
 /** Alertas (§5.3): eventos e regras. */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 
@@ -44,7 +45,7 @@ export type PedidoRegra = { name: string; kind: string | null; thresholdDays: nu
 
 export function useCriarRegra() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (r: PedidoRegra) => ler(api.POST("/alerts/rules", { body: r })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.regras }),
   });
@@ -53,7 +54,7 @@ export function useCriarRegra() {
 /** O tipo de uma regra não muda: na revisão, `kind` é ignorado pelo servidor. */
 export function useReverRegra() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ ruleId, ...r }: PedidoRegra & { ruleId: string }) => enviar(api.PUT("/alerts/rules/{ruleId}", { params: { path: { ruleId } }, body: r })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.regras }),
   });
@@ -61,7 +62,7 @@ export function useReverRegra() {
 
 export function useResolver() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (alertId: string) => enviar(api.POST("/alerts/events/{alertId}/resolution", { params: { path: { alertId } } })),
     onSettled: () => qc.invalidateQueries({ queryKey: chaves.todos }),
   });
@@ -70,7 +71,7 @@ export function useResolver() {
 /** Avalia já todas as regras activas (o servidor fá-lo também em ciclo). */
 export function useAvaliar() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: () => ler(api.POST("/alerts/evaluation")),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.todos }),
   });

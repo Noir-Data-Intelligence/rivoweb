@@ -2,7 +2,8 @@
  * Núcleo organizacional de RH (§5.2): departamentos, cargos, colaboradores,
  * ligação de conta e atribuição de cargo. O resto do RH fica na F7.
  */
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler, lerComVersao, lerPagina, seVersao } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 
@@ -88,7 +89,7 @@ export function useOcupacoes(positionId: string | null) {
 
 export function useCriarDepartamento() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { name: string; managerId: string | null }) => ler(api.POST("/hr/departments", { body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.departamentos }),
   });
@@ -96,7 +97,7 @@ export function useCriarDepartamento() {
 
 export function useCorrigirDepartamento() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ departmentId, ...dados }: { departmentId: string; name: string; managerId: string | null }) =>
       enviar(api.PUT("/hr/departments/{departmentId}", { params: { path: { departmentId } }, body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.departamentos }),
@@ -105,7 +106,7 @@ export function useCorrigirDepartamento() {
 
 export function useCriarCargo() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: { name: string; hierarchyLevel: number; grantsApprovalAuthority: boolean }) => ler(api.POST("/hr/positions", { body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.cargos }),
   });
@@ -114,7 +115,7 @@ export function useCriarCargo() {
 /** A autoridade de aprovação não se corrige: fixa-se ao criar o cargo. */
 export function useCorrigirCargo() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ positionId, ...dados }: { positionId: string; name: string; hierarchyLevel: number }) =>
       enviar(api.PUT("/hr/positions/{positionId}", { params: { path: { positionId } }, body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.cargos }),
@@ -123,7 +124,7 @@ export function useCorrigirCargo() {
 
 export function useAdmitir() {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (dados: PedidoAdmissao) => ler(api.POST("/hr/employees", { body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.colaboradores }),
   });
@@ -132,7 +133,7 @@ export function useAdmitir() {
 /** Escritas sobre um colaborador: levam `If-Match` quando a ficha veio com versão (ADR-080). */
 function useEscritaColaborador<V>(executar: (employeeId: string, versao: string | null, v: V) => Promise<unknown>, employeeId: string, versao: string | null) {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: (v: V) => executar(employeeId, versao, v),
     onSettled: () => qc.invalidateQueries({ queryKey: chaves.colaboradores }),
   });
@@ -198,7 +199,7 @@ export type ResultadoAtribuicao =
  */
 export function useAtribuirCargo(employeeId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: async ({
       directa,
       ...body
@@ -234,7 +235,7 @@ export function useAtribuirCargo(employeeId: string) {
  */
 export function useVerificarDecisao(employeeId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: async ({ assignmentId }: { assignmentId: string; positionId: string }) => {
       const r = await api.POST("/hr/position-assignments/{assignmentId}/approval-outcome", { params: { path: { assignmentId } } });
       const dados = await ler(Promise.resolve(r));
@@ -249,7 +250,7 @@ export function useVerificarDecisao(employeeId: string) {
 
 export function useEncerrarCargo(employeeId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useEscrita({
     mutationFn: ({ assignmentId, endedOn }: { assignmentId: string; positionId: string; endedOn: string | null }) =>
       enviar(api.POST("/hr/position-assignments/{assignmentId}/closure", { params: { path: { assignmentId } }, body: { endedOn } })),
     onSuccess: (_r, v) => {

@@ -1461,3 +1461,42 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   contas de QA (`tests/e2e/leitura/perfis.spec.ts`): o menu de cada perfil é
   exactamente o esperado e cada página do menu abre sem erro. Só leituras,
   login e logout. **F2 aceite** do lado técnico.
+
+### F3 — o que mudou face ao plano, e porquê
+
+| Tema | Plano | Execução | Porquê |
+|---|---|---|---|
+| Emissão | Rascunho → emitir | Sempre por rascunho: «Guardar rascunho» e «Emitir…» (grava primeiro o que está no ecrã e emite exactamente isso). `POST /finance/sales-invoices` directo não se usa | O rascunho é a única via com rasto e revisão antes do número |
+| Totais antes de emitir | Pré-visualização com `Big` | Igual, com as regras do servidor (linha a linha, 2 casas, meio para cima; retenção sobre o líquido). **Só para quem lê as taxas** (`fiscal.rates.read`); para Sales, «IVA calculado na emissão» | **Facto:** o rascunho não calcula o IVA e a Sales não lê as taxas (B16) |
+| Códigos de imposto | `NOR` | Os códigos de IVA lidos da API, sem `ISE`/`NS` (exigem código de isenção, 501); quem não lê as taxas vê só `NOR` | ADR-011: os códigos são dados |
+| Duplo envio | Botão bloqueado | **Trinco síncrono em todas as escritas** (`lib/api/escrita.ts`, `useEscrita`) | **Provado no e2e:** clique duplo em «Emitir documento» com a rede lenta fazia dois `POST …/issue` (seriam dois documentos fiscais). `isPending` só muda depois de o React voltar a desenhar |
+| Erros 400 | `title` + `detail` | Quando o `title` é o genérico do ASP.NET, o painel mostra os motivos de `errors` | A emissão recusada mostrava só «One or more validation errors occurred.» |
+| Recibos | Ecrã de recibos com criação | Registam-se a partir da factura, um recibo por factura, com o valor em aberto por omissão | A Finance não lê clientes; partir da factura dá o cliente e o saldo certos. Recibos de várias facturas ficam para quando houver pedido |
+| Notas de crédito | — | A partir da factura, com as quantidades a creditar (até à quantidade original) e o motivo | — |
+| Contas de cliente e documentos partilhados | — | Ficam para a F10 (portal do cliente) | Como no plano |
+| Chunk inicial | 150 KB | 149,3 KB; os carregadores das páginas passam para um módulo diferido (`app/paginas.ts`) | Cada `import()` no router deixava no chunk inicial o caminho e a lista de dependências: as 16 rotas da F3 punham-no em 150,2 KB. Agora as rotas novas não pesam no chunk inicial |
+| Tempo de espera do e2e | 5 s | 10 s | Três motores em paralelo numa só máquina davam esperas falhadas por carga |
+| Saldo com retenção | — | A ficha avisa «Inclui a retenção na fonte» | **Facto** (base local): o saldo do servidor ignora a retenção (B17) |
+| Importação CSV | — | Separada por vírgulas | **Facto:** o backend só aceita vírgula (B18) |
+
+### F3 — estado
+
+- **Ecrãs:** clientes (lista paginada, inactivos, registo, importação CSV,
+  ficha com correcção, estado, eliminar com 409 → desactivar, contactos),
+  facturas (emitidas com filtros por cliente e datas; rascunhos), editor de
+  rascunho (FT, FR, ND; cliente ou consumidor final; série; moeda; vencimento;
+  retenção; meio de pagamento; factura referenciada; linhas; totais previstos;
+  emissão confirmada), ficha da factura (linhas e totais do servidor, saldo,
+  PDF, envio ao cliente, nota de crédito, recibo, anulação), notas de crédito e
+  recibos (listas e fichas com PDF, envio e anulação), pró-formas (lista por
+  estado, criação, conversão em FT/FR, anulação), a receber (vencidas, totais
+  por moeda) e configuração da facturação (séries, canais, taxas de IVA).
+- **Leituras em produção:** todas as rotas `GET` da F3 deram 200 a 2026-10-13
+  (incluindo a determinação de `NOR`).
+- **Escritas:** verificadas **na base local** (`f3-escritas.spec.ts`), num
+  browser real: cliente, rascunho, emissão (com clique duplo: um só
+  documento), totais do servidor iguais aos previstos ao cêntimo, PDF, envio
+  recusado sem SMTP (501), recibo parcial, nota de crédito e a sua anulação,
+  pró-forma convertida em factura-recibo e importação CSV (importado e
+  duplicado). **Nenhum documento fiscal emitido em produção.**
+- **Testes:** 103 unitários; 49 cenários e2e × 3 motores.

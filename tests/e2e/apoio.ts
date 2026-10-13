@@ -5,7 +5,7 @@ import { fichaColaborador, loginOk, meAdmin, sessoes } from "../fixtures/identid
 
 export const API = "http://localhost:5080";
 
-type Resposta = { status: number; corpo?: unknown; cabecalhos?: Record<string, string> };
+type Resposta = { status: number; corpo?: unknown; cabecalhos?: Record<string, string>; bruto?: { conteudo: string; tipo: string }; atrasoMs?: number };
 type Handler = (route: Route) => Resposta | Promise<Resposta>;
 
 export class ApiSimulada {
@@ -48,6 +48,11 @@ export class ApiSimulada {
         return;
       }
       const r = await h(route);
+      if (r.atrasoMs) await new Promise((ok) => setTimeout(ok, r.atrasoMs));
+      if (r.bruto) {
+        await route.fulfill({ status: r.status, headers: { ...cors, "Content-Type": r.bruto.tipo, ...r.cabecalhos }, body: r.bruto.conteudo });
+        return;
+      }
       await route.fulfill({
         status: r.status,
         headers: { ...cors, ...(r.corpo !== undefined ? { "Content-Type": "application/json" } : {}), ...r.cabecalhos },

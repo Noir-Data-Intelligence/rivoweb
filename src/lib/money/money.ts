@@ -51,3 +51,16 @@ export function lerDinheiroDigitado(texto: string, casas = 2): Dinheiro | null {
   if (casasDadas > casas) return null;
   return new Big(normal) as Dinheiro;
 }
+
+/**
+ * Decimal digitado que não é dinheiro (quantidades, percentagens), com até
+ * `casas` casas. Mesmas regras de leitura de `lerDinheiroDigitado`.
+ */
+export function lerDecimalDigitado(texto: string, casas: number): Big | null {
+  return lerDinheiroDigitado(texto, casas);
+}
+
+/** Texto decimal para a API, sem zeros à direita desnecessários («1.5», «2»). */
+export function decimalParaApi(v: Big): string {
+  return v.toString();
+}

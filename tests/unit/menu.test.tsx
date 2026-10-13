@@ -51,16 +51,16 @@ describe("menu por perfil (§3.2)", () => {
   it("cada perfil real vê só as entradas que pode abrir", () => {
     const visto = Object.fromEntries(perfis.map((p) => [p.name, menuDe(p)]));
     expect(visto).toEqual({
-      Admin: ["Início", "Dashboard executivo", "Alertas", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações"],
-      SuperAdmin: ["Início", "Dashboard executivo", "Alertas", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações"],
+      Admin: ["Início", "Dashboard executivo", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação"],
+      SuperAdmin: ["Início", "Dashboard executivo", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação"],
       AssetManager: ["Início", "Alertas"],
       Cliente: ["Início"],
       Colaborador: ["Início"],
-      Finance: ["Início", "Alertas", "Configurações"],
+      Finance: ["Início", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Configurações", "Facturação"],
       HR: ["Início", "Alertas", "Colaboradores", "Departamentos", "Cargos"],
       Manager: ["Início", "Dashboard executivo", "Alertas"],
       ProjectManager: ["Início"],
-      Sales: ["Início"],
+      Sales: ["Início", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Facturação"],
     });
   });
 
