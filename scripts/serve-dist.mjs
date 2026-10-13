@@ -7,6 +7,9 @@ import { extname, join, normalize } from "node:path";
 const PORTO = Number(process.env.PORT ?? 4173);
 const DIST = "dist";
 const cfg = JSON.parse(readFileSync("vercel.json", "utf8"));
+// Com `cleanUrls`, a Vercel deixa de servir `/index.html` e a reescrita do SPA
+// dá 404 em produção, embora funcionasse aqui. Falha logo, em vez de enganar.
+if (cfg.cleanUrls) throw new Error("vercel.json: cleanUrls parte a reescrita para /index.html na Vercel.");
 
 // A CSP de produção liga a https://syyt.tech; em teste local a API pode ser outra.
 const API_TESTE = process.env.API_TESTE ?? "";
@@ -42,7 +45,7 @@ createServer((req, res) => {
   }
   let ficheiro = normalize(join(DIST, caminho));
   if (!ficheiro.startsWith(normalize(DIST)) || !existsSync(ficheiro) || statSync(ficheiro).isDirectory()) {
-    const reescrita = cfg.rewrites.some((r) => regex(r.source).test(caminho));
+const reescrita = cfg.rewrites.some((r) => regex(r.source).test(caminho));
     if (!reescrita) {
       res.writeHead(404).end();
       return;
