@@ -19,6 +19,17 @@ export function msDesdeUltimoPedido(agora: number = performance.now()): number {
   return agora - ultimoPedido;
 }
 
+/**
+ * Pode fazer-se polling (§5.3)? Só com o documento visível **e** interacção
+ * real (teclado, rato, toque) depois do último pedido autenticado. Cada
+ * pedido autenticado desliza o prazo de inactividade (ADR-067): sem esta
+ * condição, o polling manteria viva a sessão de quem deixou o ecrã aberto.
+ * Com ela, o polling nunca prolonga a sessão para lá da última interacção.
+ */
+export function podeFazerPolling(visivel: boolean, interagiu: boolean = interagiuDepoisDoUltimoPedido()): boolean {
+  return visivel && interagiu;
+}
+
 /** Houve interacção real (teclado, rato, toque) depois do último pedido? */
 export function interagiuDepoisDoUltimoPedido(): boolean {
   return ultimaInteraccao > ultimoPedido;

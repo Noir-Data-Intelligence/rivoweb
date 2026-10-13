@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BriefcaseBusiness, Building2, Home, KeyRound, Settings, UserCog, Users } from "lucide-react";
+import { BellRing, BriefcaseBusiness, Building2, Gauge, Home, KeyRound, Settings, UserCog, Users } from "lucide-react";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
 export type EntradaMenu = {
@@ -20,6 +20,8 @@ export type EntradaMenu = {
 export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
   backoffice: [
     { caminho: "/", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
+    { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: "dashboard.overview.read" },
+    { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: "alerts.alerts.read" },
     { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: "hr.employees.read", grupo: "Pessoas" },
     { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: "hr.departments.read", grupo: "Pessoas" },
     { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: "hr.positions.read", grupo: "Pessoas" },
@@ -40,6 +42,12 @@ export const CONTA: Readonly<Record<Shell, string>> = {
   backoffice: "/conta",
   colaborador: "/eu/conta",
   cliente: "/cliente/conta",
+};
+
+export const NOTIFICACOES: Readonly<Record<Shell, string>> = {
+  backoffice: "/notificacoes",
+  colaborador: "/eu/notificacoes",
+  cliente: "/cliente/notificacoes",
 };
 
 export const ICONE_CONTA = UserCog;

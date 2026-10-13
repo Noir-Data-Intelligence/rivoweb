@@ -36,7 +36,9 @@ for (const f of js) {
 // 4. Sem hosts de terceiros em runtime (S26): só a API e os namespaces XML/SVG/W3C.
 // Literais conhecidos das bibliotecas que não são pedidos: namespaces SVG, ligações
 // em mensagens de erro do React e do React Router, e a base `new URL(…, "http://localhost")`
-// do router. Os pedidos reais verificam-se no e2e (S26). Um host novo aqui é revisto.
+// do router. Desde a F2, as mensagens de erro do Redux Toolkit e do Immer (usados por
+// dentro do Recharts, só no chunk dos gráficos): `redux.js.org/Errors`,
+// `redux-toolkit.js.org/Errors` e `bit.ly/3cXEKWf` (Immer). Os pedidos reais verificam-se no e2e (S26). Um host novo aqui é revisto.
 const PERMITIDOS = [
   /^https:\/\/syyt\.tech$/,
   /^http:\/\/www\.w3\.org$/,
@@ -45,6 +47,9 @@ const PERMITIDOS = [
   /^https:\/\/reactrouter\.com$/,
   /^https:\/\/github\.com$/,
   /^http:\/\/localhost$/,
+  /^https:\/\/redux\.js\.org$/,
+  /^https:\/\/redux-toolkit\.js\.org$/,
+  /^https:\/\/bit\.ly$/,
 ];
 if (API) PERMITIDOS.push(new RegExp(`^${API.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
 for (const f of js) {

@@ -1413,7 +1413,45 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   produção.**
 - **Testes:** 31 cenários e2e × 3 motores com a API simulada (CSP, axe, 360 a
   1440 px, tema escuro, dois perfis), mais o teste local de escritas.
-- **Por fazer:** confirmar no domínio da Vercel depois do pedido de CORS
-  (critério 7) e a aceitação do convite no novo domínio, que exige
-  `FRONTEND_BASE_URL` actualizado (§9.2, D6).
+- **Em produção (2026-10-13):** publicado em `https://rivoweb-coral.vercel.app`
+  com o CORS do domínio; smoke de leitura no browser (F0 e F1) a passar.
+  Corrigido no deploy: `cleanUrls` no `vercel.json` partia a reescrita do SPA
+  (404 em todas as rotas menos `/`).
+- **Aceitação do convite:** com `FRONTEND_BASE_URL` já na Vercel, **um** convite
+  autorizado pelo utilizador (perfil Colaborador) chegou, abriu no domínio
+  novo, a password foi definida e o login entrou no portal do colaborador.
+  **F1 aceite.**
 
+
+### F2 — o que mudou face ao plano, e porquê
+
+| Tema | Plano | Execução | Porquê |
+|---|---|---|---|
+| Entrada do backoffice | — | `/` passa a ser o painel pessoal (notificações, aprovações à espera, anúncios) seguido dos KPIs das secções que o perfil lê; o dashboard executivo fica em `/dashboard` | `/dashboard/me` e `/dashboard/kpis` não exigem permissão (ADR-069): servem toda a gente. O portal do colaborador mostra também o resumo pessoal |
+| Período por omissão | — | «Este ano», com «Este mês», «Últimos 3 meses» e «Ano anterior»; no URL (`?periodo=`) | O backend não tem omissão («decisão de produto»). O ano dá sentido às séries mensais |
+| Sino | «sino + página» | O sino é uma ligação para `/notificacoes` com a contagem por ler; sem pré-visualização em popover | O Popover do Radix não estava instalado e as versões recentes têm dias. Fica acessível e sem dependência nova |
+| Polling (§5.3) | Documento visível e actividade nos últimos 5 min | Documento visível **e interacção depois do último pedido autenticado** | **Provado no e2e:** com «actividade nos últimos 5 min», o polling de 60 s deslizava o prazo de inactividade (ADR-067) e a sessão nunca terminava (o teste de inactividade falhou nos três motores). Com a regra nova, o polling nunca prolonga a sessão para lá da última interacção |
+| Gráficos | Recharts | Recharts 3.10.1, só no chunk dos dashboards; `accessibilityLayer` desligado e o SVG `aria-hidden`; a leitura acessível é «Ver como tabela» | O SVG do Recharts era focável dentro de `aria-hidden` (axe). A tabela tem os mesmos números e exporta CSV |
+| Verificação do bundle | Sem hosts de terceiros | Permitidos `redux.js.org`, `redux-toolkit.js.org` e `bit.ly` | São ligações em mensagens de erro do Redux Toolkit e do Immer (dependências do Recharts), nunca pedidos |
+| Chunk inicial | 150 KB | 147,5 KB | — |
+| Logout | — | Depois de «Sair», o login seguinte não volta à página anterior | Encontrado na verificação local: o próximo login (talvez outra pessoa) caía na página de quem saiu. O retorno fica para quem perdeu a sessão a meio |
+| Contraste | — | Datas pequenas em `muted-foreground` em vez de `muted-subtle` | axe |
+
+### F2 — estado
+
+- **Ecrãs:** painel pessoal (contadores, anúncios em texto simples, KPIs de
+  finanças, pessoas e vendas com gráficos), dashboard executivo (cinco números,
+  evolução mensal, clientes que mais facturaram), notificações (sino com
+  contagem, página paginada, marcar uma ou todas, preferência de e-mail em «A
+  minha conta») e alertas (eventos com resolução, regras com criar, rever,
+  desactivar e «Avaliar agora»).
+- **Leituras em produção:** feitas a 2026-10-13 com `npm run smoke:leitura`;
+  todas as rotas `GET` da F2 deram 200 (o SuperAdmin recebe as três secções).
+- **Escritas:** verificadas **na base local** (`f2-escritas.spec.ts`): criar,
+  rever e desactivar uma regra, avaliar, marcar uma notificação e todas como
+  lidas (com uma notificação gerada de propósito ao atribuir um perfil à conta
+  admin local) e trocar e repor a preferência de e-mail. **Resolver um alerta
+  não foi verificado localmente**: a base local não tem dados que abram
+  alertas; está coberto no e2e com a API simulada. Nenhuma escrita em produção.
+- **Testes:** 93 unitários; 40 cenários e2e × 3 motores.
+- **Por fazer:** publicar e confirmar no domínio da Vercel.

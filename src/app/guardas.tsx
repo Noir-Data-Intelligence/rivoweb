@@ -9,6 +9,7 @@ import { useMe, useSessao } from "@/features/identity/api";
 import { ProvedorUtilizador, useUtilizador } from "@/features/identity/utilizador";
 import { SemAcesso } from "@/features/sistema/paginas";
 import type { Requisito } from "@/lib/auth/permissions";
+import { motivoUltimoFim } from "@/lib/auth/session";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, Logo } from "@/ui/Layout";
 
@@ -30,6 +31,11 @@ export function AreaAutenticada() {
   const local = useLocation();
 
   if (sessao === null) {
+    // Quem saiu de propósito não volta à página onde estava: o próximo login
+    // pode ser de outra pessoa (computador partilhado). O retorno é para quem
+    // perdeu a sessão (inactividade, prazo, 401) a meio do trabalho.
+    const motivo = motivoUltimoFim();
+    if (motivo === "saiu" || motivo === "outra-aba") return <Navigate to="/entrar" replace />;
     const voltar = local.pathname + local.search;
     return <Navigate to={voltar === "/" ? "/entrar" : `/entrar?voltar=${encodeURIComponent(voltar)}`} replace />;
   }

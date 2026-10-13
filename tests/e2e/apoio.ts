@@ -67,6 +67,10 @@ export class ApiSimulada {
       .em("GET", "/identity/me", { status: 200, corpo: me })
       .em("GET", "/identity/me/sessions", { status: 200, corpo: sessoes() })
       .em("POST", "/identity/logout", { status: 204 })
+      // F2: o sino e o painel pedem isto em todas as páginas; por omissão, vazio.
+      .em("GET", "/notifications/me", { status: 200, corpo: [], cabecalhos: { "X-Page": "1", "X-Page-Size": "1", "X-Total-Count": "0" } })
+      .em("GET", "/dashboard/me", { status: 200, corpo: { employeeId: null, displayName: null, unreadNotifications: 0, pendingApprovals: 0, announcements: [] } })
+      .em("GET", "/dashboard/kpis", { status: 200, corpo: { from: "2026-01-01", to: "2026-10-13", currency: "AOA", sections: [], finance: null, hr: null, sales: null } })
       .em("GET", "/portal/me", me.roles.includes("Colaborador") ? { status: 200, corpo: fichaColaborador } : { status: 403, corpo: { title: "Forbidden" }, cabecalhos: { "Content-Type": "application/problem+json" } });
   }
 }

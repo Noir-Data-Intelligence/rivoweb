@@ -25,7 +25,11 @@ if (!EMAIL || !PASSWORD) {
   process.exit(2);
 }
 
-// Rotas GET da F0 e da F1 (§6). As GET com efeito (§5.15) nunca entram aqui.
+// Hoje em Africa/Luanda (UTC+1, sem hora de Verão), para as janelas do dashboard.
+const HOJE = new Date(Date.now() + 3600_000).toISOString().slice(0, 10);
+const ANO = HOJE.slice(0, 4);
+
+// Rotas GET da F0, F1 e F2 (§6). As GET com efeito (§5.15) nunca entram aqui.
 const LEITURAS = [
   "/health",
   "/identity/me",
@@ -38,6 +42,13 @@ const LEITURAS = [
   "/hr/departments?page=1&pageSize=25",
   "/hr/positions?page=1&pageSize=25",
   "/hr/employees?page=1&pageSize=25",
+  "/dashboard/me",
+  `/dashboard/kpis?from=${ANO}-01-01&to=${HOJE}`,
+  `/dashboard/overview?from=${ANO}-01-01&to=${HOJE}&topCustomers=5`,
+  "/notifications/me?unreadOnly=true&page=1&pageSize=1",
+  "/notifications/me/preferences",
+  "/alerts/rules",
+  "/alerts/events?openOnly=true&limit=200",
 ];
 // Leituras de detalhe a partir do primeiro elemento de uma listagem.
 const DETALHES = [
@@ -46,6 +57,8 @@ const DETALHES = [
 ];
 // 403/404 aceites: conta sem ficha de colaborador; dados da empresa por declarar.
 const ACEITES = { "/portal/me": [403], "/fiscal/tax-entity": [404] };
+// Quais secções o perfil recebe em /dashboard/kpis (ADR-069).
+const SECCOES = (json) => (Array.isArray(json?.sections) ? ` · secções: ${json.sections.join(", ") || "nenhuma"}` : "");
 const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 async function pedido(metodo, caminho, { token, corpo } = {}) {
@@ -92,7 +105,7 @@ try {
     const ok = r.status === 200 || (ACEITES[caminho] ?? []).includes(r.status);
     if (!ok) falhas++;
     const total = r.headers.get("X-Total-Count");
-    console.log(`${ok ? "ok " : "ERRO"} GET ${caminho} → ${r.status} · ${resumo(r.json)}${total !== null ? ` · total ${total}` : ""}`);
+    console.log(`${ok ? "ok " : "ERRO"} GET ${caminho} → ${r.status} · ${resumo(r.json)}${total !== null ? ` · total ${total}` : ""}${SECCOES(r.json)}`);
     if (caminho === "/identity/me" && r.json) {
       console.log(`     perfis: ${r.json.roles?.join(", ")} · ${r.json.permissions?.length} permissões`);
     }

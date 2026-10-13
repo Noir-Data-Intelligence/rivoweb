@@ -15,12 +15,13 @@ import { gravarPrefs, lerPrefs, type Tema } from "@/lib/prefs";
 import { sair, usePortalColaborador } from "@/features/identity/api";
 import { RelogioSessao } from "@/features/identity/components/RelogioSessao";
 import { useUtilizador } from "@/features/identity/utilizador";
+import { Sino } from "@/features/notificacoes";
 import { BarraSemLigacao } from "@/features/sistema/BarraSemLigacao";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { cn } from "@/ui/cn";
 import { Logo } from "@/ui/Layout";
-import { CONTA, MENU, type EntradaMenu } from "./rotas";
+import { CONTA, MENU, NOTIFICACOES, type EntradaMenu } from "./rotas";
 
 const NOME_SHELL: Readonly<Record<Shell, string | null>> = {
   backoffice: null,
@@ -258,6 +259,7 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
             </Button>
             <Logo comNome={false} className="md:hidden" />
             <div className="min-w-0 flex-1">{nomeShell ? <p className="truncate text-sm font-medium text-muted-foreground">{nomeShell}</p> : null}</div>
+            <Sino caminhoPagina={NOTIFICACOES[shell]} />
             <MenuTema />
             <MenuUtilizador shell={shell} />
           </header>

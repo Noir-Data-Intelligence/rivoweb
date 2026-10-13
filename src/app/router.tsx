@@ -26,6 +26,7 @@ const minhaConta = () => import("@/features/identity/pages/MinhaConta");
 // Os shells (Radix, menus, tooltips) ficam fora do chunk inicial, que é só o login (§1.5).
 const shells = () => import("./shells");
 const inicio = () => import("@/features/inicio/paginas");
+const notificacoes = () => import("@/features/notificacoes/pages/Notificacoes");
 
 /**
  * Prefixos por shell (§1.5): backoffice em `/`, colaborador em `/eu`, cliente
@@ -50,6 +51,7 @@ export const rotas: RouteObject[] = [
             children: [
               { index: true, element: preguicoso(() => inicio().then((m) => ({ default: m.InicioColaborador }))) },
               { path: "conta", element: preguicoso(minhaConta) },
+              { path: "notificacoes", element: preguicoso(notificacoes) },
             ],
           },
           {
@@ -58,14 +60,19 @@ export const rotas: RouteObject[] = [
             children: [
               { index: true, element: preguicoso(() => inicio().then((m) => ({ default: m.InicioCliente }))) },
               { path: "conta", element: preguicoso(minhaConta) },
+              { path: "notificacoes", element: preguicoso(notificacoes) },
             ],
           },
           {
             path: "/",
             element: preguicoso(() => shells().then((m) => ({ default: m.ShellBackoffice }))),
             children: [
-              { index: true, element: preguicoso(() => inicio().then((m) => ({ default: m.InicioBackoffice }))) },
+              // F2 — o painel pessoal é a entrada do backoffice (§5.3).
+              { index: true, element: preguicoso(() => import("@/features/dashboard/pages/Painel")) },
               { path: "conta", element: preguicoso(minhaConta) },
+              { path: "notificacoes", element: preguicoso(notificacoes) },
+              { path: "dashboard", element: protegido("dashboard.overview.read", () => import("@/features/dashboard/pages/Executivo")) },
+              { path: "alertas", element: protegido("alerts.alerts.read", () => import("@/features/alertas/pages/Alertas")) },
               // F1 — administração de acesso e núcleo organizacional (§5.1, §5.2).
               { path: "utilizadores", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizadores")) },
               { path: "utilizadores/:userId", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizador")) },

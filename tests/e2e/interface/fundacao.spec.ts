@@ -131,6 +131,8 @@ test.describe("sessão", () => {
     await api.comConta().ligar();
     await page.route("**/identity/logout", (r) => r.abort());
     await entrar(page);
+    // Sair a partir de outra página não guarda o retorno para o próximo login.
+    await page.goto("/conta");
     await page.getByRole("button", { name: /Conta de/ }).click();
     await page.getByRole("menuitem", { name: "Sair" }).click();
     await expect(page).toHaveURL(/\/entrar$/);

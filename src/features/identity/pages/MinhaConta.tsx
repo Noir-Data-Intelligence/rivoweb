@@ -14,6 +14,7 @@ import { Dialog, DialogClose, DialogContent } from "@/ui/Dialog";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader, Skeleton } from "@/ui/Layout";
+import { PreferenciasNotificacoes } from "@/features/notificacoes";
 import { chaves, sair, useMudarPassword, useSessoesActivas, useTerminarSessao, type SessaoActiva } from "../api";
 import { RegrasPassword } from "../components/DefinirPassword";
 import { useUtilizador } from "../utilizador";
@@ -178,6 +179,7 @@ export default function MinhaConta() {
       <div className="flex flex-col gap-6">
         <MudarPassword />
         <SessoesActivas />
+        <PreferenciasNotificacoes />
       </div>
     </>
   );
