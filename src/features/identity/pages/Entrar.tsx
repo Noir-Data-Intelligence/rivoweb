@@ -1,14 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors, type Resolver, type ResolverResult } from "react-hook-form";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
-import { z } from "zod/mini";
 import { rotaConhecida } from "@/app/rotasConhecidas";
 import { eApiError } from "@/lib/api/problem";
 import { validarVoltar } from "@/lib/auth/returnTo";
 import { limparMotivo, motivoUltimoFim, type MotivoFim } from "@/lib/auth/session";
 import { API_DISPONIVEL } from "@/lib/env";
-import { email } from "@/lib/validation/text";
+import { normalizarTexto, pareceEmail } from "@/lib/validation/normalizar";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
@@ -16,11 +14,24 @@ import { Field, Input } from "@/ui/Field";
 import { useEntrar, useSessao } from "../api";
 import { LayoutPublico } from "../components/LayoutPublico";
 
-const esquema = z.object({
-  email,
-  password: z.string().check(z.minLength(1, "Escreva a password."), z.maxLength(128)),
-});
-type Dados = z.infer<typeof esquema>;
+type Dados = { email: string; password: string };
+
+/**
+ * Validação do login sem zod: o login está no chunk inicial (§1.5) e o zod só
+ * carrega com os ecrãs que o usam. As regras e as mensagens são as de
+ * `lib/validation/text.ts`.
+ */
+const resolver: Resolver<Dados> = (valores): ResolverResult<Dados> => {
+  const email = normalizarTexto(valores.email).toLowerCase();
+  const errors: FieldErrors<Dados> = {};
+  if (email === "") errors.email = { type: "required", message: "Escreva o e-mail." };
+  else if (email.length > 256) errors.email = { type: "maxLength", message: "E-mail longo de mais." };
+  else if (!pareceEmail(email)) errors.email = { type: "pattern", message: "Este e-mail não é válido." };
+  if (valores.password === "") errors.password = { type: "required", message: "Escreva a password." };
+  else if (valores.password.length > 128) errors.password = { type: "maxLength", message: "No máximo 128 caracteres." };
+  if (Object.keys(errors).length > 0) return { values: {} as Record<string, never>, errors };
+  return { values: { email, password: valores.password }, errors: {} };
+};
 
 const MENSAGEM_FIM: Readonly<Record<MotivoFim, string | null>> = {
   saiu: null,
@@ -42,7 +53,7 @@ export default function Entrar() {
   });
   const destino = validarVoltar(params.get("voltar"), window.location.origin, rotaConhecida);
 
-  const form = useForm<Dados>({ resolver: zodResolver(esquema), defaultValues: { email: "", password: "" } });
+  const form = useForm<Dados>({ resolver, defaultValues: { email: "", password: "" } });
 
   if (sessao !== null && !entrar.isPending) return <Navigate to={destino} replace />;
 

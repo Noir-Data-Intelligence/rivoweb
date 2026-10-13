@@ -71,7 +71,7 @@ function Navegacao({ shell, compacto, aoNavegar }: { shell: Shell; compacto: boo
     <nav aria-label="Principal" className="flex flex-col gap-4">
       {[...grupos.entries()].map(([g, lista]) => (
         <div key={g || "_"} className="flex flex-col gap-0.5">
-          {g && !compacto ? <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-subtle">{g}</p> : null}
+          {g && !compacto ? <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g}</p> : null}
           {lista.map((e) => (
             <ItemMenu key={e.caminho} e={e} compacto={compacto} {...(aoNavegar ? { aoNavegar } : {})} />
           ))}

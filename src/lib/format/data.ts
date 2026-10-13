@@ -64,3 +64,24 @@ export function hojeIso(agora: Date = new Date()): string {
   const p = partesDataHora(agora);
   return p ? `${p.year}-${p.month}-${p.day}` : "";
 }
+
+/** «12/10/2026» a partir de um instante (data-hora da API), em Africa/Luanda. */
+export function formatarDataDeInstante(instante: string | Date): string {
+  const p = partesDataHora(instante);
+  return p ? `${p.day}/${p.month}/${p.year}` : "—";
+}
+
+/** `YYYY-MM-DD` de um instante, em Africa/Luanda (para preencher campos de data). */
+export function dataIsoDeInstante(instante: string | Date): string {
+  const p = partesDataHora(instante);
+  return p ? `${p.year}-${p.month}-${p.day}` : "";
+}
+
+/**
+ * Início do dia `YYYY-MM-DD` em Africa/Luanda, para campos `date-time` da API.
+ * Luanda está em UTC+1 todo o ano (sem hora de Verão).
+ */
+export function inicioDoDiaEmLuanda(iso: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) throw new Error("Data inválida.");
+  return `${iso}T00:00:00+01:00`;
+}

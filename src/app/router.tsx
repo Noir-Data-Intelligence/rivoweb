@@ -4,7 +4,8 @@ import { RaizSessao } from "@/features/identity/components/RaizSessao";
 import Entrar from "@/features/identity/pages/Entrar";
 import { ErroDeRota, NaoEncontrado } from "@/features/sistema/paginas";
 import { CarregandoPagina } from "@/ui/Layout";
-import { AreaAutenticada } from "./guardas";
+import type { Requisito } from "@/lib/auth/permissions";
+import { AreaAutenticada, Exige } from "./guardas";
 import { registarRotas } from "./rotasConhecidas";
 
 function preguicoso(carregar: () => Promise<{ default: ComponentType }>) {
@@ -14,6 +15,11 @@ function preguicoso(carregar: () => Promise<{ default: ComponentType }>) {
       <C />
     </Suspense>
   );
+}
+
+/** Página do backoffice atrás da guarda de permissão (§3.2). O backend decide sempre. */
+function protegido(requer: Requisito, carregar: () => Promise<{ default: ComponentType }>) {
+  return <Exige requer={requer}>{preguicoso(carregar)}</Exige>;
 }
 
 const minhaConta = () => import("@/features/identity/pages/MinhaConta");
@@ -60,6 +66,20 @@ export const rotas: RouteObject[] = [
             children: [
               { index: true, element: preguicoso(() => inicio().then((m) => ({ default: m.InicioBackoffice }))) },
               { path: "conta", element: preguicoso(minhaConta) },
+              // F1 — administração de acesso e núcleo organizacional (§5.1, §5.2).
+              { path: "utilizadores", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizadores")) },
+              { path: "utilizadores/:userId", element: protegido("identity.users.read", () => import("@/features/administracao/pages/Utilizador")) },
+              {
+                path: "configuracoes",
+                element: protegido(
+                  { anyOf: ["fiscal.tax_entity.read", "identity.users.write", "approval.policies.read"] },
+                  () => import("@/features/administracao/pages/Configuracoes"),
+                ),
+              },
+              { path: "colaboradores", element: protegido("hr.employees.read", () => import("@/features/rh/pages/Colaboradores")) },
+              { path: "colaboradores/:employeeId", element: protegido("hr.employees.read", () => import("@/features/rh/pages/Colaborador")) },
+              { path: "departamentos", element: protegido("hr.departments.read", () => import("@/features/rh/pages/Departamentos")) },
+              { path: "cargos", element: protegido("hr.positions.read", () => import("@/features/rh/pages/Cargos")) },
             ],
           },
         ],

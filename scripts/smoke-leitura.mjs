@@ -25,12 +25,31 @@ if (!EMAIL || !PASSWORD) {
   process.exit(2);
 }
 
-// Rotas GET da F0 (§6). As GET com efeito (§5.15) nunca entram aqui.
-const LEITURAS = ["/health", "/identity/me", "/identity/me/sessions", "/portal/me"];
+// Rotas GET da F0 e da F1 (§6). As GET com efeito (§5.15) nunca entram aqui.
+const LEITURAS = [
+  "/health",
+  "/identity/me",
+  "/identity/me/sessions",
+  "/portal/me",
+  "/identity/users",
+  "/identity/roles",
+  "/settings/overview",
+  "/fiscal/tax-entity",
+  "/hr/departments?page=1&pageSize=25",
+  "/hr/positions?page=1&pageSize=25",
+  "/hr/employees?page=1&pageSize=25",
+];
+// Leituras de detalhe a partir do primeiro elemento de uma listagem.
+const DETALHES = [
+  ["/hr/employees?page=1&pageSize=25", "employeeId", ["/hr/employees/{id}", "/hr/employees/{id}/account-history"]],
+  ["/hr/positions?page=1&pageSize=25", "positionId", ["/hr/positions/{id}/assignments"]],
+];
+// 403/404 aceites: conta sem ficha de colaborador; dados da empresa por declarar.
+const ACEITES = { "/portal/me": [403], "/fiscal/tax-entity": [404] };
 const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 async function pedido(metodo, caminho, { token, corpo } = {}) {
-  if (metodo !== "GET" && !PERMITIDOS.has(`${metodo} ${caminho}`)) {
+  if (metodo !== "GET" && !PERMITIDOS.has(`${metodo} ${caminho.split("?")[0]}`)) {
     throw new Error(`Bloqueado: ${metodo} ${caminho} não é leitura.`);
   }
   const r = await fetch(BASE + caminho, {
@@ -66,14 +85,26 @@ try {
   token = login.json.accessToken;
   console.log(`login: 200 · expira ${login.json.expiresAt} · inactividade ${login.json.idleTimeoutSeconds}s`);
 
-  for (const caminho of LEITURAS) {
+  const respostas = new Map();
+  const ler = async (caminho) => {
     const r = await pedido("GET", caminho, { token });
-    const ok = r.status === 200 || (caminho === "/portal/me" && r.status === 403);
+    respostas.set(caminho, r);
+    const ok = r.status === 200 || (ACEITES[caminho] ?? []).includes(r.status);
     if (!ok) falhas++;
-    console.log(`${ok ? "ok " : "ERRO"} GET ${caminho} → ${r.status} · ${resumo(r.json)}`);
+    const total = r.headers.get("X-Total-Count");
+    console.log(`${ok ? "ok " : "ERRO"} GET ${caminho} → ${r.status} · ${resumo(r.json)}${total !== null ? ` · total ${total}` : ""}`);
     if (caminho === "/identity/me" && r.json) {
       console.log(`     perfis: ${r.json.roles?.join(", ")} · ${r.json.permissions?.length} permissões`);
     }
+  };
+  for (const caminho of LEITURAS) await ler(caminho);
+  for (const [lista, campo, rotas] of DETALHES) {
+    const id = respostas.get(lista)?.json?.[0]?.[campo];
+    if (typeof id !== "string") {
+      console.log(`--   ${rotas.join(", ")}: sem elementos em ${lista}`);
+      continue;
+    }
+    for (const rota of rotas) await ler(rota.replace("{id}", encodeURIComponent(id)));
   }
 } finally {
   if (token) {

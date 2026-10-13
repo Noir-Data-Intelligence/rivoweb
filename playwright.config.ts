@@ -27,6 +27,12 @@ export default defineConfig({
     { name: "firefox", testDir: "tests/e2e/interface", use: { ...devices["Desktop Firefox"], baseURL: "http://localhost:4173" } },
     { name: "webkit", testDir: "tests/e2e/interface", use: { ...devices["Desktop Safari"], baseURL: "http://localhost:4173" } },
     {
+      // Escritas contra a API local em Docker (D1). Nunca produção.
+      name: "escritas-local",
+      testDir: "tests/e2e/local",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:5173" },
+    },
+    {
       name: "leitura-producao",
       testDir: "tests/e2e/leitura",
       use: { ...devices["Desktop Chrome"], baseURL: process.env.RIVO_FRONT_URL ?? "http://localhost:4173" },

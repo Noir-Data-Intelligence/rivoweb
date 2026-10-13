@@ -94,6 +94,23 @@ export async function enviar(pedido: Promise<Resultado<unknown>>): Promise<{ sta
   return { status: r.response.status };
 }
 
+/** Registo com a versão do `ETag` (ADR-080), para o `If-Match` da escrita seguinte. */
+export type ComVersao<T> = { readonly dados: T; readonly versao: string | null };
+
+/** Leitura de um registo com versão. Sem `ETag` legível, `versao` é `null`. */
+export async function lerComVersao<T>(pedido: Promise<Resultado<T>>): Promise<ComVersao<T>> {
+  const r = await executar(pedido);
+  return { dados: r.data as T, versao: r.response.headers.get("ETag") };
+}
+
+/**
+ * Cabeçalho `If-Match` para uma escrita sobre um registo lido com versão. Sem
+ * versão a escrita segue sem pré-condição, como antes do ADR-080.
+ */
+export function seVersao(versao: string | null | undefined): { "If-Match"?: string } {
+  return versao ? { "If-Match": versao } : {};
+}
+
 /** Listagem paginada pelo servidor (ADR-068). */
 export async function lerPagina<T>(pedido: Promise<Resultado<T[]>>): Promise<Pagina<T>> {
   const r = await executar(pedido);

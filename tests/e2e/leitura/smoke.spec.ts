@@ -11,7 +11,7 @@ const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 test.skip(process.env.RIVO_SMOKE_PRODUCAO !== "1", "Só com RIVO_SMOKE_PRODUCAO=1.");
 
-test("login → ecrãs da F0 → logout, sem escritas", async ({ page }) => {
+test("login → ecrãs da F0 e da F1 → logout, sem escritas", async ({ page }) => {
   const bloqueados: string[] = [];
   await page.route(`${API}/**`, async (route) => {
     const req = route.request();
@@ -29,6 +29,19 @@ test("login → ecrãs da F0 → logout, sem escritas", async ({ page }) => {
 
   await page.goto("/conta");
   await expect(page.getByRole("heading", { name: "Sessões activas" })).toBeVisible();
+
+  // F1: só abre os ecrãs (leituras). Nenhum botão de escrita é carregado.
+  for (const [caminho, titulo] of [
+    ["/utilizadores", "Utilizadores"],
+    ["/configuracoes", "Configurações"],
+    ["/colaboradores", "Colaboradores"],
+    ["/departamentos", "Departamentos"],
+    ["/cargos", "Cargos"],
+  ] as const) {
+    await page.goto(caminho);
+    await expect(page.getByRole("heading", { name: titulo, level: 1 })).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
+  }
 
   await page.getByRole("button", { name: /Conta de/ }).click();
   await page.getByRole("menuitem", { name: "Sair" }).click();

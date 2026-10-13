@@ -87,3 +87,12 @@ export function eTransitorio(e: unknown): boolean {
   if (!eApiError(e)) return false;
   return e.tipo === "rede" || e.tipo === "tempo" || [502, 503, 504].includes(e.status);
 }
+
+/**
+ * 409 de versão (ADR-025/080): alguém gravou o registo entretanto. Distingue-se
+ * dos 409 de regra de negócio (duplicado, estado inválido) pelo título que o
+ * backend lhe dá (Facto: `ConcurrencyConflictHandler.cs`).
+ */
+export function eConflitoDeVersao(e: unknown): boolean {
+  return eApiError(e) && e.status === 409 && e.title === "Conflito de concorrência";
+}

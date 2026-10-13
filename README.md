@@ -25,7 +25,8 @@ API local em Docker (D1). Contra produção, só leituras.
 | `npm run check` | Lint (com as regras de segurança), tipos, testes unitários, tokens da IV, tipos da API |
 | `npm run build` | Build de produção + verificação do bundle (sem source maps, sem URLs de terceiros, orçamento do chunk inicial) |
 | `npm run e2e` | Interface em Chromium, Firefox e WebKit: o build servido com os cabeçalhos do `vercel.json` e a API simulada (só em `tests/`). Antes: `VITE_API_URL=http://localhost:5080 npx vite build` |
-| `npm run smoke:leitura` | Contra produção, sem browser: login, `GET` da F0, logout. Lê `RIVO_PROD_*` do `.env.local`. Bloqueia qualquer outro método |
+| `npm run smoke:leitura` | Contra produção, sem browser: login, `GET` da F0 e da F1, logout. Lê `RIVO_PROD_*` do `.env.local`. Bloqueia qualquer outro método |
+| `npx playwright test --project=escritas-local` | Escritas contra a **API local** em Docker, num browser real. Pressupõe o build com `VITE_API_URL=http://localhost:5080` servido em `:5173` (`PORT=5173 API_TESTE=http://localhost:5080 npm run serve:dist`), e `RIVO_ESCRITAS_LOCAL=1`, `RIVO_LOCAL_EMAIL` e `RIVO_LOCAL_PASSWORD` (a conta de bootstrap do `.env` da API local). Aborta qualquer pedido fora de `localhost` |
 | `npm run e2e:producao` | O mesmo no browser, contra o front publicado (`RIVO_FRONT_URL`, `RIVO_SMOKE_PRODUCAO=1`). Só depois do pedido de CORS |
 | `npm run api:types` | Regenera `src/lib/api/schema.d.ts` a partir de `openapi/v1.json` (ver [`openapi/README.md`](openapi/README.md)) |
 

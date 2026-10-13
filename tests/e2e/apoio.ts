@@ -9,7 +9,7 @@ type Resposta = { status: number; corpo?: unknown; cabecalhos?: Record<string, s
 type Handler = (route: Route) => Resposta | Promise<Resposta>;
 
 export class ApiSimulada {
-  readonly pedidos: { metodo: string; caminho: string; autorizacao: string | null }[] = [];
+  readonly pedidos: { metodo: string; caminho: string; query: string; autorizacao: string | null; ifMatch: string | null; corpo: unknown }[] = [];
   private readonly handlers = new Map<string, Handler>();
 
   constructor(private readonly page: Page) {}
@@ -23,12 +23,25 @@ export class ApiSimulada {
     await this.page.route(`${API}/**`, async (route) => {
       const req = route.request();
       const url = new URL(req.url());
-      const cors = { "Access-Control-Allow-Origin": "http://localhost:4173", "Access-Control-Expose-Headers": "WWW-Authenticate, X-Page, X-Page-Size, X-Total-Count" };
+      const cors = { "Access-Control-Allow-Origin": "http://localhost:4173", "Access-Control-Expose-Headers": "WWW-Authenticate, X-Page, X-Page-Size, X-Total-Count, ETag" };
       if (req.method() === "OPTIONS") {
-        await route.fulfill({ status: 204, headers: { ...cors, "Access-Control-Allow-Headers": "authorization, content-type", "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE" } });
+        await route.fulfill({ status: 204, headers: { ...cors, "Access-Control-Allow-Headers": "authorization, content-type, if-match", "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE" } });
         return;
       }
-      this.pedidos.push({ metodo: req.method(), caminho: url.pathname, autorizacao: req.headers()["authorization"] ?? null });
+      let corpo: unknown;
+      try {
+        corpo = req.postDataJSON() as unknown;
+      } catch {
+        corpo = req.postData();
+      }
+      this.pedidos.push({
+        metodo: req.method(),
+        caminho: url.pathname,
+        query: url.search,
+        autorizacao: req.headers()["authorization"] ?? null,
+        ifMatch: req.headers()["if-match"] ?? null,
+        corpo,
+      });
       const h = this.handlers.get(`${req.method()} ${url.pathname}`);
       if (!h) {
         await route.fulfill({ status: 599, headers: cors, body: `sem handler para ${req.method()} ${url.pathname}` });
@@ -41,6 +54,11 @@ export class ApiSimulada {
         ...(r.corpo !== undefined ? { body: JSON.stringify(r.corpo) } : {}),
       });
     });
+  }
+
+  /** Escritas feitas (para confirmar o que subiu à API). */
+  escritas(metodo: string, caminho: string) {
+    return this.pedidos.filter((p) => p.metodo === metodo && p.caminho === caminho);
   }
 
   /** Conta autenticada pronta: login, me e sessões. */

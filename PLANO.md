@@ -1368,10 +1368,52 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   ligação, `vercel.json`, CI e Dependabot.
 - **Testes:** 78 unitários (cobertura de `lib/` ≈ 90 %, limiar 80 %) e 19
   cenários e2e × 3 motores, com CSP, axe, responsividade e sessão.
+- **Smoke de leitura em produção:** feito a 2026-10-13 (`npm run smoke:leitura`,
+  conta SuperAdmin dada na conversa): `/health`, `/identity/me`,
+  `/identity/me/sessions` e `/portal/me` (403 esperado: a conta não tem ficha);
+  login 200, logout 204.
 - **Por fazer:**
-  - smoke de leitura em produção: o classificador de permissões bloqueou o login
-    a partir desta sessão (§0), e `npm run smoke:leitura` fica para o
-    utilizador correr;
   - primeiro deploy na Vercel e pedido de CORS (`PEDIDO-BACKEND.md`);
   - login Google (D4) quando o backend o tiver.
+
+### F1 — o que mudou face ao plano, e porquê
+
+| Tema | Plano | Execução | Porquê |
+|---|---|---|---|
+| Início da fase | Só depois da F0 em produção e verificada | Começou com a F0 publicada mas sem CORS para o novo domínio | Decisão do utilizador (2026-10-13: «pode seguir pra f1») |
+| Tabelas | TanStack Table v8 | Componente próprio `ui/Tabela.tsx` (≈ 1,4 KB gzip) | As tabelas da F1 são simples: colunas escondidas por largura, ordenação local só em listas inteiras (§2.3), estados reais. Uma dependência a menos na cadeia de fornecimento. Revê-se se uma fase precisar de agrupamento, redimensionar colunas ou virtualização |
+| Login e chunk inicial | `zod` no login | O login valida com um resolver próprio (`lib/validation/normalizar.ts`) com as mesmas regras e mensagens; o `zod` sai do chunk inicial | As funções de `zod` usadas pelas páginas novas ficavam no chunk inicial (o bundler junta-as onde o módulo já está). Com a F1, o chunk passou de 150 KB para 152 KB; sem `zod` no login ficou em **146 KB** com a F1 incluída |
+| Concorrência (§4.6) | Painel com diferenças campo a campo | Na ficha do colaborador, `If-Match` com o `ETag` da leitura; o 409 de versão mostra «Alguém alterou este registo entretanto» e «Recarregar». O 409 de regra de negócio mostra o motivo do servidor, sem «recarregar» | O B8 foi resolvido (ADR-080), mas só tem `ETag` quem tem `GET` por id: na F1, só o colaborador. O `ETag` só passa a ser legível em produção quando o PR #96 for publicado; até lá a escrita segue sem pré-condição, como antes. As diferenças campo a campo ficam para os formulários longos (F3) |
+| Separação entre features (§1.3) | Uma feature só importa os tipos públicos de outra, de `index.ts` | `features/<m>/index.ts` exporta tipos **e** hooks públicos (`useUtilizadores` para ligar contas na ficha) | A ficha do colaborador precisa da lista de contas, que é de `administracao`. A lint ainda não o impõe |
+| Paginação no URL | — | `?pagina=&tamanho=` nas listas paginadas pelo servidor | O «voltar» do browser e uma ligação partilhada abrem a mesma página. Só números (S19) |
+| Listas de apoio | — | Departamentos, cargos e colaboradores para nomes e escolhas pedem a 1.ª página com o tecto do servidor (200) e avisam se houver mais | Não há pesquisa no servidor (B6) |
+| Nomes duplicados | — | Departamento e cargo avisam antes de enviar se o nome já existe na lista carregada | **Facto** (verificado na base local): o índice único devolve **500** em vez de 409 (B15, `PEDIDO-BACKEND.md`) |
+| Repor password | Atrás de confirmação; omissão = ligação de recuperação | Igual. A ligação usa a rota pública `POST /identity/password-recovery` com o e-mail da conta | ADR-059/065 |
+| Contas SuperAdmin | «Esta conta só pode ser gerida por um SuperAdmin.» | Igual; sem acções para quem não é SuperAdmin. O perfil SuperAdmin nunca se retira pela interface | ADR-058, ADR-070 |
+| Contraste do menu | — | Os títulos dos grupos passam a `muted-foreground` | O axe apanhou contraste insuficiente com `muted-subtle`, que só apareceu quando o menu passou a ter grupos |
+
+### F1 — estado
+
+- **Ecrãs:** utilizadores (lista, pesquisa, filtro, convite), ficha da conta
+  (perfis, estado com razão, ligação de recuperação, password por um
+  administrador), configurações (dados da empresa, governação, teste de
+  correio), departamentos, cargos (com ocupações), colaboradores (lista
+  paginada, admissão) e ficha do colaborador (dados, contactos, departamento,
+  estado, cargo com 201/202/directa, verificar decisão, encerrar, conta de
+  acesso com histórico).
+- **Leituras em produção:** feitas a 2026-10-13 com `npm run smoke:leitura`:
+  todas as rotas `GET` da F1 deram 200.
+- **Escritas:** verificadas **na base local** (Docker, `fix/motivo-do-401`,
+  sem SMTP) com `npx playwright test --project=escritas-local`, num browser real:
+  criar departamento e cargos (com e sem autoridade), admitir, corrigir o nome e
+  os contactos com `If-Match`, atribuir cargo (201 e 202), encerrar, a recusa de
+  arquivar com atribuição pendente (409 de negócio), convidar, juntar e retirar
+  perfil, desactivar e reactivar a conta, ligar e desligar a conta, guardar os
+  dados da empresa e o 501 do teste de correio sem SMTP. **Nenhuma escrita em
+  produção.**
+- **Testes:** 31 cenários e2e × 3 motores com a API simulada (CSP, axe, 360 a
+  1440 px, tema escuro, dois perfis), mais o teste local de escritas.
+- **Por fazer:** confirmar no domínio da Vercel depois do pedido de CORS
+  (critério 7) e a aceitação do convite no novo domínio, que exige
+  `FRONTEND_BASE_URL` actualizado (§9.2, D6).
 
