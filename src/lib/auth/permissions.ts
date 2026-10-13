@@ -23,8 +23,20 @@ export type Shell = "backoffice" | "colaborador" | "cliente";
  */
 export function shellInicial(roles: readonly string[], permissoes: readonly string[]): Shell {
   if (roles.includes("Cliente")) return "cliente";
-  if (permissoes.length > 0) return "backoffice";
+  if (temGestao(permissoes)) return "backoffice";
   return "colaborador";
+}
+
+/**
+ * Permissões que os portais também têm e que, por isso, não fazem de ninguém
+ * gestor. Facto (catálogo de 2026-10-13): `Colaborador` e `Cliente` têm só
+ * `documents.write`, para carregarem ficheiros no portal (B12, ADR-080).
+ */
+export const PERMISSOES_DE_PORTAL: ReadonlySet<Perm> = new Set(["documents.write"]);
+
+/** Tem pelo menos uma permissão de gestão (backoffice)? */
+export function temGestao(permissoes: readonly string[]): boolean {
+  return permissoes.some((p) => !PERMISSOES_DE_PORTAL.has(p));
 }
 
 export const PREFIXO_SHELL: Readonly<Record<Shell, string>> = {

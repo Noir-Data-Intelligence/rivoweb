@@ -64,6 +64,13 @@ describe("menu por perfil (§3.2)", () => {
     });
   });
 
+  it("Colaborador e Cliente vão para os portais, apesar de documents.write (§3.3)", () => {
+    const de = (n: string) => perfis.find((p) => p.name === n)?.permissions ?? [];
+    expect(shellInicial(["Colaborador"], de("Colaborador"))).toBe("colaborador");
+    expect(shellInicial(["Cliente"], de("Cliente"))).toBe("cliente");
+    expect(shellInicial(["ProjectManager"], de("ProjectManager"))).toBe("backoffice");
+  });
+
   it("Configurações só aparece a quem vê pelo menos um cartão", () => {
     const so = (...p: string[]) => pode(new Set(p), REQUISITO_PAGINA["/configuracoes"]);
     expect(so("approval.policies.read")).toBe(false);

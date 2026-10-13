@@ -1436,6 +1436,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 | Chunk inicial | 150 KB | 147,5 KB | — |
 | Logout | — | Depois de «Sair», o login seguinte não volta à página anterior | Encontrado na verificação local: o próximo login (talvez outra pessoa) caía na página de quem saiu. O retorno fica para quem perdeu a sessão a meio |
 | Contraste | — | Datas pequenas em `muted-foreground` em vez de `muted-subtle` | axe |
+| Shell do Colaborador (§3.3) | «Sem permissões» → portal do colaborador | As permissões que os portais também têm (`documents.write`) não contam como gestão | **Facto** (catálogo): Colaborador e Cliente têm `documents.write` (B12). Com a regra antiga, o Colaborador entrava na gestão com um painel vazio |
 | Menu e guardas (§3.2) | `meta.requires` por rota | Uma só tabela (`src/app/requisitos.ts`) para o menu e para as guardas; requisitos combináveis («A, ou B e C»). Teste com o catálogo real de perfis: cada perfil vê só o que pode abrir | Pedido do utilizador (2026-10-13): nenhuma entrada fora das permissões. Configurações aparecia a quem tinha só `approval.policies.read` e abria vazia (a governação exige também `identity.roles.read`) |
 
 ### F2 — estado

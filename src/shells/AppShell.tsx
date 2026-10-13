@@ -10,7 +10,7 @@ import { ChevronsLeft, ChevronsRight, LogOut, Menu, Monitor, Moon, Sun, UserCog,
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet } from "react-router";
 import { useTema } from "@/app/theme";
-import type { Shell } from "@/lib/auth/permissions";
+import { temGestao, type Shell } from "@/lib/auth/permissions";
 import { gravarPrefs, lerPrefs, type Tema } from "@/lib/prefs";
 import { sair, usePortalColaborador } from "@/features/identity/api";
 import { RelogioSessao } from "@/features/identity/components/RelogioSessao";
@@ -161,7 +161,7 @@ function MenuUtilizador({ shell }: { shell: Shell }) {
               </Link>
             </Dropdown.Item>
           ) : null}
-          {shell === "colaborador" && utilizador.permissions.length > 0 ? (
+          {shell === "colaborador" && temGestao(utilizador.permissions) ? (
             <Dropdown.Item asChild className={item}>
               <Link to="/">
                 <Monitor className="size-4" strokeWidth={1.75} aria-hidden />

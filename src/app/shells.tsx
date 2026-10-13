@@ -3,6 +3,7 @@ import { Navigate } from "react-router";
 import { sair, usePortalCliente, usePortalColaborador } from "@/features/identity/api";
 import { useUtilizador } from "@/features/identity/utilizador";
 import { eApiError } from "@/lib/api/problem";
+import { temGestao } from "@/lib/auth/permissions";
 import { AppShell } from "@/shells/AppShell";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
@@ -34,7 +35,7 @@ export function ShellColaborador() {
           <ErrorPanel erro={portal.error} tentarDeNovo={() => void portal.refetch()} />
         )}
         <div className="mt-6 flex gap-2">
-          {utilizador.permissions.length > 0 ? (
+          {temGestao(utilizador.permissions) ? (
             <Button asChild variante="secondary">
               <a href="/">Voltar à gestão</a>
             </Button>

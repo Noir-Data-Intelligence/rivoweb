@@ -36,6 +36,9 @@ const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
   Cliente: ["Início"],
 };
 
+/** Onde cada perfil entra (§3.3): os portais, apesar de `documents.write`. */
+const ENTRADA: Readonly<Record<string, RegExp>> = { Colaborador: /\/eu$/, Cliente: /\/cliente$/ };
+
 const { password, contas } = process.env.RIVO_QA_CONTAS ? lerContas() : { password: "", contas: [] as Conta[] };
 
 for (const c of contas) {
@@ -55,6 +58,7 @@ for (const c of contas) {
     await page.getByRole("button", { name: "Entrar" }).click();
     const nav = page.getByRole("navigation", { name: "Principal" }).first();
     await expect(nav).toBeVisible({ timeout: 20_000 });
+    await expect(page).toHaveURL(ENTRADA[c.perfil] ?? /\/$/);
 
     const ligacoes = nav.getByRole("link");
     await expect(ligacoes.first()).toBeVisible();

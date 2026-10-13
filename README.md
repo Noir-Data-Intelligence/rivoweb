@@ -2,7 +2,9 @@
 
 SPA em React, TypeScript e Vite para a Rivo Suite. A API é `https://syyt.tech`.
 O plano completo (arquitectura, segurança, fases) está em [`PLANO.md`](PLANO.md);
-os pedidos pendentes ao backend estão em [`PEDIDO-BACKEND.md`](PEDIDO-BACKEND.md).
+os pedidos pendentes ao backend estão em [`PEDIDO-BACKEND.md`](PEDIDO-BACKEND.md);
+o que cada perfil pode fazer está em [`FUNCIONALIDADES.md`](FUNCIONALIDADES.md),
+actualizado no fim de cada fase.
 
 ## Arranque local
 
