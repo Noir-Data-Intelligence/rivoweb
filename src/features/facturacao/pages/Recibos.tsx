@@ -146,11 +146,15 @@ export function FichaRecibo() {
               <Link to={`/facturas/${s.salesInvoiceId}`} className="font-medium text-foreground underline-offset-4 hover:underline">
                 {s.invoiceNumber}
               </Link>
-              <span className="tabular-nums">{moeda(s.amount, r.currency)}</span>
+              <span className="text-right tabular-nums">
+                {moeda(s.amount, r.currency)}
+                {Number(s.withheld) > 0 ? <span className="block text-xs text-muted-foreground">+ {moeda(s.withheld, r.currency)} retido na fonte</span> : null}
+              </span>
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-right text-sm font-semibold tabular-nums">Total: {moeda(r.total, r.currency)}</p>
+        <p className="mt-3 text-right text-sm font-semibold tabular-nums">Total recebido: {moeda(r.total, r.currency)}</p>
+        {Number(r.withheldTotal) > 0 ? <p className="text-right text-sm tabular-nums text-muted-foreground">Retido na fonte: {moeda(r.withheldTotal, r.currency)}</p> : null}
         {r.notes ? <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{r.notes}</p> : null}
         {r.fiscalNotice ? <p className="mt-3 text-xs text-muted-foreground">{r.fiscalNotice}</p> : null}
       </Card>

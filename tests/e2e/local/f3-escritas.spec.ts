@@ -99,9 +99,10 @@ test("F3 de ponta a ponta na base local", async ({ page }) => {
   await expect(page).toHaveURL(/\/recibos\/[0-9a-f-]{36}$/);
   await expect(page.getByText("1 000,00 Kz").first()).toBeVisible();
   await page.goto(urlFactura);
-  // B17: o servidor não desconta a retenção do saldo (2 850,29 − 1 000,00).
-  await expect(page.getByText("1 850,29 Kz").first()).toBeVisible();
-  await expect(page.getByText("Inclui a retenção na fonte", { exact: false })).toBeVisible();
+  // ADR-083: o recibo leva o dinheiro (1 000,00) e o retido (162,52, sugerido);
+  // em aberto fica 2 850,29 − 1 000,00 − 162,52.
+  await expect(page.getByText("1 687,77 Kz").first()).toBeVisible();
+  await expect(page.getByText("162,52 Kz").first()).toBeVisible();
 
   // Nota de crédito de 1 unidade e anulação dela
   await page.getByRole("button", { name: "Nota de crédito" }).click();
@@ -134,7 +135,8 @@ test("F3 de ponta a ponta na base local", async ({ page }) => {
   // Importação CSV (um cliente novo e um duplicado do anterior)
   await page.goto("/clientes");
   await page.getByRole("button", { name: "Importar CSV" }).click();
-  const csv = `Nome,NIF,Morada,Cidade,Pais\n${marca} Importado,8${sufixo},Rua 2,Luanda,AO\n${marca} Repetido,9${sufixo},Rua 3,Luanda,AO\n`;
+  // B18: com ponto e vírgula, como o Excel em português grava.
+  const csv = `Nome;NIF;Morada;Cidade;Pais\n${marca} Importado;8${sufixo};Rua 2;Luanda;AO\n${marca} Repetido;9${sufixo};Rua 3;Luanda;AO\n`;
   await page.getByLabel("Ficheiro").setInputFiles({ name: "clientes.csv", mimeType: "text/csv", buffer: Buffer.from(csv, "utf8") });
   await page.getByRole("dialog").getByRole("button", { name: "Importar" }).click();
   await expect(page.getByText(/1 importados, 1 duplicados, 0 recusados/)).toBeVisible();

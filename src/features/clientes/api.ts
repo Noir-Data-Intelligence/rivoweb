@@ -103,7 +103,7 @@ export function useRemoverContacto(customerId: string) {
   });
 }
 
-/** Importação CSV separado por vírgulas (`Nome,NIF,Morada,Cidade,Pais`, até 5 MB). Multipart, campo `file`. */
+/** Importação CSV com `,` ou `;` (`Nome,NIF,Morada,Cidade,Pais`, até 5 MB; B18). Multipart, campo `file`. */
 export function useImportarClientes() {
   const qc = useQueryClient();
   return useEscrita({

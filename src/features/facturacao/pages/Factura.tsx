@@ -14,9 +14,12 @@ import { Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
-import { useAnularFactura, useEmitirNota, useEmitirRecibo, useFactura, useNotas, useSaldo, type Factura } from "../api";
+import { useAnularFactura, useEmitirNota, useEmitirRecibo, useFactura, useNotas, useSaldo, type Factura, type SaldoFactura } from "../api";
 import { calcularTotais } from "../calculos";
 import { Anular, AVISO_DEFINITIVO, DescarregarPdf, EnviarPorEmail, EstadoDocumento, LinhasDocumento, MEIOS, moeda, NOME_TIPO, Totais } from "../comum";
+
+/** O valor, ou zero se for negativo. */
+const naoNegativo = (v: Big) => (v.lt(0) ? new Big(0) : v);
 
 /** Nota de crédito a partir das linhas da factura (quantidades a creditar). */
 function NovaNotaCredito({ f }: { f: Factura }) {
@@ -100,26 +103,43 @@ function NovaNotaCredito({ f }: { f: Factura }) {
   );
 }
 
-/** Recibo da factura: liquida o saldo em aberto, no todo ou em parte. */
-function NovoRecibo({ f, emAberto }: { f: Factura; emAberto: Big }) {
+/**
+ * Recibo da factura: liquida o saldo em aberto, no todo ou em parte. Numa
+ * factura com retenção, cada recibo diz o dinheiro e o retido na fonte pelo
+ * cliente (ADR-083); a factura fica liquidada pelos dois. Um recibo só com
+ * retenção (dinheiro 0) regista o certificado que chega depois.
+ */
+function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
   const navegar = useNavigate();
   const [aberto, setAberto] = useState(false);
   const emitir = useEmitirRecibo();
-  const [valor, setValor] = useState(emAberto.toFixed(2).replace(".", ","));
+  const emAberto = dinheiro(saldo.outstanding);
+  const porComprovar = naoNegativo(dinheiro(saldo.withholdingAmount).minus(dinheiro(saldo.withheld)));
+  const comRetencao = porComprovar.gt(0);
+  const [valor, setValor] = useState(naoNegativo(emAberto.minus(porComprovar)).toFixed(2).replace(".", ","));
+  const [retido, setRetido] = useState(porComprovar.toFixed(2).replace(".", ","));
   const [meio, setMeio] = useState("");
   const [data, setData] = useState(hojeIso());
   const [notas, setNotas] = useState("");
   const [tentou, setTentou] = useState(false);
   const id = useId();
   const v = lerDinheiroDigitado(valor, 2);
-  const valorOk = v !== null && v.gt(0) && v.lte(emAberto);
-  const ok = valorOk && meio !== "" && /^\d{4}-\d{2}-\d{2}$/.test(data);
+  const r = comRetencao ? lerDinheiroDigitado(retido === "" ? "0" : retido, 2) : new Big(0);
+  const retidoOk = r !== null && r.gte(0) && r.lte(porComprovar);
+  const somaOk = v !== null && r !== null && v.gte(0) && v.plus(r).gt(0) && v.plus(r).lte(emAberto);
+  const ok = retidoOk && somaOk && meio !== "" && /^\d{4}-\d{2}-\d{2}$/.test(data);
   const confirmar = () => {
     setTentou(true);
-    if (!ok || emitir.isPending || v === null) return;
+    if (!ok || emitir.isPending || v === null || r === null) return;
     emitir.mutate(
-      { series: null, receivedOn: data, method: meio, notes: normalizarTexto(notas, true) || null, settlements: [{ salesInvoiceId: f.invoiceId, amount: paraApi(v) }] },
-      { onSuccess: (r) => void navegar(`/recibos/${r.receiptId}`) },
+      {
+        series: null,
+        receivedOn: data,
+        method: meio,
+        notes: normalizarTexto(notas, true) || null,
+        settlements: [{ salesInvoiceId: f.invoiceId, amount: paraApi(v), withheld: comRetencao && r.gt(0) ? paraApi(r as never) : null }],
+      },
+      { onSuccess: (x) => void navegar(`/recibos/${x.receiptId}`) },
     );
   };
   return (
@@ -135,7 +155,7 @@ function NovoRecibo({ f, emAberto }: { f: Factura; emAberto: Big }) {
           if (!a) emitir.reset();
         }}
         titulo={`Recibo de ${f.number}`}
-        descricao={`Em aberto: ${moeda(emAberto.toFixed(2), f.currency)}. ${AVISO_DEFINITIVO}`}
+        descricao={`Em aberto: ${moeda(emAberto.toFixed(2), f.currency)}${comRetencao ? `, dos quais ${moeda(porComprovar.toFixed(2), f.currency)} de retenção por comprovar` : ""}. ${AVISO_DEFINITIVO}`}
         rotuloConfirmar="Emitir recibo"
         aCarregar={emitir.isPending}
         erro={emitir.error ? <ErrorPanel erro={emitir.error} /> : undefined}
@@ -146,9 +166,29 @@ function NovoRecibo({ f, emAberto }: { f: Factura; emAberto: Big }) {
             <label htmlFor={`${id}-v`} className="text-sm font-medium text-foreground">
               Valor recebido
             </label>
-            <Input id={`${id}-v`} inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value)} aria-invalid={tentou && !valorOk ? true : undefined} />
-            {tentou && !valorOk ? <p className="text-xs text-danger" role="alert">Entre 0 e o valor em aberto, até 2 casas.</p> : null}
+            <Input id={`${id}-v`} inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value)} aria-invalid={tentou && !somaOk ? true : undefined} />
           </div>
+          {comRetencao ? (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={`${id}-r`} className="text-sm font-medium text-foreground">
+                Retido na fonte
+              </label>
+              <Input id={`${id}-r`} inputMode="decimal" value={retido} onChange={(e) => setRetido(e.target.value)} aria-invalid={tentou && !retidoOk ? true : undefined} aria-describedby={`${id}-r-a`} />
+              <p id={`${id}-r-a`} className="text-xs text-muted-foreground">
+                Até {moeda(porComprovar.toFixed(2), f.currency)}. Com o certificado de retenção, pode registar só este valor.
+              </p>
+            </div>
+          ) : null}
+          {tentou && !somaOk ? (
+            <p className="text-xs text-danger sm:col-span-2" role="alert">
+              {comRetencao ? "O valor recebido mais o retido tem de ser maior que zero e não passar do valor em aberto." : "Entre 0 e o valor em aberto, até 2 casas."}
+            </p>
+          ) : null}
+          {tentou && !retidoOk ? (
+            <p className="text-xs text-danger sm:col-span-2" role="alert">
+              O retido não pode passar da retenção por comprovar.
+            </p>
+          ) : null}
           <div className="flex flex-col gap-1.5">
             <label htmlFor={`${id}-m`} className="text-sm font-medium text-foreground">
               Meio
@@ -188,27 +228,27 @@ function Saldo({ f }: { f: Factura }) {
   if (saldo.error) return <ErrorPanel erro={saldo.error} tentarDeNovo={() => void saldo.refetch()} />;
   const s = saldo.data;
   const emAberto = dinheiro(s.outstanding);
+  const retencao = dinheiro(s.withholdingAmount);
+  const porComprovar = naoNegativo(retencao.minus(dinheiro(s.withheld)));
+  const recebido: [string, string][] = retencao.gt(0)
+    ? [
+        ["Recebido (dinheiro)", moeda(dinheiro(s.received).minus(dinheiro(s.withheld)).toFixed(2), s.currency)],
+        ["Retido na fonte", moeda(s.withheld, s.currency)],
+      ]
+    : [["Recebido", moeda(s.received, s.currency)]];
   return (
     <Card>
       <CardTitle>Saldo</CardTitle>
-      <Totais
-        linhas={[
-          ["Facturado", moeda(s.invoiced, s.currency)],
-          ["Creditado", moeda(s.credited, s.currency)],
-          ["Recebido", moeda(s.received, s.currency)],
-          ["Em aberto", moeda(s.outstanding, s.currency)],
-        ]}
-      />
+      <Totais linhas={[["Facturado", moeda(s.invoiced, s.currency)], ["Creditado", moeda(s.credited, s.currency)], ...recebido, ["Em aberto", moeda(s.outstanding, s.currency)]]} />
       {s.settled ? <Alert tom="sucesso" className="mt-3" titulo="Liquidada." /> : null}
-      {Number(f.withholdingAmount) > 0 && !s.settled ? (
-        // B17: o saldo do servidor é o total bruto e não desconta a retenção na fonte.
-        <Alert tom="info" className="mt-3" titulo={`Inclui a retenção na fonte (${moeda(f.withholdingAmount, f.currency)}).`}>
-          O cliente paga {moeda(f.amountPayable, f.currency)}; a parte retida entrega-a ao Estado.
+      {!s.settled && porComprovar.gt(0) ? (
+        <Alert tom="info" className="mt-3" titulo={`Retenção por comprovar: ${moeda(porComprovar.toFixed(2), s.currency)}.`}>
+          Regista-se num recibo, com o valor retido pelo cliente (por exemplo quando chega o certificado).
         </Alert>
       ) : null}
       {!s.settled && f.status === "Normal" && f.documentType !== "FR" && emAberto.gt(0) && pode("finance.receipts.write") ? (
         <div className="mt-3">
-          <NovoRecibo f={f} emAberto={emAberto} />
+          <NovoRecibo f={f} saldo={s} />
         </div>
       ) : null}
     </Card>

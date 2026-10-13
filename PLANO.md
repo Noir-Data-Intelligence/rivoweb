@@ -1467,7 +1467,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 | Tema | Plano | Execução | Porquê |
 |---|---|---|---|
 | Emissão | Rascunho → emitir | Sempre por rascunho: «Guardar rascunho» e «Emitir…» (grava primeiro o que está no ecrã e emite exactamente isso). `POST /finance/sales-invoices` directo não se usa | O rascunho é a única via com rasto e revisão antes do número |
-| Totais antes de emitir | Pré-visualização com `Big` | Igual, com as regras do servidor (linha a linha, 2 casas, meio para cima; retenção sobre o líquido). **Só para quem lê as taxas** (`fiscal.rates.read`); para Sales, «IVA calculado na emissão» | **Facto:** o rascunho não calcula o IVA e a Sales não lê as taxas (B16) |
+| Totais antes de emitir | Pré-visualização com `Big` | Quem lê as taxas vê a previsão local, ao escrever (regras do servidor: linha a linha, 2 casas, meio para cima; retenção sobre o líquido). Quem não as lê (Sales) vê a previsão do servidor depois de guardar o rascunho | B16 resolvido (PR #100): o rascunho devolve `taxTotal`, `grossTotal`, `withholdingAmount`, `amountPayable` |
 | Códigos de imposto | `NOR` | Os códigos de IVA lidos da API, sem `ISE`/`NS` (exigem código de isenção, 501); quem não lê as taxas vê só `NOR` | ADR-011: os códigos são dados |
 | Duplo envio | Botão bloqueado | **Trinco síncrono em todas as escritas** (`lib/api/escrita.ts`, `useEscrita`) | **Provado no e2e:** clique duplo em «Emitir documento» com a rede lenta fazia dois `POST …/issue` (seriam dois documentos fiscais). `isPending` só muda depois de o React voltar a desenhar |
 | Erros 400 | `title` + `detail` | Quando o `title` é o genérico do ASP.NET, o painel mostra os motivos de `errors` | A emissão recusada mostrava só «One or more validation errors occurred.» |
@@ -1476,8 +1476,9 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 | Contas de cliente e documentos partilhados | — | Ficam para a F10 (portal do cliente) | Como no plano |
 | Chunk inicial | 150 KB | 149,3 KB; os carregadores das páginas passam para um módulo diferido (`app/paginas.ts`) | Cada `import()` no router deixava no chunk inicial o caminho e a lista de dependências: as 16 rotas da F3 punham-no em 150,2 KB. Agora as rotas novas não pesam no chunk inicial |
 | Tempo de espera do e2e | 5 s | 10 s | Três motores em paralelo numa só máquina davam esperas falhadas por carga |
-| Saldo com retenção | — | A ficha avisa «Inclui a retenção na fonte» | **Facto** (base local): o saldo do servidor ignora a retenção (B17) |
-| Importação CSV | — | Separada por vírgulas | **Facto:** o backend só aceita vírgula (B18) |
+| Retenção na fonte | — | O saldo mostra o recebido em dinheiro, o retido e a «retenção por comprovar»; o recibo tem «Retido na fonte» (sugerido) e aceita um recibo só com retenção | B17 resolvido (PR #101, ADR-083); verificado na base local: em aberto 2 850,29 − 1 000,00 − 162,52 = 1 687,77 |
+| Importação CSV | — | `,` ou `;` | B18 resolvido (PR #100); verificado na base local com `;` |
+| Contrato | OpenAPI de 2026-10-12 | OpenAPI de 2026-10-13 (`main` @ `01c7d6c`), tirado de uma API local construída num `git worktree` do `origin/main` | O repositório local do backend tinha alterações por gravar de outra sessão: não se mudou de ramo nele |
 
 ### F3 — estado
 
@@ -1498,5 +1499,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   documento), totais do servidor iguais aos previstos ao cêntimo, PDF, envio
   recusado sem SMTP (501), recibo parcial, nota de crédito e a sua anulação,
   pró-forma convertida em factura-recibo e importação CSV (importado e
-  duplicado). **Nenhum documento fiscal emitido em produção.**
-- **Testes:** 103 unitários; 49 cenários e2e × 3 motores.
+  duplicado). Depois de B16–B18: retenção registada no recibo e saldo
+  correcto, e importação com `;`. **Nenhum documento fiscal emitido em
+  produção.**
+- **Testes:** 103 unitários; 50 cenários e2e × 3 motores.

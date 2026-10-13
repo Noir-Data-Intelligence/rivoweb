@@ -192,7 +192,7 @@ function Importar() {
           }
         }}
         titulo="Importar clientes de um CSV"
-        descricao="Separado por vírgulas, com as colunas Nome, NIF, Morada, Cidade e Pais na primeira linha. Até 5 MB. Clientes com um NIF já registado ficam de fora."
+        descricao="Separado por vírgulas ou ponto e vírgula (como o Excel grava), com as colunas Nome, NIF, Morada, Cidade e Pais na primeira linha. Até 5 MB. Clientes com um NIF já registado ficam de fora."
         rotuloConfirmar={r ? "Importar outro" : "Importar"}
         aCarregar={importar.isPending}
         erro={importar.error ? <ErrorPanel erro={importar.error} /> : undefined}

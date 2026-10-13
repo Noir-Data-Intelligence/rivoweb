@@ -18019,6 +18019,15 @@ export interface paths {
                         "application/json": components["schemas"]["DepartmentCreatedResponse"];
                     };
                 };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
                 /** @description Sem sessão válida. */
                 401: {
                     headers: {
@@ -18032,6 +18041,15 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -18096,6 +18114,15 @@ export interface paths {
                 };
                 /** @description Not Found */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -18188,6 +18215,15 @@ export interface paths {
                         "application/json": components["schemas"]["PositionCreatedResponse"];
                     };
                 };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
                 /** @description Sem sessão válida. */
                 401: {
                     headers: {
@@ -18201,6 +18237,15 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -18265,6 +18310,15 @@ export interface paths {
                 };
                 /** @description Not Found */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -39679,6 +39733,16 @@ export interface components {
             /** Format: double */
             outstanding: number | string;
             settled: boolean;
+            /**
+             * Format: double
+             * @default 0
+             */
+            withholdingAmount: number | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            withheld: number | string;
         };
         InvoiceDraftView: {
             /** Format: uuid */
@@ -39706,6 +39770,19 @@ export interface components {
             updatedAt: string;
             /** Format: uuid */
             issuedInvoiceId: null | string;
+            /** Format: double */
+            taxTotal?: null | number | string;
+            /** Format: double */
+            grossTotal?: null | number | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            withholdingAmount: number | string;
+            /** Format: double */
+            amountPayable?: null | number | string;
+            /** Format: date */
+            taxEstimatedOn?: null | string;
         };
         InvoiceLineRequest: {
             description: string;
@@ -41704,6 +41781,11 @@ export interface components {
             cancelledAt: null | string;
             cancellationReason: null | string;
             settlements: components["schemas"]["SettlementView"][];
+            /**
+             * Format: double
+             * @default 0
+             */
+            withheldTotal: number | string;
         };
         ReconciliationSummary: {
             /** Format: uuid */
@@ -42280,6 +42362,8 @@ export interface components {
             salesInvoiceId: string;
             /** Format: double */
             amount: number | string;
+            /** Format: double */
+            withheld?: null | number | string;
         };
         SettlementView: {
             /** Format: int32 */
@@ -42289,6 +42373,11 @@ export interface components {
             invoiceNumber: string;
             /** Format: double */
             amount: number | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            withheld: number | string;
         };
         SetWarehouseStatusRequest: {
             active: boolean;

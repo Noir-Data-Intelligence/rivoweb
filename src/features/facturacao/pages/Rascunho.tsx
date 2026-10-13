@@ -153,6 +153,14 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
   const retencao = lerDecimalDigitado(v.withholdingRate ?? "", 2);
   const totais = calcularTotais(validas, retencao);
   const m = v.currency ?? "AOA";
+  // Quem não lê as taxas (Sales) vê a previsão do servidor do rascunho guardado
+  // (B16), enquanto o ecrã não tiver alterações por guardar.
+  const doServidor =
+    !leTaxas && rascunho && !form.formState.isDirty && rascunho.taxTotal !== null && rascunho.taxTotal !== undefined
+      ? { imposto: rascunho.taxTotal, aPagar: rascunho.amountPayable ?? null, data: rascunho.taxEstimatedOn ?? null }
+      : null;
+  const textoImposto = totais.imposto ? moeda(totais.imposto.toFixed(2), m) : doServidor ? moeda(doServidor.imposto, m) : leTaxas ? "Sem taxa em vigor" : "Ao guardar";
+  const textoAPagar = totais.aPagar ? moeda(totais.aPagar.toFixed(2), m) : doServidor?.aPagar !== null && doServidor?.aPagar !== undefined ? moeda(doServidor.aPagar, m) : textoImposto;
 
   const aoErrar = (e: unknown) =>
     setSoltas(aplicarErrosDoServidor(e, form.setError, ["customerId", "documentType", "series", "currency", "dueDate", "paymentTerms", "withholdingRate", "paymentMethod", "referencedInvoiceId", "notes"]));
@@ -345,7 +353,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
           <dt className="text-muted-foreground">Líquido</dt>
           <dd className="text-right tabular-nums">{moeda(totais.liquido.toFixed(2), m)}</dd>
           <dt className="text-muted-foreground">IVA</dt>
-          <dd className="text-right tabular-nums">{totais.imposto ? moeda(totais.imposto.toFixed(2), m) : "Na emissão"}</dd>
+          <dd className="text-right tabular-nums">{textoImposto}</dd>
           {totais.retencao.gt(0) ? (
             <>
               <dt className="text-muted-foreground">Retenção</dt>
@@ -353,10 +361,14 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
             </>
           ) : null}
           <dt className="font-semibold text-foreground">A pagar</dt>
-          <dd className="text-right font-semibold tabular-nums">{totais.aPagar ? moeda(totais.aPagar.toFixed(2), m) : "Na emissão"}</dd>
+          <dd className="text-right font-semibold tabular-nums">{textoAPagar}</dd>
         </dl>
         <p className="mt-2 text-right text-xs text-muted-foreground">
-          {totais.imposto ? "Previsão com as taxas em vigor hoje. O valor que conta é o do documento emitido." : "O IVA calcula-se na emissão, à taxa em vigor."}
+          {totais.imposto || doServidor
+            ? "Previsão com as taxas em vigor hoje. O valor que conta é o do documento emitido, à taxa da data da factura."
+            : leTaxas
+              ? "Há linhas sem taxa em vigor: a emissão será recusada."
+              : "Guarde o rascunho para ver o IVA previsto pelo servidor."}
         </p>
       </Card>
 
@@ -413,7 +425,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
           {v.customerId ? (clientes.data?.items.find((c) => c.customerId === v.customerId)?.name ?? "Cliente") : "Consumidor final"} ·{" "}
-          {totais.aPagar ? `a pagar ${moeda(totais.aPagar.toFixed(2), m)}` : `líquido ${moeda(totais.liquido.toFixed(2), m)} + IVA`}
+          {totais.aPagar || doServidor?.aPagar ? `a pagar ${textoAPagar}` : `líquido ${moeda(totais.liquido.toFixed(2), m)} + IVA`}
         </p>
       </Confirmar>
 

@@ -68,11 +68,11 @@ AM = AssetManager.
 | **Facturas** | | | | | | | | | | |
 | Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Nova factura: rascunhos FT, FR e ND, e emitir | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
-| Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | — ⁴ | — | — | — |
+| Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | ✓ ⁴ | — | — | — |
 | Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Emitir notas de crédito a partir da factura | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Registar recebimentos (recibos) a partir da factura | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Registar recebimentos (recibos) a partir da factura, com o retido na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Notas de crédito e recibos:** ver listas, fichas e PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** ver | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** criar, converter em factura e anular | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
@@ -107,7 +107,7 @@ Recursos Humanos.»
 ² Só se a conta estiver associada a um cliente; sem associação, o portal diz
 «Esta conta não está associada a um cliente. Fale com a empresa.»
 ³ Excepto em contas SuperAdmin, que só um SuperAdmin gere.
-⁴ A Sales não lê as taxas de IVA: vê o líquido, e o IVA calcula-se na emissão (B16).
+⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 
 ---
 
@@ -197,7 +197,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Lista paginada (nome, NIF, cidade, tipo, estado), com ou sem inactivos.
 - **Registar** (nome, NIF, morada de facturação, cidade, país, e-mail, telefone,
   sector, sítio, pessoa de contacto, tipo) e **importar de um CSV** separado por
-  vírgulas (Nome, NIF, Morada, Cidade, Pais), com o resultado linha a linha.
+  vírgulas ou ponto e vírgula, como o Excel grava (Nome, NIF, Morada, Cidade,
+  Pais), com o resultado linha a linha.
 - Ficha: **corrigir os dados** (o NIF não se corrige), **desactivar e
   reactivar**, **eliminar** (só sem história; com história oferece desactivar),
   **contactos** (criar, rever, remover; decide compras; contacto de facturação)
@@ -212,10 +213,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   preço, imposto); notas internas. Totais previstos com a taxa em vigor.
   **Guardar rascunho**, **eliminar rascunho**, **emitir** com confirmação («fica
   registado e não se apaga») e escolha da data.
-- Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido, em
-  aberto), **PDF**, **enviar ao cliente** por e-mail, **nota de crédito** (com
-  as quantidades a creditar e o motivo), **registar recebimento** (valor, meio,
-  data, notas) e **anular** com motivo.
+- Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido em
+  dinheiro, retido na fonte, em aberto, retenção por comprovar), **PDF**,
+  **enviar ao cliente** por e-mail, **nota de crédito** (com as quantidades a
+  creditar e o motivo), **registar recebimento** (valor recebido, retido na
+  fonte quando a factura tem retenção, meio, data, notas; também só a
+  retenção, quando chega o certificado) e **anular** com motivo.
 - Um clique duplo nunca emite dois documentos.
 
 **Notas de crédito** e **Recibos**
@@ -342,8 +345,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   desactivar, eliminar sem história, contactos).
 
 **Facturas**
-- Ver; **nova factura** (rascunhos FT, FR, ND) e **emitir**. Vê o líquido; o
-  IVA calcula-se na emissão (não lê as taxas).
+- Ver; **nova factura** (rascunhos FT, FR, ND) e **emitir**. Vê o IVA e o
+  total previstos pelo servidor depois de guardar o rascunho.
 - **PDF** e **enviar ao cliente**. Não anula, não emite notas de crédito nem
   regista recebimentos.
 

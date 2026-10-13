@@ -156,6 +156,29 @@ export const saldo = (): S["InvoiceBalanceView"] => ({
   received: 14000,
   outstanding: 100000,
   settled: false,
+  withholdingAmount: 0,
+  withheld: 0,
+});
+
+/** Factura com retenção de 6,5 % (ADR-083): a pagar 2 687,77; retenção 162,52. */
+export const facturaComRetencao = (): S["SalesInvoiceView"] => ({
+  ...factura(),
+  netTotal: 2500.25,
+  taxTotal: 350.04,
+  grossTotal: 2850.29,
+  withholdingRate: 6.5,
+  withholdingAmount: 162.52,
+  amountPayable: 2687.77,
+  lines: [{ lineNumber: 1, description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR", taxPercentage: 14, netAmount: 2500.25, taxAmount: 350.04 }],
+});
+
+export const saldoComRetencao = (): S["InvoiceBalanceView"] => ({
+  ...saldo(),
+  invoiced: 2850.29,
+  received: 0,
+  outstanding: 2850.29,
+  withholdingAmount: 162.52,
+  withheld: 0,
 });
 
 export const proforma = (): S["ProformaView"] => ({

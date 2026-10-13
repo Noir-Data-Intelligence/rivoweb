@@ -119,7 +119,14 @@ function Rascunhos() {
       ),
     },
     { id: "tipo", cabecalho: "Tipo", esconderAte: "sm", celula: (r) => NOME_TIPO[r.documentType] ?? r.documentType },
-    { id: "liquido", cabecalho: "Líquido", alinhar: "direita", ordenar: (r) => Number(r.netTotal), celula: (r) => moeda(r.netTotal, r.currency) },
+    { id: "liquido", cabecalho: "Líquido", alinhar: "direita", esconderAte: "md", ordenar: (r) => Number(r.netTotal), celula: (r) => moeda(r.netTotal, r.currency) },
+    {
+      id: "total",
+      cabecalho: "Total previsto",
+      alinhar: "direita",
+      ordenar: (r) => Number(r.grossTotal ?? r.netTotal),
+      celula: (r) => (r.grossTotal !== null && r.grossTotal !== undefined ? moeda(r.grossTotal, r.currency) : "Sem taxa"),
+    },
     { id: "act", cabecalho: "Actualizado", esconderAte: "md", ordenar: (r) => r.updatedAt, celula: (r) => formatarDataHora(r.updatedAt) },
   ];
   return (

@@ -3,7 +3,7 @@
  * escrita (dinheiro em texto, nunca number), confirmações de emissão e de
  * envio, sem duplo envio, permissões por perfil, axe e CSP.
  */
-import { IDF3, meFinancas, meVendas } from "../../fixtures/f3";
+import { facturaComRetencao, IDF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 import { comF3 } from "../apoio-f3";
 
@@ -157,6 +157,29 @@ test.describe("facturas", () => {
     expect(api.escritas("POST", "/finance/receipts")[0]?.corpo).toMatchObject({ method: "TB", settlements: [{ salesInvoiceId: IDF3.factura, amount: "40000.50" }] });
   });
 
+  test("recibo de factura com retenção: dinheiro e retido na fonte (ADR-083)", async ({ page, api }) => {
+    await comF3(api)
+      .em("GET", `/finance/sales-invoices/${IDF3.factura}`, { status: 200, corpo: facturaComRetencao() })
+      .em("GET", `/finance/sales-invoices/${IDF3.factura}/balance`, { status: 200, corpo: saldoComRetencao() })
+      .em("POST", "/finance/receipts", { status: 201, corpo: { receiptId: IDF3.recibo, number: "RG S001/5" } })
+      .em("GET", `/finance/receipts/${IDF3.recibo}`, { status: 404, corpo: { status: 404 }, cabecalhos: { "Content-Type": "application/problem+json" } })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/facturas/${IDF3.factura}`);
+    await expect(page.getByText("Retenção por comprovar", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Registar recebimento" }).click();
+    await expect(page.getByLabel("Valor recebido")).toHaveValue("2687,77");
+    await expect(page.getByLabel("Retido na fonte")).toHaveValue("162,52");
+    await page.getByLabel("Retido na fonte").fill("200");
+    await page.getByLabel("Meio").selectOption("TB");
+    await page.getByRole("button", { name: "Emitir recibo" }).click();
+    await expect(page.getByText("O retido não pode passar da retenção por comprovar.")).toBeVisible();
+    await page.getByLabel("Retido na fonte").fill("162,52");
+    await page.getByRole("button", { name: "Emitir recibo" }).click();
+    await expect(page).toHaveURL(new RegExp(`/recibos/${IDF3.recibo}$`));
+    expect(api.escritas("POST", "/finance/receipts")[0]?.corpo).toMatchObject({ method: "TB", settlements: [{ salesInvoiceId: IDF3.factura, amount: "2687.77", withheld: "162.52" }] });
+  });
+
   test("pró-forma: converter em factura-recibo exige o meio", async ({ page, api }) => {
     await comF3(api).em("POST", `/finance/proformas/${IDF3.proforma}/conversion`, { status: 201, corpo: { id: IDF3.factura, number: "FR S001/1" } }).ligar();
     await entrar(page);
@@ -192,17 +215,30 @@ test.describe("facturas", () => {
 });
 
 test.describe("permissões por perfil", () => {
-  test("Vendas: emite e envia, sem anular, creditar nem receber; IVA só na emissão", async ({ page, api }) => {
-    await comF3(api, meVendas).ligar();
+  test("Vendas: emite e envia, sem anular, creditar nem receber; IVA previsto pelo servidor", async ({ page, api }) => {
+    await comF3(api, meVendas)
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, {
+        status: 200,
+        corpo: {
+          draftId: IDF3.rascunho, customerId: IDF3.cliente, documentType: "FT", series: null, currency: "AOA", dueDate: null, paymentTerms: null, withholdingRate: 6.5,
+          paymentMethod: null, referencedInvoiceId: null, lines: [{ description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR", taxPercentage: 14, net: 2500.25, tax: 350.04 }],
+          netTotal: 2500.25, notes: null, createdAt: "2026-10-13T10:00:00Z", updatedAt: "2026-10-13T10:00:00Z", issuedInvoiceId: null,
+          taxTotal: 350.04, grossTotal: 2850.29, withholdingAmount: 162.52, amountPayable: 2687.77, taxEstimatedOn: "2026-10-13",
+        },
+      })
+      .ligar();
     await entrar(page, "vendas@teste.local");
     await page.goto(`/facturas/${IDF3.factura}`);
     await expect(page.getByRole("button", { name: "Enviar ao cliente" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Anular" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Nota de crédito" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Registar recebimento" })).toHaveCount(0);
-    await page.goto("/facturas/rascunhos/novo");
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    // B16: a Sales não lê as taxas; vê a previsão do servidor do rascunho guardado.
+    await expect(page.getByLabel("Totais previstos")).toContainText("350,04 Kz");
+    await expect(page.getByLabel("Totais previstos")).toContainText("2 687,77 Kz");
     await page.getByLabel("Preço unitário").fill("100");
-    await expect(page.getByLabel("Totais previstos")).toContainText("Na emissão");
+    await expect(page.getByLabel("Totais previstos")).toContainText("Ao guardar");
     expect(api.pedidos.some((p) => p.caminho === "/fiscal/tax-rates")).toBe(false);
   });
 
