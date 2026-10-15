@@ -1,9 +1,8 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F4** publicadas em
-> `https://rivoweb-coral.vercel.app`; **F5** (tesouraria, despesas e contas a
-> pagar) concluída e verificada na base local, por publicar · actualizado a
-> 2026-10-15.
+> **Estado:** fases **F0 a F5** publicadas em
+> `https://rivoweb-coral.vercel.app` (F5: tesouraria, despesas e contas a
+> pagar) · actualizado a 2026-10-16.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou

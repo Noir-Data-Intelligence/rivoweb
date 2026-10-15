@@ -1579,3 +1579,6 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   pequena com reposição, letra aceite e descontada, previsão criada, revista e
   apagada). **Nenhuma escrita em produção.**
 - **Testes:** 108 unitários; 79 cenários e2e × 3 motores.
+- **Publicação:** enviada a 2026-10-16 (`a9601b2..e5f6486`); a Vercel
+  publicou (`index-Bok-OtO4.js`) e o smoke por perfil em produção passou
+  (10/10, só leituras).
