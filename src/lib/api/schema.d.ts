@@ -37310,6 +37310,7 @@ export interface components {
             approverEmployeeId: string;
             /** Format: int32 */
             slaHours: null | number | string;
+            approverName?: null | string;
         };
         ApprovalDecisionView: {
             /** Format: uuid */
@@ -37320,6 +37321,7 @@ export interface components {
             /** Format: int32 */
             step: number | string;
             notes: null | string;
+            decidedByName?: null | string;
         };
         ApprovalHistoryView: {
             /** Format: uuid */
@@ -37345,6 +37347,8 @@ export interface components {
             totalSteps: number | string;
             assignments: components["schemas"]["ApprovalAssignmentView"][];
             decisions: components["schemas"]["ApprovalDecisionView"][];
+            summary?: null | string;
+            requestedByName?: null | string;
         };
         ApprovalRuleGroup: {
             module: string;
@@ -37376,6 +37380,9 @@ export interface components {
             requestedByEmployeeId: string;
             /** Format: date-time */
             submittedAt: string;
+            summary?: null | string;
+            requestedByName?: null | string;
+            pendingApproverNames?: null | components["schemas"]["EmployeeNameView"][];
         };
         ApproveBudgetRequest: {
             /** Format: uuid */
@@ -38934,6 +38941,11 @@ export interface components {
         EmployeeHiredResponse: {
             /** Format: uuid */
             employeeId: string;
+        };
+        EmployeeNameView: {
+            /** Format: uuid */
+            employeeId: string;
+            name: null | string;
         };
         EmployeeView: {
             /** Format: uuid */

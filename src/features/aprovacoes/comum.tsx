@@ -1,7 +1,5 @@
 /** Peças partilhadas pelos ecrãs de aprovações. */
 import { useMeuPainel } from "@/features/dashboard";
-import { useTodosColaboradores } from "@/features/rh";
-import { useUtilizador } from "@/features/identity";
 import { Badge } from "@/ui/Badge";
 
 /** Tipos de processo (Facto: `ApprovalContracts.cs`). */
@@ -51,15 +49,12 @@ export function useEuColaborador(): string | null {
 }
 
 /**
- * Nome de um colaborador a partir do id. Só quem lê colaboradores vê nomes;
- * os outros vêem «Colaborador» (os pedidos trazem só ids, B19). Nunca mostra o id.
+ * Nome de um colaborador: o pedido traz o nome ao lado do id (B19). Se o
+ * servidor não o souber, «Colaborador». Nunca mostra o id.
  */
 export function useNomeColaborador() {
-  const { pode } = useUtilizador();
   const eu = useEuColaborador();
-  const lista = useTodosColaboradores(pode("hr.employees.read"));
-  return (id: string) => {
-    const nome = lista.data?.items.find((c) => c.employeeId === id)?.fullName;
+  return (id: string, nome: string | null | undefined) => {
     if (id === eu) return nome ? `${nome} (você)` : "Você";
     return nome ?? "Colaborador";
   };

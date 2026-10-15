@@ -101,12 +101,13 @@ test.describe("caixa e decisão", () => {
     expect(api.escritas("POST", `/approval/requests/${IDF4.meu}/cancellation`)).toHaveLength(1);
   });
 
-  test("Finanças: decide sem nomes de colaboradores e sem aplicar no RH", async ({ page, api }) => {
+  test("Finanças: decide com os nomes do pedido (B19) e sem aplicar no RH", async ({ page, api }) => {
     await comF4(api, meFinancasF4).em("POST", `/approval/requests/${IDF4.pedido}/decisions`, { status: 200, corpo: pedido("Approved") }).ligar();
     await entrar(page, "financas4@teste.local");
     await page.goto(`/aprovacoes/${IDF4.pedido}`);
-    await expect(page.getByText("De Colaborador", { exact: false })).toBeVisible();
-    await expect(page.getByText("Aprovadores: Você")).toBeVisible();
+    await expect(page.getByText("De Carlos Teste", { exact: false })).toBeVisible();
+    await expect(page.getByText("Atribuição do cargo Director Financeiro", { exact: false })).toBeVisible();
+    await expect(page.getByText("Aprovadores: Ana Teste (você)")).toBeVisible();
     await page.getByRole("button", { name: "Aprovar" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);

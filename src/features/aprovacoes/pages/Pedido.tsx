@@ -189,7 +189,7 @@ export default function PedidoPagina() {
           <span className="inline-flex flex-wrap items-center gap-2">
             <EstadoPedido estado={p.status} />
             <span>
-              De {nome(p.requestedByEmployeeId)} · {formatarDataHora(p.submittedAt)}
+              De {nome(p.requestedByEmployeeId, p.requestedByName)} · {formatarDataHora(p.submittedAt)}
             </span>
           </span>
         }
@@ -200,6 +200,7 @@ export default function PedidoPagina() {
           {conflito.detalhe ?? "O pedido foi actualizado."} O estado abaixo já é o actual.
         </Alert>
       ) : null}
+      {p.summary ? <p className="mb-6 max-w-prose whitespace-pre-line text-base text-foreground">{p.summary}</p> : null}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
           {/* Quem pediu nunca decide (BR-2), mesmo ocupando o cargo aprovador. */}
@@ -229,12 +230,12 @@ export default function PedidoPagina() {
                         {atribuicoes[0] ? <span className="font-normal text-muted-foreground"> · {NOME_MODO[atribuicoes[0].mode] ?? atribuicoes[0].mode}</span> : null}
                         {atribuicoes[0]?.slaHours ? <span className="font-normal text-muted-foreground"> · prazo {String(atribuicoes[0].slaHours)} h</span> : null}
                       </p>
-                      {atribuicoes.length > 0 ? <p className="mt-1 text-sm text-muted-foreground">Aprovadores: {atribuicoes.map((a) => nome(a.approverEmployeeId)).join(", ")}</p> : null}
+                      {atribuicoes.length > 0 ? <p className="mt-1 text-sm text-muted-foreground">Aprovadores: {atribuicoes.map((a) => nome(a.approverEmployeeId, a.approverName)).join(", ")}</p> : null}
                       {decisoes.length > 0 ? (
                         <ul className="mt-2 flex flex-col gap-1 text-sm">
                           {decisoes.map((d) => (
                             <li key={`${d.decidedByEmployeeId}-${d.decidedAt}`}>
-                              <span className="font-medium">{nome(d.decidedByEmployeeId)}</span> {(NOME_ACCAO[d.action] ?? d.action).toLowerCase()} · {formatarDataHora(d.decidedAt)}
+                              <span className="font-medium">{nome(d.decidedByEmployeeId, d.decidedByName)}</span> {(NOME_ACCAO[d.action] ?? d.action).toLowerCase()} · {formatarDataHora(d.decidedAt)}
                               {d.notes ? <span className="block whitespace-pre-line text-muted-foreground">«{d.notes}»</span> : null}
                             </li>
                           ))}

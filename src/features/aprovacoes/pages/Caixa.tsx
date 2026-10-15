@@ -30,12 +30,15 @@ export default function Caixa() {
       id: "processo",
       cabecalho: "Pedido",
       celula: (p) => (
-        <Link to={`/aprovacoes/${p.requestId}`} className="font-medium text-foreground underline-offset-4 hover:underline">
-          {nomeProcesso(p.processType)}
-        </Link>
+        <div className="flex flex-col">
+          <Link to={`/aprovacoes/${p.requestId}`} className="font-medium text-foreground underline-offset-4 hover:underline">
+            {nomeProcesso(p.processType)}
+          </Link>
+          {p.summary ? <span className="line-clamp-2 text-sm text-muted-foreground">{p.summary}</span> : null}
+        </div>
       ),
     },
-    { id: "de", cabecalho: "De", esconderAte: "sm", celula: (p) => nome(p.requestedByEmployeeId) },
+    { id: "de", cabecalho: "De", esconderAte: "sm", celula: (p) => nome(p.requestedByEmployeeId, p.requestedByName) },
     { id: "passo", cabecalho: "Passo", esconderAte: "md", celula: (p) => `${String(p.currentStep)} de ${String(p.totalSteps)}` },
     { id: "data", cabecalho: "Submetido", esconderAte: "lg", celula: (p) => formatarDataHora(p.submittedAt) },
     { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoPedido estado={p.status} /> },

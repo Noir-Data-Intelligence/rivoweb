@@ -1513,7 +1513,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 | Quem pediu | — | Não vê os botões de decisão, mesmo ocupando o cargo aprovador; vê «Cancelar o pedido» | **Encontrado na base local:** a aprovadora promovida a si própria via os botões, e o servidor recusaria sempre (BR-2) |
 | 409 | Recarrega e mostra «Outra pessoa decidiu primeiro» | O aviso fica ao nível da página | **Encontrado na base local:** o 409 recarregava, o pedido fechado escondia o cartão e o aviso desaparecia com ele |
 | Depois de decidir | B14 | Numa atribuição de cargo, quem pode atribuir cargos antecipa `…/approval-outcome` (melhor esforço; o processo de fundo aplica em 60 s). Os outros processos aplicam-se nos ecrãs das suas fases | B14 respondido: idempotentes |
-| Nomes | — | Só quem lê colaboradores vê nomes; os outros vêem «Colaborador» ou «Você» | Os pedidos só trazem ids (B19) |
+| Nomes | — | Os nomes e o resumo vêm do próprio pedido; a caixa mostra o resumo por baixo do tipo | B19 resolvido (PR #102, em produção a 2026-10-15). Antes, só quem lia colaboradores via nomes |
 | Acessibilidade no e2e | — | O auxiliar do axe afasta o rato e desliga transições antes de medir | O axe media o botão a meio de `transition-colors` depois de mudar o tema e acusava contraste que os estados finais não têm |
 
 ### F4 — estado

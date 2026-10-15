@@ -23,6 +23,8 @@ export const meFinancasF4: S["CurrentUserResponse"] = {
 export const EU = ID.emp1;
 export const OUTRO = ID.emp2;
 
+const NOMES: Record<string, string> = { [ID.emp1]: "Ana Teste", [ID.emp2]: "Carlos Teste" };
+
 export const IDF4 = {
   pedido: "00000000-0000-4000-8000-000000000801",
   meu: "00000000-0000-4000-8000-000000000802",
@@ -43,10 +45,12 @@ export const pedido = (estado = "InProgress"): S["ApprovalStatusView"] => ({
   pendingApprovers: [EU],
   decisions: [],
   requestedByEmployeeId: OUTRO,
+  requestedByName: "Carlos Teste",
+  summary: "Atribuição do cargo Director Financeiro, que confere autoridade de aprovação.",
   submittedAt: "2026-10-12T09:00:00Z",
 });
 
-export const meuPedido = (): S["ApprovalStatusView"] => ({ ...pedido(), requestId: IDF4.meu, requestedByEmployeeId: EU, pendingApprovers: [OUTRO] });
+export const meuPedido = (): S["ApprovalStatusView"] => ({ ...pedido(), requestId: IDF4.meu, requestedByEmployeeId: EU, requestedByName: "Ana Teste", pendingApprovers: [OUTRO] });
 
 export const historico = (id = IDF4.pedido, requerente = OUTRO): S["ApprovalHistoryView"] => ({
   requestId: id,
@@ -54,6 +58,8 @@ export const historico = (id = IDF4.pedido, requerente = OUTRO): S["ApprovalHist
   sourceModule: "hr",
   sourceReference: IDF4.atribuicao,
   requestedByEmployeeId: requerente,
+  requestedByName: NOMES[requerente] ?? null,
+  summary: "Atribuição do cargo Director Financeiro, que confere autoridade de aprovação.",
   amount: null,
   currency: null,
   departmentId: null,
@@ -63,8 +69,8 @@ export const historico = (id = IDF4.pedido, requerente = OUTRO): S["ApprovalHist
   currentStep: 1,
   totalSteps: 2,
   assignments: [
-    { step: 1, mode: "AnyApprover", approverEmployeeId: requerente === EU ? OUTRO : EU, slaHours: 48 },
-    { step: 2, mode: "AllApprovers", approverEmployeeId: ID.emp2, slaHours: null },
+    { step: 1, mode: "AnyApprover", approverEmployeeId: requerente === EU ? OUTRO : EU, approverName: requerente === EU ? "Carlos Teste" : "Ana Teste", slaHours: 48 },
+    { step: 2, mode: "AllApprovers", approverEmployeeId: ID.emp2, approverName: "Carlos Teste", slaHours: null },
   ],
   decisions: [],
 });

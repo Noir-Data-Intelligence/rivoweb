@@ -63,7 +63,7 @@ AM = AssetManager.
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Ver os nomes de quem pediu e de quem decide | ✓ | ✓ | — | — ⁷ | — ⁷ | — | — | — | — | — |
+| Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
@@ -116,7 +116,6 @@ Recursos Humanos.»
 ⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 ⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já interveio não decide outra vez (BR-4).
 ⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
-⁷ Vêem «Colaborador» (ou «Você»): os pedidos só trazem ids e estes perfis não lêem colaboradores (B19).
 
 ---
 
@@ -197,7 +196,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
   **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
   pagamento, requisição de compra, folha de salários, contagem de inventário).
-- Ficha: estado, quem pediu, passos com o modo (basta um ou todos os ocupantes
+- Ficha: estado, o resumo do pedido (o que se aprova), quem pediu, passos com o modo (basta um ou todos os ocupantes
   do cargo) e o prazo, aprovadores e decisões com notas.
 - **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
   motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
@@ -329,8 +328,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Resumo pessoal e indicadores de **Finanças**.
 
 **Aprovações**
-- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin.
-  Vê «Colaborador» em vez dos nomes (B19).
+- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
+  com o resumo do pedido e os nomes.
 
 **Alertas**
 - Ver alertas e regras.
@@ -358,8 +357,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Como no Admin.
 
 **Aprovações**
-- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin.
-  Vê «Colaborador» em vez dos nomes (B19).
+- Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
+  com o resumo do pedido e os nomes.
 
 **Alertas**
 - Ver, **resolver**; regras: **criar**, **rever**, **desactivar** e
