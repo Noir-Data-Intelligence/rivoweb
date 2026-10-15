@@ -28,6 +28,8 @@ export function aplicarErrosDoServidor<T extends FieldValues>(
   aliases: Readonly<Record<string, Path<T>>> = {},
 ): string[] {
   if (!eApiError(erro) || erro.status !== 400) return [];
+  // Um 400 só com `detail` (sem mapa de campos) também tem de aparecer.
+  if (Object.keys(erro.errors).length === 0) return [erro.detail ?? "O servidor recusou os dados. Reveja e tente de novo."];
   const porNome = new Map(campos.map((c) => [c.toLowerCase(), c]));
   const soltas: string[] = [];
   let primeiro = true;

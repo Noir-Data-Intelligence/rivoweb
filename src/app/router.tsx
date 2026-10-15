@@ -103,6 +103,13 @@ export const rotas: RouteObject[] = [
               { path: "aprovacoes", element: protegido(R["/aprovacoes"], pagina("aprovacoes")) },
               { path: "aprovacoes/:requestId", element: protegido(R["/aprovacoes"], pagina("pedidoAprovacao")) },
               { path: "politicas-aprovacao", element: protegido(R["/politicas-aprovacao"], pagina("politicas")) },
+              // F5 — contas a pagar, despesas e tesouraria (§5.6).
+              { path: "fornecedores", element: protegido(R["/fornecedores"], pagina("fornecedores")) },
+              { path: "fornecedores/:supplierId", element: protegido(R["/fornecedores"], pagina("fornecedor")) },
+              { path: "facturas-compra", element: protegido(R["/facturas-compra"], pagina("facturasCompra")) },
+              { path: "facturas-compra/:purchaseInvoiceId", element: protegido(R["/facturas-compra"], pagina("facturaCompra")) },
+              { path: "pedidos-pagamento", element: protegido(R["/pedidos-pagamento"], pagina("pedidosPagamento")) },
+              { path: "pedidos-pagamento/:paymentRequestId", element: protegido(R["/pedidos-pagamento"], pagina("pedidoPagamento")) },
             ],
           },
         ],

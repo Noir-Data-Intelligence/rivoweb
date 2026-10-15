@@ -51,14 +51,14 @@ describe("menu por perfil (§3.2)", () => {
   it("cada perfil real vê só as entradas que pode abrir", () => {
     const visto = Object.fromEntries(perfis.map((p) => [p.name, menuDe(p)]));
     expect(visto).toEqual({
-      Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
-      SuperAdmin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
-      AssetManager: ["Início", "Alertas"],
+      Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
+      SuperAdmin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
+      AssetManager: ["Início", "Alertas", "Fornecedores"],
       Cliente: ["Início"],
       Colaborador: ["Início"],
-      Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Configurações", "Facturação"],
+      Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Configurações", "Facturação"],
       HR: ["Início", "Alertas", "Colaboradores", "Departamentos", "Cargos"],
-      Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas"],
+      Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento"],
       ProjectManager: ["Início"],
       Sales: ["Início", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Facturação"],
     });

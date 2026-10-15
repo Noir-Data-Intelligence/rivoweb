@@ -48,6 +48,13 @@ export const PAGINAS = {
   aprovacoes: () => import("@/features/aprovacoes/pages/Caixa"),
   pedidoAprovacao: () => import("@/features/aprovacoes/pages/Pedido"),
   politicas: () => import("@/features/aprovacoes/pages/Politicas"),
+  // F5
+  fornecedores: () => import("@/features/pagar/pages/Fornecedores"),
+  fornecedor: () => import("@/features/pagar/pages/Fornecedor"),
+  facturasCompra: () => import("@/features/pagar/pages/FacturasCompra"),
+  facturaCompra: () => import("@/features/pagar/pages/FacturaCompra"),
+  pedidosPagamento: () => import("@/features/pagar/pages/PedidosPagamento"),
+  pedidoPagamento: () => import("@/features/pagar/pages/PedidoPagamento"),
 } satisfies Record<string, () => Modulo>;
 
 export type NomePagina = keyof typeof PAGINAS;

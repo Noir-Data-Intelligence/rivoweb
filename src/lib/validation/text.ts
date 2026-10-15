@@ -61,3 +61,19 @@ export const IsoDate = z.string().check(
 );
 
 export const uuid = z.string().check(z.regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i));
+
+/**
+ * IBAN pela norma ISO 13616 (resto 97 = 1), sem espaços e em maiúsculas. É a
+ * mesma verificação do servidor: um IBAN errado paga a outra pessoa.
+ */
+export function ibanValido(iban: string): boolean {
+  const s = iban.replace(/\s+/g, "").toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(s)) return false;
+  const rodado = s.slice(4) + s.slice(0, 4);
+  let resto = 0;
+  for (const c of rodado) {
+    const v = c >= "A" ? String(c.charCodeAt(0) - 55) : c;
+    for (const d of v) resto = (resto * 10 + Number(d)) % 97;
+  }
+  return resto === 1;
+}

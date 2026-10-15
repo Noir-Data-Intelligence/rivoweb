@@ -32,6 +32,10 @@ export const REQUISITO_PAGINA = {
   // F4 — aprovações (§5.5).
   "/aprovacoes": "approval.requests.read",
   "/politicas-aprovacao": "approval.policies.read",
+  // F5 — contas a pagar, despesas e tesouraria (§5.6).
+  "/fornecedores": "procurement.suppliers.read",
+  "/facturas-compra": "finance.payables.read",
+  "/pedidos-pagamento": "finance.payables.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Criar documentos: escrever facturas e escolher o cliente. */

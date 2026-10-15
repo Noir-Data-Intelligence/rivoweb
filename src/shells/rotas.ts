@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BellRing, CheckSquare, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { BellRing, CheckSquare, FileInput, HandCoins, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -30,6 +30,9 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/notas-credito", titulo: "Notas de crédito", icone: FileMinus, requer: R["/notas-credito"], grupo: "Vendas" },
     { caminho: "/recibos", titulo: "Recibos", icone: Receipt, requer: R["/recibos"], grupo: "Vendas" },
     { caminho: "/a-receber", titulo: "A receber", icone: Hourglass, requer: R["/a-receber"], grupo: "Vendas" },
+    { caminho: "/fornecedores", titulo: "Fornecedores", icone: Truck, requer: R["/fornecedores"], grupo: "Pagamentos" },
+    { caminho: "/facturas-compra", titulo: "Facturas de compra", icone: FileInput, requer: R["/facturas-compra"], grupo: "Pagamentos" },
+    { caminho: "/pedidos-pagamento", titulo: "Pedidos de pagamento", icone: HandCoins, requer: R["/pedidos-pagamento"], grupo: "Pagamentos" },
     { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: R["/colaboradores"], grupo: "Pessoas" },
     { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: R["/departamentos"], grupo: "Pessoas" },
     { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: R["/cargos"], grupo: "Pessoas" },

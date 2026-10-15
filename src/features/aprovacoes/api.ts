@@ -37,8 +37,8 @@ export function usePedidos(p: { pagina: number; tamanho: number; tipo: string | 
   });
 }
 
-export function usePedido(id: string) {
-  return useQuery({ queryKey: chaves.pedido(id), queryFn: ({ signal }) => ler(api.GET("/approval/requests/{requestId}", { params: { path: { requestId: id } }, signal })) });
+export function usePedido(id: string, activo = true) {
+  return useQuery({ queryKey: chaves.pedido(id), queryFn: ({ signal }) => ler(api.GET("/approval/requests/{requestId}", { params: { path: { requestId: id } }, signal })), enabled: activo });
 }
 
 export function useHistorico(id: string) {

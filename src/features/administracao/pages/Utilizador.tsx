@@ -141,7 +141,12 @@ function EstadoConta({ alvo, propria }: { alvo: ResumoUtilizador; propria: boole
     if (mudar.isPending) return;
     mudar.mutate(
       { userId: alvo.userId, active: activar, reason: d.razao },
-      { onSuccess: () => fechar(false), onError: (e) => aplicarErrosDoServidor(e, form.setError, ["razao"], { reason: "razao" }) },
+      { onSuccess: () => fechar(false), onError: (e) => {
+          // O que não for de um campo fica no único campo do formulário.
+          const soltas = aplicarErrosDoServidor(e, form.setError, ["razao"], { reason: "razao" });
+          if (soltas.length > 0) form.setError("razao", { type: "server", message: soltas.join(" ") });
+        },
+      },
     );
   });
   return (
@@ -201,7 +206,11 @@ function Password({ alvo }: { alvo: ResumoUtilizador }) {
     if (repor.isPending) return;
     repor.mutate(
       { userId: alvo.userId, newPassword: d.nova },
-      { onSuccess: () => fecharRepor(false), onError: (e) => aplicarErrosDoServidor(e, form.setError, ["nova"], { newPassword: "nova" }) },
+      { onSuccess: () => fecharRepor(false), onError: (e) => {
+          const soltas = aplicarErrosDoServidor(e, form.setError, ["nova"], { newPassword: "nova" });
+          if (soltas.length > 0) form.setError("nova", { type: "server", message: soltas.join(" ") });
+        },
+      },
     );
   });
   return (
