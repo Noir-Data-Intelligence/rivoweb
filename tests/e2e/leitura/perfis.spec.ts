@@ -43,6 +43,8 @@ const { password, contas } = process.env.RIVO_QA_CONTAS ? lerContas() : { passwo
 
 for (const c of contas) {
   test(`perfil ${c.perfil}: menu certo e páginas sem erro`, async ({ page }) => {
+    // O Admin percorre 17 páginas contra produção: 30 s não chegam.
+    test.setTimeout(120_000);
     const bloqueados: string[] = [];
     await page.route(`${API}/**`, async (route) => {
       const req = route.request();

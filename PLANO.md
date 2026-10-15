@@ -1532,3 +1532,8 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   decisão simultânea em duas abas (409, aviso visível); depois da aprovação, o
   cargo fica em vigor no RH. Nenhuma decisão em produção.
 - **Testes:** 103 unitários; 57 cenários e2e × 3 motores.
+- **Publicada** a 2026-10-15 (`0a08b1a`). Smoke na Vercel com as 9 contas de
+  QA e o fluxo F0–F4: 10/10, só leituras. Numa primeira volta com 2 workers,
+  o Admin e o Finance viram «Sem ligação ao servidor» numa recarga e passaram
+  ao repetir; o teste por perfil passou a ter 120 s (o Admin percorre 17
+  páginas).

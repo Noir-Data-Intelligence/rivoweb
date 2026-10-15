@@ -1,12 +1,10 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F3** publicadas em
-> `https://rivoweb-coral.vercel.app`; **F4** (aprovações) concluída e
-> verificada na base local, por publicar · actualizado a 2026-10-15.
+> **Estado:** fases **F0 a F4** concluídas e publicadas em
+> `https://rivoweb-coral.vercel.app` · actualizado a 2026-10-15.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
-> funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
-pronto a publicar quando o estado acima o diz). O
+> funcionalidades novas. Só está aqui o que o front **já faz em produção**. O
 > que o backend tem e o front ainda não mostra está na última secção.
 >
 > **Fonte:** o catálogo real de perfis (`GET /settings/overview`, guardado em
