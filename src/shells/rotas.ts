@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BellRing, CheckSquare, FileInput, HandCoins, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { BellRing, CheckSquare, FileInput, HandCoins, ReceiptText, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -33,6 +33,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/fornecedores", titulo: "Fornecedores", icone: Truck, requer: R["/fornecedores"], grupo: "Pagamentos" },
     { caminho: "/facturas-compra", titulo: "Facturas de compra", icone: FileInput, requer: R["/facturas-compra"], grupo: "Pagamentos" },
     { caminho: "/pedidos-pagamento", titulo: "Pedidos de pagamento", icone: HandCoins, requer: R["/pedidos-pagamento"], grupo: "Pagamentos" },
+    { caminho: "/despesas", titulo: "Despesas", icone: ReceiptText, requer: R["/despesas"], grupo: "Pagamentos" },
     { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: R["/colaboradores"], grupo: "Pessoas" },
     { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: R["/departamentos"], grupo: "Pessoas" },
     { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: R["/cargos"], grupo: "Pessoas" },
@@ -47,7 +48,10 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/facturacao", titulo: "Facturação", icone: SlidersHorizontal, requer: R["/facturacao"], grupo: "Administração" },
     { caminho: "/politicas-aprovacao", titulo: "Políticas de aprovação", icone: ListChecks, requer: R["/politicas-aprovacao"], grupo: "Administração" },
   ],
-  colaborador: [{ caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
+  colaborador: [
+    { caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
+    { caminho: "/eu/despesas", titulo: "Despesas", icone: ReceiptText, requer: "autenticado" },
+  ],
   cliente: [{ caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
 };
 

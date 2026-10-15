@@ -171,3 +171,48 @@ export const documento = (nome = "factura.pdf"): S["DocumentDescriptor"] => ({
   uploadedBy: null,
   uploadedAt: "2026-10-15T09:00:00Z",
 });
+
+// Despesas
+
+export const IDF5D = {
+  despesa: "00000000-0000-4000-8000-000000000911",
+  minha: "00000000-0000-4000-8000-000000000912",
+  comprovativo: "00000000-0000-4000-8000-000000000913",
+};
+
+export const despesa = (estado = "Submitted", colaborador = ID.emp2, nome = "Carlos Teste"): S["ExpenseClaimView"] => ({
+  expenseId: IDF5D.despesa,
+  employeeId: colaborador,
+  employeeName: nome,
+  spentOn: "2026-10-12",
+  description: "Táxi para reunião no cliente",
+  category: "Transporte",
+  amount: 7500,
+  currency: "AOA",
+  projectId: null,
+  billable: false,
+  receiptDocumentId: IDF5D.comprovativo,
+  status: estado,
+  submittedAt: "2026-10-12T15:00:00Z",
+  decidedAt: estado === "Submitted" ? null : "2026-10-13T09:00:00Z",
+  decisionNotes: estado === "Rejected" ? "Sem comprovativo legível." : null,
+  reimbursedOn: estado === "Reimbursed" ? "2026-10-14" : null,
+  reimbursedFromAccountId: null,
+  reimbursementReference: estado === "Reimbursed" ? "TRF-9" : null,
+});
+
+export const resumoDespesas = (): S["ExpenseSummary"][] => [{ currency: "AOA", submitted: 7500, approved: 996500, reimbursed: 3260500, rejected: 599500 }];
+
+export const minhaDespesa = (estado = "Submitted"): S["OwnExpense"] => ({
+  expenseId: IDF5D.minha,
+  spentOn: "2026-10-07",
+  description: "Almoço com cliente",
+  category: "Refeições",
+  amount: 12000,
+  currency: "AOA",
+  projectId: null,
+  status: estado,
+  submittedAt: "2026-10-07T13:00:00Z",
+  decisionNotes: null,
+  reimbursedOn: null,
+});

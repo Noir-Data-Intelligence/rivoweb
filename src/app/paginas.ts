@@ -55,6 +55,9 @@ export const PAGINAS = {
   facturaCompra: () => import("@/features/pagar/pages/FacturaCompra"),
   pedidosPagamento: () => import("@/features/pagar/pages/PedidosPagamento"),
   pedidoPagamento: () => import("@/features/pagar/pages/PedidoPagamento"),
+  despesas: () => import("@/features/despesas/pages/Despesas"),
+  despesa: () => import("@/features/despesas/pages/Despesa"),
+  minhasDespesas: () => import("@/features/despesas/pages/MinhasDespesas"),
 } satisfies Record<string, () => Modulo>;
 
 export type NomePagina = keyof typeof PAGINAS;

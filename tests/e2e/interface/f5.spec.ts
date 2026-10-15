@@ -5,7 +5,9 @@
  * anexos (carregamento e recusa no cliente).
  */
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
-import { aprovacaoPagamento, contas, documento, factura, fornecedor, IDF5, meAdminF5, meFinancasF5, meGestorF5, painelAna, painelCarlos, pedidoPagamento } from "../../fixtures/f5";
+import { colaboradores } from "../../fixtures/f1";
+import { meColaborador } from "../../fixtures/identidade";
+import { aprovacaoPagamento, contas, despesa, documento, factura, fornecedor, IDF5, IDF5D, meAdminF5, meFinancasF5, meGestorF5, minhaDespesa, painelAna, painelCarlos, pedidoPagamento, resumoDespesas } from "../../fixtures/f5";
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 
@@ -219,5 +221,135 @@ test.describe("pedidos de pagamento", () => {
     expect(api.escritas("POST", `/finance/payment-requests/${IDF5.pedido}/documents`).map((p) => p.corpo)).toEqual([{ documentId: IDF5.documento, category: "Proposta" }]);
     await expect(page.getByText("Proposta ·", { exact: false })).toBeVisible();
     await expect(page.getByText("(B20)", { exact: false })).toBeVisible();
+  });
+});
+
+function comDespesas(api: ApiSimulada, me = meAdminF5, painel = painelAna()): ApiSimulada {
+  const outra = { ...despesa("Reimbursed"), expenseId: "00000000-0000-4000-8000-000000000919" };
+  return comF5(api, me, painel)
+    .em("GET", "/finance/expenses", { status: 200, corpo: [despesa(), outra] })
+    .em("GET", "/finance/expenses/summary", { status: 200, corpo: resumoDespesas() })
+    .em("GET", `/finance/expenses/${IDF5D.despesa}`, { status: 200, corpo: despesa() })
+    .em("GET", "/hr/employees", pag(colaboradores()));
+}
+
+test.describe("despesas", () => {
+  test("resumo, filtro por estado e registo em nome de um colaborador; axe e responsivo", async ({ page, api, violacoes }) => {
+    await comDespesas(api)
+      .em("POST", "/finance/expenses", { status: 201, corpo: { id: IDF5D.despesa } })
+      .ligar();
+    await entrar(page);
+    await page.goto("/despesas");
+    await expect(page.getByText("3 260 500,00", { exact: false })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Táxi para reunião no cliente" }).first()).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await semScrollHorizontal(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.getByLabel("Estado").selectOption("Submitted");
+    await expect.poll(() => api.pedidos.some((p) => p.caminho === "/finance/expenses" && p.query.includes("status=Submitted"))).toBe(true);
+    await page.getByRole("button", { name: "Registar despesa" }).click();
+    await page.getByLabel("Categoria").fill("Combustível");
+    await page.getByLabel("Descrição").fill("Gasóleo da viatura de serviço");
+    await page.getByLabel("Valor").fill("25 000,50");
+    await page.getByRole("dialog").getByRole("button", { name: "Registar despesa" }).click();
+    await expect(page.getByText("Escolha o colaborador.")).toBeVisible();
+    await page.getByLabel("Colaborador").selectOption({ label: "Carlos Teste" });
+    await page.getByRole("dialog").getByRole("button", { name: "Registar despesa" }).click();
+    await expect(page).toHaveURL(new RegExp(`/despesas/${IDF5D.despesa}$`));
+    expect(api.escritas("POST", "/finance/expenses")[0]?.corpo).toMatchObject({ category: "Combustível", amount: "25000.50", currency: "AOA", billable: false, projectId: null, receiptDocumentId: null });
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("rejeitar exige motivo; aprovar sem notas; comprovativo descarrega com o arquivo", async ({ page, api }) => {
+    await comDespesas(api)
+      .em("POST", `/finance/expenses/${IDF5D.despesa}/rejection`, { status: 204 })
+      .em("POST", `/finance/expenses/${IDF5D.despesa}/approval`, { status: 204 })
+      .em("GET", `/documents/${IDF5D.comprovativo}`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    const descarga = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar" }).click();
+    expect((await descarga).suggestedFilename()).toContain("comprovativo");
+    await page.getByRole("button", { name: "Rejeitar" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Rejeitar" }).click();
+    await expect(page.getByText("Indique o motivo da rejeição.")).toBeVisible();
+    await page.getByLabel("Motivo").fill("Valor acima do limite diário.");
+    await page.getByRole("dialog").getByRole("button", { name: "Rejeitar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/rejection`).map((p) => p.corpo)).toEqual([{ notes: "Valor acima do limite diário." }]);
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/approval`).map((p) => p.corpo)).toEqual([{ notes: null }]);
+  });
+
+  test("a própria despesa não se decide; quem não lê o arquivo vê o porquê (B20)", async ({ page, api }) => {
+    await comDespesas(api, meGestorF5, painelCarlos()).ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    await expect(page.getByText("É a sua despesa.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Aprovar" })).toHaveCount(0);
+    await expect(page.getByText("(B20)", { exact: false })).toBeVisible();
+  });
+
+  test("reembolsar: data, conta da moeda e referência", async ({ page, api }) => {
+    await comDespesas(api, meFinancasF5)
+      .em("GET", `/finance/expenses/${IDF5D.despesa}`, { status: 200, corpo: despesa("Approved") })
+      .em("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement`, { status: 204 })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    await page.getByRole("button", { name: "Marcar reembolsada" }).click();
+    await page.getByLabel("Data do reembolso").fill("2026-10-14");
+    await page.getByLabel("Conta de onde saiu (opcional)").selectOption(IDF5.conta);
+    await page.getByLabel("Referência (opcional)").fill("TRF-9");
+    await page.getByRole("dialog").getByRole("button", { name: "Marcar reembolsada" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement`).map((p) => p.corpo)).toEqual([{ on: "2026-10-14", fromAccountId: IDF5.conta, reference: "TRF-9" }]);
+  });
+
+  test("portal: submeter com comprovativo e retirar", async ({ page, api, violacoes }) => {
+    const colaborador = { ...meColaborador, permissions: ["documents.write"] };
+    let lista = [minhaDespesa()];
+    await api
+      .comConta(colaborador)
+      .em("GET", "/portal/me/expenses", () => ({ status: 200, corpo: lista }))
+      .em("POST", "/documents", { status: 201, corpo: { ...documento("recibo.jpg"), documentId: IDF5D.comprovativo, category: "Comprovativo de despesa" } })
+      .em("POST", "/portal/me/expenses", { status: 201, corpo: { expenseId: "00000000-0000-4000-8000-000000000918" } })
+      .em("POST", `/portal/me/expenses/${IDF5D.minha}/withdrawal`, () => {
+        lista = [minhaDespesa("Withdrawn")];
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.getByRole("navigation", { name: "Principal" }).first().getByRole("link", { name: "Despesas" }).click();
+    await expect(page.getByRole("heading", { name: "As minhas despesas", level: 1 })).toBeVisible();
+    await expect(page.getByText("Almoço com cliente")).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("button", { name: "Nova despesa" }).click();
+    await page.getByLabel("Categoria").fill("Transporte");
+    await page.getByLabel("Descrição").fill("Táxi para o aeroporto");
+    await page.getByLabel("Valor").fill("9000");
+    await page.getByLabel("Comprovativo (opcional)").setInputFiles({ name: "recibo.jpg", mimeType: "image/jpeg", buffer: Buffer.from([0xff, 0xd8, 0xff, 0xe0]) });
+    await expect(page.getByRole("dialog").getByText("recibo.jpg")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Submeter" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", "/portal/me/expenses")[0]?.corpo).toMatchObject({ description: "Táxi para o aeroporto", amount: "9000.00", receiptDocumentId: IDF5D.comprovativo });
+    await page.getByRole("button", { name: "Retirar a despesa Almoço com cliente" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Retirar" }).click();
+    await expect(page.getByText("Retirada")).toBeVisible();
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("portal sem ficha ligada explica em vez de mostrar erro", async ({ page, api }) => {
+    await api
+      .comConta({ ...meColaborador, permissions: ["documents.write"] })
+      .em("GET", "/portal/me/expenses", { status: 403, corpo: { title: "Forbidden", status: 403 }, cabecalhos: { "Content-Type": "application/problem+json" } })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/despesas");
+    await expect(page.getByText("A sua conta não está ligada a uma ficha de colaborador.")).toBeVisible();
   });
 });

@@ -36,6 +36,7 @@ export const REQUISITO_PAGINA = {
   "/fornecedores": "procurement.suppliers.read",
   "/facturas-compra": "finance.payables.read",
   "/pedidos-pagamento": "finance.payables.read",
+  "/despesas": "finance.expenses.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Criar documentos: escrever facturas e escolher o cliente. */

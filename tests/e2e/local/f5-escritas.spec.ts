@@ -193,3 +193,63 @@ test("F5: pedir, aprovar e pagar com três pessoas; quem pede e quem aprova não
   // Arrumar: a política só servia esta corrida.
   await sa("POST", `/approval/policies/${politica.corpo.policyId}/deactivation`);
 });
+
+test("F5: despesa submetida no portal com comprovativo, aprovada e reembolsada", async ({ page, request }) => {
+  test.setTimeout(180_000);
+  await soLocal(page);
+  const adminEmail = process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "";
+  const adminPass = process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "";
+  const sa = await sessaoApi(request, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "");
+  const email = `colab-${sufixo}@teste.local`;
+  const c = await sa<{ userId: string }>("POST", "/identity/invitations", { email, profile: "Colaborador" });
+  expect(c.status).toBe(201);
+  expect((await sa("POST", `/identity/users/${c.corpo.userId}/password-reset`, { newPassword: PASSWORD_LOCAL })).status).toBe(204);
+  await sa("POST", `/identity/users/${c.corpo.userId}/status`, { active: true, reason: `${marca} activar para o teste` });
+  const ficha = await sa<{ employeeId: string }>("POST", "/hr/employees", { fullName: `${marca} Colaborador`, departmentId: null, userId: null, hiredOn: null });
+  expect(ficha.status).toBe(201);
+  expect((await sa("POST", `/hr/employees/${ficha.corpo.employeeId}/account`, { userId: c.corpo.userId })).status).toBe(204);
+
+  // Colaborador: submete no portal, com comprovativo.
+  const descricao = `${marca} Táxi para o cliente`;
+  await page.goto("/entrar");
+  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Password").fill(PASSWORD_LOCAL);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page).toHaveURL(/\/eu$/);
+  await page.getByRole("navigation", { name: "Principal" }).first().getByRole("link", { name: "Despesas" }).click();
+  await page.getByRole("button", { name: "Nova despesa" }).click();
+  await page.getByLabel("Categoria").fill("Transporte");
+  await page.getByLabel("Descrição").fill(descricao);
+  await page.getByLabel("Valor").fill("7500");
+  await page.getByLabel("Comprovativo (opcional)").setInputFiles({ name: "recibo.pdf", mimeType: "application/pdf", buffer: PDF });
+  await expect(page.getByRole("dialog").getByText("recibo.pdf")).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Submeter" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("row").filter({ hasText: descricao }).getByText("Por decidir")).toBeVisible();
+  await sair(page);
+
+  // Admin: aprova e reembolsa; o comprovativo descarrega (o Admin lê o arquivo).
+  await entrar(page, adminEmail, adminPass);
+  await page.goto("/despesas?estado=Submitted");
+  await page.getByRole("link", { name: descricao }).click();
+  const descarga = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Descarregar" }).click();
+  expect((await descarga).suggestedFilename()).toContain("comprovativo");
+  await page.getByRole("button", { name: "Aprovar" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
+  await expect(page.getByText("Aprovada", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Marcar reembolsada" }).click();
+  await page.getByLabel("Referência (opcional)").fill(`TRF-${sufixo}`);
+  await page.getByRole("dialog").getByRole("button", { name: "Marcar reembolsada" }).click();
+  await expect(page.getByText("Reembolsada", { exact: true })).toBeVisible();
+  await sair(page);
+
+  // O colaborador vê o reembolso no portal.
+  await page.goto("/entrar");
+  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Password").fill(PASSWORD_LOCAL);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page).toHaveURL(/\/eu$/);
+  await page.getByRole("navigation", { name: "Principal" }).first().getByRole("link", { name: "Despesas" }).click();
+  await expect(page.getByRole("row").filter({ hasText: descricao }).getByText("Reembolsada")).toBeVisible();
+});

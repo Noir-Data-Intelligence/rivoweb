@@ -53,6 +53,7 @@ export const rotas: RouteObject[] = [
             element: preguicoso(pagina("shellColaborador")),
             children: [
               { index: true, element: preguicoso(pagina("inicioColaborador")) },
+              { path: "despesas", element: preguicoso(pagina("minhasDespesas")) },
               { path: "conta", element: preguicoso(pagina("minhaConta")) },
               { path: "notificacoes", element: preguicoso(pagina("notificacoes")) },
             ],
@@ -110,6 +111,8 @@ export const rotas: RouteObject[] = [
               { path: "facturas-compra/:purchaseInvoiceId", element: protegido(R["/facturas-compra"], pagina("facturaCompra")) },
               { path: "pedidos-pagamento", element: protegido(R["/pedidos-pagamento"], pagina("pedidosPagamento")) },
               { path: "pedidos-pagamento/:paymentRequestId", element: protegido(R["/pedidos-pagamento"], pagina("pedidoPagamento")) },
+              { path: "despesas", element: protegido(R["/despesas"], pagina("despesas")) },
+              { path: "despesas/:expenseId", element: protegido(R["/despesas"], pagina("despesa")) },
             ],
           },
         ],
