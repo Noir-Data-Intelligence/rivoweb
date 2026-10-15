@@ -1,10 +1,13 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F4** concluídas e publicadas em
-> `https://rivoweb-coral.vercel.app` · actualizado a 2026-10-15.
+> **Estado:** fases **F0 a F4** publicadas em
+> `https://rivoweb-coral.vercel.app`; **F5** (tesouraria, despesas e contas a
+> pagar) concluída e verificada na base local, por publicar · actualizado a
+> 2026-10-15.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
-> funcionalidades novas. Só está aqui o que o front **já faz em produção**. O
+> funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
+pronto a publicar quando o estado acima o diz). O
 > que o backend tem e o front ainda não mostra está na última secção.
 >
 > **Fonte:** o catálogo real de perfis (`GET /settings/overview`, guardado em
@@ -22,15 +25,15 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Configurações, Facturação |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas |
-| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Configurações, Facturação |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias |
+| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
-| **Colaborador** | Portal do colaborador (`/eu`) | Início |
+| **Colaborador** | Portal do colaborador (`/eu`) | Início, Despesas |
 | **Cliente** | Portal do cliente (`/cliente`) | Início |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
@@ -86,6 +89,34 @@ AM = AssetManager.
 | **Facturação:** ver séries e canais de pagamento | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Facturação:** abrir séries; criar e rever canais | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Facturação:** ver as taxas de IVA | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Fornecedores** | | | | | | | | | | |
+| Ver a lista (com inactivos) e a ficha | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
+| Registar, importar CSV, corrigir (IBAN verificado), desactivar e reactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Facturas de compra** | | | | | | | | | | |
+| Ver a lista (vencem até) e a ficha, com o confronto com a encomenda | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Registar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Anular | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Pedidos de pagamento** | | | | | | | | | | |
+| Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Anexar documentos ao pedido (carregar ficheiro) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Executar o pagamento ⁷ ⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir os anexos | ✓ | ✓ | — | — ⁹ | — ⁹ | — | — | — | — | — |
+| **Despesas** | | | | | | | | | | |
+| Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
+| Aprovar e rejeitar (com motivo) ¹⁰ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Marcar reembolsada | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir o comprovativo | ✓ | ✓ | — | — ⁹ | — ⁹ | — | — | — | — | — |
+| Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| **Tesouraria** | | | | | | | | | | |
+| Contas bancárias: ver saldos e extracto por período | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Contas bancárias: abrir, depositar, levantar, fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Letras e livranças: ver; registar; aceite, desconto, endosso, pagamento, protesto, anulação | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Fluxo de caixa: previsto e realizado; previsões manuais (criar, rever, apagar) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Colaboradores** | | | | | | | | | | |
 | Ver a lista e a ficha | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Admitir; corrigir nome; mudar contactos, departamento e estado | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -116,6 +147,10 @@ Recursos Humanos.»
 ⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 ⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já interveio não decide outra vez (BR-4).
 ⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
+⁷ Só com ficha de colaborador ligada à conta: o registo fica em nome de quem o faz. O Finance não lê colaboradores, por isso regista despesas só em seu nome.
+⁸ Só depois de aprovado (BR-5), e nunca por quem pediu nem por quem aprovou (BR-3); o servidor confirma com 403. O dinheiro sai de uma conta aberta na moeda do pedido.
+⁹ Vê a lista, mas abrir o ficheiro exige ler o arquivo de documentos, que estes perfis não têm (B20).
+¹⁰ A própria despesa não se decide.
 
 ---
 
@@ -260,6 +295,86 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **A receber**
 - Facturas vencidas com saldo em aberto, dias de atraso e totais por moeda.
 
+**Fornecedores**
+- Lista paginada (nome, NIF, cidade, contacto, estado), com ou sem inactivos.
+- **Registar** (nome, NIF, IBAN, e-mail, telefone, pessoa de contacto, morada,
+  cidade, país) e **importar de um CSV** (Nome e NIF obrigatórios; IBAN, Email,
+  Telefone opcionais), com o resultado linha a linha.
+- O IBAN é verificado (ISO 13616) antes de gravar, como no servidor: um IBAN
+  errado paga a outra pessoa.
+- Ficha: **corrigir os dados** (o NIF não se corrige) e **desactivar e
+  reactivar**; se alguém alterou o fornecedor entretanto, oferece «Recarregar».
+
+**Facturas de compra**
+- Lista paginada (número, fornecedor, emitida, vence, total, estado), com
+  filtro «vencem até».
+- **Registar** (fornecedor da lista ou não registado com nome e NIF, número da
+  factura do fornecedor, moeda, emissão, vencimento, valor sem IVA, IVA,
+  descrição), com o total à vista.
+- Ficha: dados e totais, confronto com a encomenda quando a tem, os pedidos de
+  pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
+  **anular** com motivo.
+
+**Pedidos de pagamento**
+- Lista paginada (factura, beneficiário, data, valor, estado).
+- **Pedir** a partir da factura (valor até ao que falta pedir, notas): vai
+  para aprovação.
+- Ficha: beneficiário, valor, quem pediu, o estado da aprovação com ligação ao
+  pedido de aprovação, notas e, depois de pago, data, meio e referência.
+- **Executar**: só depois de aprovado; escolhe-se uma conta aberta na moeda do
+  pedido (com o saldo à vista), o meio de pagamento e a referência; aviso com o
+  saldo da conta depois do pagamento. Quem pediu e quem aprovou não vêem o
+  botão e a ficha explica porquê (BR-3).
+- **Cancelar** com motivo; **anexar** documentos (factura, proposta, contrato)
+  e **descarregá-los**.
+
+**Despesas**
+- Resumo por moeda (por decidir, aprovadas por reembolsar, reembolsadas,
+  rejeitadas) e lista com filtros por estado e datas.
+- **Registar** em nome de um colaborador (data, categoria com sugestões,
+  descrição, valor, moeda, comprovativo).
+- Ficha: **aprovar** (notas opcionais), **rejeitar** (com motivo, que o
+  colaborador lê), **marcar reembolsada** (data, conta, referência) e
+  **descarregar o comprovativo**. A própria despesa não se decide.
+
+**Contas bancárias**
+- Lista com saldos (com ou sem fechadas); **abrir** (nome, banco, moeda, IBAN
+  verificado).
+- Ficha: saldo, **depositar**, **levantar**, **fechar** (só com saldo zero) e
+  **reabrir**; **extracto** por período (saldo inicial, entradas, saídas,
+  saldo final, movimentos), com aviso se não bater com o saldo.
+- **Reconciliação:** resumo (saldo contabilístico, linhas conciliadas,
+  ignoradas e por conciliar, movimentos sem par); **importar o extracto** do
+  banco em CSV (ficheiro ou colado) com conciliação automática; **conciliar
+  automaticamente**; **conciliar à mão** (os movimentos do mesmo valor primeiro),
+  **desfazer** e **ignorar** linhas.
+
+**Caixa pequena**
+- Fundos com fundo fixo, saldo e o que falta repor; **abrir** e **rever**
+  fundos (responsável, fundo fixo, activo).
+- Ficha do fundo: movimentos por período e **registar** despesa, reposição
+  (vazia repõe o que falta) ou ajuste de contagem.
+
+**Letras e livranças**
+- Lista com filtros por sentido (a receber, a pagar) e estado; as vencidas
+  ficam marcadas.
+- **Registar** (letra ou livrança, sentido, número, sacado ou tomador, emissão,
+  vencimento, valor, moeda, banco, notas).
+- Ficha: só as acções que o estado permite: **aceite**, **desconto** (com
+  encargos e banco), **endosso**, **pagamento**, **protesto** e **anulação**;
+  endossos registados.
+
+**Câmbios**
+- Taxas registadas (filtro por moeda), **registar** uma taxa (até 6 casas
+  decimais, com a fonte) e **converter** um valor entre moedas numa data.
+
+**Fluxo de caixa**
+- **Previsto** até uma data: saldo de hoje, saldo previsto, previsão por mês e
+  de onde vem cada movimento (a receber, a pagar, letras, previsões manuais).
+- **Realizado** por mês, por período e por conta.
+- **Previsões manuais:** criar, rever e apagar (entrada ou saída, data, valor,
+  moeda, descrição, categoria, repetição mensal).
+
 **Colaboradores**
 - Lista paginada (nome, n.º, departamento, admissão, conta ligada, estado).
 - **Admitir** (nome, departamento, data, e-mail, telefone, n.º mecanográfico).
@@ -346,6 +461,27 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Facturação**
 - Ver séries, canais de pagamento e taxas de IVA.
 
+**Fornecedores**
+- Ver a lista e a ficha (não regista nem corrige).
+
+**Facturas de compra**
+- Ver a lista e a ficha; **anular**. Não regista facturas nem pede pagamentos.
+
+**Pedidos de pagamento**
+- Ver e **executar** os aprovados (BR-3: não executa o que pediu nem o que
+  aprovou). Vê a lista de anexos, mas não os abre (B20).
+
+**Despesas**
+- Resumo, lista e ficha; **aprovar**, **rejeitar**, **marcar reembolsada** e
+  **registar** em seu nome. Não abre o comprovativo (B20).
+
+**Contas bancárias**
+- Ver saldos e extracto; **reconciliação** completa. Não abre contas nem
+  deposita ou levanta.
+
+**Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
+- Tudo o que o Admin faz.
+
 **Configurações**
 - Só **Dados da empresa**: ver, **declarar** e **corrigir**.
 
@@ -364,12 +500,33 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver, **resolver**; regras: **criar**, **rever**, **desactivar** e
   **avaliar agora**.
 
+**Fornecedores**
+- Ver a lista e a ficha.
+
+**Facturas de compra**
+- Ver, **registar** e **pedir pagamento**; **anexar** documentos ao pedido e
+  **cancelá-lo**. Não anula facturas nem executa pagamentos.
+
+**Pedidos de pagamento**
+- Ver a lista e a ficha. Vê a lista de anexos, mas não os abre (B20).
+
+**Despesas**
+- Resumo, lista e ficha; **aprovar** e **rejeitar** (não as da própria). Não
+  regista nem reembolsa; não abre o comprovativo (B20).
+
+**Contas bancárias**
+- Ver saldos e extracto; **abrir**, **depositar**, **levantar**, **fechar** e
+  **reabrir**. Sem reconciliação.
+
 ### AssetManager (Gestão de activos)
 **Início**
 - Resumo pessoal (sem indicadores de gestão nesta fase).
 
 **Alertas**
 - Ver alertas e regras.
+
+**Fornecedores**
+- Ver a lista e a ficha.
 
 ### Sales (Vendas)
 **Início**
@@ -405,6 +562,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 Entra no **portal do colaborador** (`/eu`).
 - **Início:** saudação com o nome da ficha, cargo actual, notificações por
   ler, aprovações à espera e anúncios em vigor.
+- **Despesas:** submeter (data, categoria com sugestões, descrição, valor,
+  moeda, comprovativo até 10 MB), acompanhar o estado, ler o motivo de uma
+  rejeição, ver a data do reembolso e **retirar** as que ainda não foram
+  decididas.
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem ficha ligada, o portal explica que a conta ainda não está ligada e pede
   para falar com os Recursos Humanos.
@@ -425,7 +586,6 @@ entra neste documento quando estiver publicada.
 
 | Fase | Área |
 |---|---|
-| F5 | Tesouraria, despesas, contas a pagar, pedidos de pagamento, carregamento de ficheiros |
 | F6 | Fiscal e contabilidade |
 | F7 | RH completo e portal do colaborador (férias, recibos, documentos) |
 | F8 | Salários |

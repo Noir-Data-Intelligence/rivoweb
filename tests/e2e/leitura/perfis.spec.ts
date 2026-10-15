@@ -25,11 +25,11 @@ function lerContas(): { password: string; contas: Conta[] } {
 
 /** O mesmo quadro do teste unitário `menu.test.tsx`. */
 const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
-  Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
-  Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Configurações", "Facturação"],
+  Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
+  Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Configurações", "Facturação"],
   HR: ["Início", "Alertas", "Colaboradores", "Departamentos", "Cargos"],
   Sales: ["Início", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Facturação"],
-  Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas"],
+  Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias"],
   AssetManager: ["Início", "Alertas", "Fornecedores"],
   ProjectManager: ["Início"],
   Colaborador: ["Início", "Despesas"],

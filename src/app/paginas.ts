@@ -58,6 +58,14 @@ export const PAGINAS = {
   despesas: () => import("@/features/despesas/pages/Despesas"),
   despesa: () => import("@/features/despesas/pages/Despesa"),
   minhasDespesas: () => import("@/features/despesas/pages/MinhasDespesas"),
+  contas: () => import("@/features/tesouraria/pages/Contas"),
+  conta: () => import("@/features/tesouraria/pages/Conta"),
+  caixaPequena: () => import("@/features/tesouraria/pages/CaixaPequena"),
+  fundoCaixa: () => import("@/features/tesouraria/pages/FundoCaixa"),
+  letras: () => import("@/features/tesouraria/pages/Letras"),
+  letra: () => import("@/features/tesouraria/pages/Letra"),
+  cambios: () => import("@/features/tesouraria/pages/Cambios"),
+  fluxoCaixa: () => import("@/features/tesouraria/pages/FluxoCaixa"),
 } satisfies Record<string, () => Modulo>;
 
 export type NomePagina = keyof typeof PAGINAS;

@@ -11,7 +11,9 @@ const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 test.skip(process.env.RIVO_SMOKE_PRODUCAO !== "1", "Só com RIVO_SMOKE_PRODUCAO=1.");
 
-test("login → ecrãs da F0 à F4 → logout, sem escritas", async ({ page }) => {
+test("login → ecrãs da F0 à F5 → logout, sem escritas", async ({ page }) => {
+  // Percorre todos os ecrãs publicados contra produção: 30 s não chegam.
+  test.setTimeout(240_000);
   const bloqueados: string[] = [];
   await page.route(`${API}/**`, async (route) => {
     const req = route.request();
@@ -52,6 +54,16 @@ test("login → ecrãs da F0 à F4 → logout, sem escritas", async ({ page }) =
     // F4
     ["/aprovacoes", "Aprovações"],
     ["/politicas-aprovacao", "Políticas de aprovação"],
+    // F5
+    ["/fornecedores", "Fornecedores"],
+    ["/facturas-compra", "Facturas de compra"],
+    ["/pedidos-pagamento", "Pedidos de pagamento"],
+    ["/despesas", "Despesas"],
+    ["/contas", "Contas bancárias"],
+    ["/caixa-pequena", "Caixa pequena"],
+    ["/letras", "Letras e livranças"],
+    ["/cambios", "Câmbios"],
+    ["/fluxo-caixa", "Fluxo de caixa"],
   ] as const) {
     await page.goto(caminho);
     await expect(page.getByRole("heading", { name: titulo, level: 1 })).toBeVisible();

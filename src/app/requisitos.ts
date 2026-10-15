@@ -37,6 +37,11 @@ export const REQUISITO_PAGINA = {
   "/facturas-compra": "finance.payables.read",
   "/pedidos-pagamento": "finance.payables.read",
   "/despesas": "finance.expenses.read",
+  "/contas": "finance.payables.read",
+  "/caixa-pequena": "finance.treasury.read",
+  "/letras": "finance.treasury.read",
+  "/cambios": "finance.treasury.read",
+  "/fluxo-caixa": { anyOf: ["finance.reports.read", "finance.treasury.read"] },
 } as const satisfies Record<string, Requisito>;
 
 /** Criar documentos: escrever facturas e escolher o cliente. */

@@ -7,7 +7,34 @@
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { colaboradores } from "../../fixtures/f1";
 import { meColaborador } from "../../fixtures/identidade";
-import { aprovacaoPagamento, contas, despesa, documento, factura, fornecedor, IDF5, IDF5D, meAdminF5, meFinancasF5, meGestorF5, minhaDespesa, painelAna, painelCarlos, pedidoPagamento, resumoDespesas } from "../../fixtures/f5";
+import {
+  aprovacaoPagamento,
+  cambios,
+  contas,
+  despesa,
+  documento,
+  extracto,
+  factura,
+  fornecedor,
+  fundo,
+  IDF5,
+  IDF5D,
+  IDF5T,
+  itemPrevisao,
+  letra,
+  linhaExtracto,
+  meAdminF5,
+  meFinancasF5,
+  meGestorF5,
+  minhaDespesa,
+  movimentosFundo,
+  painelAna,
+  painelCarlos,
+  pedidoPagamento,
+  previsto,
+  reconciliacao,
+  resumoDespesas,
+} from "../../fixtures/f5";
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 
@@ -351,5 +378,152 @@ test.describe("despesas", () => {
     await entrar(page, meColaborador.email);
     await page.goto("/eu/despesas");
     await expect(page.getByText("A sua conta não está ligada a uma ficha de colaborador.")).toBeVisible();
+  });
+});
+
+function comTesouraria(api: ApiSimulada, me = meAdminF5): ApiSimulada {
+  return comF5(api, me)
+    .em("GET", `/finance/accounts/${IDF5.conta}/statement`, { status: 200, corpo: extracto() })
+    .em("GET", `/finance/accounts/${IDF5.conta}/reconciliation`, { status: 200, corpo: reconciliacao() })
+    .em("GET", `/finance/accounts/${IDF5.conta}/statement-lines`, { status: 200, corpo: [linhaExtracto()] })
+    .em("GET", "/finance/exchange-rates", { status: 200, corpo: cambios() })
+    .em("GET", "/finance/petty-cash", { status: 200, corpo: [fundo()] })
+    .em("GET", `/finance/petty-cash/${IDF5T.fundo}/movements`, { status: 200, corpo: movimentosFundo() })
+    .em("GET", "/finance/bills", { status: 200, corpo: [letra()] })
+    .em("GET", `/finance/bills/${IDF5T.letra}`, { status: 200, corpo: letra() })
+    .em("GET", "/finance/cash-flow/forecast", { status: 200, corpo: previsto() })
+    .em("GET", "/finance/cash-flow/actual", { status: 200, corpo: { from: "2026-04-15", to: "2026-10-15", bankAccountId: null, totalInflows: 5100000, totalOutflows: 100000, months: [{ month: "2026-10", inflows: 5100000, outflows: 100000, net: 5000000 }] } })
+    .em("GET", "/finance/cash-flow/items", { status: 200, corpo: [itemPrevisao()] });
+}
+
+test.describe("tesouraria", () => {
+  test("contas e ficha: extracto, depósito em texto; axe e responsivo", async ({ page, api, violacoes }) => {
+    await comTesouraria(api)
+      .em("POST", `/finance/accounts/${IDF5.conta}/deposits`, { status: 204 })
+      .ligar();
+    await entrar(page);
+    await page.goto("/contas");
+    await expect(page.getByRole("link", { name: "Conta à ordem BAI" })).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("link", { name: "Conta à ordem BAI" }).click();
+    await expect(page.getByRole("cell", { name: "Levantamento para caixa" })).toBeVisible();
+    await expect(page.getByText("5 100 000,00 Kz").first()).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await semScrollHorizontal(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.getByRole("button", { name: "Depositar" }).click();
+    await page.getByLabel(/^Valor/).fill("1 250 000,5");
+    await page.getByLabel("Referência (opcional)").fill("DEP-1");
+    await page.getByRole("dialog").getByRole("button", { name: "Depositar" }).dblclick();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/accounts/${IDF5.conta}/deposits`).map((p) => p.corpo)).toEqual([{ amount: "1250000.50", reference: "DEP-1" }]);
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("reconciliação: conciliar à mão com o movimento do mesmo valor primeiro", async ({ page, api }) => {
+    await comTesouraria(api)
+      .em("POST", `/finance/statement-lines/${IDF5T.linha}/match`, { status: 204 })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/contas/${IDF5.conta}?vista=reconciliacao`);
+    await expect(page.getByRole("cell", { name: "LEV BALCAO" })).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("button", { name: "Conciliar", exact: true }).click();
+    const primeira = await page.getByRole("dialog").getByLabel("Movimento da conta").locator("option").nth(1).textContent();
+    expect(primeira).toContain("Levantamento para caixa");
+    await page.getByRole("dialog").getByLabel("Movimento da conta").selectOption(IDF5T.movimento);
+    await page.getByRole("dialog").getByRole("button", { name: "Conciliar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/statement-lines/${IDF5T.linha}/match`).map((p) => p.corpo)).toEqual([{ movementId: IDF5T.movimento }]);
+  });
+
+  test("o Manager vê contas e movimenta, mas não a reconciliação", async ({ page, api }) => {
+    await comTesouraria(api, meGestorF5).ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/contas/${IDF5.conta}?vista=reconciliacao`);
+    await expect(page.getByRole("cell", { name: "Levantamento para caixa" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Reconciliação" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Depositar" })).toBeVisible();
+  });
+
+  test("câmbios: lista, taxa com 6 casas em texto e conversão; 404 sem taxa", async ({ page, api, violacoes }) => {
+    await comTesouraria(api)
+      .em("POST", "/finance/exchange-rates", { status: 201, corpo: { id: "00000000-0000-4000-8000-000000000931" } })
+      .em("GET", "/finance/exchange-rates/conversion", (route) => {
+        const q = new URL(route.request().url()).searchParams;
+        return q.get("from") === "EUR"
+          ? { status: 404, corpo: { title: "Not Found", status: 404 }, cabecalhos: { "Content-Type": "application/problem+json" } }
+          : { status: 200, corpo: { amount: 100, from: "USD", to: "AOA", on: "2026-10-15", rate: 932.8183, rateDate: "2026-10-07", converted: 93281.83 } };
+      })
+      .ligar();
+    await entrar(page);
+    await page.goto("/cambios");
+    await expect(page.getByRole("cell", { name: "932,818300 AOA" })).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByLabel("Valor").fill("100");
+    await page.getByRole("button", { name: "Converter" }).click();
+    await expect(page.getByText("93 281,83 Kz")).toBeVisible();
+    await page.getByLabel("De", { exact: true }).selectOption("EUR");
+    await page.getByRole("button", { name: "Converter" }).click();
+    await expect(page.getByText("Não há câmbio registado", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Registar câmbio" }).click();
+    await page.getByRole("dialog").getByLabel(/^Taxa/).fill("1021,1668");
+    await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", "/finance/exchange-rates")[0]?.corpo).toMatchObject({ currency: "USD", rate: "1021.1668", source: "BNA" });
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("caixa pequena: reposição sem valor repõe o que falta", async ({ page, api }) => {
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", `/finance/petty-cash/${IDF5T.fundo}/movements`, { status: 201, corpo: { id: "00000000-0000-4000-8000-000000000932" } })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/caixa-pequena");
+    await page.getByRole("link", { name: "Caixa da sede" }).click();
+    await expect(page.getByText("259 500,00 Kz").first()).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("button", { name: "Registar movimento" }).click();
+    await page.getByRole("dialog").getByLabel("Tipo").selectOption("Replenishment");
+    await expect(page.getByText("Vazio repõe o que falta: 259 500,00 Kz.")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/petty-cash/${IDF5T.fundo}/movements`)[0]?.corpo).toMatchObject({ kind: "Replenishment", amount: null });
+  });
+
+  test("letras: só as acções do estado; descontar com encargos em texto", async ({ page, api }) => {
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", `/finance/bills/${IDF5T.letra}/discount`, { status: 204 })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/letras");
+    await page.getByRole("link", { name: "L2026-003" }).click();
+    await expect(page.getByRole("button", { name: "Registar aceite" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Endossar" })).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("button", { name: "Descontar" }).click();
+    await page.getByRole("dialog").getByLabel(/^Encargos/).fill("9260000");
+    await page.getByRole("dialog").getByRole("button", { name: "Descontar" }).click();
+    await expect(page.getByText("Os encargos vão de zero a menos do valor da letra.")).toBeVisible();
+    await page.getByRole("dialog").getByLabel(/^Encargos/).fill("125 000");
+    await page.getByRole("dialog").getByRole("button", { name: "Descontar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/bills/${IDF5T.letra}/discount`)[0]?.corpo).toEqual({ on: expect.any(String), fee: "125000.00", bank: "BAI", notes: null });
+  });
+
+  test("fluxo de caixa: previsto por mês e origem, realizado, previsões manuais; axe", async ({ page, api, violacoes }) => {
+    await comTesouraria(api, meFinancasF5).ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/fluxo-caixa");
+    await expect(page.getByRole("cell", { name: "6 500 000,00 Kz" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Previsão manual" })).toBeVisible();
+    await semViolacoesAxe(page);
+    await page.getByRole("link", { name: "Realizado" }).click();
+    await expect(page.getByRole("cell", { name: "5 000 000,00 Kz" })).toBeVisible();
+    await page.getByRole("link", { name: "Previsões manuais" }).click();
+    await expect(page.getByText("mensal até", { exact: false })).toBeVisible();
+    await semViolacoesAxe(page);
+    expect(await violacoes()).toEqual([]);
   });
 });

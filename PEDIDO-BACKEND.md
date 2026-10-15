@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-15 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `4457f94`, já em produção. Em aberto: **B20**.
+> Revisto contra `main` @ `4457f94`, já em produção. Em aberto: **B20** e
+> **B21**.
 > B15 a B19 estão resolvidos e o front já os usa:
 >
 > - B15 — nome duplicado dá 409 (PR #99);
@@ -41,3 +42,15 @@ leitura desse contexto e só para o documento ligado:
 É o padrão de `GET /portal/me/documents/{documentId}` (ADR-080, B13): não dá
 acesso ao arquivo, só ao ficheiro de que a pessoa precisa para decidir ou pagar.
 
+## B21 — IBAN repetido numa conta bancária dá 500
+
+**Facto:** `POST /finance/accounts` com um IBAN que outra conta já tem responde
+**500** («Ocorreu um erro no servidor»). O registo da API mostra a violação do
+índice único `ix_bank_account_iban` (SQL 2601) a sair como excepção não
+tratada. Reproduzido na base local a 2026-10-15.
+
+**Consequência:** quem abre a conta não sabe porquê falhou; o front só pode
+mostrar o código para o suporte.
+
+**Pedido:** responder **409** com o motivo («Já existe uma conta com este
+IBAN: …»), como o B15 fez para os nomes duplicados.

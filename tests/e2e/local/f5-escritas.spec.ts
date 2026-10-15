@@ -20,6 +20,12 @@ const marca = `[TESTE] ${sufixo}`;
 const PASSWORD_LOCAL = `Local-${sufixo}-Rivo#2026`;
 // Valor único por corrida: a política só cobre este valor e não colide com outras corridas.
 const VALOR = String(10_000 + (Date.now() % 89_999));
+/** IBAN angolano válido (ISO 13616) e único por corrida: as contas não aceitam IBAN repetido. */
+function ibanDeTeste(): string {
+  const bban = `0040${String(Date.now()).slice(-13).padStart(17, "0")}`;
+  const resto = [...`${bban}102400`].reduce((r, c) => (r * 10 + Number(c)) % 97, 0);
+  return `AO${String(98 - resto).padStart(2, "0")}${bban}`;
+}
 const PDF = Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n");
 
 async function soLocal(page: Page) {
@@ -252,4 +258,147 @@ test("F5: despesa submetida no portal com comprovativo, aprovada e reembolsada",
   await expect(page).toHaveURL(/\/eu$/);
   await page.getByRole("navigation", { name: "Principal" }).first().getByRole("link", { name: "Despesas" }).click();
   await expect(page.getByRole("row").filter({ hasText: descricao }).getByText("Reembolsada")).toBeVisible();
+});
+
+test("F5: tesouraria — conta, extracto e reconciliação, câmbio, caixa pequena, letra e previsão", async ({ page, request }) => {
+  test.setTimeout(240_000);
+  await soLocal(page);
+  const sa = await sessaoApi(request, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "");
+  await entrar(page, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "");
+
+  // Conta: abrir, depositar, levantar; o saldo e o extracto acompanham.
+  const conta = `${marca} Tesouraria`;
+  await page.goto("/contas");
+  await page.getByRole("button", { name: "Abrir conta" }).click();
+  await page.getByLabel("Nome").fill(conta);
+  await page.getByLabel("Banco").fill("Banco de teste");
+  await page.getByLabel("IBAN (opcional)").fill(ibanDeTeste());
+  await page.getByRole("dialog").getByRole("button", { name: "Abrir conta" }).click();
+  await expect(page.getByRole("heading", { name: conta, level: 1 })).toBeVisible();
+  const idConta = page.url().split("/").pop() ?? "";
+  await page.getByRole("button", { name: "Depositar" }).click();
+  await page.getByLabel(/^Valor/).fill("100 000,00");
+  await page.getByLabel("Referência (opcional)").fill(`DEP-${sufixo}`);
+  await page.getByRole("dialog").getByRole("button", { name: "Depositar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("button", { name: "Levantar" }).click();
+  await page.getByLabel(/^Valor/).fill("2500");
+  await page.getByLabel("Descrição").fill(`${marca} levantamento`);
+  await page.getByRole("dialog").getByRole("button", { name: "Levantar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("97 500,00 Kz").first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: `${marca} levantamento` })).toBeVisible();
+
+  // Reconciliação: importa o extracto, ignora uma linha, concilia outra à mão e desfaz.
+  await page.getByRole("link", { name: "Reconciliação" }).click();
+  await page.getByRole("button", { name: "Importar extracto" }).click();
+  const hoje = new Date().toISOString().slice(0, 10);
+  await page.getByLabel("Ou cole as linhas").fill(`data;descrição;valor;referência\n${hoje};Depósito;100000,00;DEP-${sufixo}\n${hoje};Comissão bancária;-150,00;\n${hoje};Levantamento ao balcão;-2500,00;`);
+  await page.getByRole("dialog").getByRole("button", { name: "Importar" }).click();
+  await expect(page.getByText(/3 linhas importadas/)).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Concluído" }).click();
+  const comissao = page.getByRole("row").filter({ hasText: "Comissão bancária" });
+  await comissao.getByRole("button", { name: "Ignorar" }).click();
+  await expect(comissao).toHaveCount(0);
+  const balcao = page.getByRole("row").filter({ hasText: "Levantamento ao balcão" });
+  if ((await balcao.count()) > 0) {
+    await balcao.getByRole("button", { name: "Conciliar" }).click();
+    const opcao = page.getByRole("dialog").getByLabel("Movimento da conta").locator("option", { hasText: `${marca} levantamento` });
+    await page.getByRole("dialog").getByLabel("Movimento da conta").selectOption((await opcao.getAttribute("value")) ?? "");
+    await page.getByRole("dialog").getByRole("button", { name: "Conciliar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  }
+  await page.getByLabel("Linhas", { exact: true }).selectOption("Matched");
+  await expect(page.getByRole("row").filter({ hasText: "Levantamento ao balcão" })).toBeVisible();
+  await page.getByRole("row").filter({ hasText: "Levantamento ao balcão" }).getByRole("button", { name: "Desfazer" }).click();
+  await expect(page.getByRole("row").filter({ hasText: "Levantamento ao balcão" })).toHaveCount(0);
+  const resumo = await sa<{ matched: number; ignored: number; unmatched: number }>("GET", `/finance/accounts/${idConta}/reconciliation`);
+  expect(resumo.corpo).toMatchObject({ ignored: 1, unmatched: 1 });
+
+  // Fechar (só com saldo zero: levanta-se o resto) e reabrir.
+  await page.getByRole("button", { name: "Levantar" }).click();
+  await page.getByLabel(/^Valor/).fill("97500");
+  await page.getByLabel("Descrição").fill(`${marca} saldo final`);
+  await page.getByRole("dialog").getByRole("button", { name: "Levantar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("button", { name: "Fechar", exact: true }).click();
+  await page.getByLabel("Motivo").fill(`${marca} fecho de teste`);
+  await page.getByRole("dialog").getByRole("button", { name: "Fechar conta" }).click();
+  await expect(page.getByText("Fechada", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Reabrir" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Reabrir" }).click();
+  await expect(page.getByText("Aberta", { exact: true })).toBeVisible();
+
+  // Câmbio e conversão.
+  await page.goto("/cambios");
+  await page.getByRole("button", { name: "Registar câmbio" }).click();
+  await page.getByRole("dialog").getByLabel("Moeda", { exact: true }).selectOption("ZAR");
+  await page.getByRole("dialog").getByLabel(/^Taxa/).fill("51,234567");
+  await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByLabel("Valor").fill("10");
+  await page.getByLabel("De", { exact: true }).selectOption("ZAR");
+  await page.getByLabel("Para").selectOption("AOA");
+  await page.getByRole("button", { name: "Converter" }).click();
+  await expect(page.getByText("512,35 Kz")).toBeVisible();
+
+  // Caixa pequena: abrir, despesa, reposição sem valor (repõe o que falta).
+  const fundo = `${marca} Caixa`;
+  await page.goto("/caixa-pequena");
+  await page.getByRole("button", { name: "Abrir fundo" }).click();
+  await page.getByRole("dialog").getByLabel("Nome").fill(fundo);
+  await page.getByRole("dialog").getByLabel("Fundo fixo").fill("50000");
+  await page.getByRole("dialog").getByRole("button", { name: "Abrir fundo" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("link", { name: fundo }).click();
+  await page.getByRole("button", { name: "Registar movimento" }).click();
+  await page.getByRole("dialog").getByLabel(/^Valor/).fill("12500");
+  await page.getByRole("dialog").getByLabel("Descrição").fill(`${marca} material de limpeza`);
+  await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("37 500,00 Kz").first()).toBeVisible();
+  await page.getByRole("button", { name: "Registar movimento" }).click();
+  await page.getByRole("dialog").getByLabel("Tipo").selectOption("Replenishment");
+  await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("table", { name: "Movimentos da caixa" }).getByText("Reposição do fundo")).toBeVisible();
+  const caixas = await sa<{ name: string; balance: number }[]>("GET", "/finance/petty-cash");
+  expect(String(caixas.corpo.find((f) => f.name === fundo)?.balance)).toBe("50000");
+
+  // Letra a receber: registar, aceitar, descontar.
+  const numero = `L-${sufixo}`;
+  await page.goto("/letras");
+  await page.getByRole("button", { name: "Registar letra" }).click();
+  await page.getByRole("dialog").getByLabel("Número").fill(numero);
+  await page.getByRole("dialog").getByLabel("Sacado (quem paga)").fill(`${marca} Cliente`);
+  await page.getByRole("dialog").getByLabel("Vencimento").fill("2027-01-31");
+  await page.getByRole("dialog").getByLabel("Valor").fill("300000");
+  await page.getByRole("dialog").getByRole("button", { name: "Registar" }).click();
+  await expect(page.getByRole("heading", { name: `Letra ${numero}`, level: 1 })).toBeVisible();
+  await page.getByRole("button", { name: "Registar aceite" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Registar aceite" }).click();
+  await expect(page.getByText("Aceite", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Descontar" }).click();
+  await page.getByRole("dialog").getByLabel(/^Encargos/).fill("4500");
+  await page.getByRole("dialog").getByRole("button", { name: "Descontar" }).click();
+  await expect(page.getByText("Descontada", { exact: true })).toBeVisible();
+  await expect(page.getByText("4 500,00 Kz")).toBeVisible();
+
+  // Previsão manual: criar, rever, apagar.
+  const previsao = `${marca} renda do armazém`;
+  await page.goto("/fluxo-caixa?vista=itens");
+  await page.getByRole("button", { name: "Nova previsão" }).click();
+  await page.getByRole("dialog").getByLabel("Valor").fill("750000");
+  await page.getByRole("dialog").getByLabel("Descrição").fill(previsao);
+  await page.getByRole("dialog").getByRole("button", { name: "Guardar" }).click();
+  await expect(page.getByRole("cell", { name: previsao, exact: true })).toBeVisible();
+  await page.getByRole("button", { name: `Rever ${previsao}` }).click();
+  await page.getByRole("dialog").getByLabel("Valor").fill("800000");
+  await page.getByRole("dialog").getByRole("button", { name: "Guardar" }).click();
+  await expect(page.getByRole("row").filter({ hasText: previsao }).getByText("800 000,00 Kz", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: `Apagar ${previsao}` }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Apagar" }).click();
+  await expect(page.getByRole("cell", { name: previsao, exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Previsto" }).click();
+  await expect(page.getByRole("table", { name: "Previsão por mês" })).toBeVisible();
 });

@@ -1537,3 +1537,45 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   o Admin e o Finance viram «Sem ligação ao servidor» numa recarga e passaram
   ao repetir; o teste por perfil passou a ter 120 s (o Admin percorre 17
   páginas).
+
+### F5 — o que mudou face ao plano, e porquê
+
+| Tema | Plano | Execução | Porquê |
+|---|---|---|---|
+| B12 | Bloqueava a F5 | Resolvido no backend (ADR-080): Finance, Manager e Colaborador carregam ficheiros | — |
+| Abrir anexos | — | Só quem lê o arquivo (Admin, HR) abre comprovativos e anexos; os outros vêem a lista e o porquê | `GET /documents/{id}` exige `documents.read` (B20) |
+| Contas bancárias | `finance.payables.*` | Lêem com `payables.read` (Finance e Manager) e escrevem com `payables.write`: o **Manager** abre, deposita e levanta; o **Finance** não | Facto do catálogo; está no relatório por perfil |
+| Executar | Contas diferentes | Quem pediu **e quem aprovou** não vêem «Executar» e a ficha diz porquê; só contas abertas na moeda do pedido; o aviso de sucesso fica com a página | O servidor recusa os dois (BR-3, 403). **Encontrado na base local:** o aviso desaparecia com o botão quando o pedido ficava pago |
+| Pedir | — | Valor até ao que falta pedir (total menos pedidos não cancelados); 202 abre o pedido | O servidor recusa acima do total (409) |
+| Fornecedor | — | IBAN verificado pela ISO 13616 no cliente | **Encontrado na base local:** o servidor recusava com 400 só com `detail`, e o formulário não mostrava nada |
+| 400 só com `detail` | — | `aplicarErrosDoServidor` devolve o `detail` quando não há mapa de campos: aparece em todos os formulários (F1 a F5) | Mesmo achado |
+| Fechar conta | — | A descrição diz que só fecha com saldo zero e quanto tem | Regra do domínio, descoberta na base local |
+| Despesas | — | Paginação local (a API devolve a lista inteira); o Finance regista só em seu nome | Não lê colaboradores |
+| Portal | — | «Despesas» no menu do colaborador; sem ficha ligada (403) explica em vez de mostrar erro | O portal autoriza pelo vínculo |
+| Gráficos | — | Tesouraria só com tabelas | Os números importam mais do que a forma; os gráficos ficam para quando houver uma conclusão a mostrar |
+| Orçamento | 150 KB | Chunk inicial a **149,8 KB** | Só a tabela de rotas cresce no chunk inicial; a F6 tem de o aliviar antes de juntar rotas |
+
+### F5 — estado
+
+- **Ecrãs:** fornecedores (lista, ficha, registo, importação, correcção,
+  estado), facturas de compra (lista, ficha, registo, confronto, anular),
+  pedidos de pagamento (lista, ficha, pedir, executar, cancelar, anexos),
+  despesas (resumo, lista, ficha, registar, aprovar, rejeitar, reembolsar;
+  portal: submeter, retirar), contas bancárias (lista, ficha, abrir, depositar,
+  levantar, fechar, reabrir, extracto, reconciliação), caixa pequena (fundos,
+  movimentos), letras e livranças (lista, ficha, acções por estado), câmbios
+  (lista, registo, conversor) e fluxo de caixa (previsto, realizado,
+  previsões manuais). Carregamento de ficheiros partilhado.
+- **Leituras em produção:** 3 contas, 80 fornecedores, 289 facturas de
+  compra, 235 pedidos de pagamento, 148 despesas, fundos de caixa, letras,
+  câmbios, previsões e fluxo previsto (456 movimentos) lidos a 2026-10-15
+  (200).
+- **Escritas:** verificadas **na base local** (`f5-escritas.spec.ts`): o
+  ciclo do pagamento com três pessoas (Manager pede e anexa, Admin aprova, o
+  Admin e quem pediu recebem 403 ao executar, o Finance executa e o saldo desce
+  o valor pago); a despesa submetida no portal com comprovativo, aprovada e
+  reembolsada; e a tesouraria inteira (conta, extracto importado, conciliação
+  automática e à mão, ignorar, fechar e reabrir, câmbio e conversão, caixa
+  pequena com reposição, letra aceite e descontada, previsão criada, revista e
+  apagada). **Nenhuma escrita em produção.**
+- **Testes:** 108 unitários; 79 cenários e2e × 3 motores.

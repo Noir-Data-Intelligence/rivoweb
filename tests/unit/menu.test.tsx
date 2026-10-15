@@ -51,14 +51,14 @@ describe("menu por perfil (§3.2)", () => {
   it("cada perfil real vê só as entradas que pode abrir", () => {
     const visto = Object.fromEntries(perfis.map((p) => [p.name, menuDe(p)]));
     expect(visto).toEqual({
-      Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
-      SuperAdmin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
+      Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
+      SuperAdmin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
       AssetManager: ["Início", "Alertas", "Fornecedores"],
       Cliente: ["Início"],
       Colaborador: ["Início", "Despesas"],
-      Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Configurações", "Facturação"],
+      Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Configurações", "Facturação"],
       HR: ["Início", "Alertas", "Colaboradores", "Departamentos", "Cargos"],
-      Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas"],
+      Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias"],
       ProjectManager: ["Início"],
       Sales: ["Início", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Facturação"],
     });

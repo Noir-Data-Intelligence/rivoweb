@@ -216,3 +216,107 @@ export const minhaDespesa = (estado = "Submitted"): S["OwnExpense"] => ({
   decisionNotes: null,
   reimbursedOn: null,
 });
+
+// Tesouraria
+
+export const IDF5T = {
+  linha: "00000000-0000-4000-8000-000000000921",
+  movimento: "00000000-0000-4000-8000-000000000922",
+  fundo: "00000000-0000-4000-8000-000000000923",
+  letra: "00000000-0000-4000-8000-000000000924",
+  item: "00000000-0000-4000-8000-000000000925",
+};
+
+export const extracto = (): S["AccountStatementView"] => ({
+  accountId: IDF5.conta,
+  name: "Conta à ordem BAI",
+  bank: "Banco de teste",
+  currency: "AOA",
+  from: null,
+  to: null,
+  openingBalance: 0,
+  totalCredits: 5100000,
+  totalDebits: 100000,
+  closingBalance: 5000000,
+  accountBalance: 5000000,
+  reconciles: true,
+  movements: [
+    { movementId: "00000000-0000-4000-8000-000000000926", occurredAt: "2026-10-01T09:00:00Z", direction: "Credit", amount: 5100000, balanceAfter: 5100000, description: "Saldo de abertura", sourceType: null, sourceId: null },
+    { movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", direction: "Debit", amount: 100000, balanceAfter: 5000000, description: "Levantamento para caixa", sourceType: null, sourceId: null },
+  ],
+});
+
+export const reconciliacao = (): S["ReconciliationSummary"] => ({
+  bankAccountId: IDF5.conta,
+  accountName: "Conta à ordem BAI",
+  currency: "AOA",
+  bookBalance: 5000000,
+  statementLines: 1,
+  matched: 0,
+  unmatched: 1,
+  ignored: 0,
+  unmatchedStatementTotal: -100000,
+  unreconciledMovements: [{ movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", direction: "Debit", amount: 100000, description: "Levantamento para caixa" }],
+});
+
+export const linhaExtracto = (estado = "Unmatched"): S["StatementLineView"] => ({
+  lineId: IDF5T.linha,
+  on: "2026-10-10",
+  description: "LEV BALCAO",
+  amount: -100000,
+  reference: null,
+  status: estado,
+  matchedMovementId: estado === "Matched" ? IDF5T.movimento : null,
+  importBatchId: "00000000-0000-4000-8000-000000000927",
+});
+
+export const cambios = (): S["ExchangeRateView"][] => [
+  { rateId: "00000000-0000-4000-8000-000000000928", currency: "USD", baseCurrency: "AOA", on: "2026-10-07", rate: 932.8183, source: "BNA (indicativo)" },
+];
+
+export const fundo = (): S["PettyCashFundView"] => ({ fundId: IDF5T.fundo, name: "Caixa da sede", custodianEmployeeId: null, currency: "AOA", floatAmount: 500000, balance: 240500, replenishmentNeeded: 259500, isActive: true });
+
+export const movimentosFundo = (): S["PettyCashMovementView"][] => [
+  { movementId: "00000000-0000-4000-8000-000000000929", kind: "Replenishment", amount: 500000, on: "2026-10-01", description: "Fundo inicial", category: null, reference: null, balanceAfter: 500000 },
+  { movementId: "00000000-0000-4000-8000-000000000930", kind: "Expense", amount: 259500, on: "2026-10-09", description: "Material de limpeza", category: "Limpeza", reference: null, balanceAfter: 240500 },
+];
+
+export const letra = (estado = "Accepted", sentido = "Receivable"): S["BillView"] => ({
+  billId: IDF5T.letra,
+  instrument: "BillOfExchange",
+  direction: sentido,
+  number: "L2026-003",
+  counterpartyName: "Kwanza Logística, Lda",
+  customerId: null,
+  supplierId: null,
+  salesInvoiceId: null,
+  purchaseInvoiceId: null,
+  issuedOn: "2026-05-27",
+  dueOn: "2026-12-26",
+  amount: 9260000,
+  currency: "AOA",
+  bank: "BAI",
+  status: estado,
+  settledOn: null,
+  discountFee: null,
+  notes: null,
+  overdue: false,
+  endorsements: [],
+});
+
+export const previsto = (): S["CashForecast"] => ({
+  from: "2026-10-15",
+  to: "2027-01-15",
+  currency: "AOA",
+  openingBalance: 5000000,
+  months: [
+    { month: "2026-10", inflows: 2000000, outflows: 500000, closingBalance: 6500000 },
+    { month: "2026-11", inflows: 1000000, outflows: 3200000, closingBalance: 4300000 },
+  ],
+  entries: [
+    { on: "2026-10-20", direction: "Inflow", amount: 2000000, source: "receivable", description: "FT 2026/10 · Cliente Teste", referenceId: null },
+    { on: "2026-11-21", direction: "Outflow", amount: 3200000, source: "manual", description: "Prestação de leasing", referenceId: IDF5T.item },
+  ],
+});
+
+export const itemPrevisao = (): S["CashForecastItemView"] => ({ itemId: IDF5T.item, direction: "Outflow", on: "2026-11-21", amount: 3200000, currency: "AOA", description: "Prestação de leasing", category: "Financiamento", repeatMonthlyUntil: "2027-04-21" });
