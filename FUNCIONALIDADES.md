@@ -1,10 +1,12 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F4** concluídas e publicadas em
-> `https://rivoweb-coral.vercel.app` · actualizado a 2026-10-13.
+> **Estado:** fases **F0 a F3** publicadas em
+> `https://rivoweb-coral.vercel.app`; **F4** (aprovações) concluída e
+> verificada na base local, por publicar · actualizado a 2026-10-15.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
-> funcionalidades novas. Só está aqui o que o front **já faz em produção**. O
+> funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
+pronto a publicar quando o estado acima o diz). O
 > que o backend tem e o front ainda não mostra está na última secção.
 >
 > **Fonte:** o catálogo real de perfis (`GET /settings/overview`, guardado em
@@ -113,10 +115,10 @@ Recursos Humanos.»
 ² Só se a conta estiver associada a um cliente; sem associação, o portal diz
 «Esta conta não está associada a um cliente. Fale com a empresa.»
 ³ Excepto em contas SuperAdmin, que só um SuperAdmin gere.
+⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 ⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já interveio não decide outra vez (BR-4).
 ⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
 ⁷ Vêem «Colaborador» (ou «Você»): os pedidos só trazem ids e estes perfis não lêem colaboradores (B19).
-⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
 
 ---
 
