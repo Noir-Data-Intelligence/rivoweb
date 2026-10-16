@@ -1,8 +1,9 @@
 # Rivo — funcionalidades do front por perfil
 
 > **Estado:** fases **F0 a F5** publicadas em
-> `https://rivoweb-coral.vercel.app` (F5: tesouraria, despesas e contas a
-> pagar) · actualizado a 2026-10-16.
+> `https://rivoweb-coral.vercel.app`; **F6** (fiscal, contabilidade e
+> planeamento) concluída e verificada na base local, por publicar ·
+> actualizado a 2026-10-16.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -24,11 +25,11 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Configurações, Facturação |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
@@ -118,6 +119,23 @@ AM = AssetManager.
 | Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Letras e livranças: ver; registar; aceite, desconto, endosso, pagamento, protesto, anulação | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fluxo de caixa: previsto e realizado; previsões manuais (criar, rever, apagar) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Relatórios financeiros** | | | | | | | | | | |
+| Balancete por ano e período, com o equilíbrio | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Balanço e demonstração de resultados, com as contas sem classe e a diferença à vista | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Antiguidade dos saldos de clientes e de fornecedores, numa data | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Impostos** | | | | | | | | | | |
+| Resumo do IVA (liquidado, regularizado, dedutível, a entregar) e retenções na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Descarregar o SAF-T AO de facturação do mês ou do ano ¹² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Contabilidade** | | | | | | | | | | |
+| Ver lançamentos, diários, plano de contas, versões do plano, períodos e regras | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir diários e contas; lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Fechar e reabrir períodos; versões do plano; regras de lançamento e contabilísticas | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Planeamento** | | | | | | | | | | |
+| Ver centros de custo, orçamentos (com os meses) e previsões de custos | ✓ | ✓ | — | ✓ ¹¹ | ✓ ¹¹ | — | — | — | — | — |
+| Abrir centros de custo e registar previsões de custos ¹³ | ✓ | ✓ | — | — | — ¹¹ | — | — | — | — | — |
+| Criar e rever orçamentos (rascunho) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Aprovar orçamentos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Colaboradores** | | | | | | | | | | |
 | Ver a lista e a ficha | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Admitir; corrigir nome; mudar contactos, departamento e estado | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -138,6 +156,9 @@ AM = AssetManager.
 | Dados da empresa: declarar e corrigir | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Governação: perfis e regras de aprovação | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Teste de correio | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Fiscal** | | | | | | | | | | |
+| Ver taxas (IVA, INSS), tabela de IRT e isenções dos subsídios; simular taxa e IRT | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir pautas; registar e fechar versões de taxas, de IRT e de isenções | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 
 ¹ Só se a conta estiver ligada a uma ficha de colaborador; sem ficha, o portal
 diz «A sua conta ainda não está ligada a uma ficha de colaborador. Fale com os
@@ -152,6 +173,9 @@ Recursos Humanos.»
 ⁸ Só depois de aprovado (BR-5), e nunca por quem pediu nem por quem aprovou (BR-3); o servidor confirma com 403. O dinheiro sai de uma conta aberta na moeda do pedido.
 ⁹ Vê a lista, mas abrir o ficheiro exige ler o arquivo de documentos, que estes perfis não têm (B20).
 ¹⁰ A própria despesa não se decide.
+¹¹ Estes perfis não lêem os Recursos Humanos: vêem «Departamento» e «Colaborador» em vez dos nomes, e o Manager não consegue escolher o responsável de um centro nem o departamento de uma previsão (B22).
+¹² Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
+¹³ Uma previsão guardada em rascunho já não se submete nem corrige: não há rota para isso (B23). Por omissão, o front submete.
 
 ---
 
@@ -195,6 +219,11 @@ Recursos Humanos.»
 - Tema claro, escuro ou o do sistema, lembrado no browser.
 - Funciona em telemóvel, tablet e computador (360 a 1440 px). Teclado completo;
   verificado com axe em cada ecrã.
+- Uma tabela mais larga que o ecrã recebe foco e desliza pelo teclado; um
+  formulário mais alto que o ecrã desliza dentro da janela, com o botão de
+  confirmar sempre alcançável.
+- Os separadores de uma página (por exemplo Balancete, Balanço, Resultados)
+  ficam no endereço e guardam o ano e o período ao mudar de separador.
 
 ---
 
@@ -376,6 +405,71 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Previsões manuais:** criar, rever e apagar (entrada ou saída, data, valor,
   moeda, descrição, categoria, repetição mensal).
 
+**Relatórios financeiros**
+- **Balancete** por ano e período (ou ano inteiro): abertura, movimentos e
+  saldos devedor e credor por conta, totais e se está equilibrado.
+- **Balanço** no fecho do período: activo, passivo e capital próprio por
+  rubrica e conta, resultado do exercício; as contas movimentadas **sem classe
+  de reporte** e a **diferença** aparecem à parte, com ligação para as
+  configurar.
+- **Demonstração de resultados**: proveitos e custos por rubrica, resultado
+  líquido; num mês, acumulado desde Janeiro ou só o mês.
+- **Antiguidade de saldos** de clientes (a receber) ou de fornecedores (a
+  pagar) numa data: por vencer, 1–30, 31–60, 61–90 e mais de 90 dias.
+
+**Impostos**
+- **IVA** do mês ou do ano: liquidado por taxa, regularizado nas notas de
+  crédito, dedutível nas facturas de compra e o valor a entregar ou a
+  recuperar, com a nota de que não é a declaração oficial.
+- **Retenções na fonte** feitas pelos clientes, por cliente.
+- **SAF-T AO** de facturação do mês ou do ano, descarregado em XML, com o aviso
+  de que a Rivo não é software certificado. Hoje o servidor recusa por falta de
+  configuração (B24) e o ecrã mostra o motivo.
+
+**Lançamentos**
+- Lista por diário, ano e período (incluindo os de regularização), com estado.
+- **Diários**: ver e **abrir** (código e nome).
+- **Novo lançamento**: diário, n.º de arquivo, data, período, tipo (SAF-T) e
+  linhas a débito e a crédito com conta, valor, descrição e centro de custo;
+  totais e diferença enquanto se escreve; só envia equilibrado e com contas de
+  movimento.
+- **Ficha**: cabeçalho, transacção SAF-T, linhas e totais; **estornar** com
+  motivo (fica marcado, não se apaga).
+
+**Plano de contas**
+- **Contas** (categorias do SAF-T AO: 1.º grau, agregadoras e de movimento,
+  geral e analítica): procurar, ver as inactivas, **abrir** (com a conta-mãe
+  validada como no servidor) e **desactivar**.
+- **Versões do plano**: ver e **registar** (nome, versão, fonte, vigência).
+- **Classes de reporte** (prefixo → activo, passivo, capital, proveitos ou
+  custos, rubrica e ordem): ver, **criar**, **rever** e **apagar**.
+
+**Períodos**
+- Por ano: meses 1–12 e regularizações 13–16, com estado, fecho e última
+  reabertura; **abrir**, **fechar** (fica registado quem fechou) e **reabrir**
+  com motivo.
+
+**Regras contabilísticas**
+- **Lançamento automático**: por acontecimento (factura emitida, nota de
+  crédito, recibo, retenção, factura de compra, pagamento), as linhas que gera;
+  os acontecimentos sem regra dizem que não geram lançamento. **Definir** (só
+  regras equilibradas em líquido e imposto) e **desactivar**.
+- **Contabilísticas**: registo versionado com tipo de origem e fonte;
+  **criar** e **desactivar**.
+
+**Centros de custo**
+- Lista com departamento e responsável pelos nomes; **abrir** (código, nome,
+  departamento opcional, responsável).
+
+**Orçamentos**
+- Por centro de custo e ano, com os tectos mês a mês e o total anual;
+  **criar** e **rever** em rascunho; **aprovar** (passa a travar a despesa
+  acima do tecto e deixa de se alterar).
+
+**Previsões de custos**
+- Por departamento e ano: custos operacionais, fixos e total por mês;
+  **registar** e submeter (uma por departamento e mês).
+
 **Colaboradores**
 - Lista paginada (nome, n.º, departamento, admissão, conta ligada, estado).
 - **Admitir** (nome, departamento, data, e-mail, telefone, n.º mecanográfico).
@@ -410,6 +504,18 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Canais de pagamento**: ver, **criar** e **rever** (nome, mecanismo, origem,
   activo).
 - **Taxas de IVA**: só leitura, com as versões em vigor.
+
+**Fiscal**
+- **Taxas** (IVA e INSS) por pauta, com as versões, a vigência, o estado e o
+  instrumento legal; **abrir pauta**, **registar versão** (aviso se se cruza com
+  a em vigor) e **fechar** uma versão com a data de fim; ver que taxa se aplica
+  a um código numa data.
+- **IRT**: escalões de cada tabela, **simular** o imposto de uma matéria
+  colectável; **registar** uma tabela nova (parte da em vigor, escalões
+  validados como no servidor) e **fechar** a em vigor.
+- **Subsídios** de alimentação e de transporte: limiar isento por mês em vigor
+  e versões; **registar** e **fechar** versões.
+- Avisa que é configuração fiscal de produção.
 
 **Configurações**
 - **Dados da empresa** (razão social, NIF, endereço, cidade, país, nome
@@ -483,8 +589,23 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
 - Tudo o que o Admin faz.
 
+**Relatórios financeiros** e **Impostos**
+- Tudo o que o Admin faz.
+
+**Lançamentos**, **Plano de contas**, **Períodos** e **Regras contabilísticas**
+- Ver tudo; **abrir** diários e contas, **lançar**, **estornar**, **abrir
+  períodos** e mexer nas **classes de reporte**. Não fecha nem reabre
+  períodos, não regista versões do plano nem define regras.
+
+**Centros de custo**, **Orçamentos** e **Previsões de custos**
+- Ver tudo, sem os nomes dos departamentos e responsáveis (B22). **Aprova**
+  orçamentos; não os cria nem revê, não abre centros nem regista previsões.
+
 **Configurações**
 - Só **Dados da empresa**: ver, **declarar** e **corrigir**.
+
+**Fiscal**
+- Tudo o que o Admin faz.
 
 ### Manager (Gestão)
 **Início**
@@ -518,6 +639,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Contas bancárias**
 - Ver saldos e extracto; **abrir**, **depositar**, **levantar**, **fechar** e
   **reabrir**. Sem reconciliação.
+
+**Centros de custo**, **Orçamentos** e **Previsões de custos**
+- Ver tudo, sem os nomes dos departamentos e responsáveis (B22). **Cria** e
+  **revê** orçamentos em rascunho; não os aprova. Não consegue abrir centros
+  nem registar previsões, porque não escolhe responsável nem departamento
+  (B22).
 
 ### AssetManager (Gestão de activos)
 **Início**
@@ -587,7 +714,7 @@ entra neste documento quando estiver publicada.
 
 | Fase | Área |
 |---|---|
-| F6 | Fiscal e contabilidade |
+| — | Declarações à AGT (o backend ainda não as tem, B5) |
 | F7 | RH completo e portal do colaborador (férias, recibos, documentos) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |

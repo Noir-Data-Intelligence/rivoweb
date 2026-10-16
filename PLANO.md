@@ -1582,3 +1582,69 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 - **Publicação:** enviada a 2026-10-16 (`a9601b2..e5f6486`); a Vercel
   publicou (`index-Bok-OtO4.js`) e o smoke por perfil em produção passou
   (10/10, só leituras).
+
+### F6 — o que mudou face ao plano, e porquê
+
+- **Carregamento inicial aliviado primeiro:** o login deixou o
+  react-hook-form (validação própria, mesmo comportamento). O chunk inicial
+  desceu de 149,8 KB para 137,0 KB; com as rotas da F6 está em 137,5 KB.
+- **SAF-T entra na F6:** o backend passou a ter `GET /finance/saft-ao`
+  (facturação, TaxAccountingBasis F), por isso o B5 está meio resolvido. Em
+  produção (e na base local) o servidor recusa por falta de
+  `SAFT_PRODUCT_COMPANY_TAX_ID` (B24); o ecrã mostra o motivo. As declarações à
+  AGT continuam sem rota.
+- **Rotas e menu:** grupo «Contabilidade» (Relatórios financeiros, Impostos,
+  Lançamentos, Plano de contas, Períodos, Regras contabilísticas), grupo
+  «Planeamento» (Centros de custo, Orçamentos, Previsões de custos) e «Fiscal»
+  em Administração. As classes de reporte ficam no plano de contas (é o que
+  liga as contas ao balanço) e a antiguidade de saldos nos relatórios.
+- **Permissões lidas em produção** (`/identity/me`, 2026-10-16): o Finance tem
+  `ledger.read/write`, `reports.read`, `planning.read`, `budgets.approve` e
+  `fiscal.*`, mas não `ledger.close` nem `planning.write`; o Manager só
+  `planning.read/write`. Logo: o Finance lança mas não fecha períodos nem
+  define regras, aprova orçamentos mas não os cria; o Manager cria orçamentos
+  mas não os aprova.
+- **Nomes de RH no planeamento:** as vistas só trazem ids e nem o Finance nem o
+  Manager lêem RH. O front mostra os nomes a quem lê RH, diz «Departamento» e
+  «Colaborador» aos outros (nunca o id) e desactiva «Abrir centro» e «Registar
+  previsão» para quem não pode escolher (B22).
+- **Previsão em rascunho presa:** não há rota para submeter nem rever depois
+  (B23); «Submeter já» vem marcado.
+- **Peças partilhadas novas:** `ui/Vistas` (separadores no URL, guardam os
+  outros filtros), `Confirmar largo` para formulários com linhas.
+- **Defeitos corrigidos de passagem:** os diálogos não tinham altura máxima (o
+  botão de confirmar ficava fora do ecrã nos formulários grandes); uma tabela
+  que transborda passa a receber foco para deslizar pelo teclado
+  (`scrollable-region-focusable`); os 404 com detalhe do servidor mostram-no
+  («Diário não encontrado.»).
+- **Fora da F6:** regras de lançamento automático não se testam na base local
+  (mudariam a emissão de facturas dos outros testes).
+
+### F6 — estado
+
+- **Ecrãs:** fiscal (taxas com versões, simulação; IRT com escalões,
+  simulação e tabela nova; isenções dos subsídios), relatórios (balancete,
+  balanço, resultados, antiguidade), impostos (IVA, retenções, SAF-T),
+  lançamentos (lista, ficha, novo, estorno, diários), plano de contas (contas,
+  versões, classes de reporte), períodos (abrir, fechar, reabrir), regras
+  (lançamento automático, contabilísticas), centros de custo, orçamentos
+  (criar, rever, aprovar) e previsões de custos.
+- **Leituras em produção:** todas as rotas da F6 com o Admin e o Finance
+  (200), o Manager só no planeamento (o resto 403) e a Sales em nenhuma (403),
+  a 2026-10-16. Dados reais: 10 centros de custo, 10 orçamentos, 120
+  previsões, IVA de Outubro, antiguidade de clientes (1 006 419 588,00 Kz) e de
+  fornecedores; o razão ainda está vazio (sem plano de contas carregado).
+- **Escritas:** verificadas **na base local** (`f6-escritas.spec.ts`, API em
+  `33697a8`): diário, contas (com a recusa de conta debaixo de conta de
+  movimento), lançamento em partida dobrada, balancete, estorno, período de
+  regularização aberto, fechado e reaberto, classe de reporte criada e
+  apagada, versão do plano, regra contabilística criada e desactivada; pauta
+  nova com versão fechada e a recusa de uma tabela de IRT sobreposta (sem
+  mudar nada); centro de custo, orçamento criado, revisto e aprovado, previsão
+  submetida e a recusa da segunda para o mesmo mês. **Nenhuma escrita em
+  produção.**
+- **Incidente na base local:** uma primeira versão do teste fechou por engano a
+  versão do INSS patronal (dois botões com o mesmo nome). Reposta com uma
+  versão igual desde 2021-01-01; os botões passaram a ter nomes únicos.
+- **Testes:** 124 unitários; interface 12 cenários F6 × 3 motores (36); a
+  suite inteira 277 + 5 instáveis sob carga que passam ao repetir.

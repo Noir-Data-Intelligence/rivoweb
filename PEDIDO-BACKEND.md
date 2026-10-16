@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
-> 2026-10-15 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `4457f94`, já em produção. Em aberto: **B20** e
-> **B21**.
+> 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
+> Revisto contra `main` @ `33697a8`. Em aberto: **B20**, **B21**, **B22**,
+> **B23** e **B24** (configuração). O **B5** está meio resolvido: já há
+> SAF-T AO de facturação (`GET /finance/saft-ao`), continuam a faltar as
+> declarações à AGT.
 > B15 a B19 estão resolvidos e o front já os usa:
 >
 > - B15 — nome duplicado dá 409 (PR #99);
@@ -54,3 +56,58 @@ mostrar o código para o suporte.
 
 **Pedido:** responder **409** com o motivo («Já existe uma conta com este
 IBAN: …»), como o B15 fez para os nomes duplicados.
+
+## B22 — O planeamento só traz ids de departamento e de colaborador
+
+**Facto:** `CostCentreView` traz `departmentId` e `responsibleEmployeeId`,
+`BudgetView` traz `approvedByEmployeeId` e `CostForecastView` traz
+`departmentId`, sem nomes. Os nomes só se obtêm por `/hr/departments` e
+`/hr/employees`, que pedem `hr.departments.read` e `hr.employees.read`.
+O **Finance** e o **Manager**, que são quem lê e escreve o planeamento
+(`finance.planning.*`, `finance.budgets.approve`), não têm nenhuma das duas
+(lido em `/identity/me` de produção a 2026-10-16).
+
+**Consequência:**
+
+- nas listas de centros de custo e de previsões, o Finance e o Manager vêem
+  «Departamento» e «Colaborador» em vez dos nomes (o front nunca mostra o id);
+- o Manager tem `finance.planning.write` mas **não consegue abrir um centro de
+  custo** nem **registar uma previsão**: o responsável e o departamento
+  escolhem-se de listas de RH que ele não lê. O front desactiva os dois
+  botões e explica porquê.
+
+**Pedido:** como o B19 fez nas aprovações, trazer o nome ao lado do id:
+`departmentName` e `responsibleName` em `CostCentreView`, `departmentName` em
+`CostForecastView` e `approvedByName` em `BudgetView`. Para escolher, uma
+lista curta de departamentos e de colaboradores activos (id e nome) com
+`finance.planning.write`, por exemplo `GET /finance/planning/lookups`.
+
+## B23 — Uma previsão de custos em rascunho fica presa
+
+**Facto:** `POST /finance/planning/cost-forecasts` aceita `submit: false`
+(rascunho), e o domínio tem `DepartmentCostForecast.Revise` e `Submit`. Mas
+não há rota para rever nem para submeter depois, e um segundo `POST` para o
+mesmo departamento e mês dá **409** («Já existe previsão…»).
+
+**Consequência:** um rascunho nunca chega à tesouraria nem se corrige. O front
+deixa marcado «Submeter já» por omissão e avisa que, em rascunho, não há forma
+de a submeter mais tarde.
+
+**Pedido:** `PUT /finance/planning/cost-forecasts/{forecastId}` (rever, só em
+rascunho) e `POST /finance/planning/cost-forecasts/{forecastId}/submission`,
+com `finance.planning.write`.
+
+## B24 — O SAF-T recusa em produção por falta de configuração
+
+**Facto:** `GET /finance/saft-ao` responde **400** em produção (e na base
+local): «Falta o NIF do produtor do software (Finance:SaftProductCompanyTaxId,
+SAFT_PRODUCT_COMPANY_TAX_ID no .env). O SAF-T exige-o no cabeçalho.»
+Verificado com a conta Finance de QA a 2026-10-16, só leitura.
+
+**Consequência:** o botão «Descarregar SAF-T» mostra a recusa com o motivo; o
+ficheiro não sai.
+
+**Pedido (operação, não código):** definir `SAFT_PRODUCT_COMPANY_TAX_ID` (o
+NIF da produtora do software, a NOIR) no `.env` de produção e reiniciar a API.
+É a única chave em falta: o `docker-compose.yml` já a passa como
+`Finance__SaftProductCompanyTaxId`, e o `ProductID` tem valor por omissão.
