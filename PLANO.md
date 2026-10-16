@@ -1648,3 +1648,5 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   versão igual desde 2021-01-01; os botões passaram a ter nomes únicos.
 - **Testes:** 124 unitários; interface 12 cenários F6 × 3 motores (36); a
   suite inteira 277 + 5 instáveis sob carga que passam ao repetir.
+- **Publicada** a 2026-10-16 (`58c7892`, `5d06c6f`, `2ea42de`): CI verde e
+  smoke de produção por perfil 10/10, só leituras, com os ecrãs e menus da F6.
