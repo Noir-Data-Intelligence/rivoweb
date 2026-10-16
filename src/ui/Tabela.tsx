@@ -6,7 +6,7 @@
  * página visível enganaria.
  */
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { cn } from "./cn";
 import { EmptyState, Skeleton } from "./Layout";
 
@@ -25,6 +25,23 @@ export type Coluna<T> = {
 const ESCONDER = { sm: "hidden sm:table-cell", md: "hidden md:table-cell", lg: "hidden lg:table-cell" } as const;
 
 const comparador = new Intl.Collator("pt", { sensitivity: "base", numeric: true });
+
+/** Quando a tabela transborda na horizontal, a zona de deslocamento recebe foco para se mover pelo teclado (WCAG 2.1.1). */
+function useTransborda() {
+  // Ref por callback: a zona volta a medir-se quando aparece (depois de um erro, por exemplo).
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+  const [transborda, setTransborda] = useState(false);
+  useEffect(() => {
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const medir = () => setTransborda(el.scrollWidth > el.clientWidth + 1);
+    medir();
+    const ro = new ResizeObserver(medir);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+  }, [el]);
+  return { setEl, transborda };
+}
 
 export function Tabela<T>({
   rotulo,
@@ -51,6 +68,7 @@ export function Tabela<T>({
   rodape?: ReactNode;
 }) {
   const [ordem, setOrdem] = useState<{ id: string; asc: boolean } | null>(null);
+  const { setEl: zonaDeslocar, transborda } = useTransborda();
 
   const ordenadas = useMemo(() => {
     const lista = linhas ?? [];
@@ -70,7 +88,11 @@ export function Tabela<T>({
 
   return (
     <div className="overflow-hidden rounded-card border border-border bg-card">
-      <div className="overflow-x-auto">
+      <div
+        ref={zonaDeslocar}
+        className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        {...(transborda ? { tabIndex: 0, role: "region", "aria-label": `${rotulo} (deslize para ver mais colunas)` } : {})}
+      >
         <table className="w-full border-collapse text-base" aria-label={rotulo} aria-busy={aCarregar || undefined}>
           <thead>
             <tr className="border-b border-border bg-muted">

@@ -23,7 +23,8 @@ export function mensagemErro(e: unknown): MensagemErro {
     case 403:
       return { titulo: "Não pode fazer isto.", detalhe: e.detail ?? "Não tem permissão para esta acção.", codigoSuporte: null };
     case 404:
-      return { titulo: "Não encontrado, ou não tem acesso.", detalhe: null, codigoSuporte: null };
+      // O servidor às vezes diz o quê («Diário não encontrado.», «A conta 62 não existe.»).
+      return { titulo: "Não encontrado, ou não tem acesso.", detalhe: e.detail ?? null, codigoSuporte: null };
     case 409:
       return { titulo: "Não foi possível concluir.", detalhe: e.detail ?? "O registo foi alterado entretanto. Recarregue e reveja.", codigoSuporte: null };
     case 413:

@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeftRight, BellRing, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { ArrowLeftRight, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -39,6 +39,15 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/letras", titulo: "Letras e livranças", icone: ScrollText, requer: R["/letras"], grupo: "Tesouraria" },
     { caminho: "/cambios", titulo: "Câmbios", icone: ArrowLeftRight, requer: R["/cambios"], grupo: "Tesouraria" },
     { caminho: "/fluxo-caixa", titulo: "Fluxo de caixa", icone: TrendingUp, requer: R["/fluxo-caixa"], grupo: "Tesouraria" },
+    { caminho: "/relatorios", titulo: "Relatórios financeiros", icone: ChartColumn, requer: R["/relatorios"], grupo: "Contabilidade" },
+    { caminho: "/impostos", titulo: "Impostos", icone: Percent, requer: R["/impostos"], grupo: "Contabilidade" },
+    { caminho: "/lancamentos", titulo: "Lançamentos", icone: BookOpen, requer: R["/lancamentos"], grupo: "Contabilidade" },
+    { caminho: "/plano-contas", titulo: "Plano de contas", icone: ListTree, requer: R["/plano-contas"], grupo: "Contabilidade" },
+    { caminho: "/periodos", titulo: "Períodos", icone: CalendarRange, requer: R["/periodos"], grupo: "Contabilidade" },
+    { caminho: "/regras-contabilisticas", titulo: "Regras contabilísticas", icone: Workflow, requer: R["/regras-contabilisticas"], grupo: "Contabilidade" },
+    { caminho: "/centros-custo", titulo: "Centros de custo", icone: Target, requer: R["/centros-custo"], grupo: "Planeamento" },
+    { caminho: "/orcamentos", titulo: "Orçamentos", icone: Wallet, requer: R["/orcamentos"], grupo: "Planeamento" },
+    { caminho: "/previsoes-custos", titulo: "Previsões de custos", icone: CalendarClock, requer: R["/previsoes-custos"], grupo: "Planeamento" },
     { caminho: "/colaboradores", titulo: "Colaboradores", icone: Users, requer: R["/colaboradores"], grupo: "Pessoas" },
     { caminho: "/departamentos", titulo: "Departamentos", icone: Building2, requer: R["/departamentos"], grupo: "Pessoas" },
     { caminho: "/cargos", titulo: "Cargos", icone: BriefcaseBusiness, requer: R["/cargos"], grupo: "Pessoas" },
@@ -51,6 +60,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
       grupo: "Administração",
     },
     { caminho: "/facturacao", titulo: "Facturação", icone: SlidersHorizontal, requer: R["/facturacao"], grupo: "Administração" },
+    { caminho: "/fiscal", titulo: "Fiscal", icone: Scale, requer: R["/fiscal"], grupo: "Administração" },
     { caminho: "/politicas-aprovacao", titulo: "Políticas de aprovação", icone: ListChecks, requer: R["/politicas-aprovacao"], grupo: "Administração" },
   ],
   colaborador: [

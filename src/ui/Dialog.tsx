@@ -26,7 +26,8 @@ export function DialogContent({
       <D.Overlay className="fixed inset-0 z-50 bg-foreground/40" />
       <D.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2",
+          // Nunca mais alto que o ecrã: o que não cabe desliza, e o botão de confirmar fica sempre alcançável.
+          "fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto",
           "rounded-card border border-border bg-popover p-5 text-popover-foreground shadow-md focus:outline-none",
           className,
         )}

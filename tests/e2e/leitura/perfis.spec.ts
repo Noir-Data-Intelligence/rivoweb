@@ -25,11 +25,11 @@ function lerContas(): { password: string; contas: Conta[] } {
 
 /** O mesmo quadro do teste unitário `menu.test.tsx`. */
 const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
-  Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Políticas de aprovação"],
-  Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Configurações", "Facturação"],
+  Admin: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Relatórios financeiros", "Impostos", "Lançamentos", "Plano de contas", "Períodos", "Regras contabilísticas", "Centros de custo", "Orçamentos", "Previsões de custos", "Colaboradores", "Departamentos", "Cargos", "Utilizadores", "Configurações", "Facturação", "Fiscal", "Políticas de aprovação"],
+  Finance: ["Início", "Aprovações", "Alertas", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Caixa pequena", "Letras e livranças", "Câmbios", "Fluxo de caixa", "Relatórios financeiros", "Impostos", "Lançamentos", "Plano de contas", "Períodos", "Regras contabilísticas", "Centros de custo", "Orçamentos", "Previsões de custos", "Configurações", "Facturação", "Fiscal"],
   HR: ["Início", "Alertas", "Colaboradores", "Departamentos", "Cargos"],
   Sales: ["Início", "Clientes", "Facturas", "Pró-formas", "Notas de crédito", "Recibos", "A receber", "Facturação"],
-  Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias"],
+  Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Centros de custo", "Orçamentos", "Previsões de custos"],
   AssetManager: ["Início", "Alertas", "Fornecedores"],
   ProjectManager: ["Início"],
   Colaborador: ["Início", "Despesas"],
@@ -43,8 +43,8 @@ const { password, contas } = process.env.RIVO_QA_CONTAS ? lerContas() : { passwo
 
 for (const c of contas) {
   test(`perfil ${c.perfil}: menu certo e páginas sem erro`, async ({ page }) => {
-    // O Admin percorre 17 páginas contra produção: 30 s não chegam.
-    test.setTimeout(120_000);
+    // O Admin percorre 37 páginas contra produção: 30 s não chegam.
+    test.setTimeout(240_000);
     const bloqueados: string[] = [];
     await page.route(`${API}/**`, async (route) => {
       const req = route.request();

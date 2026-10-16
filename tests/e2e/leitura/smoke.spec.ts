@@ -11,7 +11,7 @@ const PERMITIDOS = new Set(["POST /identity/login", "POST /identity/logout"]);
 
 test.skip(process.env.RIVO_SMOKE_PRODUCAO !== "1", "Só com RIVO_SMOKE_PRODUCAO=1.");
 
-test("login → ecrãs da F0 à F5 → logout, sem escritas", async ({ page }) => {
+test("login → ecrãs da F0 à F6 → logout, sem escritas", async ({ page }) => {
   // Percorre todos os ecrãs publicados contra produção: 30 s não chegam.
   test.setTimeout(240_000);
   const bloqueados: string[] = [];
@@ -64,6 +64,28 @@ test("login → ecrãs da F0 à F5 → logout, sem escritas", async ({ page }) =
     ["/letras", "Letras e livranças"],
     ["/cambios", "Câmbios"],
     ["/fluxo-caixa", "Fluxo de caixa"],
+    // F6
+    ["/fiscal", "Fiscal"],
+    ["/fiscal?vista=irt", "Fiscal"],
+    ["/fiscal?vista=subsidios", "Fiscal"],
+    ["/relatorios", "Relatórios financeiros"],
+    ["/relatorios?vista=balanco", "Relatórios financeiros"],
+    ["/relatorios?vista=resultados", "Relatórios financeiros"],
+    ["/relatorios?vista=antiguidade", "Relatórios financeiros"],
+    ["/impostos", "Impostos"],
+    ["/impostos?vista=retencoes", "Impostos"],
+    ["/impostos?vista=saft", "Impostos"],
+    ["/lancamentos", "Lançamentos"],
+    ["/lancamentos?vista=diarios", "Lançamentos"],
+    ["/plano-contas", "Plano de contas"],
+    ["/plano-contas?vista=versoes", "Plano de contas"],
+    ["/plano-contas?vista=reporte", "Plano de contas"],
+    ["/periodos", "Períodos"],
+    ["/regras-contabilisticas", "Regras contabilísticas"],
+    ["/regras-contabilisticas?vista=contabilisticas", "Regras contabilísticas"],
+    ["/centros-custo", "Centros de custo"],
+    ["/orcamentos", "Orçamentos"],
+    ["/previsoes-custos", "Previsões de custos"],
   ] as const) {
     await page.goto(caminho);
     await expect(page.getByRole("heading", { name: titulo, level: 1 })).toBeVisible();

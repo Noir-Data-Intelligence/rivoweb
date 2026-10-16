@@ -19,6 +19,7 @@ export function Confirmar({
   erro,
   aoConfirmar,
   formulario,
+  largo = false,
 }: {
   aberto: boolean;
   aoMudar: (aberto: boolean) => void;
@@ -33,10 +34,12 @@ export function Confirmar({
   aoConfirmar?: () => void;
   /** Id de um `<form>` dentro de `children`: o botão submete-o. */
   formulario?: string;
+  /** Formulários com linhas (escalões, tectos mensais, linhas de uma regra). */
+  largo?: boolean;
 }) {
   return (
     <Dialog open={aberto} onOpenChange={(a) => (aCarregar ? undefined : aoMudar(a))}>
-      <DialogContent titulo={titulo} descricao={descricao}>
+      <DialogContent titulo={titulo} descricao={descricao} className={largo ? "max-w-3xl" : undefined}>
         {erro ? <div className="mb-4">{erro}</div> : null}
         {children}
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

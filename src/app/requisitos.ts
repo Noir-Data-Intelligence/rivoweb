@@ -42,7 +42,21 @@ export const REQUISITO_PAGINA = {
   "/letras": "finance.treasury.read",
   "/cambios": "finance.treasury.read",
   "/fluxo-caixa": { anyOf: ["finance.reports.read", "finance.treasury.read"] },
+  // F6 — fiscal, contabilidade e planeamento (§5.7).
+  "/fiscal": "fiscal.rates.read",
+  "/relatorios": { anyOf: ["finance.ledger.read", "finance.reports.read"] },
+  "/impostos": "finance.reports.read",
+  "/lancamentos": "finance.ledger.read",
+  "/plano-contas": "finance.ledger.read",
+  "/periodos": "finance.ledger.read",
+  "/regras-contabilisticas": "finance.ledger.read",
+  "/centros-custo": "finance.planning.read",
+  "/orcamentos": "finance.planning.read",
+  "/previsoes-custos": "finance.planning.read",
 } as const satisfies Record<string, Requisito>;
+
+/** Lançar à mão: escrever no razão e ler os diários e as contas. */
+export const REQUISITO_NOVO_LANCAMENTO = { allOf: ["finance.ledger.write", "finance.ledger.read"] } as const satisfies Requisito;
 
 /** Criar documentos: escrever facturas e escolher o cliente. */
 export const REQUISITO_NOVA_FACTURA = { allOf: ["finance.invoices.write", "commercial.customers.read"] } as const satisfies Requisito;

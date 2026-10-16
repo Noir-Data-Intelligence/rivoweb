@@ -6,7 +6,7 @@ import { ErroDeRota, NaoEncontrado } from "@/features/sistema/paginas";
 import { CarregandoPagina } from "@/ui/Layout";
 import type { Requisito } from "@/lib/auth/permissions";
 import { AreaAutenticada, Exige } from "./guardas";
-import { REQUISITO_NOVA_FACTURA, REQUISITO_PAGINA as R } from "./requisitos";
+import { REQUISITO_NOVA_FACTURA, REQUISITO_NOVO_LANCAMENTO, REQUISITO_PAGINA as R } from "./requisitos";
 import type { NomePagina } from "./paginas";
 import { registarRotas } from "./rotasConhecidas";
 
@@ -121,6 +121,19 @@ export const rotas: RouteObject[] = [
               { path: "letras/:billId", element: protegido(R["/letras"], pagina("letra")) },
               { path: "cambios", element: protegido(R["/cambios"], pagina("cambios")) },
               { path: "fluxo-caixa", element: protegido(R["/fluxo-caixa"], pagina("fluxoCaixa")) },
+              // F6 — fiscal, contabilidade e planeamento (§5.7).
+              { path: "fiscal", element: protegido(R["/fiscal"], pagina("fiscal")) },
+              { path: "relatorios", element: protegido(R["/relatorios"], pagina("relatorios")) },
+              { path: "impostos", element: protegido(R["/impostos"], pagina("impostos")) },
+              { path: "lancamentos", element: protegido(R["/lancamentos"], pagina("lancamentos")) },
+              { path: "lancamentos/novo", element: protegido(REQUISITO_NOVO_LANCAMENTO, pagina("novoLancamento")) },
+              { path: "lancamentos/:entryId", element: protegido(R["/lancamentos"], pagina("lancamento")) },
+              { path: "plano-contas", element: protegido(R["/plano-contas"], pagina("planoContas")) },
+              { path: "periodos", element: protegido(R["/periodos"], pagina("periodos")) },
+              { path: "regras-contabilisticas", element: protegido(R["/regras-contabilisticas"], pagina("regras")) },
+              { path: "centros-custo", element: protegido(R["/centros-custo"], pagina("centrosCusto")) },
+              { path: "orcamentos", element: protegido(R["/orcamentos"], pagina("orcamentos")) },
+              { path: "previsoes-custos", element: protegido(R["/previsoes-custos"], pagina("previsoesCustos")) },
             ],
           },
         ],

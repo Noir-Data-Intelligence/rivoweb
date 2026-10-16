@@ -7,7 +7,6 @@ export function nomeFicheiroPdf(numero: string): string {
   const seguro = numero
     .trim()
     .replace(/[/\\]+/g, "-")
-    // eslint-disable-next-line no-control-regex
     .replace(/[<>:"|?*\u0000-\u001F]/g, "-")
     .replace(/\s+/g, " ");
   return `${seguro || "documento"}.pdf`;
