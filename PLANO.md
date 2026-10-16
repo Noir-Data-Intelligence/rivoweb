@@ -1687,3 +1687,5 @@ desempenho, conquistas e importação.
   declaração emitida (registada com código). **Nenhuma escrita em produção.**
 - **Testes:** 132 unitários; interface 9 cenários F7 × 3 motores (27); suite
   inteira 302 + 7 instáveis sob carga que passam ao repetir.
+- **Publicada** a 2026-10-16 (`5146bbb`, `e2cda82`): CI verde e smoke de
+  produção por perfil 10/10, só leituras, com o menu novo do Colaborador.

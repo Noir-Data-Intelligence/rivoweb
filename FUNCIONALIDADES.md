@@ -1,9 +1,9 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F6** publicadas em
+> **Estado:** fases **F0 a F6** e **F7a** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
-> planeamento); **F7a** (portal do colaborador completo) concluída e verificada
-> na base local, por publicar · actualizado a 2026-10-16.
+> planeamento; F7a: portal do colaborador completo) · actualizado a
+> 2026-10-16.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
