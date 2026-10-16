@@ -54,6 +54,18 @@ export const rotas: RouteObject[] = [
             children: [
               { index: true, element: preguicoso(pagina("inicioColaborador")) },
               { path: "despesas", element: preguicoso(pagina("minhasDespesas")) },
+              // F7 — portal do colaborador (§5.8): o próprio, pelo token.
+              { path: "assiduidade", element: preguicoso(pagina("minhaAssiduidade")) },
+              { path: "ferias", element: preguicoso(pagina("minhasFerias")) },
+              { path: "turnos", element: preguicoso(pagina("meusTurnos")) },
+              { path: "recibos", element: preguicoso(pagina("meusRecibos")) },
+              { path: "documentos", element: preguicoso(pagina("meusDocumentos")) },
+              { path: "pedidos", element: preguicoso(pagina("meusPedidos")) },
+              { path: "pedidos/:ticketId", element: preguicoso(pagina("meuPedido")) },
+              { path: "formacao", element: preguicoso(pagina("minhaFormacao")) },
+              { path: "objectivos", element: preguicoso(pagina("meusObjectivos")) },
+              { path: "anuncios", element: preguicoso(pagina("anuncios")) },
+              { path: "bens", element: preguicoso(pagina("meusBens")) },
               { path: "conta", element: preguicoso(pagina("minhaConta")) },
               { path: "notificacoes", element: preguicoso(pagina("notificacoes")) },
             ],

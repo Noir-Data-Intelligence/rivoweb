@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeftRight, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { ArrowLeftRight, Banknote, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -65,7 +65,17 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
   ],
   colaborador: [
     { caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
-    { caminho: "/eu/despesas", titulo: "Despesas", icone: ReceiptText, requer: "autenticado" },
+    { caminho: "/eu/anuncios", titulo: "Anúncios", icone: Megaphone, requer: "autenticado" },
+    { caminho: "/eu/assiduidade", titulo: "Assiduidade", icone: Clock, requer: "autenticado", grupo: "O meu tempo" },
+    { caminho: "/eu/ferias", titulo: "Férias e ausências", icone: Plane, requer: "autenticado", grupo: "O meu tempo" },
+    { caminho: "/eu/turnos", titulo: "Turnos", icone: CalendarDays, requer: "autenticado", grupo: "O meu tempo" },
+    { caminho: "/eu/recibos", titulo: "Recibos", icone: Banknote, requer: "autenticado", grupo: "Documentos" },
+    { caminho: "/eu/documentos", titulo: "Documentos e declarações", icone: FolderOpen, requer: "autenticado", grupo: "Documentos" },
+    { caminho: "/eu/pedidos", titulo: "Pedidos internos", icone: MessageSquare, requer: "autenticado", grupo: "Pedidos" },
+    { caminho: "/eu/despesas", titulo: "Despesas", icone: ReceiptText, requer: "autenticado", grupo: "Pedidos" },
+    { caminho: "/eu/formacao", titulo: "Formação", icone: GraduationCap, requer: "autenticado", grupo: "Desenvolvimento" },
+    { caminho: "/eu/objectivos", titulo: "Objectivos e conquistas", icone: Target, requer: "autenticado", grupo: "Desenvolvimento" },
+    { caminho: "/eu/bens", titulo: "Bens à minha guarda", icone: Laptop, requer: "autenticado", grupo: "Desenvolvimento" },
   ],
   cliente: [{ caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
 };

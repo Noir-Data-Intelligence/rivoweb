@@ -32,7 +32,7 @@ const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
   Manager: ["Início", "Dashboard executivo", "Aprovações", "Alertas", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Centros de custo", "Orçamentos", "Previsões de custos"],
   AssetManager: ["Início", "Alertas", "Fornecedores"],
   ProjectManager: ["Início"],
-  Colaborador: ["Início", "Despesas"],
+  Colaborador: ["Início", "Anúncios", "Assiduidade", "Férias e ausências", "Turnos", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda"],
   Cliente: ["Início"],
 };
 

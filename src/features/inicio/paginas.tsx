@@ -2,6 +2,7 @@
 import { usePortalCliente, usePortalColaborador } from "@/features/identity/api";
 import { useUtilizador } from "@/features/identity/utilizador";
 import { ResumoPessoal } from "@/features/dashboard";
+import { ResumoPortal } from "@/features/portal";
 import { Card } from "@/ui/Card";
 import { PageHeader } from "@/ui/Layout";
 
@@ -24,6 +25,7 @@ export function InicioColaborador() {
             <p className="mt-1 text-md font-medium">{ficha.currentPosition.name}</p>
           </Card>
         ) : null}
+        <ResumoPortal />
         <ResumoPessoal prefixo="/eu/" />
       </div>
     </>
