@@ -47,7 +47,7 @@ export function ResumoPessoal({ prefixo }: { prefixo: string }) {
   const podeAprovacoes = prefixo === "/" && pode("approval.requests.read");
   if (meu.isPending) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2" aria-label="A carregar o painel">
+      <div className="grid gap-3 sm:grid-cols-2" role="status" aria-label="A carregar o painel">
         <Skeleton className="h-20" />
         <Skeleton className="h-20" />
       </div>

@@ -210,8 +210,11 @@ test.describe("shells", () => {
     await expect(page).toHaveURL(/\/$/);
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto("/eu");
+    await expect(page.getByText("Técnico")).toBeVisible();
     await page.getByRole("button", { name: "Abrir menu" }).click();
-    await expect(page.getByRole("dialog").getByRole("link", { name: "Voltar à gestão" })).toBeVisible();
+    const menu = page.getByRole("dialog");
+    await expect(menu).toHaveAttribute("data-state", "open");
+    await expect(menu.getByRole("link", { name: "Voltar à gestão" })).toBeVisible();
     await semViolacoesAxe(page);
   });
 

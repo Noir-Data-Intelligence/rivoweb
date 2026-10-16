@@ -112,7 +112,8 @@ test.describe("facturas", () => {
     await expect(page.getByText("114 000,00 Kz").first()).toBeVisible();
     await expect(page.getByText("100 000,00 Kz").first()).toBeVisible();
     const [descarga] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "PDF" }).click()]);
-    expect(descarga.suggestedFilename()).toBe("FT S001-17.pdf");
+    // A barra da série passa a hífen (nomeFicheiroPdf); o WebKit em Linux troca ainda o espaço por «_».
+    expect(descarga.suggestedFilename()).toMatch(/^FT[ _]S001-17\.pdf$/);
     await page.getByRole("button", { name: "Enviar ao cliente" }).click();
     await expect(page.getByRole("dialog")).toContainText("Sai um e-mail para o endereço do cliente");
     await page.getByRole("dialog").getByRole("button", { name: "Enviar e-mail" }).click();

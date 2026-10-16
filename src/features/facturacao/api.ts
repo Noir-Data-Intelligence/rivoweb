@@ -7,6 +7,7 @@ import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-quer
 import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import { descarregar } from "@/lib/api/download";
+import { nomeFicheiroPdf } from "./ficheiro";
 import type { components } from "@/lib/api/schema";
 
 type S = components["schemas"];
@@ -205,7 +206,7 @@ const CAMINHO_PDF: Readonly<Record<TipoDocumento, string>> = {
 export function useDescarregarPdf() {
   return useEscrita({
     mutationFn: ({ tipo, id, numero }: { tipo: TipoDocumento; id: string; numero: string }) =>
-      descarregar(CAMINHO_PDF[tipo].replace("{id}", encodeURIComponent(id)), `${numero.replace(/\//g, "-")}.pdf`),
+      descarregar(CAMINHO_PDF[tipo].replace("{id}", encodeURIComponent(id)), nomeFicheiroPdf(numero)),
   });
 }
 

@@ -1,6 +1,7 @@
 import Big from "big.js";
 import { describe, expect, it } from "vitest";
 import { calcularTotais, impostoDaLinha, liquidoDaLinha } from "@/features/facturacao/calculos";
+import { nomeFicheiroPdf } from "@/features/facturacao/ficheiro";
 import { taxaEmVigor } from "@/features/facturacao/pages/Rascunho";
 import { lerDecimalDigitado } from "@/lib/money/money";
 
@@ -74,5 +75,15 @@ describe("400 com o título genérico do ASP.NET", () => {
     const m = mensagemErro(new ApiError({ tipo: "http", status: 400, title: "One or more validation errors occurred.", errors: { factura: ["A série FT não existe."] } }));
     expect(m.titulo).toBe("Há dados por corrigir.");
     expect(m.detalhe).toBe("A série FT não existe.");
+  });
+});
+
+describe("nome do PDF a partir do número", () => {
+  it("troca as barras da série por hífen e limpa o resto", () => {
+    expect(nomeFicheiroPdf("FT S001/17")).toBe("FT S001-17.pdf");
+    expect(nomeFicheiroPdf("FT S001\\17")).toBe("FT S001-17.pdf");
+    expect(nomeFicheiroPdf("  NC  A/2026/3 ")).toBe("NC A-2026-3.pdf");
+    expect(nomeFicheiroPdf('RC "x"?')).toBe("RC -x--.pdf");
+    expect(nomeFicheiroPdf("   ")).toBe("documento.pdf");
   });
 });
