@@ -1689,3 +1689,32 @@ desempenho, conquistas e importação.
   inteira 302 + 7 instáveis sob carga que passam ao repetir.
 - **Publicada** a 2026-10-16 (`5146bbb`, `e2cda82`): CI verde e smoke de
   produção por perfil 10/10, só leituras, com o menu novo do Colaborador.
+
+### F7b — RH do dia-a-dia na gestão (estado)
+
+- **Ecrãs** (grupo «Pessoas»): organograma, contratos, assiduidade, férias e
+  ausências (pedidos e saldos), benefícios (adesões e catálogo), validades de
+  imigração. A ficha do colaborador passa a ter separadores, cada um só para
+  quem o lê: resumo, dados pessoais (com a imigração), documentos, contratos,
+  férias, assiduidade, benefícios.
+- **Dados pessoais (§7.6):** nada se pede até «Ver dados pessoais»; a query tem
+  `gcTime: 0`; os números (NIF, BI, INSS, conta, IBAN, passaporte, visto,
+  autorização) aparecem mascarados com «Mostrar» por campo, que volta a
+  mascarar ao fim de 60 s. O `PUT` substitui tudo, por isso o formulário parte
+  do gravado e envia todos os campos. Peça nova: `ui/Mascarado`.
+- **Permissões lidas em produção** (2026-10-16): só o Admin e o HR têm RH; o
+  Manager recebe 403 no organograma e nos contratos.
+- **B26 pedido:** contratos de um colaborador com `page` dão 500; a ficha pede
+  sem paginação.
+- **Leituras em produção:** organograma (62 activos), contratos, assiduidade,
+  férias, saldos, benefícios, adesões, imigração e documentos com a conta HR
+  (200); dos dados pessoais só o código de resposta, sem ler os valores.
+- **Escritas:** verificadas **na base local** (`f7b-escritas.spec.ts`, conta
+  Admin local, ficha nova): contrato celebrado e cessado, entrada e saída
+  marcadas, falta, direito 22 + 2,5 dias, pedido em nome (com política e
+  ocupante só para a corrida), «ver decisão» que ainda espera, pedido
+  retirado, benefício criado, adesão e cancelamento, dados pessoais com IBAN
+  mascarado, imigração na lista de validades, documento anexado e retirado.
+  **Nenhuma escrita em produção.**
+- **Testes:** 138 unitários; interface 9 cenários F7b × 3 motores (27); suite
+  inteira 336, sem instáveis.

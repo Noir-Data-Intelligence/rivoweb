@@ -2,8 +2,9 @@
 
 > **Estado:** fases **F0 a F6** e **F7a** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
-> planeamento; F7a: portal do colaborador completo) · actualizado a
-> 2026-10-16.
+> planeamento; F7a: portal do colaborador completo); **F7b** (RH do dia-a-dia
+> na gestão) concluída e verificada na base local, por publicar · actualizado
+> a 2026-10-16.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -25,9 +26,9 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
@@ -160,6 +161,16 @@ AM = AssetManager.
 | **Departamentos:** criar e corrigir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Cargos:** ver, com ocupações | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Cargos:** criar e corrigir | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Ficha do colaborador** (separadores conforme as permissões) | | | | | | | | | | |
+| Dados pessoais e imigração: só a pedido, números mascarados com «Mostrar» | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Corrigir dados pessoais (IBAN validado) e imigração | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Documentos da ficha: ver, anexar e retirar com motivo; descarregar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Organograma:** departamentos, responsável e pessoas com o cargo | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Contratos:** ver; celebrar (o tipo manda na data de fim) e cessar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Assiduidade:** marcações por período e colaborador, só anomalias; marcar ponto e registar falta | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Férias e ausências:** pedidos; pedir em nome, retirar, ver a decisão; saldos e direito por ano | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Benefícios:** catálogo (criar), adesões (aderir, cancelar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Validades de imigração:** documentos a caducar em 30 ou 90 dias, ou todos | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -497,6 +508,49 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   histórico de ligações.
 - Se alguém alterou a ficha entretanto, a gravação é recusada e oferece
   «Recarregar» (nada se perde sem aviso).
+- **Ficha com separadores** (cada um só aparece a quem o pode ler):
+  - **Dados pessoais:** nada se pede até «Ver dados pessoais»; NIF, BI,
+    segurança social, conta, IBAN, passaporte, visto e autorização aparecem
+    mascarados («•••• 4821»), com «Mostrar» por campo, que volta a mascarar ao
+    fim de 60 s. **Corrigir** os dados pessoais (género, nascimento,
+    nacionalidade, estado civil, NIF, BI e validade, segurança social, morada,
+    cidade, país, banco, conta, IBAN validado, contacto de emergência) e a
+    **imigração** (nacionalidade, passaporte, país emissor, visto, autorização
+    de trabalho, validades, notas), com aviso do documento que caduca primeiro.
+  - **Documentos:** ver, **anexar** (carregar o ficheiro com a categoria),
+    **descarregar** e **retirar** com motivo; o colaborador vê-os no portal.
+  - **Contratos**, **Férias** (saldo e pedidos), **Assiduidade** e
+    **Benefícios** do colaborador, com as mesmas acções das páginas próprias.
+
+**Organograma**
+- Departamentos com o responsável e as pessoas activas, com o cargo actual.
+
+**Contratos**
+- Lista de todos ou de um colaborador (tipo, vigência, salário, estado);
+  **celebrar** (sem termo, a termo ou prestação de serviços; os dois últimos
+  exigem data de fim; salário mensal e moeda) e **cessar** numa data.
+
+**Assiduidade**
+- Marcações de um período (por omissão, os últimos 30 dias), de todos ou de um
+  colaborador, só as anomalias (faltas e atrasos); **marcar o ponto**
+  (entrada na primeira vez, saída na segunda, à hora do servidor; atraso
+  opcional) e **registar uma falta** (com justificação opcional).
+
+**Férias e ausências**
+- **Pedidos:** de todos ou de um colaborador; **pedir em nome** do colaborador
+  (vai a aprovação); **retirar** um pedido por decidir; **ver a decisão**
+  tomada em Aprovações (ou que ainda espera).
+- **Saldos** de um ano: direito, transitados, gozados, por decidir e por
+  gozar; **definir o direito** de cada pessoa (dias e transitados, de 0 a 366).
+
+**Benefícios**
+- **Catálogo:** nome, tipo, valor mensal e estado; **criar** benefício.
+- **Adesões:** de todos ou de um colaborador; **aderir** (só a benefícios
+  activos) e **cancelar** numa data.
+
+**Validades de imigração**
+- Passaportes, vistos e autorizações de trabalho a caducar nos próximos 30 ou
+  90 dias (ou todos), com o prazo; os números só na ficha, mascarados.
 
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e
@@ -554,6 +608,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Atribuir cargo** (com aprovação se der autoridade), «Verificar decisão» e
   **encerrar o cargo actual**.
 - **Não** vê nem gere a conta de acesso dos colaboradores.
+- **Ficha com separadores** como no Admin: dados pessoais e imigração
+  (mascarados, corrigir), documentos, contratos, férias, assiduidade e
+  benefícios.
+
+**Organograma**, **Contratos**, **Assiduidade**, **Férias e ausências**,
+**Benefícios** e **Validades de imigração**
+- Tudo o que o Admin faz.
 
 **Departamentos**
 - Ver, **criar** e **corrigir**.
@@ -768,7 +829,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F7 | RH completo na gestão (ficha completa, contratos, assiduidade, férias, benefícios, recrutamento, formação, turnos, desempenho, declarações) |
+| F7 | Resto do RH na gestão (recrutamento, admissões e saídas, anúncios, pedidos internos, formação, turnos, declarações, desempenho, conquistas, importação) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |

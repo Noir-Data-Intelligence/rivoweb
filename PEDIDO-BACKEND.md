@@ -2,7 +2,7 @@
 
 > 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
 > Revisto contra `main` @ `33697a8`. Em aberto: **B20**, **B21**, **B22**,
-> **B23**, **B24** (configuração) e **B25**. O **B13** está resolvido (ADR-080):
+> **B23**, **B24** (configuração), **B25** e **B26**. O **B13** está resolvido (ADR-080):
 > o portal já descarrega os documentos pessoais e os recibos, e o front usa-o. O **B5** está meio resolvido: já há
 > SAF-T AO de facturação (`GET /finance/saft-ao`), continuam a faltar as
 > declarações à AGT.
@@ -128,3 +128,18 @@ que retirem o pedido; o ecrã de férias do portal diz isso.
 **Pedido:** `POST /portal/me/leave/{leaveId}/cancellation` (204; 404 se não for
 do próprio; 409 se já decidido), só autenticação, como as outras rotas do
 portal.
+
+## B26 — Contratos de um colaborador com paginação dão 500
+
+**Facto:** `GET /hr/contracts?employeeId={id}&page=1&pageSize=25` responde
+**500** (base local, `33697a8`). Sem `page`/`pageSize` responde 200. Causa:
+`ListEmploymentContracts` não pagina o histórico de um colaborador e devolve
+`TotalCount = null`; `EscreverCabecalhosDePagina` faz `total!.Value` sempre que
+há página pedida. As outras listas por colaborador (férias, assiduidade,
+adesões) paginam e não falham.
+
+**Consequência:** nenhuma no front: na ficha, o pedido sai sem paginação.
+Qualquer outro cliente que pagine sempre recebe 500.
+
+**Pedido:** em `ListContractsAsync`, escrever os cabeçalhos só quando há total
+(ou paginar também o histórico do colaborador).
