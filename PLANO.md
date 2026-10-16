@@ -1718,6 +1718,9 @@ desempenho, conquistas e importação.
   **Nenhuma escrita em produção.**
 - **Testes:** 138 unitários; interface 9 cenários F7b × 3 motores (27); suite
   inteira 336, sem instáveis.
+- **Publicada** a 2026-10-16 (`d80afe6`, `458f484`, com o B25 em `0a96f3b`):
+  CI verde, Vercel em produção com `0a96f3b`, smoke de produção por perfil
+  10/10, só leituras, com os menus novos do Admin e do HR.
 
 ### B25 resolvido (portal, 2026-10-16)
 
