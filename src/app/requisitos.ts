@@ -53,6 +53,13 @@ export const REQUISITO_PAGINA = {
   "/centros-custo": "finance.planning.read",
   "/orcamentos": "finance.planning.read",
   "/previsoes-custos": "finance.planning.read",
+  // F7b — RH do dia-a-dia (§5.8).
+  "/organograma": "hr.employees.read",
+  "/contratos": "hr.contracts.read",
+  "/assiduidade": "hr.attendance.read",
+  "/ferias": "hr.leave.read",
+  "/beneficios": "hr.benefits.read",
+  "/imigracao": "hr.personal_data.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */

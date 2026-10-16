@@ -19,6 +19,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Checkbox, Select } from "@/ui/Controlos";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
+import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import {
   useAtribuirCargo,
   useColaborador,
@@ -39,6 +40,12 @@ import {
   type ResultadoAtribuicao,
 } from "../api";
 import { AvisoListaIncompleta, EstadoColaborador, nomeDepartamento } from "../comum";
+import { DadosPessoais } from "../ficha/DadosPessoais";
+import { DocumentosFicha } from "../ficha/Documentos";
+import { AccoesAssiduidade, ListaAssiduidade } from "./Assiduidade";
+import { Aderir, ListaAdesoes } from "./Beneficios";
+import { CelebrarContrato, ListaContratos } from "./Contratos";
+import { ListaAusencias, PedirAusencia, Saldos } from "./Ferias";
 import { emailOpcional, vazioParaNull } from "../validacao";
 
 type Ficha = { dados: FichaColaborador; versao: string | null; recarregar: () => void };
@@ -639,9 +646,22 @@ function ContaDeAcesso({ ficha }: { ficha: Ficha }) {
   );
 }
 
+type VistaFicha = "resumo" | "dados-pessoais" | "documentos" | "contratos" | "ferias" | "assiduidade" | "beneficios";
+
 export default function Colaborador() {
   const { employeeId = "" } = useParams();
   const colaborador = useColaborador(employeeId);
+  const { pode } = useUtilizador();
+  const vistas: readonly Vista<VistaFicha>[] = [
+    { valor: "resumo", texto: "Resumo" },
+    { valor: "dados-pessoais", texto: "Dados pessoais", visivel: pode("hr.personal_data.read") },
+    { valor: "documentos", texto: "Documentos" },
+    { valor: "contratos", texto: "Contratos", visivel: pode("hr.contracts.read") },
+    { valor: "ferias", texto: "Férias", visivel: pode("hr.leave.read") },
+    { valor: "assiduidade", texto: "Assiduidade", visivel: pode("hr.attendance.read") },
+    { valor: "beneficios", texto: "Benefícios", visivel: pode("hr.benefits.read") },
+  ];
+  const vista = useVista(vistas);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/colaboradores">
@@ -672,15 +692,58 @@ export default function Colaborador() {
           </span>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="lg:col-span-2">
-          <Dados ficha={ficha} />
+      <Vistas rotulo="Ficha" vistas={vistas} actual={vista} />
+      {vista === "dados-pessoais" ? (
+        <DadosPessoais employeeId={employeeId} />
+      ) : vista === "documentos" ? (
+        <DocumentosFicha employeeId={employeeId} />
+      ) : vista === "contratos" ? (
+        <div className="flex flex-col gap-4">
+          <Can requer="hr.contracts.write">
+            <div>
+              <CelebrarContrato colaboradorFixo={employeeId} />
+            </div>
+          </Can>
+          <ListaContratos colaborador={employeeId} comNome={false} />
         </div>
-        <CargoActual ficha={ficha} />
-        <Can requer="hr.employees.link_account">
-          <ContaDeAcesso ficha={ficha} />
-        </Can>
-      </div>
+      ) : vista === "ferias" ? (
+        <div className="flex flex-col gap-6">
+          <Saldos colaborador={employeeId} comNome={false} />
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-md font-semibold text-foreground">Pedidos</h2>
+              <Can requer="hr.leave.write">
+                <PedirAusencia colaboradorFixo={employeeId} />
+              </Can>
+            </div>
+            <ListaAusencias colaborador={employeeId} comNome={false} />
+          </div>
+        </div>
+      ) : vista === "assiduidade" ? (
+        <div className="flex flex-col gap-4">
+          <AccoesAssiduidade colaboradorFixo={employeeId} />
+          <ListaAssiduidade colaborador={employeeId} comNome={false} />
+        </div>
+      ) : vista === "beneficios" ? (
+        <div className="flex flex-col gap-4">
+          <Can requer="hr.benefits.write">
+            <div>
+              <Aderir colaboradorFixo={employeeId} />
+            </div>
+          </Can>
+          <ListaAdesoes colaborador={employeeId} comNome={false} />
+        </div>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <Dados ficha={ficha} />
+          </div>
+          <CargoActual ficha={ficha} />
+          <Can requer="hr.employees.link_account">
+            <ContaDeAcesso ficha={ficha} />
+          </Can>
+        </div>
+      )}
     </>
   );
 }

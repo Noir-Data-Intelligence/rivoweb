@@ -7,6 +7,8 @@ import { decimalParaApi, lerDecimalDigitado } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import type { Anuncio } from "./api";
 
+export { diasDeCalendario, validarFerias, type ErrosFerias } from "@/features/rh";
+
 /** Limites das colunas do servidor (`HrDbContext.cs`). */
 export const MAXIMO_ASSUNTO = 200;
 export const MAXIMO_MENSAGEM = 4000;
@@ -16,16 +18,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 function dia(iso: string): number | null {
   if (!ISO.test(iso)) return null;
   const t = Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)));
-  const d = new Date(t);
-  return d.toISOString().slice(0, 10) === iso ? t / 86_400_000 : null;
-}
-
-/** Dias de calendário de um intervalo, os dois extremos incluídos (como `calendarDays`). */
-export function diasDeCalendario(de: string, ate: string): number | null {
-  const a = dia(de);
-  const b = dia(ate);
-  if (a === null || b === null || b < a) return null;
-  return b - a + 1;
+  return new Date(t).toISOString().slice(0, 10) === iso ? t / 86_400_000 : null;
 }
 
 /** Soma dias a uma data ISO. */
@@ -55,17 +48,6 @@ export function erroJanelaAssiduidade(de: string, ate: string): string | undefin
   if (a === null || b === null) return "Indique as duas datas.";
   if (b < a) return "A data final não pode ser anterior à inicial.";
   return undefined;
-}
-
-export type ErrosFerias = { tipo?: string; de?: string; ate?: string };
-
-export function validarFerias(p: { tipo: string; de: string; ate: string }): ErrosFerias {
-  const e: ErrosFerias = {};
-  if (!p.tipo) e.tipo = "Escolha o tipo.";
-  if (dia(p.de) === null) e.de = "Indique o primeiro dia.";
-  if (dia(p.ate) === null) e.ate = "Indique o último dia.";
-  else if (!e.de && diasDeCalendario(p.de, p.ate) === null) e.ate = "O último dia não pode ser anterior ao primeiro.";
-  return e;
 }
 
 /** Valor actual de um resultado-chave: decimal com até 4 casas, como texto para a API. */

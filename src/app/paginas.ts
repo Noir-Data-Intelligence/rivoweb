@@ -70,6 +70,13 @@ export const PAGINAS = {
   meusObjectivos: () => import("@/features/portal/pages/Objectivos"),
   anuncios: () => import("@/features/portal/pages/Anuncios"),
   meusBens: () => import("@/features/portal/pages/Bens"),
+  // F7b — RH do dia-a-dia (§5.8).
+  organograma: () => import("@/features/rh/pages/Organograma"),
+  contratos: () => import("@/features/rh/pages/Contratos"),
+  assiduidade: () => import("@/features/rh/pages/Assiduidade"),
+  ferias: () => import("@/features/rh/pages/Ferias"),
+  beneficios: () => import("@/features/rh/pages/Beneficios"),
+  imigracao: () => import("@/features/rh/pages/Imigracao"),
   contas: () => import("@/features/tesouraria/pages/Contas"),
   conta: () => import("@/features/tesouraria/pages/Conta"),
   caixaPequena: () => import("@/features/tesouraria/pages/CaixaPequena"),

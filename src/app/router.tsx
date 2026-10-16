@@ -146,6 +146,13 @@ export const rotas: RouteObject[] = [
               { path: "centros-custo", element: protegido(R["/centros-custo"], pagina("centrosCusto")) },
               { path: "orcamentos", element: protegido(R["/orcamentos"], pagina("orcamentos")) },
               { path: "previsoes-custos", element: protegido(R["/previsoes-custos"], pagina("previsoesCustos")) },
+              // F7b — RH do dia-a-dia (§5.8).
+              { path: "organograma", element: protegido(R["/organograma"], pagina("organograma")) },
+              { path: "contratos", element: protegido(R["/contratos"], pagina("contratos")) },
+              { path: "assiduidade", element: protegido(R["/assiduidade"], pagina("assiduidade")) },
+              { path: "ferias", element: protegido(R["/ferias"], pagina("ferias")) },
+              { path: "beneficios", element: protegido(R["/beneficios"], pagina("beneficios")) },
+              { path: "imigracao", element: protegido(R["/imigracao"], pagina("imigracao")) },
             ],
           },
         ],
