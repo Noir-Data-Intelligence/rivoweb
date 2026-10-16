@@ -84,6 +84,15 @@ export function usePedirFerias() {
   });
 }
 
+/** Só um pedido por decidir; já decidido dá 409 (B25). Actualiza também o saldo («por decidir»). */
+export function useRetirarFerias() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (leaveId: string) => enviar(api.POST("/portal/me/leave/{leaveId}/cancellation", { params: { path: { leaveId } } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.ferias }),
+  });
+}
+
 export function useMeusDocumentos() {
   return useQuery({ queryKey: chaves.documentos, queryFn: ({ signal }) => ler(api.GET("/portal/me/documents", { signal })) });
 }

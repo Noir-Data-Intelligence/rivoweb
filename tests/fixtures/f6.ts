@@ -241,7 +241,7 @@ export const versoesPlano = (): S["ChartOfAccountsVersionView"][] => [
 
 export const classesReporte = (): S["ReportingRuleView"][] => [{ ruleId: IDF6.classe, codePrefix: "11", class: "Asset", section: "Meios monetários", order: 1 }];
 
-export const centros = (): S["CostCentreView"][] => [{ costCentreId: IDF6.centro, code: "CC01", name: "Direcção Geral", departmentId: ID.dep1, responsibleEmployeeId: ID.emp1, isActive: true }];
+export const centros = (): S["CostCentreView"][] => [{ costCentreId: IDF6.centro, code: "CC01", name: "Direcção Geral", departmentId: ID.dep1, departmentName: null, responsibleEmployeeId: ID.emp1, responsibleName: null, isActive: true }];
 
 export const orcamento = (estado = "Draft"): S["BudgetView"] => ({
   budgetId: IDF6.orcamento,
@@ -252,6 +252,7 @@ export const orcamento = (estado = "Draft"): S["BudgetView"] => ({
   annualTotal: 3000000.5,
   approvedAt: estado === "Approved" ? "2026-10-13T17:39:20Z" : null,
   approvedByEmployeeId: estado === "Approved" ? ID.emp1 : null,
+  approvedByName: null,
   lines: [
     { month: 1, amount: 1000000.5 },
     { month: 2, amount: 2000000 },
@@ -259,5 +260,5 @@ export const orcamento = (estado = "Draft"): S["BudgetView"] => ({
 });
 
 export const previsoes = (): S["CostForecastView"][] => [
-  { forecastId: IDF6.previsao, departmentId: ID.dep1, fiscalYear: 2026, month: 1, currency: "AOA", operationalCosts: 6026000, fixedCosts: 3270000, total: 9296000, status: "Submitted", submittedAt: "2026-10-13T17:39:14Z" },
+  { forecastId: IDF6.previsao, departmentId: ID.dep1, departmentName: null, fiscalYear: 2026, month: 1, currency: "AOA", operationalCosts: 6026000, fixedCosts: 3270000, total: 9296000, status: "Submitted", submittedAt: "2026-10-13T17:39:14Z" },
 ];

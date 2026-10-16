@@ -13399,6 +13399,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/expenses/{expenseId}/receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descarrega o comprovativo da despesa (anexo, nosniff), sem `documents.read` (B20, ADR-085). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    expenseId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/expenses/{expenseId}/approval": {
         parameters: {
             query?: never;
@@ -14231,6 +14292,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/payment-requests/{paymentRequestId}/documents/{linkId}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descarrega um anexo do pedido de pagamento (anexo, nosniff), pelo `linkId` da lista, sem `documents.read` (B20, ADR-085). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    paymentRequestId: string;
+                    linkId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/tax-summaries/vat": {
         parameters: {
             query?: never;
@@ -14474,6 +14597,7 @@ export interface paths {
             };
         };
         put?: never;
+        /** Abre uma conta. Um IBAN que outra conta já tem dá 409. */
         post: {
             parameters: {
                 query?: never;
@@ -14518,6 +14642,15 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -17389,6 +17522,205 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/planning/cost-forecasts/{forecastId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Revê os custos de uma previsão em rascunho. Submetida: 409. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    forecastId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CostForecastRevisionRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/planning/cost-forecasts/{forecastId}/submission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submete uma previsão que ficou em rascunho. Já submetida: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    forecastId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/planning/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Departamentos e colaboradores activos (id e nome), para escolher o departamento e o responsável sem as permissões de RH. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlanningLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -33692,6 +34024,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portal/me/leave/{leaveId}/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** O próprio retira um pedido de férias ainda pendente. De outra pessoa: 404; já decidido: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    leaveId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/portal/me/attendance/justification": {
         parameters: {
             query?: never;
@@ -37846,6 +38248,7 @@ export interface components {
             approvedAt: null | string;
             /** Format: uuid */
             approvedByEmployeeId: null | string;
+            approvedByName: null | string;
             lines: components["schemas"]["BudgetLineView"][];
         };
         CancelCountRequest: {
@@ -38240,8 +38643,10 @@ export interface components {
             name: string;
             /** Format: uuid */
             departmentId: null | string;
+            departmentName: null | string;
             /** Format: uuid */
             responsibleEmployeeId: string;
+            responsibleName: null | string;
             isActive: boolean;
         };
         CostForecastRequest: {
@@ -38258,11 +38663,18 @@ export interface components {
             fixedCosts: number | string;
             submit: null | boolean;
         };
+        CostForecastRevisionRequest: {
+            /** Format: double */
+            operationalCosts: number | string;
+            /** Format: double */
+            fixedCosts: number | string;
+        };
         CostForecastView: {
             /** Format: uuid */
             forecastId: string;
             /** Format: uuid */
             departmentId: string;
+            departmentName: null | string;
             /** Format: int32 */
             fiscalYear: number | string;
             /** Format: int32 */
@@ -40204,6 +40616,11 @@ export interface components {
             /** Format: int32 */
             idleTimeoutSeconds: number | string;
         };
+        LookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
         MaintenanceCompletionRequest: {
             /** Format: date */
             completedOn: null | string;
@@ -41232,6 +41649,10 @@ export interface components {
             totalValue: number | string;
             /** Format: double */
             weightedValue: number | string;
+        };
+        PlanningLookups: {
+            departments: components["schemas"]["LookupEntry"][];
+            employees: components["schemas"]["LookupEntry"][];
         };
         PlanTaskRequest: {
             title: string;

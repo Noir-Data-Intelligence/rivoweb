@@ -3,7 +3,7 @@
  * pela API com a conta SuperAdmin local: conta Colaborador ligada a uma ficha
  * nova, direito de férias, turno escalado, ciclo de avaliação com objectivo e
  * resultado-chave, anúncio. Tudo o resto pela interface, com a conta do
- * colaborador: justificar falta, pedir férias, pedir e cancelar troca de
+ * colaborador: justificar falta, pedir e retirar férias (B25), pedir e cancelar troca de
  * turno, abrir e responder a um pedido interno, registar progresso, emitir uma
  * declaração (só na base local).
  */
@@ -131,6 +131,11 @@ test("F7: portal do colaborador — falta, férias, troca de turno, pedido inter
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("row").filter({ hasText: `${br(de)} a ${br(ate)}` }).getByText("Por decidir")).toBeVisible();
   await sa("POST", `/approval/policies/${politica.corpo.policyId}/deactivation`);
+  // B25: o próprio retira o pedido por decidir.
+  await page.getByRole("button", { name: `Retirar o pedido de ${br(de)}` }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Retirar pedido" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("row").filter({ hasText: `${br(de)} a ${br(ate)}` }).getByText("Retirado")).toBeVisible();
 
   // Turnos: pedir troca do turno de amanhã e cancelar.
   await page.goto("/eu/turnos");
@@ -176,7 +181,7 @@ test("F7: portal do colaborador — falta, férias, troca de turno, pedido inter
   const trocas = await sa<{ status: string; reason: string }[]>("GET", `/hr/shifts/change-requests?requesterEmployeeId=${eu}`);
   expect(trocas.corpo.map((t) => [t.reason, t.status])).toEqual([[`${marca} Exame`, "Cancelled"]]);
   const ferias = await sa<{ startsOn: string; status: string }[]>("GET", `/hr/leave?employeeId=${eu}`);
-  expect(ferias.corpo.map((f) => [f.startsOn, f.status])).toEqual([[de, "Pending"]]);
+  expect(ferias.corpo.map((f) => [f.startsOn, f.status])).toEqual([[de, "Cancelled"]]);
   const emitidas = await sa<{ templateId: string; bySelf: boolean; verificationCode: string }[]>("GET", `/hr/declarations?employeeId=${eu}`);
   expect(emitidas.corpo.map((d) => [d.templateId, d.bySelf])).toEqual([[tpl.corpo.templateId, true]]);
   expect(emitidas.corpo[0]?.verificationCode).toBeTruthy();

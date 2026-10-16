@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5080/"
+      "url": "https://syyt.tech/"
     }
   ],
   "paths": {
@@ -12958,6 +12958,58 @@
         ]
       }
     },
+    "/finance/expenses/{expenseId}/receipt": {
+      "get": {
+        "tags": [
+          "SpendingEndpoints"
+        ],
+        "summary": "Descarrega o comprovativo da despesa (anexo, nosniff), sem `documents.read` (B20, ADR-085).",
+        "parameters": [
+          {
+            "name": "expenseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/expenses/{expenseId}/approval": {
       "post": {
         "tags": [
@@ -13774,6 +13826,67 @@
         ]
       }
     },
+    "/finance/payment-requests/{paymentRequestId}/documents/{linkId}/content": {
+      "get": {
+        "tags": [
+          "SpendingEndpoints"
+        ],
+        "summary": "Descarrega um anexo do pedido de pagamento (anexo, nosniff), pelo `linkId` da lista, sem `documents.read` (B20, ADR-085).",
+        "parameters": [
+          {
+            "name": "paymentRequestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/tax-summaries/vat": {
       "get": {
         "tags": [
@@ -14050,6 +14163,7 @@
         "tags": [
           "PayablesEndpoints"
         ],
+        "summary": "Abre uma conta. Um IBAN que outra conta já tem dá 409.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -14077,6 +14191,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17068,6 +17192,167 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/planning/cost-forecasts/{forecastId}": {
+      "put": {
+        "tags": [
+          "LedgerEndpoints"
+        ],
+        "summary": "Revê os custos de uma previsão em rascunho. Submetida: 409.",
+        "parameters": [
+          {
+            "name": "forecastId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostForecastRevisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/planning/cost-forecasts/{forecastId}/submission": {
+      "post": {
+        "tags": [
+          "LedgerEndpoints"
+        ],
+        "summary": "Submete uma previsão que ficou em rascunho. Já submetida: 409.",
+        "parameters": [
+          {
+            "name": "forecastId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/planning/lookups": {
+      "get": {
+        "tags": [
+          "LedgerEndpoints"
+        ],
+        "summary": "Departamentos e colaboradores activos (id e nome), para escolher o departamento e o responsável sem as permissões de RH.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningLookups"
                 }
               }
             }
@@ -32986,6 +33271,68 @@
         ]
       }
     },
+    "/portal/me/leave/{leaveId}/cancellation": {
+      "post": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "O próprio retira um pedido de férias ainda pendente. De outra pessoa: 404; já decidido: 409.",
+        "parameters": [
+          {
+            "name": "leaveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/portal/me/attendance/justification": {
       "post": {
         "tags": [
@@ -39644,6 +39991,7 @@
           "annualTotal",
           "approvedAt",
           "approvedByEmployeeId",
+          "approvedByName",
           "lines"
         ],
         "type": "object",
@@ -39691,6 +40039,12 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "approvedByName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "lines": {
             "type": "array",
@@ -41182,7 +41536,9 @@
           "code",
           "name",
           "departmentId",
+          "departmentName",
           "responsibleEmployeeId",
+          "responsibleName",
           "isActive"
         ],
         "type": "object",
@@ -41204,9 +41560,21 @@
             ],
             "format": "uuid"
           },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "responsibleEmployeeId": {
             "type": "string",
             "format": "uuid"
+          },
+          "responsibleName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "isActive": {
             "type": "boolean"
@@ -41275,10 +41643,36 @@
           }
         }
       },
+      "CostForecastRevisionRequest": {
+        "required": [
+          "operationalCosts",
+          "fixedCosts"
+        ],
+        "type": "object",
+        "properties": {
+          "operationalCosts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "fixedCosts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "CostForecastView": {
         "required": [
           "forecastId",
           "departmentId",
+          "departmentName",
           "fiscalYear",
           "month",
           "currency",
@@ -41297,6 +41691,12 @@
           "departmentId": {
             "type": "string",
             "format": "uuid"
+          },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "fiscalYear": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -49205,6 +49605,22 @@
           }
         }
       },
+      "LookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "MaintenanceCompletionRequest": {
         "required": [
           "completedOn",
@@ -53310,6 +53726,27 @@
               "string"
             ],
             "format": "double"
+          }
+        }
+      },
+      "PlanningLookups": {
+        "required": [
+          "departments",
+          "employees"
+        ],
+        "type": "object",
+        "properties": {
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LookupEntry"
+            }
+          },
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LookupEntry"
+            }
           }
         }
       },

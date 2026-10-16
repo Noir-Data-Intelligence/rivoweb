@@ -1,4 +1,4 @@
-/** Portal › Férias e ausências: saldo do ano, pedidos e pedir férias (vai a aprovação). */
+/** Portal › Férias e ausências: saldo do ano, pedidos, pedir férias (vai a aprovação) e retirar um pedido por decidir. */
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -15,7 +15,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useMeusSaldos, useMinhasFerias, usePedirFerias, type PedidoFerias, type SaldoFerias } from "../api";
+import { useMeusSaldos, useMinhasFerias, usePedirFerias, useRetirarFerias, type PedidoFerias, type SaldoFerias } from "../api";
 import { diasDeCalendario, validarFerias } from "../regras";
 
 const MAXIMO_MOTIVO = 1000;
@@ -97,6 +97,33 @@ function Pedir() {
   );
 }
 
+function Retirar({ p }: { p: PedidoFerias }) {
+  const [aberto, setAberto] = useState(false);
+  const retirar = useRetirarFerias();
+  const periodo = p.startsOn === p.endsOn ? formatarData(p.startsOn) : `${formatarData(p.startsOn)} a ${formatarData(p.endsOn)}`;
+  return (
+    <>
+      <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Retirar o pedido de ${formatarData(p.startsOn)}`}>
+        Retirar
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={(a) => {
+          setAberto(a);
+          if (!a) retirar.reset();
+        }}
+        titulo="Retirar este pedido?"
+        descricao={`${nome(TIPO_AUSENCIA, p.type)}, ${periodo}. Deixa de esperar aprovação; para voltar a pedir, faz um pedido novo.`}
+        rotuloConfirmar="Retirar pedido"
+        variante="destructive"
+        aCarregar={retirar.isPending}
+        erro={retirar.error ? <ErrorPanel erro={retirar.error} /> : undefined}
+        aoConfirmar={() => (retirar.isPending ? undefined : retirar.mutate(p.leaveId, { onSuccess: () => setAberto(false) }))}
+      />
+    </>
+  );
+}
+
 function Saldo({ s }: { s: SaldoFerias }) {
   return (
     <Card>
@@ -149,6 +176,7 @@ export default function Ferias() {
     { id: "periodo", cabecalho: "Período", celula: (p) => (p.startsOn === p.endsOn ? formatarData(p.startsOn) : `${formatarData(p.startsOn)} a ${formatarData(p.endsOn)}`) },
     { id: "dias", cabecalho: "Dias", alinhar: "direita", esconderAte: "sm", celula: (p) => dias(p.calendarDays) },
     { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoAusencia estado={p.status} /> },
+    { id: "accao", cabecalho: "", alinhar: "direita", celula: (p) => (p.status === "Pending" ? <Retirar p={p} /> : null) },
   ];
   return (
     <>
@@ -212,7 +240,6 @@ export default function Ferias() {
         erro={pedidos.error ? <ErrorPanel erro={pedidos.error} tentarDeNovo={() => void pedidos.refetch()} /> : undefined}
         vazio="Ainda não pediu férias nem ausências."
       />
-      <p className="mt-3 text-sm text-muted-foreground">Para retirar um pedido por decidir, fale com os Recursos Humanos: o portal ainda não o permite.</p>
     </>
   );
 }

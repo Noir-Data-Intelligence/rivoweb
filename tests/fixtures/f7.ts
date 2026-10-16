@@ -35,8 +35,8 @@ export const marcacoes = (): S["OwnAttendanceRecord"][] => [
   { recordId: IDF7.marcacaoFalta, day: "2026-10-09", checkedInAt: null, checkedOutAt: null, status: "Absent", justification: null, observedHours: null },
 ];
 
-export const pedidosFerias = (): S["OwnLeaveRequest"][] => [
-  { leaveId: IDF7.ferias, type: "Annual", startsOn: "2026-11-22", endsOn: "2026-12-01", calendarDays: 10, status: "Pending", reason: "Férias de fim de ano.", approvalRequestId: "00000000-0000-4000-8000-000000000799" },
+export const pedidosFerias = (estado = "Pending"): S["OwnLeaveRequest"][] => [
+  { leaveId: IDF7.ferias, type: "Annual", startsOn: "2026-11-22", endsOn: "2026-12-01", calendarDays: 10, status: estado, reason: "Férias de fim de ano.", approvalRequestId: "00000000-0000-4000-8000-000000000799" },
 ];
 
 export const saldos = (): S["OwnLeaveBalance"][] => [{ year: 2026, type: "Annual", entitled: 22.0, carriedOver: 3.0, taken: 0, pending: 10, remaining: 25.0, configured: true }];

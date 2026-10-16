@@ -1,6 +1,6 @@
 /**
  * F7 — portal do colaborador, com a API simulada: início com o resumo,
- * assiduidade (justificar falta), férias (saldo, pedido validado), turnos
+ * assiduidade (justificar falta), férias (saldo, pedido validado, retirar), turnos
  * (janela de 93 dias, pedir e cancelar troca), recibos e documentos
  * descarregados, declaração só depois de confirmar, pedidos internos
  * (abrir, responder, fechado sem resposta), objectivos (valor em texto, ciclo
@@ -130,6 +130,31 @@ test.describe("portal do colaborador", () => {
       { type: "Annual", startsOn: "2026-12-10", endsOn: "2026-12-12", reason: null },
       { type: "Annual", startsOn: "2026-12-10", endsOn: "2026-12-12", reason: null },
     ]);
+  });
+
+  test("férias: retirar um pedido por decidir; o já decidido não se retira (B25)", async ({ page, api }) => {
+    let lista = pedidosFerias();
+    let tentativas = 0;
+    await comPortal(api)
+      .em("GET", "/portal/me/leave", () => ({ status: 200, corpo: lista }))
+      .em("POST", `/portal/me/leave/${IDF7.ferias}/cancellation`, () => {
+        if (++tentativas === 1) return problema(409, { title: "Conflito", detail: "Só um pedido pendente pode ser retirado." });
+        lista = pedidosFerias("Cancelled");
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/ferias");
+    await page.getByRole("button", { name: "Retirar o pedido de 22/11/2026" }).click();
+    const dialogo = page.getByRole("dialog");
+    await expect(dialogo.getByText("Férias, 22/11/2026 a 01/12/2026.", { exact: false })).toBeVisible();
+    await semViolacoesAxe(page);
+    await dialogo.getByRole("button", { name: "Retirar pedido" }).click();
+    await expect(dialogo.getByText("Só um pedido pendente pode ser retirado.")).toBeVisible();
+    await dialogo.getByRole("button", { name: "Retirar pedido" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Retirar o pedido/ })).toHaveCount(0);
+    expect(api.escritas("POST", `/portal/me/leave/${IDF7.ferias}/cancellation`)).toHaveLength(2);
   });
 
   test("turnos: janela até 93 dias, pedir troca sem colega e cancelar", async ({ page, api }) => {

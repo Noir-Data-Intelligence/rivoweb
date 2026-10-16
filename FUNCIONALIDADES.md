@@ -116,7 +116,7 @@ AM = AssetManager.
 | Início: férias por gozar, próximo turno, pedidos em aberto e anúncios recentes | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Anúncios em vigor, os fixados primeiro | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Assiduidade: marcações por período; justificar uma falta | — | — | — | — | — | — | — | — | ✓ ¹ | — |
-| Férias e ausências: saldo por ano; pedidos e o estado; pedir (vai a aprovação) ¹⁵ | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Férias e ausências: saldo por ano; pedidos e o estado; pedir (vai a aprovação); retirar um pedido por decidir | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Turnos: escala por período (até 93 dias); pedir para sair de um turno; cancelar o pedido | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Recibos de vencimento: ver os meses e descarregar o PDF | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Documentos da ficha: ver e descarregar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
@@ -202,7 +202,6 @@ Recursos Humanos.»
 ¹² Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
 ¹³ Uma previsão guardada em rascunho já não se submete nem corrige: não há rota para isso (B23). Por omissão, o front submete.
 ¹⁴ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
-¹⁵ Retirar um pedido de férias ainda não está no portal (B25): pede-se aos Recursos Humanos.
 
 ---
 
@@ -781,7 +780,8 @@ decide pela conta, nunca por um id escolhido no ecrã.
   férias, baixa médica, licença parental ou ausência sem retribuição, com os
   dias de calendário calculados enquanto se escreve. O pedido vai a aprovação;
   se não houver política de aprovação, o ecrã mostra o motivo do servidor.
-  Retirar um pedido ainda exige os Recursos Humanos (B25).
+  **Retirar** um pedido ainda por decidir, depois de confirmar; um pedido já
+  decidido não se retira, e o ecrã mostra o motivo do servidor.
 - **Turnos:** escala de um período (por omissão, os próximos 30 dias; no
   máximo 93); **pedir para sair** de um turno de hoje em diante, com motivo
   (quem lê os colaboradores pode propor o colega que fica com o turno); os

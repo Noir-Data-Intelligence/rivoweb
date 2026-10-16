@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
 > 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `33697a8`. Em aberto: **B20**, **B21**, **B22**,
-> **B23**, **B24** (configuração), **B25** e **B26**. O **B13** está resolvido (ADR-080):
+> Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração) e
+> **B26**. **B20** a **B23** estão resolvidos no backend (PR #105, ADR-085) e
+> o front ainda não os usa. O **B25** está resolvido (PR #106) e o front já o
+> usa: o colaborador retira no portal o próprio pedido de férias. O **B13** está resolvido (ADR-080):
 > o portal já descarrega os documentos pessoais e os recibos, e o front usa-o. O **B5** está meio resolvido: já há
 > SAF-T AO de facturação (`GET /finance/saft-ao`), continuam a faltar as
 > declarações à AGT.
@@ -114,6 +116,10 @@ NIF da produtora do software, a NOIR) no `.env` de produção e reiniciar a API.
 `Finance__SaftProductCompanyTaxId`, e o `ProductID` tem valor por omissão.
 
 ## B25 — O colaborador não retira o próprio pedido de férias
+
+> **Resolvido** (PR #106, em produção a 2026-10-16): `POST
+> /portal/me/leave/{leaveId}/cancellation`. O portal mostra «Retirar» nos
+> pedidos por decidir; verificado na base local.
 
 **Facto:** o domínio deixa retirar um pedido pendente (`LeaveRequest.Cancel`,
 «Só um pedido pendente pode ser retirado»), mas a única rota é

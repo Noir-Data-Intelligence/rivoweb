@@ -1718,3 +1718,14 @@ desempenho, conquistas e importação.
   **Nenhuma escrita em produção.**
 - **Testes:** 138 unitários; interface 9 cenários F7b × 3 motores (27); suite
   inteira 336, sem instáveis.
+
+### B25 resolvido (portal, 2026-10-16)
+
+- O backend publicou `POST /portal/me/leave/{leaveId}/cancellation` (PR #106).
+  O portal mostra «Retirar» nos pedidos por decidir, com confirmação; o 409
+  (pedido já decidido) aparece com o motivo do servidor. O saldo actualiza-se.
+- `openapi/v1.json` actualizado de produção (`64e6a8b`). Traz também B20 a B23
+  (PR #105, ADR-085), ainda por usar no front; as fixtures da F6 ganharam os
+  campos novos a `null`.
+- API local passou a `64e6a8b`. Escritas F7 e F7b verificadas na base local
+  (o pedido fica `Cancelled` no servidor); interface F7 30 testes × 3 motores.
