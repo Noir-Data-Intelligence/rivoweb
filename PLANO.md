@@ -1553,7 +1553,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 | Despesas | — | Paginação local (a API devolve a lista inteira); o Finance regista só em seu nome | Não lê colaboradores |
 | Portal | — | «Despesas» no menu do colaborador; sem ficha ligada (403) explica em vez de mostrar erro | O portal autoriza pelo vínculo |
 | Gráficos | — | Tesouraria só com tabelas | Os números importam mais do que a forma; os gráficos ficam para quando houver uma conclusão a mostrar |
-| Orçamento | 150 KB | Chunk inicial a **149,8 KB** | Só a tabela de rotas cresce no chunk inicial; a F6 tem de o aliviar antes de juntar rotas |
+| Orçamento | 150 KB | Chunk inicial a **149,8 KB** | Só a tabela de rotas cresce no chunk inicial; a F6 tem de o aliviar antes de juntar rotas. **Resolvido no início da F6:** o login deixou o react-hook-form (validação própria, mesmo comportamento) e o chunk inicial desceu para **137,0 KB** |
 
 ### F5 — estado
 

@@ -80,6 +80,24 @@ test.describe("sessão", () => {
     expect(await page.evaluate(() => sessionStorage.getItem("rivo.sessao"))).toBeNull();
   });
 
+  test("validação do login: foco no primeiro erro, revalida ao escrever, e-mail normalizado, password limpa", async ({ page, api }) => {
+    await api.em("POST", "/identity/login", { status: 401 }).ligar();
+    await page.goto("/entrar");
+    await page.getByRole("button", { name: "Entrar" }).click();
+    await expect(page.getByText("Escreva o e-mail.")).toBeVisible();
+    await expect(page.getByText("Escreva a password.")).toBeVisible();
+    await expect(page.getByLabel("E-mail")).toBeFocused();
+    await page.getByLabel("E-mail").fill("nao-e-email");
+    await expect(page.getByText("Este e-mail não é válido.")).toBeVisible();
+    await page.getByLabel("E-mail").fill("  Alguem@Teste.Local ");
+    await expect(page.getByText("Este e-mail não é válido.")).toHaveCount(0);
+    await page.getByLabel("Password").fill("errada");
+    await page.getByRole("button", { name: "Entrar" }).click();
+    await expect(page.getByText("E-mail ou password incorrectos.")).toBeVisible();
+    await expect(page.getByLabel("Password")).toHaveValue("");
+    expect(api.escritas("POST", "/identity/login").map((p) => p.corpo)).toEqual([{ email: "alguem@teste.local", password: "errada" }]);
+  });
+
   test("token só em sessionStorage e só para a API (S1, S2)", async ({ page, api }) => {
     await api.comConta().ligar();
     await entrar(page);

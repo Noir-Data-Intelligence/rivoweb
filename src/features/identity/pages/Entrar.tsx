@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useForm, type FieldErrors, type Resolver, type ResolverResult } from "react-hook-form";
+import { useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
 import { rotaConhecida } from "@/app/rotasConhecidas";
 import { eApiError } from "@/lib/api/problem";
@@ -15,23 +14,23 @@ import { useEntrar, useSessao } from "../api";
 import { LayoutPublico } from "../components/LayoutPublico";
 
 type Dados = { email: string; password: string };
+type Erros = Partial<Record<keyof Dados, string>>;
 
 /**
- * Validação do login sem zod: o login está no chunk inicial (§1.5) e o zod só
- * carrega com os ecrãs que o usam. As regras e as mensagens são as de
- * `lib/validation/text.ts`.
+ * Validação do login sem zod nem react-hook-form: o login está no chunk
+ * inicial (§1.5) e essas bibliotecas só carregam com os ecrãs que as usam.
+ * As regras e as mensagens são as de `lib/validation/text.ts`.
  */
-const resolver: Resolver<Dados> = (valores): ResolverResult<Dados> => {
+function validar(valores: Dados): { erros: Erros; dados: Dados } {
   const email = normalizarTexto(valores.email).toLowerCase();
-  const errors: FieldErrors<Dados> = {};
-  if (email === "") errors.email = { type: "required", message: "Escreva o e-mail." };
-  else if (email.length > 256) errors.email = { type: "maxLength", message: "E-mail longo de mais." };
-  else if (!pareceEmail(email)) errors.email = { type: "pattern", message: "Este e-mail não é válido." };
-  if (valores.password === "") errors.password = { type: "required", message: "Escreva a password." };
-  else if (valores.password.length > 128) errors.password = { type: "maxLength", message: "No máximo 128 caracteres." };
-  if (Object.keys(errors).length > 0) return { values: {} as Record<string, never>, errors };
-  return { values: { email, password: valores.password }, errors: {} };
-};
+  const erros: Erros = {};
+  if (email === "") erros.email = "Escreva o e-mail.";
+  else if (email.length > 256) erros.email = "E-mail longo de mais.";
+  else if (!pareceEmail(email)) erros.email = "Este e-mail não é válido.";
+  if (valores.password === "") erros.password = "Escreva a password.";
+  else if (valores.password.length > 128) erros.password = "No máximo 128 caracteres.";
+  return { erros, dados: { email, password: valores.password } };
+}
 
 const MENSAGEM_FIM: Readonly<Record<MotivoFim, string | null>> = {
   saiu: null,
@@ -53,17 +52,36 @@ export default function Entrar() {
   });
   const destino = validarVoltar(params.get("voltar"), window.location.origin, rotaConhecida);
 
-  const form = useForm<Dados>({ resolver, defaultValues: { email: "", password: "" } });
+  const [valores, setValores] = useState<Dados>({ email: "", password: "" });
+  const [erros, setErros] = useState<Erros>({});
+  // Como no resto dos formulários: valida ao submeter e, a partir daí, a cada alteração.
+  const [submetido, setSubmetido] = useState(false);
+  const refs = { email: useRef<HTMLInputElement>(null), password: useRef<HTMLInputElement>(null) };
 
   if (sessao !== null && !entrar.isPending) return <Navigate to={destino} replace />;
 
-  const submeter = form.handleSubmit((dados) => {
+  const mudar = (campo: keyof Dados, valor: string) => {
+    const novos = { ...valores, [campo]: valor };
+    setValores(novos);
+    if (submetido) setErros(validar(novos).erros);
+  };
+
+  const submeter = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmetido(true);
+    const { erros: encontrados, dados } = validar(valores);
+    setErros(encontrados);
+    const primeiro = (["email", "password"] as const).find((c) => encontrados[c] !== undefined);
+    if (primeiro) {
+      refs[primeiro].current?.focus();
+      return;
+    }
     if (entrar.isPending) return;
     entrar.mutate(dados, {
       onSuccess: () => navigate(destino, { replace: true }),
-      onError: () => form.setValue("password", ""),
+      onError: () => setValores((v) => ({ ...v, password: "" })),
     });
-  });
+  };
 
   const credenciaisErradas = eApiError(entrar.error) && entrar.error.status === 401;
 
@@ -78,7 +96,7 @@ export default function Entrar() {
         <ErrorPanel erro={entrar.error} className="mb-4" />
       ) : null}
       <form onSubmit={submeter} noValidate className="flex flex-col gap-4">
-        <Field rotulo="E-mail" erro={form.formState.errors.email?.message}>
+        <Field rotulo="E-mail" erro={erros.email}>
           {({ id, descricao, invalido }) => (
             <Input
               id={id}
@@ -88,11 +106,14 @@ export default function Entrar() {
               maxLength={256}
               aria-describedby={descricao}
               invalido={invalido}
-              {...form.register("email")}
+              ref={refs.email}
+              name="email"
+              value={valores.email}
+              onChange={(e) => mudar("email", e.target.value)}
             />
           )}
         </Field>
-        <Field rotulo="Password" erro={form.formState.errors.password?.message}>
+        <Field rotulo="Password" erro={erros.password}>
           {({ id, descricao, invalido }) => (
             <Input
               id={id}
@@ -101,7 +122,10 @@ export default function Entrar() {
               maxLength={128}
               aria-describedby={descricao}
               invalido={invalido}
-              {...form.register("password")}
+              ref={refs.password}
+              name="password"
+              value={valores.password}
+              onChange={(e) => mudar("password", e.target.value)}
             />
           )}
         </Field>
