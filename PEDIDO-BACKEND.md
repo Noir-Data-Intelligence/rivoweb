@@ -2,8 +2,9 @@
 
 > 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
 > Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração) e
-> **B26**. **B20** a **B23** estão resolvidos no backend (PR #105, ADR-085) e
-> o front ainda não os usa. O **B25** está resolvido (PR #106) e o front já o
+> **B26**. **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
+> os usa: anexos e comprovativos pelo contexto, IBAN repetido com o motivo,
+> nomes e escolhas no planeamento, previsão em rascunho revista e submetida. O **B25** está resolvido (PR #106) e o front já o
 > usa: o colaborador retira no portal o próprio pedido de férias. O **B13** está resolvido (ADR-080):
 > o portal já descarrega os documentos pessoais e os recibos, e o front usa-o. O **B5** está meio resolvido: já há
 > SAF-T AO de facturação (`GET /finance/saft-ao`), continuam a faltar as
@@ -20,6 +21,8 @@
 >   e o Manager vêem quem pediu e o que estão a aprovar.
 
 ## B20 — Quem aprova ou paga não abre o comprovativo nem os anexos
+
+> **Resolvido** (PR #105, ADR-085, em produção a 2026-10-16); o front usa-o e foi verificado na base local.
 
 **Facto:** `GET /documents/{documentId}` exige `documents.read`, que só o
 Admin e o HR têm. O ADR-080 deu `documents.write` ao Finance, ao Manager e
@@ -49,6 +52,8 @@ acesso ao arquivo, só ao ficheiro de que a pessoa precisa para decidir ou pagar
 
 ## B21 — IBAN repetido numa conta bancária dá 500
 
+> **Resolvido** (PR #105, ADR-085, em produção a 2026-10-16); o front usa-o e foi verificado na base local.
+
 **Facto:** `POST /finance/accounts` com um IBAN que outra conta já tem responde
 **500** («Ocorreu um erro no servidor»). O registo da API mostra a violação do
 índice único `ix_bank_account_iban` (SQL 2601) a sair como excepção não
@@ -61,6 +66,8 @@ mostrar o código para o suporte.
 IBAN: …»), como o B15 fez para os nomes duplicados.
 
 ## B22 — O planeamento só traz ids de departamento e de colaborador
+
+> **Resolvido** (PR #105, ADR-085, em produção a 2026-10-16); o front usa-o e foi verificado na base local.
 
 **Facto:** `CostCentreView` traz `departmentId` e `responsibleEmployeeId`,
 `BudgetView` traz `approvedByEmployeeId` e `CostForecastView` traz
@@ -86,6 +93,8 @@ lista curta de departamentos e de colaboradores activos (id e nome) com
 `finance.planning.write`, por exemplo `GET /finance/planning/lookups`.
 
 ## B23 — Uma previsão de custos em rascunho fica presa
+
+> **Resolvido** (PR #105, ADR-085, em produção a 2026-10-16); o front usa-o e foi verificado na base local.
 
 **Facto:** `POST /finance/planning/cost-forecasts` aceita `submit: false`
 (rascunho), e o domínio tem `DepartmentCostForecast.Revise` e `Submit`. Mas

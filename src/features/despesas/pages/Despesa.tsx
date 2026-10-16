@@ -195,21 +195,20 @@ export default function Despesa() {
           <Linha rotulo="Comprovativo">
             {d.receiptDocumentId === null ? (
               "Sem comprovativo."
-            ) : pode("documents.read") ? (
+            ) : (
               <Button
                 variante="ghost"
                 tamanho="sm"
                 className="-ml-2"
                 onClick={() => {
                   setErroDescarga(null);
-                  descarregar(`/documents/${d.receiptDocumentId ?? ""}`, `comprovativo-${d.spentOn}`).catch(setErroDescarga);
+                  // Pela despesa (B20, ADR-085): quem a lê abre o comprovativo, sem o arquivo.
+                  descarregar(`/finance/expenses/${encodeURIComponent(d.expenseId)}/receipt`, `comprovativo-${d.spentOn}`).catch(setErroDescarga);
                 }}
               >
                 <Download strokeWidth={1.75} aria-hidden />
                 Descarregar
               </Button>
-            ) : (
-              "Anexado. Abri-lo exige ler o arquivo de documentos, que este perfil não tem (B20)."
             )}
           </Linha>
           {d.decidedAt ? (

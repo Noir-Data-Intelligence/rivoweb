@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Can } from "@/features/identity";
 import { normalizarTexto } from "@/lib/validation/text";
-import { Alert } from "@/ui/Alert";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
@@ -15,10 +14,10 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useAbrirCentroCusto, useCentrosCusto, type CentroCusto } from "../api";
-import { useNomesOrganizacao } from "../comum";
+import { nomeOuTraco, useEscolhasOrganizacao } from "../comum";
 
 function AbrirCentro() {
-  const org = useNomesOrganizacao();
+  const org = useEscolhasOrganizacao();
   const [aberto, setAberto] = useState(false);
   const abrir = useAbrirCentroCusto();
   const [codigo, setCodigo] = useState("");
@@ -42,13 +41,6 @@ function AbrirCentro() {
       setNome("");
     }
   };
-  if (!org.leColaboradores)
-    return (
-      <Button disabled title="Escolher o responsável exige ler os colaboradores (Recursos Humanos).">
-        <Plus strokeWidth={1.75} aria-hidden />
-        Abrir centro
-      </Button>
-    );
   return (
     <>
       <Button onClick={() => setAberto(true)}>
@@ -62,7 +54,7 @@ function AbrirCentro() {
         descricao="O departamento é opcional; o responsável responde pelo orçamento do centro."
         rotuloConfirmar="Abrir centro"
         aCarregar={abrir.isPending}
-        erro={abrir.error ? <ErrorPanel erro={abrir.error} /> : undefined}
+        erro={abrir.error ? <ErrorPanel erro={abrir.error} /> : org.erro ? <ErrorPanel erro={org.erro} /> : undefined}
         formulario={idForm}
       >
         <form
@@ -84,10 +76,10 @@ function AbrirCentro() {
           </Field>
           <Field rotulo="Departamento (opcional)">
             {({ id, descricao }) => (
-              <Select id={id} aria-describedby={descricao} value={departamento} onChange={(e) => setDepartamento(e.target.value)} disabled={!org.leDepartamentos}>
+              <Select id={id} aria-describedby={descricao} value={departamento} onChange={(e) => setDepartamento(e.target.value)} disabled={org.aCarregar}>
                 <option value="">Nenhum</option>
                 {org.departamentos.map((d) => (
-                  <option key={d.departmentId} value={d.departmentId}>
+                  <option key={d.id} value={d.id}>
                     {d.name}
                   </option>
                 ))}
@@ -96,15 +88,13 @@ function AbrirCentro() {
           </Field>
           <Field rotulo="Responsável" erro={tentou ? erros.responsavel : undefined}>
             {({ id, descricao, invalido }) => (
-              <Select id={id} aria-describedby={descricao} invalido={invalido} value={responsavel} onChange={(e) => setResponsavel(e.target.value)}>
-                <option value="">Escolha…</option>
-                {org.colaboradores
-                  .filter((x) => x.status === "Active")
-                  .map((x) => (
-                    <option key={x.employeeId} value={x.employeeId}>
-                      {x.fullName}
-                    </option>
-                  ))}
+              <Select id={id} aria-describedby={descricao} invalido={invalido} value={responsavel} onChange={(e) => setResponsavel(e.target.value)} disabled={org.aCarregar}>
+                <option value="">{org.aCarregar ? "A carregar…" : "Escolha…"}</option>
+                {org.colaboradores.map((x) => (
+                  <option key={x.id} value={x.id}>
+                    {x.name}
+                  </option>
+                ))}
               </Select>
             )}
           </Field>
@@ -118,12 +108,11 @@ export default function CentrosCusto() {
   const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const [inactivos, setInactivos] = useState(false);
   const lista = useCentrosCusto({ inactivos, pagina, tamanho });
-  const org = useNomesOrganizacao();
   const colunas: Coluna<CentroCusto>[] = [
     { id: "codigo", cabecalho: "Código", celula: (c) => <span className="font-medium">{c.code}</span> },
     { id: "nome", cabecalho: "Nome", celula: (c) => c.name },
-    { id: "departamento", cabecalho: "Departamento", esconderAte: "md", celula: (c) => org.nomeDepartamento(c.departmentId) },
-    { id: "responsavel", cabecalho: "Responsável", esconderAte: "sm", celula: (c) => org.nomeColaborador(c.responsibleEmployeeId) },
+    { id: "departamento", cabecalho: "Departamento", esconderAte: "md", celula: (c) => nomeOuTraco(c.departmentId, c.departmentName) },
+    { id: "responsavel", cabecalho: "Responsável", esconderAte: "sm", celula: (c) => nomeOuTraco(c.responsibleEmployeeId, c.responsibleName) },
     { id: "estado", cabecalho: "Estado", celula: (c) => (c.isActive ? <Badge tom="sucesso">Activo</Badge> : <Badge>Inactivo</Badge>) },
   ];
   return (
@@ -137,9 +126,6 @@ export default function CentrosCusto() {
           </Can>
         }
       />
-      {!org.leColaboradores || !org.leDepartamentos ? (
-        <Alert tom="info" className="mb-4" titulo="Os nomes dos responsáveis e dos departamentos só aparecem a quem lê os Recursos Humanos." />
-      ) : null}
       <div className="mb-4">
         <Checkbox rotulo="Mostrar os inactivos" checked={inactivos} onChange={(e) => setInactivos(e.target.checked)} />
       </div>

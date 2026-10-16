@@ -10,7 +10,7 @@
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEscrita } from "@/lib/api/escrita";
-import { api, enviar, lerPagina } from "@/lib/api/client";
+import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 
 type S = components["schemas"];
@@ -105,6 +105,30 @@ export function useRegistarPrevisaoCustos() {
   const qc = useQueryClient();
   return useEscrita({
     mutationFn: (b: PedidoPrevisaoCustos) => enviar(api.POST("/finance/planning/cost-forecasts", { body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "planning", "cost-forecasts"] }),
+  });
+}
+
+/** Departamentos e colaboradores activos para escolher, sem as permissões de RH (B22). Só com `finance.planning.write`. */
+export function useEscolhasPlaneamento(activo: boolean) {
+  return useQuery({ queryKey: [...chaves.planeamento, "lookups"], queryFn: ({ signal }) => ler(api.GET("/finance/planning/lookups", { signal })), enabled: activo, staleTime: 60_000 });
+}
+
+/** Revê os custos de uma previsão em rascunho (B23). Submetida: 409. */
+export function useReverPrevisaoCustos() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: ({ forecastId, ...body }: { forecastId: string } & S["CostForecastRevisionRequest"]) =>
+      enviar(api.PUT("/finance/planning/cost-forecasts/{forecastId}", { params: { path: { forecastId } }, body })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "planning", "cost-forecasts"] }),
+  });
+}
+
+/** Submete uma previsão que ficou em rascunho (B23). Já submetida: 409. */
+export function useSubmeterPrevisaoCustos() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (forecastId: string) => enviar(api.POST("/finance/planning/cost-forecasts/{forecastId}/submission", { params: { path: { forecastId } } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "planning", "cost-forecasts"] }),
   });
 }

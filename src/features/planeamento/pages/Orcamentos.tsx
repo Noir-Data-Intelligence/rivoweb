@@ -295,7 +295,7 @@ export default function Orcamentos() {
     { id: "ano", cabecalho: "Ano", celula: (o) => String(o.fiscalYear) },
     { id: "total", cabecalho: "Total anual", alinhar: "direita", celula: (o) => formatarMoeda(dinheiro(o.annualTotal), o.currency) },
     { id: "estado", cabecalho: "Estado", celula: (o) => <EstadoOrcamento estado={o.status} /> },
-    { id: "aprovado", cabecalho: "Aprovado em", esconderAte: "md", celula: (o) => (o.approvedAt ? formatarDataHora(o.approvedAt) : "—") },
+    { id: "aprovado", cabecalho: "Aprovado em", esconderAte: "md", celula: (o) => (o.approvedAt ? `${formatarDataHora(o.approvedAt)}${o.approvedByName ? ` por ${o.approvedByName}` : ""}` : "—") },
     {
       id: "accoes",
       cabecalho: "Acções",

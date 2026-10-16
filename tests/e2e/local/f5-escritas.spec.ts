@@ -234,7 +234,7 @@ test("F5: despesa submetida no portal com comprovativo, aprovada e reembolsada",
   await expect(page.getByRole("row").filter({ hasText: descricao }).getByText("Por decidir")).toBeVisible();
   await sair(page);
 
-  // Admin: aprova e reembolsa; o comprovativo descarrega (o Admin lê o arquivo).
+  // Admin: aprova e reembolsa; o comprovativo descarrega pela despesa (B20).
   await entrar(page, adminEmail, adminPass);
   await page.goto("/despesas?estado=Submitted");
   await page.getByRole("link", { name: descricao }).click();
@@ -268,14 +268,26 @@ test("F5: tesouraria — conta, extracto e reconciliação, câmbio, caixa peque
 
   // Conta: abrir, depositar, levantar; o saldo e o extracto acompanham.
   const conta = `${marca} Tesouraria`;
+  const iban = ibanDeTeste();
   await page.goto("/contas");
   await page.getByRole("button", { name: "Abrir conta" }).click();
   await page.getByLabel("Nome").fill(conta);
   await page.getByLabel("Banco").fill("Banco de teste");
-  await page.getByLabel("IBAN (opcional)").fill(ibanDeTeste());
+  await page.getByLabel("IBAN (opcional)").fill(iban);
   await page.getByRole("dialog").getByRole("button", { name: "Abrir conta" }).click();
   await expect(page.getByRole("heading", { name: conta, level: 1 })).toBeVisible();
   const idConta = page.url().split("/").pop() ?? "";
+  // B21: o mesmo IBAN noutra conta dá 409 com o motivo, não 500.
+  await page.goto("/contas");
+  await page.getByRole("button", { name: "Abrir conta" }).click();
+  await page.getByLabel("Nome").fill(`${marca} Repetida`);
+  await page.getByLabel("Banco").fill("Banco de teste");
+  await page.getByLabel("IBAN (opcional)").fill(iban);
+  await page.getByRole("dialog").getByRole("button", { name: "Abrir conta" }).click();
+  await expect(page.getByRole("dialog").getByText("Já existe uma conta com este IBAN", { exact: false })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
+  await page.goto(`/contas/${idConta}`);
+  await expect(page.getByRole("heading", { name: conta, level: 1 })).toBeVisible();
   await page.getByRole("button", { name: "Depositar" }).click();
   await page.getByLabel(/^Valor/).fill("100 000,00");
   await page.getByLabel("Referência (opcional)").fill(`DEP-${sufixo}`);

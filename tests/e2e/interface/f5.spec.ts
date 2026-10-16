@@ -225,6 +225,7 @@ test.describe("pedidos de pagamento", () => {
     await comF5(api, meGestorF5, painelCarlos())
       .em("GET", `/finance/payment-requests/${IDF5.pedido}/documents`, () => ({ status: 200, corpo: anexos }))
       .em("POST", "/documents", { status: 201, corpo: documento() })
+      .em("GET", `/finance/payment-requests/${IDF5.pedido}/documents/l1/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .em("POST", `/finance/payment-requests/${IDF5.pedido}/documents`, () => {
         anexos = [{ linkId: "l1", documentId: IDF5.documento, category: "Proposta", fileName: "factura.pdf", attachedAt: "2026-10-15T09:00:00Z" }];
         return { status: 201, corpo: { id: "l1" } };
@@ -247,7 +248,12 @@ test.describe("pedidos de pagamento", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(api.escritas("POST", `/finance/payment-requests/${IDF5.pedido}/documents`).map((p) => p.corpo)).toEqual([{ documentId: IDF5.documento, category: "Proposta" }]);
     await expect(page.getByText("Proposta ·", { exact: false })).toBeVisible();
-    await expect(page.getByText("(B20)", { exact: false })).toBeVisible();
+    // B20: o Manager abre o anexo pelo pedido, sem ler o arquivo.
+    const anexo = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar factura.pdf" }).click();
+    expect((await anexo).suggestedFilename()).toBe("factura.pdf");
+    expect(api.pedidos.some((p) => p.caminho === `/finance/payment-requests/${IDF5.pedido}/documents/l1/content`)).toBe(true);
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/documents/"))).toBe(false);
   });
 });
 
@@ -288,11 +294,11 @@ test.describe("despesas", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("rejeitar exige motivo; aprovar sem notas; comprovativo descarrega com o arquivo", async ({ page, api }) => {
+  test("rejeitar exige motivo; aprovar sem notas; comprovativo descarrega pela despesa", async ({ page, api }) => {
     await comDespesas(api)
       .em("POST", `/finance/expenses/${IDF5D.despesa}/rejection`, { status: 204 })
       .em("POST", `/finance/expenses/${IDF5D.despesa}/approval`, { status: 204 })
-      .em("GET", `/documents/${IDF5D.comprovativo}`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .em("GET", `/finance/expenses/${IDF5D.despesa}/receipt`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .ligar();
     await entrar(page);
     await page.goto(`/despesas/${IDF5D.despesa}`);
@@ -312,13 +318,18 @@ test.describe("despesas", () => {
     expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/approval`).map((p) => p.corpo)).toEqual([{ notes: null }]);
   });
 
-  test("a própria despesa não se decide; quem não lê o arquivo vê o porquê (B20)", async ({ page, api }) => {
-    await comDespesas(api, meGestorF5, painelCarlos()).ligar();
+  test("a própria despesa não se decide; o comprovativo abre-se pela despesa (B20)", async ({ page, api }) => {
+    await comDespesas(api, meGestorF5, painelCarlos())
+      .em("GET", `/finance/expenses/${IDF5D.despesa}/receipt`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .ligar();
     await entrar(page, "gestor5@teste.local");
     await page.goto(`/despesas/${IDF5D.despesa}`);
     await expect(page.getByText("É a sua despesa.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Aprovar" })).toHaveCount(0);
-    await expect(page.getByText("(B20)", { exact: false })).toBeVisible();
+    const comprovativo = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar" }).click();
+    await comprovativo;
+    expect(api.pedidos.some((p) => p.caminho === `/finance/expenses/${IDF5D.despesa}/receipt`)).toBe(true);
   });
 
   test("reembolsar: data, conta da moeda e referência", async ({ page, api }) => {

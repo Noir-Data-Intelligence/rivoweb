@@ -4,7 +4,8 @@
  * partida dobrada, balancete, estorno, fecho e reabertura, classe de reporte,
  * versão do plano, regra contabilística), configuração fiscal (o servidor
  * recusa versões sobrepostas; nada da configuração existente muda),
- * planeamento (centro de custo, orçamento revisto e aprovado, previsão) e o
+ * planeamento (centro de custo, orçamento revisto e aprovado, previsão
+ * submetida, rascunho revisto e submetido depois — B23) e o
  * SAF-T descarregado.
  *
  * Não define regras de lançamento automático: mudariam a emissão de facturas
@@ -251,7 +252,7 @@ test("F6: fiscal recusa versões sobrepostas sem mudar nada; impostos e SAF-T", 
   else await expect(recusa).toBeVisible();
 });
 
-test("F6: planeamento — centro de custo, orçamento revisto e aprovado, previsão submetida", async ({ page, request }) => {
+test("F6: planeamento — centro de custo, orçamento revisto e aprovado, previsão submetida e rascunho submetido depois", async ({ page, request }) => {
   test.setTimeout(180_000);
   await soLocal(page);
   const ad = await sessaoApi(request, adminEmail(), adminPass());
@@ -312,4 +313,37 @@ test("F6: planeamento — centro de custo, orçamento revisto e aprovado, previs
   await page.getByRole("dialog").getByLabel("Custos fixos").fill("1");
   await page.getByRole("dialog").getByRole("button", { name: "Submeter" }).click();
   await expect(page.getByRole("dialog").getByText("Já existe previsão para este departamento", { exact: false })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
+
+  // B23: rascunho no mês seguinte, revisto e submetido depois.
+  const mesSeguinte = (mes % 12) + 1;
+  const anoSeguinte = mes === 12 ? ano + 1 : ano;
+  await page.getByRole("button", { name: "Registar previsão" }).click();
+  const r = page.getByRole("dialog");
+  await r.getByLabel("Departamento").selectOption({ label: `${marca} Planeamento` });
+  await r.getByLabel("Ano").fill(String(anoSeguinte));
+  await r.getByLabel("Mês").selectOption(String(mesSeguinte));
+  await r.getByLabel("Custos operacionais").fill("1 000 000");
+  await r.getByLabel("Custos fixos").fill("0");
+  await r.getByLabel("Submeter já").uncheck();
+  await r.getByRole("button", { name: "Guardar rascunho" }).click();
+  await expect(r).toHaveCount(0);
+  const rascunho = page.getByRole("row").filter({ hasText: `${marca} Planeamento` }).filter({ hasText: "Rascunho" });
+  await expect(rascunho).toContainText("1 000 000,00 Kz");
+  await rascunho.getByRole("button", { name: /^Rever a previsão/ }).click();
+  await page.getByRole("dialog").getByLabel("Custos fixos").fill("250 000,50");
+  await page.getByRole("dialog").getByRole("button", { name: "Guardar" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(rascunho).toContainText("1 250 000,50 Kz");
+  await rascunho.getByRole("button", { name: /^Submeter a previsão/ }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Submeter" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  const prev = await ad<{ month: number; status: string; total: number; departmentName: string | null }[]>("GET", `/finance/planning/cost-forecasts?departmentId=${dep.corpo.departmentId}&page=1&pageSize=25`);
+  expect(prev.corpo.map((x) => [x.month, x.status, Number(x.total)]).sort()).toEqual(
+    [
+      [mes, "Submitted", 9296000],
+      [mesSeguinte, "Submitted", 1250000.5],
+    ].sort(),
+  );
+  expect(prev.corpo.every((x) => x.departmentName === `${marca} Planeamento`)).toBe(true);
 });

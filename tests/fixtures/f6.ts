@@ -241,7 +241,7 @@ export const versoesPlano = (): S["ChartOfAccountsVersionView"][] => [
 
 export const classesReporte = (): S["ReportingRuleView"][] => [{ ruleId: IDF6.classe, codePrefix: "11", class: "Asset", section: "Meios monetários", order: 1 }];
 
-export const centros = (): S["CostCentreView"][] => [{ costCentreId: IDF6.centro, code: "CC01", name: "Direcção Geral", departmentId: ID.dep1, departmentName: null, responsibleEmployeeId: ID.emp1, responsibleName: null, isActive: true }];
+export const centros = (): S["CostCentreView"][] => [{ costCentreId: IDF6.centro, code: "CC01", name: "Direcção Geral", departmentId: ID.dep1, departmentName: "Operações", responsibleEmployeeId: ID.emp1, responsibleName: "Ana Teste", isActive: true }];
 
 export const orcamento = (estado = "Draft"): S["BudgetView"] => ({
   budgetId: IDF6.orcamento,
@@ -252,13 +252,33 @@ export const orcamento = (estado = "Draft"): S["BudgetView"] => ({
   annualTotal: 3000000.5,
   approvedAt: estado === "Approved" ? "2026-10-13T17:39:20Z" : null,
   approvedByEmployeeId: estado === "Approved" ? ID.emp1 : null,
-  approvedByName: null,
+  approvedByName: estado === "Approved" ? "Ana Teste" : null,
   lines: [
     { month: 1, amount: 1000000.5 },
     { month: 2, amount: 2000000 },
   ],
 });
 
+/** `/finance/planning/lookups` (B22): só ids e nomes. */
+export const escolhasPlaneamento = (): S["PlanningLookups"] => ({
+  departments: [{ id: ID.dep1, name: "Operações" }],
+  employees: [{ id: ID.emp1, name: "Ana Teste" }],
+});
+
+export const previsaoRascunho = (): S["CostForecastView"] => ({
+  forecastId: "00000000-0000-4000-8000-000000000994",
+  departmentId: ID.dep1,
+  departmentName: "Operações",
+  fiscalYear: 2026,
+  month: 2,
+  currency: "AOA",
+  operationalCosts: 1000000,
+  fixedCosts: 250000.5,
+  total: 1250000.5,
+  status: "Draft",
+  submittedAt: null,
+});
+
 export const previsoes = (): S["CostForecastView"][] => [
-  { forecastId: IDF6.previsao, departmentId: ID.dep1, departmentName: null, fiscalYear: 2026, month: 1, currency: "AOA", operationalCosts: 6026000, fixedCosts: 3270000, total: 9296000, status: "Submitted", submittedAt: "2026-10-13T17:39:14Z" },
+  { forecastId: IDF6.previsao, departmentId: ID.dep1, departmentName: "Operações", fiscalYear: 2026, month: 1, currency: "AOA", operationalCosts: 6026000, fixedCosts: 3270000, total: 9296000, status: "Submitted", submittedAt: "2026-10-13T17:39:14Z" },
 ];

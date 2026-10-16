@@ -103,15 +103,15 @@ AM = AssetManager.
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Anexar documentos ao pedido (carregar ficheiro) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Executar o pagamento ⁷ ⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Abrir os anexos | ✓ | ✓ | — | — ⁹ | — ⁹ | — | — | — | — | — |
+| Abrir os anexos (pelo pedido) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | **Despesas** | | | | | | | | | | |
 | Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
-| Aprovar e rejeitar (com motivo) ¹⁰ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Aprovar e rejeitar (com motivo) ⁹ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Marcar reembolsada | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Abrir o comprovativo | ✓ | ✓ | — | — ⁹ | — ⁹ | — | — | — | — | — |
+| Abrir o comprovativo (pela despesa) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
-| **Portal do colaborador** (o próprio, pela conta) ¹⁴ | | | | | | | | | | |
+| **Portal do colaborador** (o próprio, pela conta) ¹¹ | | | | | | | | | | |
 | Início: férias por gozar, próximo turno, pedidos em aberto e anúncios recentes | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Anúncios em vigor, os fixados primeiro | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Assiduidade: marcações por período; justificar uma falta | — | — | — | — | — | — | — | — | ✓ ¹ | — |
@@ -139,15 +139,16 @@ AM = AssetManager.
 | Antiguidade dos saldos de clientes e de fornecedores, numa data | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Impostos** | | | | | | | | | | |
 | Resumo do IVA (liquidado, regularizado, dedutível, a entregar) e retenções na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Descarregar o SAF-T AO de facturação do mês ou do ano ¹² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Descarregar o SAF-T AO de facturação do mês ou do ano ¹⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Contabilidade** | | | | | | | | | | |
 | Ver lançamentos, diários, plano de contas, versões do plano, períodos e regras | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir diários e contas; lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fechar e reabrir períodos; versões do plano; regras de lançamento e contabilísticas | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Planeamento** | | | | | | | | | | |
-| Ver centros de custo, orçamentos (com os meses) e previsões de custos | ✓ | ✓ | — | ✓ ¹¹ | ✓ ¹¹ | — | — | — | — | — |
-| Abrir centros de custo e registar previsões de custos ¹³ | ✓ | ✓ | — | — | — ¹¹ | — | — | — | — | — |
+| Ver centros de custo, orçamentos (com os meses, quem aprovou) e previsões de custos, com os nomes | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Abrir centros de custo e registar previsões de custos | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Rever e submeter previsões guardadas em rascunho | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Criar e rever orçamentos (rascunho) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Aprovar orçamentos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Colaboradores** | | | | | | | | | | |
@@ -195,12 +196,9 @@ Recursos Humanos.»
 ⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
 ⁷ Só com ficha de colaborador ligada à conta: o registo fica em nome de quem o faz. O Finance não lê colaboradores, por isso regista despesas só em seu nome.
 ⁸ Só depois de aprovado (BR-5), e nunca por quem pediu nem por quem aprovou (BR-3); o servidor confirma com 403. O dinheiro sai de uma conta aberta na moeda do pedido.
-⁹ Vê a lista, mas abrir o ficheiro exige ler o arquivo de documentos, que estes perfis não têm (B20).
-¹⁰ A própria despesa não se decide.
-¹¹ Estes perfis não lêem os Recursos Humanos: vêem «Departamento» e «Colaborador» em vez dos nomes, e o Manager não consegue escolher o responsável de um centro nem o departamento de uma previsão (B22).
-¹² Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
-¹³ Uma previsão guardada em rascunho já não se submete nem corrige: não há rota para isso (B23). Por omissão, o front submete.
-¹⁴ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
+⁹ A própria despesa não se decide.
+¹⁰ Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
+¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
 
 ---
 
@@ -489,11 +487,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Orçamentos**
 - Por centro de custo e ano, com os tectos mês a mês e o total anual;
   **criar** e **rever** em rascunho; **aprovar** (passa a travar a despesa
-  acima do tecto e deixa de se alterar).
+  acima do tecto e deixa de se alterar); mostra quem aprovou.
 
 **Previsões de custos**
 - Por departamento e ano: custos operacionais, fixos e total por mês;
-  **registar** e submeter (uma por departamento e mês).
+  **registar** e submeter já, ou guardar em rascunho (uma por departamento e
+  mês); em rascunho, **rever** os custos e **submeter** depois.
 
 **Colaboradores**
 - Lista paginada (nome, n.º, departamento, admissão, conta ligada, estado).
@@ -651,11 +650,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Pedidos de pagamento**
 - Ver e **executar** os aprovados (BR-3: não executa o que pediu nem o que
-  aprovou). Vê a lista de anexos, mas não os abre (B20).
+  aprovou). **Abre os anexos** pelo pedido, sem ler o arquivo de documentos.
 
 **Despesas**
 - Resumo, lista e ficha; **aprovar**, **rejeitar**, **marcar reembolsada** e
-  **registar** em seu nome. Não abre o comprovativo (B20).
+  **registar** em seu nome; **abre o comprovativo** pela despesa.
 
 **Contas bancárias**
 - Ver saldos e extracto; **reconciliação** completa. Não abre contas nem
@@ -673,8 +672,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   períodos, não regista versões do plano nem define regras.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
-- Ver tudo, sem os nomes dos departamentos e responsáveis (B22). **Aprova**
-  orçamentos; não os cria nem revê, não abre centros nem regista previsões.
+- Ver tudo, com os nomes dos departamentos, dos responsáveis e de quem
+  aprovou. **Aprova** orçamentos; não os cria nem revê, não abre centros nem
+  regista previsões.
 
 **Configurações**
 - Só **Dados da empresa**: ver, **declarar** e **corrigir**.
@@ -705,21 +705,21 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **cancelá-lo**. Não anula facturas nem executa pagamentos.
 
 **Pedidos de pagamento**
-- Ver a lista e a ficha. Vê a lista de anexos, mas não os abre (B20).
+- Ver a lista e a ficha; **abre os anexos** pelo pedido.
 
 **Despesas**
 - Resumo, lista e ficha; **aprovar** e **rejeitar** (não as da própria). Não
-  regista nem reembolsa; não abre o comprovativo (B20).
+  regista nem reembolsa; **abre o comprovativo** pela despesa.
 
 **Contas bancárias**
 - Ver saldos e extracto; **abrir**, **depositar**, **levantar**, **fechar** e
   **reabrir**. Sem reconciliação.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
-- Ver tudo, sem os nomes dos departamentos e responsáveis (B22). **Cria** e
-  **revê** orçamentos em rascunho; não os aprova. Não consegue abrir centros
-  nem registar previsões, porque não escolhe responsável nem departamento
-  (B22).
+- Ver tudo, com os nomes. **Cria** e **revê** orçamentos em rascunho; não os
+  aprova. **Abre centros de custo** e **regista previsões**, escolhendo o
+  departamento e o responsável das listas do planeamento (sem ler os Recursos
+  Humanos); **revê** e **submete** as previsões em rascunho.
 
 ### AssetManager (Gestão de activos)
 **Início**

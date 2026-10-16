@@ -1732,3 +1732,21 @@ desempenho, conquistas e importação.
   campos novos a `null`.
 - API local passou a `64e6a8b`. Escritas F7 e F7b verificadas na base local
   (o pedido fica `Cancelled` no servidor); interface F7 30 testes × 3 motores.
+
+### B20 a B23 resolvidos (finanças, 2026-10-16)
+
+- **B20:** o comprovativo abre por `GET /finance/expenses/{id}/receipt` e os
+  anexos do pedido por `…/payment-requests/{id}/documents/{linkId}/content`;
+  quem abre a ficha já tem a leitura que a rota pede, por isso o botão
+  aparece a todos. Deixou de se usar `/documents/{id}` nestes ecrãs.
+- **B21:** IBAN repetido dá 409 com o motivo, mostrado no diálogo (base local).
+- **B22:** listas com `departmentName`, `responsibleName` e `approvedByName`;
+  um nome `null` com id mostra «Removido». Escolhas de quem escreve no
+  planeamento por `GET /finance/planning/lookups` (Manager 200, Finance 403 em
+  produção: o Finance só lê). O Manager passa a abrir centros e a registar
+  previsões; o front deixou de pedir listas de RH no planeamento.
+- **B23:** «Rever» e «Submeter» nas previsões em rascunho (só com
+  `finance.planning.write`).
+- **Verificação:** interface 342 × 3 motores, sem instáveis; escritas F5 e F6
+  na base local (`64e6a8b`), com o rascunho revisto e submetido e o IBAN
+  repetido recusado. Leituras em produção: só códigos.

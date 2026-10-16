@@ -7,7 +7,7 @@
  * orçamentos (tectos em texto, aprovação sem corpo) e permissões por perfil.
  */
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
-import { colaboradores, departamentos } from "../../fixtures/f1";
+import { colaboradores, departamentos, ID } from "../../fixtures/f1";
 import { painelAna } from "../../fixtures/f5";
 import {
   antiguidade,
@@ -17,6 +17,7 @@ import {
   classesReporte,
   contasRazao,
   diarios,
+  escolhasPlaneamento,
   IDF6,
   isencaoAlimentacao,
   lancamento,
@@ -27,6 +28,7 @@ import {
   orcamento,
   pautas,
   periodos,
+  previsaoRascunho,
   previsoes,
   regrasLancamento,
   resultados,
@@ -67,6 +69,7 @@ function comF6(api: ApiSimulada, me = meAdminF6): ApiSimulada {
     .em("GET", "/finance/planning/cost-centres", pag(centros()))
     .em("GET", "/finance/planning/budgets", pag([orcamento()]))
     .em("GET", "/finance/planning/cost-forecasts", pag(previsoes()))
+    .em("GET", "/finance/planning/lookups", { status: 200, corpo: escolhasPlaneamento() })
     .em("GET", "/hr/departments", pag(departamentos()))
     .em("GET", "/hr/employees", pag(colaboradores()));
 }
@@ -390,9 +393,10 @@ test.describe("contabilidade", () => {
 });
 
 test.describe("planeamento", () => {
-  test("Manager: só o planeamento no menu, sem nomes de RH (nunca o id), cria orçamento com tectos em texto e não aprova", async ({ page, api }) => {
+  test("Manager: só o planeamento no menu, nomes do servidor sem ler RH, abre centro pelas escolhas, cria orçamento e não aprova", async ({ page, api }) => {
     await comF6(api, meGestorF6)
       .em("POST", "/finance/planning/budgets", { status: 201, corpo: { budgetId: "00000000-0000-4000-8000-000000000993", estado: "Draft" } })
+      .em("POST", "/finance/planning/cost-centres", { status: 201, corpo: { id: "00000000-0000-4000-8000-000000000995" } })
       .ligar();
     await entrar(page, meGestorF6.email);
     await page.goto("/centros-custo");
@@ -400,10 +404,21 @@ test.describe("planeamento", () => {
     await expect(menu.getByRole("link", { name: "Orçamentos" })).toBeVisible();
     await expect(menu.getByRole("link", { name: "Lançamentos" })).toHaveCount(0);
     await expect(page.getByRole("cell", { name: "Direcção Geral" })).toBeVisible();
-    await expect(page.getByText("Os nomes dos responsáveis e dos departamentos só aparecem a quem lê os Recursos Humanos.")).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Ana Teste" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Operações" })).toBeVisible();
     await expect(page.getByText(IDF6.centro)).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Abrir centro" })).toBeDisabled();
+    await page.getByRole("button", { name: "Abrir centro" }).click();
+    const c = page.getByRole("dialog");
+    await c.getByLabel("Código").fill("cc02");
+    await c.getByLabel("Nome").fill("Logística");
+    await c.getByLabel("Departamento (opcional)").selectOption({ label: "Operações" });
+    await c.getByLabel("Responsável").selectOption({ label: "Ana Teste" });
     await semViolacoesAxe(page);
+    await c.getByRole("button", { name: "Abrir centro" }).click();
+    await expect(c).toHaveCount(0);
+    expect(api.escritas("POST", "/finance/planning/cost-centres")[0]?.corpo).toEqual({ code: "CC02", name: "Logística", departmentId: ID.dep1, responsibleEmployeeId: ID.emp1 });
+    // As escolhas vêm do planeamento, não das listas de RH.
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
     await page.goto("/orcamentos");
     await expect(page.getByRole("table", { name: "Orçamentos" }).getByText("CC01 · Direcção Geral", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Aprovar o orçamento/ })).toHaveCount(0);
@@ -458,5 +473,38 @@ test.describe("planeamento", () => {
     expect(api2.escritas("POST", "/finance/planning/cost-forecasts")[0]?.corpo).toMatchObject({ month: 3, currency: "AOA", operationalCosts: "6026000.00", fixedCosts: "0.00", submit: true });
     await semViolacoesAxe(outra);
     await contexto.close();
+  });
+
+  test("previsão em rascunho: rever os custos em texto e submeter depois (B23)", async ({ page, api }) => {
+    const rascunho = previsaoRascunho();
+    let lista = [rascunho, ...previsoes()];
+    await comF6(api, meGestorF6)
+      .em("GET", "/finance/planning/cost-forecasts", () => pag(lista))
+      .em("PUT", `/finance/planning/cost-forecasts/${rascunho.forecastId}`, { status: 204 })
+      .em("POST", `/finance/planning/cost-forecasts/${rascunho.forecastId}/submission`, () => {
+        lista = [{ ...rascunho, status: "Submitted", submittedAt: "2026-10-16T10:00:00Z" }, ...previsoes()];
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, meGestorF6.email);
+    await page.goto("/previsoes-custos");
+    // A submetida não se revê nem se submete.
+    await expect(page.getByRole("button", { name: /previsão de Operações, Janeiro/ })).toHaveCount(0);
+    await page.getByRole("button", { name: "Rever a previsão de Operações, Fevereiro 2026" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Custos fixos")).toHaveValue("250000,50");
+    await d.getByLabel("Custos operacionais").fill("");
+    await d.getByRole("button", { name: "Guardar" }).click();
+    await expect(d.getByText("Indique os custos operacionais (zero se não houver).")).toBeVisible();
+    await d.getByLabel("Custos operacionais").fill("1 200 000");
+    await semViolacoesAxe(page);
+    await d.getByRole("button", { name: "Guardar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("PUT", `/finance/planning/cost-forecasts/${rascunho.forecastId}`).map((x) => x.corpo)).toEqual([{ operationalCosts: "1200000.00", fixedCosts: "250000.50" }]);
+    await page.getByRole("button", { name: "Submeter a previsão de Operações, Fevereiro 2026" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Submeter" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Submeter a previsão/ })).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/planning/cost-forecasts/${rascunho.forecastId}/submission`)).toHaveLength(1);
   });
 });

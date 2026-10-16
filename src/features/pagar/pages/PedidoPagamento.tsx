@@ -206,27 +206,26 @@ function Anexos({ p }: { p: TipoPedido }) {
                   {a.category} · {formatarDataHora(a.attachedAt)}
                 </p>
               </div>
-              {pode("documents.read") ? (
-                <Button
-                  variante="ghost"
-                  tamanho="sm"
-                  aria-label={`Descarregar ${a.fileName ?? "documento"}`}
-                  onClick={() => {
-                    setErroDescarga(null);
-                    descarregar(`/documents/${a.documentId}`, a.fileName ?? "anexo").catch(setErroDescarga);
-                  }}
-                >
-                  <Download strokeWidth={1.75} aria-hidden />
-                </Button>
-              ) : null}
+              <Button
+                variante="ghost"
+                tamanho="sm"
+                aria-label={`Descarregar ${a.fileName ?? "documento"}`}
+                onClick={() => {
+                  setErroDescarga(null);
+                  // Pelo pedido (B20, ADR-085): quem o lê abre os anexos, sem o arquivo.
+                  descarregar(
+                    `/finance/payment-requests/${encodeURIComponent(p.paymentRequestId)}/documents/${encodeURIComponent(a.linkId)}/content`,
+                    a.fileName ?? "anexo",
+                  ).catch(setErroDescarga);
+                }}
+              >
+                <Download strokeWidth={1.75} aria-hidden />
+              </Button>
             </li>
           ))}
         </ul>
       )}
       {erroDescarga ? <ErrorPanel erro={erroDescarga} className="mt-2" /> : null}
-      {anexos.data && anexos.data.length > 0 && !pode("documents.read") ? (
-        <p className="mt-2 text-xs text-muted-foreground">Abrir os anexos exige ler o arquivo de documentos, que este perfil não tem (B20).</p>
-      ) : null}
     </Card>
   );
 }
