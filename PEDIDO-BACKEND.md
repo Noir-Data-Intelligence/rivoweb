@@ -2,7 +2,8 @@
 
 > 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
 > Revisto contra `main` @ `33697a8`. Em aberto: **B20**, **B21**, **B22**,
-> **B23** e **B24** (configuração). O **B5** está meio resolvido: já há
+> **B23**, **B24** (configuração) e **B25**. O **B13** está resolvido (ADR-080):
+> o portal já descarrega os documentos pessoais e os recibos, e o front usa-o. O **B5** está meio resolvido: já há
 > SAF-T AO de facturação (`GET /finance/saft-ao`), continuam a faltar as
 > declarações à AGT.
 > B15 a B19 estão resolvidos e o front já os usa:
@@ -111,3 +112,19 @@ ficheiro não sai.
 NIF da produtora do software, a NOIR) no `.env` de produção e reiniciar a API.
 É a única chave em falta: o `docker-compose.yml` já a passa como
 `Finance__SaftProductCompanyTaxId`, e o `ProductID` tem valor por omissão.
+
+## B25 — O colaborador não retira o próprio pedido de férias
+
+**Facto:** o domínio deixa retirar um pedido pendente (`LeaveRequest.Cancel`,
+«Só um pedido pendente pode ser retirado»), mas a única rota é
+`POST /hr/leave/{leaveId}/cancellation`, com `hr.leave.write`. O portal tem
+`POST /portal/me/leave` e não tem a cancelação. Nas trocas de turno e nas
+despesas, o próprio já retira (`…/shift-change-requests/{id}/cancellation`,
+`…/expenses/{id}/withdrawal`).
+
+**Consequência:** quem se engana nas datas tem de pedir aos Recursos Humanos
+que retirem o pedido; o ecrã de férias do portal diz isso.
+
+**Pedido:** `POST /portal/me/leave/{leaveId}/cancellation` (204; 404 se não for
+do próprio; 409 se já decidido), só autenticação, como as outras rotas do
+portal.

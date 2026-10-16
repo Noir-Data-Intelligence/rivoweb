@@ -1650,3 +1650,40 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
   suite inteira 277 + 5 instáveis sob carga que passam ao repetir.
 - **Publicada** a 2026-10-16 (`58c7892`, `5d06c6f`, `2ea42de`): CI verde e
   smoke de produção por perfil 10/10, só leituras, com os ecrãs e menus da F6.
+
+### F7 — divisão em três blocos
+
+A F7 tem perto de 110 rotas. Sai em três blocos, cada um com commit e
+verificação próprios: **F7a** portal do colaborador; **F7b** RH do dia-a-dia na
+gestão (ficha completa com dados pessoais e imigração, documentos, contratos,
+assiduidade, férias e saldos, benefícios, organograma); **F7c** recrutamento,
+admissões e saídas, anúncios, pedidos internos, formação, turnos, declarações,
+desempenho, conquistas e importação.
+
+### F7a — portal do colaborador (estado)
+
+- **Ecrãs** (`/eu`, só autenticação; o servidor decide pela conta): início com
+  resumo (férias por gozar, próximo turno, pedidos em aberto, anúncios),
+  anúncios, assiduidade (justificar falta), férias (saldo, pedidos, pedir),
+  turnos (janela até 93 dias, pedir e cancelar troca), recibos (PDF), documentos
+  (descarregar) e declarações (emitir com confirmação), pedidos internos (abrir,
+  conversa, responder), formação, objectivos (registar valor) e conquistas,
+  bens à guarda. Menu agrupado: «O meu tempo», «Documentos», «Pedidos»,
+  «Desenvolvimento».
+- **B13 resolvido** no backend (ADR-080): `GET /portal/me/documents/{id}` e
+  `GET /portal/me/payslips/{itemId}/document`. Lido em produção com a conta
+  Colaborador (recibo e documento em PDF; id alheio dá 404).
+- **Emitir uma declaração é escrita** (regista, com código de verificação):
+  só depois de confirmar, e verificada só na base local.
+- **B25 pedido:** o portal não retira um pedido de férias pendente.
+- **Peças partilhadas novas:** `rh/estados.tsx` (nomes e estados do RH, para o
+  portal e para a F7b/F7c), janela de datas no URL e barra de progresso.
+- **Leituras em produção:** todas as rotas do portal com a conta Colaborador
+  (200, com dados reais), a 2026-10-16. Só o Admin e o HR têm permissões de RH.
+- **Escritas:** verificadas **na base local** (`f7-escritas.spec.ts`): falta
+  justificada, pedido de férias (recusa sem política com o motivo do servidor;
+  depois, com política e ocupante no cargo, fica por decidir), troca de turno
+  pedida e cancelada, pedido interno aberto e respondido, progresso registado,
+  declaração emitida (registada com código). **Nenhuma escrita em produção.**
+- **Testes:** 132 unitários; interface 9 cenários F7 × 3 motores (27); suite
+  inteira 302 + 7 instáveis sob carga que passam ao repetir.

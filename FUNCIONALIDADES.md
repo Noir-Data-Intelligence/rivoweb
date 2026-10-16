@@ -2,7 +2,8 @@
 
 > **Estado:** fases **F0 a F6** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
-> planeamento) · actualizado a 2026-10-16.
+> planeamento); **F7a** (portal do colaborador completo) concluída e verificada
+> na base local, por publicar · actualizado a 2026-10-16.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -32,7 +33,7 @@ pronto a publicar quando o estado acima o diz). O
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
-| **Colaborador** | Portal do colaborador (`/eu`) | Início, Despesas |
+| **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
 | **Cliente** | Portal do cliente (`/cliente`) | Início |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
@@ -110,6 +111,20 @@ AM = AssetManager.
 | Marcar reembolsada | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir o comprovativo | ✓ | ✓ | — | — ⁹ | — ⁹ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| **Portal do colaborador** (o próprio, pela conta) ¹⁴ | | | | | | | | | | |
+| Início: férias por gozar, próximo turno, pedidos em aberto e anúncios recentes | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Anúncios em vigor, os fixados primeiro | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Assiduidade: marcações por período; justificar uma falta | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Férias e ausências: saldo por ano; pedidos e o estado; pedir (vai a aprovação) ¹⁵ | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Turnos: escala por período (até 93 dias); pedir para sair de um turno; cancelar o pedido | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Recibos de vencimento: ver os meses e descarregar o PDF | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Documentos da ficha: ver e descarregar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Declarações: emitir em PDF (fica registada, com código de verificação) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Pedidos internos: abrir, acompanhar a conversa e responder | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Formação: acções, horas, nota e certificado | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Objectivos: progresso e resultados-chave; registar o valor actual (ciclo aberto) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Conquistas recebidas e pontos | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Bens da empresa à guarda | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Tesouraria** | | | | | | | | | | |
 | Contas bancárias: ver saldos e extracto por período | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar, fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -175,6 +190,8 @@ Recursos Humanos.»
 ¹¹ Estes perfis não lêem os Recursos Humanos: vêem «Departamento» e «Colaborador» em vez dos nomes, e o Manager não consegue escolher o responsável de um centro nem o departamento de uma previsão (B22).
 ¹² Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
 ¹³ Uma previsão guardada em rascunho já não se submete nem corrige: não há rota para isso (B23). Por omissão, o front submete.
+¹⁴ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
+¹⁵ Retirar um pedido de férias ainda não está no portal (B25): pede-se aos Recursos Humanos.
 
 ---
 
@@ -686,9 +703,46 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Resumo pessoal. Os projectos chegam na F12.
 
 ### Colaborador
-Entra no **portal do colaborador** (`/eu`).
-- **Início:** saudação com o nome da ficha, cargo actual, notificações por
-  ler, aprovações à espera e anúncios em vigor.
+Entra no **portal do colaborador** (`/eu`). Tudo é do próprio: o servidor
+decide pela conta, nunca por um id escolhido no ecrã.
+- **Início:** saudação com o nome da ficha, cargo actual, dias de férias por
+  gozar, próximo turno, pedidos internos em aberto, os dois anúncios mais
+  recentes (fixados primeiro), notificações por ler e aprovações à espera.
+- **Anúncios:** os comunicados em vigor, fixados primeiro, com a data de
+  publicação e o fim.
+- **Assiduidade:** marcações de um período (por omissão, do início do mês a
+  hoje): entrada, saída, horas e estado (presente, atraso, falta, falta
+  justificada); **justificar uma falta** de um dia até hoje (numa falta
+  existente ou num dia sem marcação, que fica registado como falta
+  justificada); aviso dos dias com entrada e sem saída.
+- **Férias e ausências:** saldo de um ano (direito, transitados, gozados, por
+  decidir e por gozar); os pedidos com o período, os dias e o estado; **pedir**
+  férias, baixa médica, licença parental ou ausência sem retribuição, com os
+  dias de calendário calculados enquanto se escreve. O pedido vai a aprovação;
+  se não houver política de aprovação, o ecrã mostra o motivo do servidor.
+  Retirar um pedido ainda exige os Recursos Humanos (B25).
+- **Turnos:** escala de um período (por omissão, os próximos 30 dias; no
+  máximo 93); **pedir para sair** de um turno de hoje em diante, com motivo
+  (quem lê os colaboradores pode propor o colega que fica com o turno); os
+  pedidos de troca com o estado e a decisão; **cancelar** os que estão por
+  decidir.
+- **Recibos:** os meses processados com o bruto (e os subsídios que inclui),
+  IRT, segurança social e líquido; **descarregar o PDF** (o anexado pelos
+  Recursos Humanos ou, sem anexo, o da folha aprovada).
+- **Documentos e declarações:** os documentos da ficha (nome, categoria, data,
+  tamanho) e **descarregar**; **emitir** uma declaração dos modelos
+  disponíveis, depois de confirmar (fica registada, com código de verificação).
+- **Pedidos internos:** abrir um pedido a Recursos Humanos, informática,
+  instalações, finanças, adiantamento salarial, pedido de documento ou outro,
+  com prioridade; a conversa com a equipa; **responder** (num pedido resolvido,
+  responder reabre-o; um fechado já não recebe mensagens).
+- **Formação:** acções em que está inscrito ou que concluiu, com datas, horas,
+  nota e certificado (número e validade).
+- **Objectivos e conquistas:** objectivos de cada ciclo com o peso e o
+  progresso; resultados-chave com partida, valor actual e alvo; **registar o
+  valor actual** enquanto o ciclo está aberto; conquistas com os pontos e a
+  nota.
+- **Bens à minha guarda:** equipamento da empresa entregue e não devolvido.
 - **Despesas:** submeter (data, categoria com sugestões, descrição, valor,
   moeda, comprovativo até 10 MB), acompanhar o estado, ler o motivo de uma
   rejeição, ver a data do reembolso e **retirar** as que ainda não foram
@@ -714,7 +768,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F7 | RH completo e portal do colaborador (férias, recibos, documentos) |
+| F7 | RH completo na gestão (ficha completa, contratos, assiduidade, férias, benefícios, recrutamento, formação, turnos, desempenho, declarações) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |
