@@ -37,7 +37,9 @@ pronto a publicar quando o estado acima o diz). O
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
 perfil de gestão e ficha de colaborador vê também «O meu portal» no menu da
-conta, e no portal tem «Voltar à gestão».
+conta; no portal, «Voltar à gestão» fica no fundo da barra lateral (e no menu
+da conta), e o logotipo leva de volta ao ecrã principal com os menus
+completos. Em qualquer ambiente, o logotipo leva ao início desse ambiente.
 
 ---
 

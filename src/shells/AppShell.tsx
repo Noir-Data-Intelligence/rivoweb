@@ -6,7 +6,7 @@
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as D from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { ChevronsLeft, ChevronsRight, LogOut, Menu, Monitor, Moon, Sun, UserCog, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ChevronsLeft, ChevronsRight, LogOut, Menu, Monitor, Moon, Sun, UserCog, X, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet } from "react-router";
 import { useTema } from "@/app/theme";
@@ -22,6 +22,31 @@ import { Button } from "@/ui/Button";
 import { cn } from "@/ui/cn";
 import { Logo } from "@/ui/Layout";
 import { CONTA, MENU, NOTIFICACOES, type EntradaMenu } from "./rotas";
+
+/** No portal do colaborador, quem também gere volta ao backoffice pela barra lateral (§3.3). */
+const VOLTAR_GESTAO: EntradaMenu = { caminho: "/", titulo: "Voltar à gestão", icone: ArrowLeft, requer: "autenticado", exacto: true };
+
+/** O logotipo leva ao início do ambiente; no portal, quem também gere vai para o backoffice. */
+function inicioDoLogo(shell: Shell, gere: boolean): string {
+  if (shell === "cliente") return "/cliente";
+  if (shell === "colaborador" && !gere) return "/eu";
+  return "/";
+}
+
+function LogoInicio({ shell, className, comNome }: { shell: Shell; className?: string; comNome?: boolean }) {
+  const { utilizador } = useUtilizador();
+  const gere = temGestao(utilizador.permissions);
+  const destino = inicioDoLogo(shell, gere);
+  return (
+    <Link
+      to={destino}
+      aria-label={destino === "/" && shell === "colaborador" ? "Rivo, ir para a gestão" : "Rivo, página inicial"}
+      className={cn("inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
+    >
+      <Logo comNome={comNome ?? true} />
+    </Link>
+  );
+}
 
 const NOME_SHELL: Readonly<Record<Shell, string | null>> = {
   backoffice: null,
@@ -61,8 +86,9 @@ function ItemMenu({ e, compacto, aoNavegar }: { e: EntradaMenu; compacto: boolea
 }
 
 function Navegacao({ shell, compacto, aoNavegar }: { shell: Shell; compacto: boolean; aoNavegar?: () => void }) {
-  const { pode } = useUtilizador();
+  const { pode, utilizador } = useUtilizador();
   const itens = MENU[shell].filter((e) => pode(e.requer));
+  const voltar = shell === "colaborador" && temGestao(utilizador.permissions);
   const grupos = new Map<string, EntradaMenu[]>();
   for (const e of itens) {
     const g = e.grupo ?? "";
@@ -78,6 +104,11 @@ function Navegacao({ shell, compacto, aoNavegar }: { shell: Shell; compacto: boo
           ))}
         </div>
       ))}
+      {voltar ? (
+        <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-4">
+          <ItemMenu e={VOLTAR_GESTAO} compacto={compacto} {...(aoNavegar ? { aoNavegar } : {})} />
+        </div>
+      ) : null}
     </nav>
   );
 }
@@ -187,7 +218,7 @@ function Gaveta({ shell, aberta, setAberta }: { shell: Shell; aberta: boolean; s
         <D.Overlay className="fixed inset-0 z-40 bg-foreground/40 md:hidden" />
         <D.Content className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col gap-6 border-r border-sidebar-border bg-sidebar p-4 focus:outline-none md:hidden">
           <div className="flex items-center justify-between">
-            <Logo />
+            <LogoInicio shell={shell} />
             <D.Close asChild>
               <Button variante="ghost" tamanho="icone" aria-label="Fechar menu">
                 <X strokeWidth={1.75} aria-hidden />
@@ -230,8 +261,8 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
           )}
         >
           <div className={cn("flex items-center", colapsada ? "justify-center" : "justify-center lg:justify-start lg:px-2")}>
-            <Logo comNome={false} className={colapsada ? "" : "lg:hidden"} />
-            <Logo className={colapsada ? "hidden" : "hidden lg:inline-flex"} />
+            <LogoInicio shell={shell} comNome={false} className={colapsada ? "" : "lg:hidden"} />
+            <LogoInicio shell={shell} className={colapsada ? "hidden" : "hidden lg:inline-flex"} />
           </div>
           <div className="flex-1 overflow-y-auto">
             <div className={colapsada ? "" : "lg:hidden"}>
@@ -257,7 +288,7 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
             <Button variante="ghost" tamanho="icone" className="md:hidden" onClick={() => setGaveta(true)} aria-label="Abrir menu">
               <Menu strokeWidth={1.75} aria-hidden />
             </Button>
-            <Logo comNome={false} className="md:hidden" />
+            <LogoInicio shell={shell} comNome={false} className="md:hidden" />
             <div className="min-w-0 flex-1">{nomeShell ? <p className="truncate text-sm font-medium text-muted-foreground">{nomeShell}</p> : null}</div>
             <Sino caminhoPagina={NOTIFICACOES[shell]} />
             <MenuTema />

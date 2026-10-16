@@ -1,4 +1,4 @@
-import { meCliente, meColaborador, meSuperAdmin } from "../../fixtures/identidade";
+import { meAdmin, meCliente, meColaborador, meSuperAdmin } from "../../fixtures/identidade";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 
 const LARGURAS = [360, 768, 1024, 1440];
@@ -193,6 +193,34 @@ test.describe("shells", () => {
     await expect(page).toHaveURL(/\/eu$/);
     await expect(page.getByText("Técnico")).toBeVisible();
     await semViolacoesAxe(page);
+  });
+
+  test("no portal, quem também gere volta à gestão pela barra lateral e pelo logotipo", async ({ page, api }) => {
+    await api.comConta({ ...meAdmin, roles: ["Admin", "Colaborador"] }).ligar();
+    await entrar(page);
+    await page.goto("/eu");
+    await expect(page.getByText("Portal do colaborador")).toBeVisible();
+    const lateral = page.locator("aside");
+    const visivel = (nome: string) => lateral.getByRole("link", { name: nome }).filter({ visible: true });
+    await visivel("Voltar à gestão").click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByText("Portal do colaborador")).toHaveCount(0);
+    await page.goto("/eu");
+    await visivel("Rivo, ir para a gestão").click();
+    await expect(page).toHaveURL(/\/$/);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto("/eu");
+    await page.getByRole("button", { name: "Abrir menu" }).click();
+    await expect(page.getByRole("dialog").getByRole("link", { name: "Voltar à gestão" })).toBeVisible();
+    await semViolacoesAxe(page);
+  });
+
+  test("o colaborador sem gestão não vê «Voltar à gestão» e o logotipo leva ao portal", async ({ page, api }) => {
+    await api.comConta(meColaborador).ligar();
+    await entrar(page, meColaborador.email);
+    await expect(page).toHaveURL(/\/eu$/);
+    await expect(page.getByRole("link", { name: "Voltar à gestão" })).toHaveCount(0);
+    await expect(page.locator("aside").getByRole("link", { name: "Rivo, página inicial" }).first()).toHaveAttribute("href", "/eu");
   });
 
   test("cliente sem associação vê a mensagem e não chega ao portal", async ({ page, api }) => {
