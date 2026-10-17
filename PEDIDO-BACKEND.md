@@ -2,7 +2,7 @@
 
 > 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
 > Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração),
-> **B26**, **B27** e **B28** (salários). **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
+> **B26**, **B27** e **B28** (salários), **B29** e **B30** (compras). **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
 > os usa: anexos e comprovativos pelo contexto, IBAN repetido com o motivo,
 > nomes e escolhas no planeamento, previsão em rascunho revista e submetida. O **B25** está resolvido (PR #106) e o front já o
 > usa: o colaborador retira no portal o próprio pedido de férias. O **B13** está resolvido (ADR-080):
@@ -186,3 +186,35 @@ tira.
 
 **Pedido:** `DELETE /payroll/runs/{runId}/items/{itemId}` (só em rascunho;
 409 fora dele) e, se fizer sentido, anular uma folha em rascunho.
+
+## B29 — Requisições e recepções só trazem ids de pessoas e departamentos
+
+**Facto:** `RequisitionView` traz `requestedByEmployeeId` e `departmentId`, e
+`GoodsReceiptView` traz `receivedByEmployeeId`, sem nomes. O Manager, o
+Finance e o AssetManager, que trabalham com compras, não têm
+`hr.employees.read` nem `hr.departments.read` (lido em `/identity/me` de
+produção a 2026-10-17).
+
+**Consequência:** esses perfis vêem «Colaborador» e «Departamento» em vez dos
+nomes (o front nunca mostra o id), e o Manager não escolhe o departamento ao
+abrir uma requisição.
+
+**Pedido:** como o B22 fez no planeamento, `requestedByName`,
+`departmentName` e `receivedByName` nas vistas, e uma lista curta de
+departamentos para quem tem `procurement.requisitions.write` (por exemplo
+`GET /procurement/lookups`).
+
+## B30 — As linhas de requisições e ordens não têm ordem garantida
+
+**Facto:** as linhas de `RequisitionView` e `PurchaseOrderView` vêm sem ordem
+definida (a consulta não tem `ORDER BY` e não há coluna de posição). Na base
+local, a mesma requisição devolveu as linhas em ordens diferentes entre
+leituras; os ids das linhas do mesmo pedido são do mesmo milissegundo, por
+isso ordenar por id não recupera a ordem em que foram escritas.
+
+**Consequência:** a ordem das linhas muda de uma leitura para a outra (o front
+ordena pelo id para ao menos ser estável) e não é a que o utilizador
+escreveu.
+
+**Pedido:** guardar a posição de cada linha (como `LifecycleTask.Order`) e
+devolver as linhas por essa ordem.

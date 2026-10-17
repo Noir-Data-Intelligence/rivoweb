@@ -1839,6 +1839,39 @@ F7c e a F7 no front.
 - **Testes:** 158 unitários; interface 4 cenários × 3 motores; suite inteira
   405, sem instáveis.
 
+### F9 — Compras, inventário e activos (estado)
+
+Em três blocos: (1) compras; (2) inventário; (3) activos fixos.
+
+**Bloco 1 — compras** (2026-10-17, por publicar)
+- **Ecrãs:** `/requisicoes` e `/requisicoes/:id` (abrir, submeter, ver
+  decisão, cancelar; emitir ordens da aprovada), `/encomendas` e
+  `/encomendas/:id` (linhas com o que falta, recepções, registar, anular,
+  cancelar), `/recepcoes`. Menu novo «Compras», antes de Pagamentos.
+- **Permissões lidas em produção** (2026-10-17): Admin tudo; Manager
+  requisições e ordens (lê recepções); Finance lê ordens e recepções;
+  AssetManager lê ordens e regista recepções. Os três sem RH (B29).
+- **Regras:** requisitante e quem recebe vêm da conta (ADR-057; os campos
+  `…ByEmployeeId` vão a `null`); ordem só de aprovada, até ao aprovado menos o
+  já encomendado; recepção sem passar o que falta; cancelar a ordem só sem
+  mercadoria. Quantidades até 4 casas, preços até 2, totais em Big.
+- **B29 e B30 pedidos:** nomes nas vistas; ordem das linhas (o front ordena
+  pelo id para ser estável).
+- **Leituras em produção** (Admin, 2026-10-17): 120 requisições (90
+  aprovadas), 75 ordens, 69 recepções, tudo em AOA (200).
+- **Escritas:** verificadas **na base local** (`f9-compras-escritas.spec.ts`,
+  3 corridas seguidas): conta Manager ligada a uma ficha abre e submete; o
+  Admin, com cargo que aprova e política só da corrida, aprova; o Manager vê
+  a decisão e emite a ordem (acima do aprovado recusado no front); o Admin
+  regista uma recepção parcial, anula-a, regista o resto; a ordem com
+  mercadoria não se cancela (409 com o motivo). **Nenhuma escrita em
+  produção.**
+- **CI:** duas corridas seguidas com dezenas de repetições por tempo (420
+  testes, 2 vCPU). No CI, espera 20 s, teste 60 s e duas repetições
+  (`23d366b`).
+- **Testes:** 167 unitários; interface 6 cenários × 3 motores; suite inteira
+  438, sem instáveis.
+
 ### F8 — Salários (estado)
 
 **Publicada a 2026-10-17** (`5763d7d`: CI verde, Vercel, smoke de produção

@@ -72,6 +72,10 @@ export const REQUISITO_PAGINA = {
   "/conquistas": "hr.employees.read",
   // F8 — salários (§5.9).
   "/salarios": "payroll.runs.read",
+  // F9 — compras (§5.10).
+  "/requisicoes": "procurement.requisitions.read",
+  "/encomendas": "procurement.orders.read",
+  "/recepcoes": "procurement.receipts.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */
