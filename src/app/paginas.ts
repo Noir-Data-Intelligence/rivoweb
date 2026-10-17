@@ -15,7 +15,7 @@ export const PAGINAS = {
   shellColaborador: () => de(import("./shells"), (m) => m.ShellColaborador),
   shellCliente: () => de(import("./shells"), (m) => m.ShellCliente),
   inicioColaborador: () => de(import("@/features/inicio/paginas"), (m) => m.InicioColaborador),
-  inicioCliente: () => de(import("@/features/inicio/paginas"), (m) => m.InicioCliente),
+  inicioCliente: () => import("@/features/portalcliente/pages/Inicio"),
   minhaConta: () => import("@/features/identity/pages/MinhaConta"),
   notificacoes: () => import("@/features/notificacoes/pages/Notificacoes"),
   // F2
@@ -70,6 +70,15 @@ export const PAGINAS = {
   meusObjectivos: () => import("@/features/portal/pages/Objectivos"),
   anuncios: () => import("@/features/portal/pages/Anuncios"),
   meusBens: () => import("@/features/portal/pages/Bens"),
+  // F10 — portal do cliente
+  extractoCliente: () => import("@/features/portalcliente/pages/Extracto"),
+  pagamentosCliente: () => import("@/features/portalcliente/pages/Pagamentos"),
+  documentosCliente: () => import("@/features/portalcliente/pages/Documentos"),
+  mensagensCliente: () => import("@/features/portalcliente/pages/Mensagens"),
+  suporteCliente: () => import("@/features/portalcliente/pages/Suporte"),
+  pedidoSuporteCliente: () => import("@/features/portalcliente/pages/PedidoSuporte"),
+  ajudaCliente: () => import("@/features/portalcliente/pages/Ajuda"),
+  artigoAjudaCliente: () => import("@/features/portalcliente/pages/ArtigoAjuda"),
   // F7b — RH do dia-a-dia (§5.8).
   organograma: () => import("@/features/rh/pages/Organograma"),
   contratos: () => import("@/features/rh/pages/Contratos"),

@@ -62,3 +62,11 @@ export function formatarPercentagem(valor: number | string, casas = 0, comSinal 
 export function formatarInteiro(valor: number): string {
   return formatarNumeroDecimal(String(Math.trunc(valor)), 0);
 }
+
+/** «512 B» · «38 KB» · «2,4 MB». */
+export function formatarTamanho(bytes: number | string): string {
+  const b = Number(bytes);
+  if (b < 1024) return `${formatarNumeroDecimal(String(b), 0)} B`;
+  if (b < 1024 * 1024) return `${formatarNumeroDecimal((b / 1024).toFixed(0), 0)} KB`;
+  return `${formatarNumeroDecimal((b / 1024 / 1024).toFixed(1), 1)} MB`;
+}

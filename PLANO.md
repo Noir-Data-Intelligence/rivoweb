@@ -1925,6 +1925,54 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 - **Testes:** 180 unitários; interface 5 cenários × 3 motores; suite inteira
   471, sem instáveis.
 
+### F10 — Portal do cliente, documentos e mensagens
+
+**Inventário** (2026-10-17, contra `727666d` e produção, só códigos e
+contagens): portal do cliente 200 com a conta Cliente (2 comprovativos, 1
+conversa de mensagens, 3 pedidos de suporte, 3 documentos partilhados, 12
+artigos, 2 ficheiros próprios); `/finance/payment-claims` 200 para Admin,
+Sales e Finance; `/documents` só Admin (60); conversas e base de
+conhecimento Admin e Sales (4 e 15); Manager e ProjectManager 403 em tudo.
+Os artigos são texto simples (sem HTML nem Markdown, 15 de 15): mostram-se
+como texto, sem `SafeHtml`. Os projectos do portal ficam na F12 (§5.13).
+
+**Pedidos:** **B32** (quem confirma um comprovativo não o vê: nem cliente,
+nem factura, nem ficheiro) e **B33** (o Sales não liga contas nem partilha
+documentos; nota de segurança sobre partilhar qualquer `documentId`).
+
+**Bloco 1 — portal do cliente** (2026-10-17, por publicar).
+- **Ecrãs:** `/cliente` (em dívida hoje, facturado no mês, facturas com
+  «Enviar comprovativo»), `/cliente/extracto` (período no URL),
+  `/cliente/pagamentos` (`?factura=` abre o envio), `/cliente/documentos`,
+  `/cliente/mensagens`, `/cliente/suporte` e `/cliente/suporte/:id`,
+  `/cliente/ajuda` (pesquisa e categoria no URL) e `/cliente/ajuda/:slug`.
+  Menu com os grupos «Contas» e «Apoio».
+- **Regras:** o resumo traz todas as facturas (o número do comprovativo sai
+  daí); o valor em aberto só o servidor o sabe (`ExceedsOutstanding`); o
+  ficheiro tem de ser do próprio (VULN-016) e carrega-se antes; uma conversa
+  de mensagens de cada vez; ticket com assunto até 200, mensagens até 4000,
+  notas até 500; só se avalia um ticket fechado, uma vez. **Abrir um artigo
+  conta uma visualização:** a página não volta a pedi-lo sozinha.
+- **Peças:** `formatarTamanho` passa para `lib/format/numero` (o portal do
+  colaborador usa-o); o antigo `InicioCliente` saiu.
+- **Revisão de segurança do bloco (§7.9):** S9 testado (nenhum pedido do
+  portal leva o id do cliente); S10 (sem HTML: artigos, mensagens e motivos
+  em texto; um artigo com `<img onerror>` aparece como texto e não corre,
+  testado); S16 (o `.exe` recusado no front; um executável com nome `.pdf`
+  recusado pelo servidor com 415 e o motivo no ecrã, na base local); S17
+  (descargas em anexo, sem pré-visualização); S19 (URLs só com ids, slugs e a
+  pesquisa); S21 (`useEscrita`); S13/S26 (zero violações de CSP nos
+  cenários); 429 do carregamento mostrado com o `detail`.
+- **Escritas:** verificadas **na base local** (`f10-cliente-escritas.spec.ts`,
+  à primeira): conta Cliente ligada a um cliente novo, factura emitida (só
+  local), documento partilhado e artigo publicado pela API; pela interface,
+  comprovativo de 50 000 Kz enviado (Pending no servidor), mensagem, pedido
+  aberto, respondido e fechado pela equipa e avaliado (5, recomendaria 9),
+  documento descarregado, voto «útil» (1 voto, 1 visualização), extracto.
+  **Nenhuma escrita em produção.**
+- **Testes:** 186 unitários; interface 7 cenários × 3 motores; suite inteira
+  491, sem instáveis.
+
 ### B29 e B30 resolvidos (compras, 2026-10-17)
 
 - **B29:** `requestedByName`, `departmentName` e `receivedByName` nas vistas;

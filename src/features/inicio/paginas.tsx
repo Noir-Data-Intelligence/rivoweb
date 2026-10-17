@@ -1,5 +1,5 @@
 /** Páginas iniciais de cada shell. Só dados reais; sem conteúdo de exemplo. */
-import { usePortalCliente, usePortalColaborador } from "@/features/identity/api";
+import { usePortalColaborador } from "@/features/identity/api";
 import { useUtilizador } from "@/features/identity/utilizador";
 import { ResumoPessoal } from "@/features/dashboard";
 import { ResumoPortal } from "@/features/portal";
@@ -30,10 +30,4 @@ export function InicioColaborador() {
       </div>
     </>
   );
-}
-
-export function InicioCliente() {
-  const { utilizador } = useUtilizador();
-  const portal = usePortalCliente();
-  return <PageHeader titulo={portal.data?.customerName ?? saudacao(utilizador.displayName, utilizador.email)} />;
 }

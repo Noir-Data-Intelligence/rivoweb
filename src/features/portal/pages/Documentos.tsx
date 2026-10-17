@@ -6,7 +6,7 @@
 import { Download, FileCheck } from "lucide-react";
 import { useState } from "react";
 import { formatarDataDeInstante } from "@/lib/format/data";
-import { formatarNumeroDecimal } from "@/lib/format/numero";
+import { formatarTamanho as tamanho } from "@/lib/format/numero";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Card } from "@/ui/Card";
@@ -15,13 +15,6 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useDescarregarDocumento, useEmitirDeclaracao, useMeusDocumentos, useMinhasDeclaracoes, type DocumentoPessoal, type ModeloDeclaracao } from "../api";
-
-function tamanho(bytes: number | string): string {
-  const b = Number(bytes);
-  if (b < 1024) return `${formatarNumeroDecimal(String(b), 0)} B`;
-  if (b < 1024 * 1024) return `${formatarNumeroDecimal((b / 1024).toFixed(0), 0)} KB`;
-  return `${formatarNumeroDecimal((b / 1024 / 1024).toFixed(1), 1)} MB`;
-}
 
 function Descarregar({ d, aoFalhar }: { d: DocumentoPessoal; aoFalhar: (e: unknown) => void }) {
   const doc = useDescarregarDocumento();

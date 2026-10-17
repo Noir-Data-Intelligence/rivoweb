@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeftRight, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { ArrowLeftRight, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -101,7 +101,15 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/eu/objectivos", titulo: "Objectivos e conquistas", icone: Target, requer: "autenticado", grupo: "Desenvolvimento" },
     { caminho: "/eu/bens", titulo: "Bens à minha guarda", icone: Laptop, requer: "autenticado", grupo: "Desenvolvimento" },
   ],
-  cliente: [{ caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true }],
+  cliente: [
+    { caminho: "/cliente", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
+    { caminho: "/cliente/extracto", titulo: "Extracto", icone: ScrollText, requer: "autenticado", grupo: "Contas" },
+    { caminho: "/cliente/pagamentos", titulo: "Pagamentos", icone: HandCoins, requer: "autenticado", grupo: "Contas" },
+    { caminho: "/cliente/documentos", titulo: "Documentos", icone: FolderOpen, requer: "autenticado", grupo: "Contas" },
+    { caminho: "/cliente/mensagens", titulo: "Mensagens", icone: MessageSquare, requer: "autenticado", grupo: "Apoio" },
+    { caminho: "/cliente/suporte", titulo: "Suporte", icone: LifeBuoy, requer: "autenticado", grupo: "Apoio" },
+    { caminho: "/cliente/ajuda", titulo: "Ajuda", icone: BookOpen, requer: "autenticado", grupo: "Apoio" },
+  ],
 };
 
 export const CONTA: Readonly<Record<Shell, string>> = {

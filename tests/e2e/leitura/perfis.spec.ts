@@ -33,7 +33,7 @@ const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
   AssetManager: ["Início", "Alertas", "Ordens de compra", "Recepções", "Artigos", "Armazéns", "Contagens", "Valorização do stock", "Activos fixos", "Fornecedores"],
   ProjectManager: ["Início"],
   Colaborador: ["Início", "Anúncios", "Assiduidade", "Férias e ausências", "Turnos", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda"],
-  Cliente: ["Início"],
+  Cliente: ["Início", "Extracto", "Pagamentos", "Documentos", "Mensagens", "Suporte", "Ajuda"],
 };
 
 /** Onde cada perfil entra (§3.3): os portais, apesar de `documents.write`. */

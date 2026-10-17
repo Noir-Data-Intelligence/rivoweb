@@ -75,6 +75,15 @@ export const rotas: RouteObject[] = [
             element: preguicoso(pagina("shellCliente")),
             children: [
               { index: true, element: preguicoso(pagina("inicioCliente")) },
+              // F10 — portal do cliente (§5.11).
+              { path: "extracto", element: preguicoso(pagina("extractoCliente")) },
+              { path: "pagamentos", element: preguicoso(pagina("pagamentosCliente")) },
+              { path: "documentos", element: preguicoso(pagina("documentosCliente")) },
+              { path: "mensagens", element: preguicoso(pagina("mensagensCliente")) },
+              { path: "suporte", element: preguicoso(pagina("suporteCliente")) },
+              { path: "suporte/:conversationId", element: preguicoso(pagina("pedidoSuporteCliente")) },
+              { path: "ajuda", element: preguicoso(pagina("ajudaCliente")) },
+              { path: "ajuda/:slug", element: preguicoso(pagina("artigoAjudaCliente")) },
               { path: "conta", element: preguicoso(pagina("minhaConta")) },
               { path: "notificacoes", element: preguicoso(pagina("notificacoes")) },
             ],

@@ -6,8 +6,9 @@
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
 > colaboradores; F8: salários — folhas de pagamento; F9: compras —
-> requisições, ordens de compra, recepções —, inventário e activos fixos) ·
-> actualizado a 2026-10-17.
+> requisições, ordens de compra, recepções —, inventário e activos fixos).
+> 1.º bloco da **F10** (portal do cliente) concluído e verificado na base
+> local, por publicar · actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -38,7 +39,7 @@ pronto a publicar quando o estado acima o diz). O
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
-| **Cliente** | Portal do cliente (`/cliente`) | Início |
+| **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Mensagens, Suporte, Ajuda |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
 perfil de gestão e ficha de colaborador vê também «O meu portal» no menu da
@@ -66,6 +67,14 @@ AM = AssetManager.
 | Indicadores de pessoas (com gráficos) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Indicadores de vendas (com gráficos) | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
 | Nome do cliente associado à conta | — | — | — | — | — | — | — | — | — | ✓ ² |
+| **Portal do cliente** (o próprio, pela conta) ² | | | | | | | | | | |
+| Em dívida hoje, facturado no mês e as facturas | — | — | — | — | — | — | — | — | — | ✓ |
+| Extracto de um período (facturas, notas de crédito, recibos, saldos) | — | — | — | — | — | — | — | — | — | ✓ |
+| Enviar o comprovativo de uma transferência (ficheiro carregado) e ver o estado de cada um | — | — | — | — | — | — | — | — | — | ✓ |
+| Descarregar os documentos partilhados e os ficheiros que carregou | — | — | — | — | — | — | — | — | — | ✓ |
+| Mensagens à equipa comercial (uma conversa de cada vez) | — | — | — | — | — | — | — | — | — | ✓ |
+| Pedidos de suporte: abrir, responder; avaliar um fechado | — | — | — | — | — | — | — | — | — | ✓ |
+| Ajuda: pesquisar e ler artigos; dizer se foi útil | — | — | — | — | — | — | — | — | — | ✓ |
 | Cargo actual (da ficha ligada) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Dashboard executivo** | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Aprovações** | | | | | | | | | | |
@@ -1101,8 +1110,31 @@ decide pela conta, nunca por um id escolhido no ecrã.
   para falar com os Recursos Humanos.
 
 ### Cliente
-Entra no **portal do cliente** (`/cliente`).
-- **Início:** nome do cliente associado.
+Entra no **portal do cliente** (`/cliente`). Tudo é do próprio cliente, pela
+conta; nenhum pedido diz de que cliente é.
+- **Início:** nome do cliente, o que está **em dívida hoje** (já descontados
+  recibos e notas de crédito), o **facturado este mês** (sem impostos) e todas
+  as facturas (número, data, estado, total), com «Enviar comprovativo» nas que
+  estão em vigor.
+- **Extracto:** facturas, notas de crédito e recibos de um período (por
+  omissão, do início do ano a hoje; o período fica no URL), com débito,
+  crédito e o saldo depois de cada movimento; saldo inicial e final.
+- **Pagamentos:** os comprovativos enviados (factura, data do pagamento, data
+  do envio, valor, estado — por confirmar, confirmado, rejeitado com o
+  motivo); **enviar um comprovativo**: factura em vigor, valor pago (até ao
+  que falta pagar, o servidor confere), data do pagamento (não futura),
+  ficheiro (PDF, imagem, documento de escritório ou texto, até 10 MB, até 20
+  por dia; o servidor confirma o tipo pelo conteúdo) e notas.
+- **Documentos:** os que a empresa partilhou (título, categoria, data,
+  tamanho) e os ficheiros que carregou; descarregar, sempre em anexo.
+- **Mensagens:** a conversa aberta com a equipa comercial e as anteriores;
+  escrever (se a equipa fechou a conversa, a mensagem abre outra).
+- **Suporte:** pedidos com assunto, vários abertos ao mesmo tempo; **abrir**
+  (assunto e descrição), **responder** enquanto está aberto; fechado pela
+  equipa, **avaliar** uma vez (1 a 5, se recomendaria de 0 a 10, comentário).
+- **Ajuda:** artigos publicados para clientes, com pesquisa e categoria;
+  ler um artigo (texto simples) e dizer se foi útil (um voto por conta, que
+  se pode mudar).
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem associação a um cliente, o portal explica-o e pede para falar com a
   empresa.
@@ -1117,7 +1149,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F10 | Portal do cliente, gestão documental e mensagens |
+| F10 | Gestão documental, mensagens e base de conhecimento (equipa), comprovativos (Finanças), contas e documentos partilhados nos clientes |
 | F11 | Comercial avançado (CRM, contratos) |
 | F12 | Projectos e frota |
 | F13 | Complementar (ESG, IA, base de conhecimento) |

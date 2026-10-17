@@ -1,8 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração) e
-> **B31** (activos).
+> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração),
+> **B31** (activos), **B32** e **B33** (portal do cliente).
 > **B29** e **B30** estão resolvidos (PR #108) e o front já os usa: nomes nas
 > requisições e recepções, departamentos em `/procurement/lookups`, linhas pela
 > ordem em que foram escritas. **B26** a **B28** estão resolvidos (PR #107,
@@ -249,3 +249,51 @@ os Recursos Humanos.
 **Pedido:** como o B22 e o B29, uma lista curta de colaboradores activos
 (id e nome) para quem tem `finance.assets.write`, por exemplo
 `GET /finance/assets/lookups`.
+
+## B32 — Quem confirma um comprovativo não o vê
+
+**Facto:** `GET /finance/payment-claims` (`finance.receipts.read`) devolve
+`PaymentClaimView` com `id`, `salesInvoiceId`, `amount`, `paidOn`, `status`,
+`rejectionReason` e `submittedAt`. Não traz o cliente, o número da factura, as
+notas do cliente nem o `documentId`. O ficheiro só se lê por
+`GET /documents/{documentId}` (`documents.read`), que o Finance não tem (lido
+em `/identity/me` de produção a 2026-10-17); o Sales também não. (Do lado do
+cliente não falta nada: `/customer-portal/me` traz todas as facturas, e o
+front tira daí o número.)
+
+**Consequência:** o Finance confirma (e com isso regista um recibo) ou rejeita
+um pagamento sem ver o comprovativo, sem saber de que cliente é e sem o número
+da factura. O front não deve oferecer «Confirmar» às cegas.
+
+**Pedido:** como o B20 e o B21 (comprovativos e anexos pelo contexto):
+1. Em `GET /finance/payment-claims`, `customerId`, `customerName`,
+   `invoiceNumber`, `notes` e o nome do ficheiro (`fileName`).
+2. `GET /finance/payment-claims/{claimId}/document` com `finance.receipts.read`,
+   sempre em anexo (`Content-Disposition: attachment`).
+
+## B33 — O Sales gere o portal do cliente, mas não liga contas nem partilha
+
+**Facto:** ligar uma conta (`POST /commercial/customers/{id}/account`) e
+partilhar um documento (`POST …/shared-documents`) pedem
+`commercial.customers.write`, que o Sales tem. Mas escolher a conta pede a
+lista de utilizadores (`identity.users.read`) e escolher o documento pede o
+arquivo (`documents.read`) ou carregar um novo (`documents.write`): o Sales
+não tem nenhuma das três (produção, 2026-10-17). Só o Admin faz as duas coisas.
+
+**Consequência:** o Sales vê a conta ligada, o histórico e os documentos
+partilhados, desliga e revoga, mas não liga nem partilha: o front explica
+porquê.
+
+**Pedido:**
+1. Uma lista curta das contas com o papel Cliente ainda sem cliente (id e
+   e-mail) para quem tem `commercial.customers.write`, por exemplo
+   `GET /commercial/customers/account-candidates`.
+2. Partilhar carregando o ficheiro no mesmo pedido (multipart em
+   `POST …/shared-documents`), ou `documents.write` para o Sales.
+
+**Nota de segurança:** hoje `ShareDocumentAsync` aceita qualquer `documentId`
+do arquivo (só confirma que existe). Quem tem `commercial.customers.write` e
+saiba um id pode partilhar com um cliente um ficheiro de outra área (um
+recibo de vencimento, o comprovativo de outro cliente). Sugere-se limitar aos
+documentos carregados para partilha (por exemplo, uma categoria própria) ou
+pedir também `documents.read`.
