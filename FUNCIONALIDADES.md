@@ -1,14 +1,13 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F8** publicadas em
+> **Estado:** fases **F0 a F9** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7: recursos humanos completos — portal do colaborador, RH do
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
-> colaboradores; F8: salários — folhas de pagamento) e o 1.º bloco da **F9**
-> (compras: requisições, ordens de compra, recepções) e o 2.º (inventário);
-> 3.º e último bloco da F9 (activos fixos) concluído e verificado na base
-> local, por publicar · actualizado a 2026-10-17.
+> colaboradores; F8: salários — folhas de pagamento; F9: compras —
+> requisições, ordens de compra, recepções —, inventário e activos fixos) ·
+> actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou

@@ -1901,7 +1901,8 @@ dois trabalhadores e passaram sozinhos: o perfil Admin já percorre ~70 páginas
 - **Testes:** 174 unitários; interface 5 cenários × 3 motores; suite inteira
   456, sem instáveis.
 
-**Bloco 3 — activos fixos** (2026-10-17, por publicar). Fecha a F9 no front.
+**Bloco 3 — activos fixos** (publicado a 2026-10-17, `ebb8db9`: CI verde,
+Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 - **Ecrãs:** `/activos` (vistas: activos — registar, correr amortização —,
   manutenção, custódia, seguros a caducar) e `/activos/:id` (plano,
   corrigir, abater; manutenção, custódia, seguros). Menu «Activos».
