@@ -5,7 +5,7 @@
  */
 import { hojeIso } from "@/lib/format/data";
 import { lerDinheiroDigitado } from "@/lib/money/money";
-import { normalizarTexto } from "@/lib/validation/normalizar";
+import { normalizarTexto, pareceEmail } from "@/lib/validation/normalizar";
 import { ibanValido } from "@/lib/validation/text";
 
 /** País com duas letras, nascimento não futuro, IBAN válido se mudou. */
@@ -78,3 +78,60 @@ export function validarFerias(p: { tipo: string; de: string; ate: string }): Err
   else if (!e.de && diasDeCalendario(p.de, p.ate) === null) e.ate = "O último dia não pode ser anterior ao primeiro.";
   return e;
 }
+
+// --- F7c: recrutamento, entradas e saídas (limites de `HrDbContext`)
+
+const ORDEM_FUNIL = ["Applied", "Screening", "Interview", "Offer"] as const;
+
+/** A etapa seguinte do funil, ou `null` na proposta (daí contrata-se) e nas finais. */
+export function proximaEtapa(etapa: string): string | null {
+  const i = ORDEM_FUNIL.indexOf(etapa as (typeof ORDEM_FUNIL)[number]);
+  return i >= 0 && i < ORDEM_FUNIL.length - 1 ? (ORDEM_FUNIL[i + 1] ?? null) : null;
+}
+
+export type ErrosVaga = { titulo?: string; vagas?: string; descricao?: string; requisitos?: string };
+
+export function errosVaga(p: { titulo: string; vagas: string; descricao: string; requisitos: string }): ErrosVaga {
+  const e: ErrosVaga = {};
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título da vaga.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  if (!/^\d{1,3}$/.test(p.vagas.trim()) || Number(p.vagas) < 1) e.vagas = "Pelo menos uma vaga (número inteiro).";
+  if (normalizarTexto(p.descricao, true).length > 2000) e.descricao = "No máximo 2000 caracteres.";
+  if (normalizarTexto(p.requisitos, true).length > 2000) e.requisitos = "No máximo 2000 caracteres.";
+  return e;
+}
+
+export type ErrosCandidato = { nome?: string; email?: string; telefone?: string; data?: string };
+
+export function errosCandidato(p: { nome: string; email: string; telefone: string; data: string }, hoje = hojeIso()): ErrosCandidato {
+  const e: ErrosCandidato = {};
+  const n = normalizarTexto(p.nome);
+  if (n === "") e.nome = "Indique o nome.";
+  else if (n.length > 200) e.nome = "No máximo 200 caracteres.";
+  const m = p.email.trim();
+  if (m !== "" && (!pareceEmail(m) || m.length > 320)) e.email = "E-mail inválido.";
+  if (p.telefone.trim().length > 30) e.telefone = "No máximo 30 caracteres.";
+  if (p.data !== "" && p.data > hoje) e.data = "A candidatura não pode ter data futura.";
+  return e;
+}
+
+export type TarefaRascunho = { titulo: string; categoria: string; prazo: string };
+export type ErrosProcesso = { colaborador?: string; ultimoDia?: string; motivo?: string; tarefas?: string; linhas: Record<number, string> };
+
+/** Um processo sem tarefas nunca se conclui e não há como lhas juntar depois: exige-se pelo menos uma. */
+export function errosProcesso(p: { colaborador: string; tipo: string; ultimoDia: string; motivo: string; tarefas: readonly TarefaRascunho[] }): ErrosProcesso {
+  const e: ErrosProcesso = { linhas: {} };
+  if (p.colaborador === "") e.colaborador = "Escolha o colaborador.";
+  if (p.tipo === "Offboarding" && p.ultimoDia === "") e.ultimoDia = "Uma saída exige o último dia de trabalho.";
+  if (normalizarTexto(p.motivo, true).length > 500) e.motivo = "No máximo 500 caracteres.";
+  const preenchidas = p.tarefas.filter((t) => normalizarTexto(t.titulo) !== "");
+  if (preenchidas.length === 0) e.tarefas = "Indique pelo menos uma tarefa: um processo sem tarefas não se conclui.";
+  p.tarefas.forEach((t, i) => {
+    if (normalizarTexto(t.titulo).length > 200) e.linhas[i] = "Título com mais de 200 caracteres.";
+    else if (normalizarTexto(t.titulo) === "" && t.prazo !== "") e.linhas[i] = "Falta o título desta tarefa.";
+  });
+  return e;
+}
+
+export const temErrosProcesso = (e: ErrosProcesso) => Boolean(e.colaborador || e.ultimoDia || e.motivo || e.tarefas) || Object.keys(e.linhas).length > 0;

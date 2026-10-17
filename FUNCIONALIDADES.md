@@ -3,7 +3,9 @@
 > **Estado:** fases **F0 a F6**, **F7a** e **F7b** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7a: portal do colaborador completo, já com retirar férias;
-> F7b: RH do dia-a-dia na gestão) · actualizado a 2026-10-16.
+> F7b: RH do dia-a-dia na gestão); **F7c** em curso — 1.º bloco
+> (recrutamento, entradas e saídas) concluído e verificado na base local, por
+> publicar · actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -25,9 +27,9 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
@@ -171,6 +173,10 @@ AM = AssetManager.
 | **Férias e ausências:** pedidos; pedir em nome, retirar, ver a decisão; saldos e direito por ano | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Benefícios:** catálogo (criar), adesões (aderir, cancelar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Validades de imigração:** documentos a caducar em 30 ou 90 dias, ou todos | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Recrutamento:** vagas (abrir, fechar) e candidatos de cada vaga | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Registar candidatos; avançar no funil um passo de cada vez; rejeitar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Contratar da proposta (cria a ficha, sem conta) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Entradas e saídas:** processos com tarefas; iniciar (com as tarefas); marcar tarefas feitas; concluir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -549,6 +555,25 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Passaportes, vistos e autorizações de trabalho a caducar nos próximos 30 ou
   90 dias (ou todos), com o prazo; os números só na ficha, mascarados.
 
+**Recrutamento**
+- Vagas com o departamento, o número de vagas e o estado; **abrir** (título,
+  departamento opcional, n.º de vagas, descrição e requisitos) e **fechar**
+  (deixa de aceitar candidaturas; quem está no funil continua).
+- Em cada vaga, os candidatos com o contacto, a data e a etapa; **registar**
+  candidato (nome, e-mail e telefone opcionais, data não futura; só com a vaga
+  aberta); **avançar** um passo de cada vez (Candidatura → Triagem →
+  Entrevista → Proposta); **rejeitar** em qualquer etapa; **contratar** da
+  proposta, com o departamento da vaga por omissão (cria a ficha de
+  colaborador, sem conta). O contratado leva à ficha e a **iniciar a entrada**.
+
+**Entradas e saídas**
+- Processos de entrada e de saída, filtrados por tipo e por colaborador, com o
+  último dia e o motivo (saídas), as tarefas por área (Recursos Humanos,
+  Informática, Bens e equipamento, Finanças), o prazo e quantas estão feitas.
+- **Iniciar** um processo com as tarefas (pelo menos uma: depois não se juntam
+  mais; uma saída exige o último dia); **marcar feita** cada tarefa (a
+  primeira põe-no em curso); **concluir** quando todas estiverem feitas.
+
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e
   responsável).
@@ -611,6 +636,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Organograma**, **Contratos**, **Assiduidade**, **Férias e ausências**,
 **Benefícios** e **Validades de imigração**
+- Tudo o que o Admin faz.
+
+**Recrutamento** e **Entradas e saídas**
 - Tudo o que o Admin faz.
 
 **Departamentos**
@@ -828,7 +856,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F7 | Resto do RH na gestão (recrutamento, admissões e saídas, anúncios, pedidos internos, formação, turnos, declarações, desempenho, conquistas, importação) |
+| F7c | Resto do RH na gestão (anúncios, pedidos internos, formação, turnos, declarações, desempenho, conquistas, importação) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |

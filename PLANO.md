@@ -1733,6 +1733,32 @@ desempenho, conquistas e importação.
 - API local passou a `64e6a8b`. Escritas F7 e F7b verificadas na base local
   (o pedido fica `Cancelled` no servidor); interface F7 30 testes × 3 motores.
 
+### F7c — resto do RH na gestão (estado)
+
+Em quatro blocos, cada um com commit e verificação: (1) recrutamento e
+entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
+(4) declarações, desempenho, conquistas e importação. Menu novo «Talento».
+
+**Bloco 1 — recrutamento, entradas e saídas** (2026-10-17, por publicar)
+- **Ecrãs:** `/recrutamento` (vagas), `/recrutamento/:openingId` (vaga e
+  funil; não há GET de uma vaga, lê-se da lista), `/entradas-saidas`
+  (processos em cartões, com as tarefas). Permissões: `hr.recruitment.*`,
+  `hr.lifecycle.*`; contratar exige `hr.employees.write`.
+- **Regras do domínio** levadas para o front: o funil avança um passo de cada
+  vez e contrata-se só da proposta; um processo recebe as tarefas ao começar
+  (não há rota para juntar depois) e sem tarefas nunca se conclui — por isso o
+  front exige pelo menos uma; uma saída exige o último dia.
+- **Leituras em produção** (HR, 2026-10-17): 6 vagas, 33 candidatos, 5
+  processos (200); Manager 403. Categorias de tarefa usadas: hr, it, assets,
+  finance. Dos candidatos só as contagens, sem nomes nem contactos.
+- **Escritas:** verificadas **na base local** (`f7c-escritas.spec.ts`, conta
+  Admin): vaga aberta, dois candidatos, um rejeitado e outro levado à proposta
+  e contratado (ficha criada no departamento da vaga), entrada iniciada a
+  partir da contratação com duas tarefas, ambas feitas, processo concluído,
+  vaga fechada; tudo conferido no servidor. **Nenhuma escrita em produção.**
+- **Testes:** 143 unitários; interface 6 cenários × 3 motores; suite inteira
+  360, sem instáveis.
+
 ### B20 a B23 resolvidos (finanças, 2026-10-16)
 
 - **B20:** o comprovativo abre por `GET /finance/expenses/{id}/receipt` e os

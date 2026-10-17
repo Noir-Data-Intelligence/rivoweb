@@ -60,6 +60,9 @@ export const REQUISITO_PAGINA = {
   "/ferias": "hr.leave.read",
   "/beneficios": "hr.benefits.read",
   "/imigracao": "hr.personal_data.read",
+  // F7c — recrutamento, entradas e saídas (§5.8).
+  "/recrutamento": "hr.recruitment.read",
+  "/entradas-saidas": "hr.lifecycle.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */

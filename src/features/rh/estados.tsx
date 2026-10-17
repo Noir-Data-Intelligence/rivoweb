@@ -79,3 +79,48 @@ export const EstadoCiclo = badge({
   Active: { texto: "Em curso", tom: "info" },
   Closed: { texto: "Fechado", tom: "neutro" },
 });
+
+// --- F7c: recrutamento, entradas e saídas
+
+/** Pela ordem do funil (`CandidateStage`): só se avança um passo de cada vez. */
+export const ETAPA_CANDIDATO: Readonly<Record<string, string>> = {
+  Applied: "Candidatura",
+  Screening: "Triagem",
+  Interview: "Entrevista",
+  Offer: "Proposta",
+  Hired: "Contratado",
+  Rejected: "Rejeitado",
+};
+
+export const EstadoCandidato = badge({
+  Applied: { texto: "Candidatura", tom: "neutro" },
+  Screening: { texto: "Triagem", tom: "info" },
+  Interview: { texto: "Entrevista", tom: "info" },
+  Offer: { texto: "Proposta", tom: "aviso" },
+  Hired: { texto: "Contratado", tom: "sucesso" },
+  Rejected: { texto: "Rejeitado", tom: "erro" },
+});
+
+export const EstadoVaga = badge({
+  Open: { texto: "Aberta", tom: "sucesso" },
+  Closed: { texto: "Fechada", tom: "neutro" },
+});
+
+export const TIPO_PROCESSO: Readonly<Record<string, string>> = {
+  Onboarding: "Entrada",
+  Offboarding: "Saída",
+};
+
+export const EstadoProcesso = badge({
+  Pending: { texto: "Por começar", tom: "neutro" },
+  InProgress: { texto: "Em curso", tom: "info" },
+  Completed: { texto: "Concluído", tom: "sucesso" },
+});
+
+/** Texto livre no servidor; estas são as que a base usa. Outra aparece tal como vem. */
+export const CATEGORIA_TAREFA: Readonly<Record<string, string>> = {
+  hr: "Recursos Humanos",
+  it: "Informática",
+  assets: "Bens e equipamento",
+  finance: "Finanças",
+};
