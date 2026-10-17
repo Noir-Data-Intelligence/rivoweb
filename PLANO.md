@@ -1841,10 +1841,13 @@ F7c e a F7 no front.
 
 ### F8 — Salários (estado)
 
-**Concluída e verificada na base local a 2026-10-17, por publicar.**
+**Publicada a 2026-10-17** (`5763d7d`: CI verde, Vercel, smoke de produção
+10/10).
 - **Trave do ADR-049:** aceite a 2026-09-04 (parecer fiscal profissional
-  confirmou os valores implementados, sem alterações). O plano pede
-  confirmação do utilizador antes de publicar: pedida com o push.
+  confirmou os valores implementados, sem alterações). O utilizador confirmou
+  a 2026-10-17: «sim, pode dar a F8 por publicável».
+- **CI:** a primeira corrida falhou por tempo (51 instáveis, 2 falhas em F3 e
+  F6, que passaram 6/6 localmente); repetido o job, passou 420/420 em 11 min.
 - **Ecrãs:** `/salarios` (folhas, abrir) e `/salarios/:runId` (totais, itens,
   juntar, submeter, ver decisão, recibos). Menu «Salários › Folhas de
   pagamento». Só o Admin e o HR têm `payroll.runs.*` (lido em produção).
