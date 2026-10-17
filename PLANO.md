@@ -1760,7 +1760,8 @@ entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
 - **Testes:** 143 unitários; interface 6 cenários × 3 motores; suite inteira
   360, sem instáveis.
 
-**Bloco 2 — anúncios e pedidos internos** (2026-10-17, por publicar)
+**Bloco 2 — anúncios e pedidos internos** (publicado a 2026-10-17,
+`8d60836`: CI verde, Vercel, smoke de produção 10/10)
 - **Ecrãs:** `/anuncios` (gestão; `hr.announcements.write`), `/pedidos-internos`
   (fila e, em `?vista=prazos`, o SLA; `hr.tickets.read`) e
   `/pedidos-internos/:ticketId`. Menu novo «Serviços».
@@ -1783,6 +1784,30 @@ entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
   mudado e reposto no fim. **Nenhuma escrita em produção.**
 - **Testes:** 148 unitários; interface 5 cenários × 3 motores; suite inteira
   375, sem instáveis.
+
+**Bloco 3 — formação e turnos** (2026-10-17, por publicar)
+- **Ecrãs:** `/formacao` e `/formacao/:courseId` (não há GET de uma formação:
+  lê-se da lista com as canceladas); `/turnos` com três vistas — escala
+  (janela no URL, por omissão 7 dias, máximo 94), pedidos de troca (por
+  decidir por omissão) e tipos de turno. «Formação» no grupo Talento, «Turnos»
+  em Pessoas. Permissões `hr.training.*` e `hr.shifts.*`.
+- **Factos:** escalar substitui o turno do dia (a resposta traz
+  `replacedAssignmentId`, e o ecrã diz quantos foram substituídos); aprovar uma
+  troca passa o turno ao colega ou liberta-o; horas `HH:mm:ss`; custo e horas
+  em texto (`paraApi`, `decimalParaApi`).
+- **Leituras em produção** (HR, 2026-10-17): 10 formações, 74 inscrições, 4
+  tipos de turno (Manhã, Administrativo, Tarde, Noite), pelo menos 200 turnos
+  nos próximos 30 dias, nenhum pedido de troca (200); Manager 403.
+- **Escritas:** verificadas **na base local** (`f7c-tempo-escritas.spec.ts`):
+  formação com lotação 1 (inscrição, lotada, concluída com avaliação 87,5 e
+  certificado com validade), outra com inscrição e formação canceladas; tipo de
+  turno criado e corrigido (desactivado no fim); escala de dois dias, um
+  substituído e outro tirado; troca pedida pelo portal (conta Colaborador
+  local, pela API) e aprovada pela interface — o turno passou ao colega.
+  **Nenhuma escrita em produção.**
+- **Testes:** 152 unitários; interface 6 cenários × 3 motores; suite inteira
+  393 (uma corrida com um timeout de carga no webkit, que passou isolado 5× e
+  na segunda corrida inteira do webkit).
 
 ### B20 a B23 resolvidos (finanças, 2026-10-16)
 

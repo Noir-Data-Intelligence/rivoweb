@@ -4,7 +4,7 @@
  * servidor decide sempre; isto só evita um pedido que se sabe recusado.
  */
 import { hojeIso } from "@/lib/format/data";
-import { lerDinheiroDigitado } from "@/lib/money/money";
+import { lerDecimalDigitado, lerDinheiroDigitado } from "@/lib/money/money";
 import { normalizarTexto, pareceEmail } from "@/lib/validation/normalizar";
 import { ibanValido } from "@/lib/validation/text";
 
@@ -190,4 +190,77 @@ export const MAXIMO_MENSAGEM_PEDIDO = 4000;
 export function erroMensagem(texto: string): string | undefined {
   const t = normalizarTexto(texto, true);
   return t === "" ? "Escreva a mensagem." : t.length > MAXIMO_MENSAGEM_PEDIDO ? `No máximo ${MAXIMO_MENSAGEM_PEDIDO} caracteres.` : undefined;
+}
+
+// --- F7c: formação e turnos (regras de `Workplace.cs` e `ManageWorkplace.cs`)
+
+export type ErrosCurso = { titulo?: string; inicio?: string; fim?: string; horas?: string; custo?: string; lotacao?: string; validade?: string };
+
+const inteiroPositivo = (t: string, max: number) => /^\d{1,6}$/.test(t.trim()) && Number(t) >= 1 && Number(t) <= max;
+
+export function errosCurso(p: { titulo: string; inicio: string; fim: string; horas: string; custo: string; lotacao: string; validade: string }): ErrosCurso {
+  const e: ErrosCurso = {};
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  if (p.inicio === "") e.inicio = "Indique o início.";
+  if (p.fim !== "" && p.inicio !== "" && p.fim < p.inicio) e.fim = "A formação não pode acabar antes de começar.";
+  if (p.horas.trim() !== "") {
+    const h = lerDecimalDigitado(p.horas, 2);
+    if (h === null || h.lte(0)) e.horas = "Horas positivas (até 2 casas decimais).";
+  }
+  if (p.custo.trim() !== "") {
+    const c = lerDinheiroDigitado(p.custo);
+    if (c === null || c.lt(0)) e.custo = "Valor inválido (até 2 casas decimais, não negativo).";
+  }
+  if (p.lotacao.trim() !== "" && !inteiroPositivo(p.lotacao, 100000)) e.lotacao = "Pelo menos uma vaga (número inteiro).";
+  if (p.validade.trim() !== "" && !inteiroPositivo(p.validade, 240)) e.validade = "De 1 a 240 meses.";
+  return e;
+}
+
+export function errosConclusao(p: { data: string; avaliacao: string; certificado: string }, hoje = hojeIso()): { data?: string; avaliacao?: string; certificado?: string } {
+  const e: { data?: string; avaliacao?: string; certificado?: string } = {};
+  if (p.data !== "" && p.data > hoje) e.data = "A conclusão não pode ser futura.";
+  if (p.avaliacao.trim() !== "") {
+    const a = lerDecimalDigitado(p.avaliacao, 2);
+    if (a === null || a.lt(0) || a.gt(100)) e.avaliacao = "A avaliação é de 0 a 100.";
+  }
+  if (p.certificado.trim().length > 60) e.certificado = "No máximo 60 caracteres.";
+  return e;
+}
+
+/** `HH:mm` (do campo) para `HH:mm:00` (TimeOnly da API); e o inverso. */
+export const horaParaApi = (h: string) => (/^\d{2}:\d{2}$/.test(h) ? `${h}:00` : h);
+export const horaDaApi = (h: string) => h.slice(0, 5);
+
+export function errosTipoTurno(p: { codigo: string; nome: string; inicio: string; fim: string; novo: boolean }): { codigo?: string; nome?: string; fim?: string; inicio?: string } {
+  const e: { codigo?: string; nome?: string; fim?: string; inicio?: string } = {};
+  const c = normalizarTexto(p.codigo);
+  if (p.novo && c === "") e.codigo = "Indique o código.";
+  else if (c.length > 20) e.codigo = "No máximo 20 caracteres.";
+  const n = normalizarTexto(p.nome);
+  if (n === "") e.nome = "Indique o nome.";
+  else if (n.length > 100) e.nome = "No máximo 100 caracteres.";
+  if (!/^\d{2}:\d{2}$/.test(p.inicio)) e.inicio = "Indique a hora de início.";
+  if (!/^\d{2}:\d{2}$/.test(p.fim)) e.fim = "Indique a hora de fim.";
+  else if (p.inicio === p.fim) e.fim = "Início e fim do turno não podem coincidir.";
+  return e;
+}
+
+/** Fim antes do início passa a meia-noite (turno da noite). */
+export const passaMeiaNoite = (inicio: string, fim: string) => fim < inicio;
+
+export const MAXIMO_DIAS_ESCALA = 94;
+
+export function errosEscala(p: { colaborador: string; tipo: string; de: string; ate: string }): { colaborador?: string; tipo?: string; de?: string; ate?: string } {
+  const e: { colaborador?: string; tipo?: string; de?: string; ate?: string } = {};
+  if (p.colaborador === "") e.colaborador = "Escolha o colaborador.";
+  if (p.tipo === "") e.tipo = "Escolha o turno.";
+  if (p.de === "") e.de = "Indique o primeiro dia.";
+  else if (p.ate !== "") {
+    const d = diasDeCalendario(p.de, p.ate);
+    if (d === null) e.ate = "O último dia não pode ser anterior ao primeiro.";
+    else if (d > MAXIMO_DIAS_ESCALA) e.ate = `No máximo ${MAXIMO_DIAS_ESCALA} dias de cada vez.`;
+  }
+  return e;
 }

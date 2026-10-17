@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { erroMensagem, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
+import { erroMensagem, errosConclusao, errosCurso, errosEscala, errosTipoTurno, horaDaApi, horaParaApi, passaMeiaNoite, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
 
 describe("funil de recrutamento", () => {
   it("avança um passo de cada vez; da proposta contrata-se, não se avança", () => {
@@ -102,5 +102,55 @@ describe("prazos dos pedidos (SLA)", () => {
     expect(erroMensagem(" ")).toBe("Escreva a mensagem.");
     expect(erroMensagem("x".repeat(4001))).toBe("No máximo 4000 caracteres.");
     expect(erroMensagem("Olá")).toBeUndefined();
+  });
+});
+
+describe("formação", () => {
+  const base = { titulo: "Primeiros socorros", inicio: "2026-11-02", fim: "", horas: "", custo: "", lotacao: "", validade: "" };
+  it("título e início obrigatórios; fim não antes do início; números positivos", () => {
+    expect(errosCurso(base)).toEqual({});
+    expect(errosCurso({ ...base, horas: "7,5", custo: "150 000,00", lotacao: "12", validade: "24", fim: "2026-11-03" })).toEqual({});
+    expect(errosCurso({ titulo: " ", inicio: "", fim: "", horas: "0", custo: "-1", lotacao: "0", validade: "241" })).toEqual({
+      titulo: "Indique o título.",
+      inicio: "Indique o início.",
+      horas: "Horas positivas (até 2 casas decimais).",
+      custo: "Valor inválido (até 2 casas decimais, não negativo).",
+      lotacao: "Pelo menos uma vaga (número inteiro).",
+      validade: "De 1 a 240 meses.",
+    });
+    expect(errosCurso({ ...base, fim: "2026-11-01" }).fim).toBe("A formação não pode acabar antes de começar.");
+  });
+  it("conclusão: data não futura, avaliação de 0 a 100", () => {
+    const hoje = "2026-10-17";
+    expect(errosConclusao({ data: hoje, avaliacao: "87,5", certificado: "" }, hoje)).toEqual({});
+    expect(errosConclusao({ data: "2026-10-18", avaliacao: "101", certificado: "x".repeat(61) }, hoje)).toEqual({
+      data: "A conclusão não pode ser futura.",
+      avaliacao: "A avaliação é de 0 a 100.",
+      certificado: "No máximo 60 caracteres.",
+    });
+  });
+});
+
+describe("turnos", () => {
+  it("tipo: código só ao criar; início e fim diferentes; noite passa a meia-noite", () => {
+    expect(errosTipoTurno({ codigo: "N", nome: "Noite", inicio: "22:00", fim: "06:00", novo: true })).toEqual({});
+    expect(passaMeiaNoite("22:00", "06:00")).toBe(true);
+    expect(passaMeiaNoite("08:00", "17:00")).toBe(false);
+    expect(errosTipoTurno({ codigo: "", nome: "", inicio: "08:00", fim: "08:00", novo: true })).toEqual({
+      codigo: "Indique o código.",
+      nome: "Indique o nome.",
+      fim: "Início e fim do turno não podem coincidir.",
+    });
+    expect(errosTipoTurno({ codigo: "", nome: "Tarde", inicio: "14:00", fim: "22:00", novo: false })).toEqual({});
+    expect(horaParaApi("06:00")).toBe("06:00:00");
+    expect(horaDaApi("22:00:00")).toBe("22:00");
+  });
+  it("escala: de 1 a 94 dias", () => {
+    const b = { colaborador: "x", tipo: "y", de: "2026-11-01" };
+    expect(errosEscala({ ...b, ate: "" })).toEqual({});
+    expect(errosEscala({ ...b, ate: "2027-02-02" })).toEqual({});
+    expect(errosEscala({ ...b, ate: "2027-02-03" }).ate).toBe("No máximo 94 dias de cada vez.");
+    expect(errosEscala({ ...b, ate: "2026-10-31" }).ate).toBe("O último dia não pode ser anterior ao primeiro.");
+    expect(errosEscala({ colaborador: "", tipo: "", de: "", ate: "" })).toEqual({ colaborador: "Escolha o colaborador.", tipo: "Escolha o turno.", de: "Indique o primeiro dia." });
   });
 });

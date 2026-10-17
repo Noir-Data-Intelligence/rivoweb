@@ -3,9 +3,10 @@
 > **Estado:** fases **F0 a F6**, **F7a** e **F7b** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7a: portal do colaborador completo, já com retirar férias;
-> F7b: RH do dia-a-dia na gestão) e o 1.º bloco da **F7c** (recrutamento,
-> entradas e saídas); 2.º bloco da F7c (anúncios e pedidos internos) concluído
-> e verificado na base local, por publicar · actualizado a 2026-10-17.
+> F7b: RH do dia-a-dia na gestão) e os blocos 1 e 2 da **F7c** (recrutamento,
+> entradas e saídas; anúncios e pedidos internos); 3.º bloco da F7c (formação
+> e turnos) concluído e verificado na base local, por publicar · actualizado a
+> 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -27,9 +28,9 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Anúncios, Pedidos internos |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
@@ -181,6 +182,8 @@ AM = AssetManager.
 | **Pedidos internos:** fila com filtros e prazos fora; abrir em nome de um colaborador | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Pedido: conversa, responder, atribuir, mudar o estado (fechar com confirmação) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Prazos de resposta e resolução por categoria (SLA): ver e definir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Formação:** formações (planear, corrigir, cancelar); inscrever; concluir com avaliação e certificado; cancelar inscrição | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Turnos:** escala por período (escalar, tirar); decidir pedidos de troca; tipos de turno (criar, corrigir, desactivar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -603,6 +606,30 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Prazos (SLA):** por categoria, em horas, para responder e para resolver;
   **definir** (positivos; a resolução não mais curta do que a resposta).
 
+**Formação**
+- Formações com a entidade, as datas, as horas, o custo, os inscritos (e a
+  lotação), as concluídas e o estado; as canceladas só a pedido.
+- **Planear** e **corrigir** (título, entidade, início e fim, horas, custo e
+  moeda, lotação, validade do certificado em meses, descrição); **cancelar**
+  (deixa de aceitar inscrições; não se desfaz).
+- Em cada formação, as inscrições com o estado, a data de conclusão, a
+  avaliação e o certificado (n.º e validade); **inscrever** um colaborador
+  (recusado se lotada, cancelada ou já inscrito); **concluir** (data, avaliação
+  de 0 a 100, n.º do certificado, notas — a validade conta desde a conclusão);
+  **cancelar** a inscrição.
+
+**Turnos**
+- **Escala** de um período (por omissão os próximos 7 dias; no máximo 94), por
+  departamento ou colaborador: dia, pessoa, turno, horário (o da noite acaba no
+  dia seguinte) e notas; **escalar** um colaborador num turno de um dia até 94
+  (nos dias em que já tinha turno, o novo substitui o anterior, e o ecrã diz
+  quantos); **tirar** da escala.
+- **Pedidos de troca** (por decidir por omissão, ou por estado): quem pede, o
+  motivo e quem fica com o turno; **aprovar** (o turno passa ao colega
+  proposto, ou fica livre se não houver) ou **recusar**, com notas.
+- **Tipos de turno:** código, nome, horário e estado; **criar** (código único,
+  em maiúsculas) e **corrigir** (nome, horas, activo; o código não muda).
+
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e
   responsável).
@@ -667,7 +694,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Benefícios** e **Validades de imigração**
 - Tudo o que o Admin faz.
 
-**Recrutamento**, **Entradas e saídas**, **Anúncios** e **Pedidos internos**
+**Recrutamento**, **Entradas e saídas**, **Formação**, **Turnos**, **Anúncios**
+e **Pedidos internos**
 - Tudo o que o Admin faz.
 
 **Departamentos**
@@ -885,7 +913,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F7c | Resto do RH na gestão (formação, turnos, declarações, desempenho, conquistas, importação) |
+| F7c | Resto do RH na gestão (declarações, desempenho, conquistas, importação) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |

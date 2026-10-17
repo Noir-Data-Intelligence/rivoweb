@@ -98,3 +98,39 @@ export const politicasSla = (): S["TicketSlaPolicyView"][] => [
   { category: "HumanResources", responseMinutes: 240, resolutionMinutes: 2880 },
   { category: "It", responseMinutes: 60, resolutionMinutes: 480 },
 ];
+
+// --- Bloco 3: formação e turnos
+
+export const IDF7C3 = {
+  curso: "00000000-0000-4000-8000-000000000941",
+  cancelado: "00000000-0000-4000-8000-000000000942",
+  inscricao: "00000000-0000-4000-8000-000000000943",
+  concluida: "00000000-0000-4000-8000-000000000944",
+  manha: "00000000-0000-4000-8000-000000000945",
+  noite: "00000000-0000-4000-8000-000000000946",
+  escalado: "00000000-0000-4000-8000-000000000947",
+  troca: "00000000-0000-4000-8000-000000000948",
+} as const;
+
+export const cursos = (inscritos = 1, cancelado = false): S["TrainingCourseView"][] => [
+  { courseId: IDF7C3.curso, title: "Primeiros socorros", provider: "Cruz Vermelha Teste", description: "Curso prático.", startsOn: "2026-11-02", endsOn: "2026-11-03", hours: 16, cost: 150000, currency: "AOA", capacity: 2, cancelled: cancelado, enrolled: inscritos, completed: 1, certificateValidityMonths: 24 },
+  { courseId: IDF7C3.cancelado, title: "Excel avançado", provider: null, description: null, startsOn: "2026-09-01", endsOn: null, hours: null, cost: null, currency: null, capacity: null, cancelled: true, enrolled: 0, completed: 0, certificateValidityMonths: null },
+];
+
+export const inscricoesGestao = (estado = "Enrolled"): S["TrainingEnrolmentView"][] => [
+  { enrolmentId: IDF7C3.inscricao, courseId: IDF7C3.curso, employeeId: ID.emp2, status: estado, completedOn: estado === "Completed" ? "2026-10-17" : null, score: estado === "Completed" ? 87.5 : null, notes: null, certificateNumber: estado === "Completed" ? "PS-001" : null, certificateExpiresOn: estado === "Completed" ? "2028-10-17" : null },
+  { enrolmentId: IDF7C3.concluida, courseId: IDF7C3.curso, employeeId: ID.emp1, status: "Completed", completedOn: "2026-10-03", score: 92, notes: null, certificateNumber: "PS-000", certificateExpiresOn: "2028-10-03" },
+];
+
+export const tiposTurno = (): S["ShiftTypeView"][] => [
+  { shiftTypeId: IDF7C3.manha, code: "M", name: "Manhã", startsAt: "06:00:00", endsAt: "14:00:00", crossesMidnight: false, active: true },
+  { shiftTypeId: IDF7C3.noite, code: "N", name: "Noite", startsAt: "22:00:00", endsAt: "06:00:00", crossesMidnight: true, active: true },
+];
+
+export const escala = (dia: string): S["ShiftAssignmentView"][] => [
+  { assignmentId: IDF7C3.escalado, employeeId: ID.emp2, employeeName: "Carlos Teste", departmentId: ID.dep1, shiftTypeId: IDF7C3.noite, shiftCode: "N", shiftName: "Noite", day: dia, startsAt: "22:00:00", endsAt: "06:00:00", notes: null },
+];
+
+export const trocasGestao = (dia: string, estado = "Pending"): S["ShiftChangeView"][] => [
+  { requestId: IDF7C3.troca, assignmentId: IDF7C3.escalado, day: dia, requesterEmployeeId: ID.emp2, requesterName: "Carlos Teste", proposedEmployeeId: ID.emp1, proposedName: "Ana Teste", reason: "Consulta médica.", status: estado, requestedAt: "2026-10-16T10:00:00+00:00", decidedAt: estado === "Pending" ? null : "2026-10-17T10:00:00+00:00", decisionNotes: null },
+];
