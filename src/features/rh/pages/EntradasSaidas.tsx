@@ -291,15 +291,13 @@ export default function EntradasSaidas() {
           <Select
             id={idTipo}
             value={tipo ?? ""}
-            onChange={(e) =>
-              setParams((a) => {
-                const n = new URLSearchParams(a);
-                if (e.target.value === "") n.delete("tipo");
-                else n.set("tipo", e.target.value);
-                n.delete("pagina");
-                return n;
-              })
-            }
+            onChange={(e) => {
+              const n = new URLSearchParams(window.location.search);
+              if (e.target.value === "") n.delete("tipo");
+              else n.set("tipo", e.target.value);
+              n.delete("pagina");
+              setParams(n);
+            }}
           >
             <option value="">Todos</option>
             <option value="Onboarding">Entradas</option>

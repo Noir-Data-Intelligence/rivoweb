@@ -41,14 +41,14 @@ export function useFiltroColaborador() {
   const [params, setParams] = useSearchParams();
   const v = params.get("colaborador") ?? "";
   const colaborador = uuid.safeParse(v).success ? v : null;
-  const mudar = (id: string) =>
-    setParams((a) => {
-      const n = new URLSearchParams(a);
-      if (id) n.set("colaborador", id);
-      else n.delete("colaborador");
-      n.delete("pagina");
-      return n;
-    });
+  // Do URL actual, não do último render: com outro filtro mudado logo antes, nenhum se perde (as navegações vão em transição).
+  const mudar = (id: string) => {
+    const n = new URLSearchParams(window.location.search);
+    if (id) n.set("colaborador", id);
+    else n.delete("colaborador");
+    n.delete("pagina");
+    setParams(n);
+  };
   return { colaborador, mudar };
 }
 

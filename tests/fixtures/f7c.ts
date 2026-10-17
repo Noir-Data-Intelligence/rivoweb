@@ -54,3 +54,47 @@ export const processos = (feita2 = false, estado = "InProgress"): S["LifecyclePr
     ],
   },
 ];
+
+// --- Bloco 2: anúncios e pedidos internos
+
+export const IDF7C2 = {
+  anuncio: "00000000-0000-4000-8000-000000000921",
+  agendado: "00000000-0000-4000-8000-000000000922",
+  arquivado: "00000000-0000-4000-8000-000000000923",
+  pedido: "00000000-0000-4000-8000-000000000924",
+  fechado: "00000000-0000-4000-8000-000000000925",
+} as const;
+
+export const anunciosGestao = (): S["AnnouncementView"][] => [
+  { announcementId: IDF7C2.anuncio, title: "Encerramento para inventário", body: "Dia 31 o armazém fecha às 14h.", departmentId: ID.dep1, pinned: true, publishedAt: "2026-10-01T08:00:00+01:00", expiresAt: null, archived: false, visible: true, authorUserId: null },
+  { announcementId: IDF7C2.agendado, title: "Formação de segurança", body: "Inscrições em Novembro.", departmentId: null, pinned: false, publishedAt: "2099-01-01T00:00:00+01:00", expiresAt: null, archived: false, visible: false, authorUserId: null },
+  { announcementId: IDF7C2.arquivado, title: "Aviso antigo", body: "Já não se aplica.", departmentId: null, pinned: false, publishedAt: "2026-01-01T00:00:00+01:00", expiresAt: null, archived: true, visible: false, authorUserId: null },
+];
+
+const sla = (quebrada: boolean): S["TicketSla"] => ({ responseDueAt: "2026-10-15T13:00:00+00:00", resolutionDueAt: "2026-10-17T09:00:00+00:00", firstResponseAt: quebrada ? null : "2026-10-15T10:00:00+00:00", responseBreached: quebrada, resolutionBreached: false });
+
+export const pedidosGestao = (estado = "Open", comResposta = false): S["TicketView"][] => [
+  {
+    ticketId: IDF7C2.pedido,
+    subject: "Declaração de rendimentos",
+    category: "DocumentRequest",
+    priority: "High",
+    status: estado,
+    requesterEmployeeId: ID.emp2,
+    assigneeEmployeeId: estado === "Open" ? null : ID.emp1,
+    openedAt: "2026-10-15T09:00:00+00:00",
+    resolvedAt: estado === "Resolved" || estado === "Closed" ? "2026-10-17T08:00:00+00:00" : null,
+    messageCount: comResposta ? 2 : 1,
+    messages: [
+      { messageId: "00000000-0000-4000-8000-000000000926", authorUserId: null, fromRequester: true, body: "Preciso para o banco.", sentAt: "2026-10-15T09:00:00+00:00" },
+      ...(comResposta ? [{ messageId: "00000000-0000-4000-8000-000000000927", authorUserId: null, fromRequester: false, body: "Fica pronta amanhã.", sentAt: "2026-10-17T10:00:00+00:00" }] : []),
+    ],
+    sla: sla(!comResposta),
+  },
+  { ticketId: IDF7C2.fechado, subject: "Cadeira partida", category: "Facilities", priority: "Low", status: "Closed", requesterEmployeeId: ID.emp1, assigneeEmployeeId: null, openedAt: "2026-10-01T09:00:00+00:00", resolvedAt: "2026-10-02T09:00:00+00:00", messageCount: 1, messages: null, sla: null },
+];
+
+export const politicasSla = (): S["TicketSlaPolicyView"][] => [
+  { category: "HumanResources", responseMinutes: 240, resolutionMinutes: 2880 },
+  { category: "It", responseMinutes: 60, resolutionMinutes: 480 },
+];

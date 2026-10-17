@@ -135,3 +135,59 @@ export function errosProcesso(p: { colaborador: string; tipo: string; ultimoDia:
 }
 
 export const temErrosProcesso = (e: ErrosProcesso) => Boolean(e.colaborador || e.ultimoDia || e.motivo || e.tarefas) || Object.keys(e.linhas).length > 0;
+
+// --- F7c: anúncios e pedidos internos (limites de `HrDbContext`)
+
+export type ErrosAnuncio = { titulo?: string; texto?: string; expira?: string };
+
+/** Datas ao dia (Luanda); publicar vazio é «agora». Expira depois de publicado. */
+export function errosAnuncio(p: { titulo: string; texto: string; publica: string; expira: string }, hoje = hojeIso()): ErrosAnuncio {
+  const e: ErrosAnuncio = {};
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  const x = normalizarTexto(p.texto, true);
+  if (x === "") e.texto = "Escreva o texto do anúncio.";
+  else if (x.length > 8000) e.texto = "No máximo 8000 caracteres.";
+  if (p.expira !== "" && p.expira <= (p.publica === "" ? hoje : p.publica)) e.expira = "Tem de expirar depois do dia de publicação.";
+  return e;
+}
+
+export type FaseAnuncio = "arquivado" | "agendado" | "expirado" | "em-vigor";
+
+export function faseAnuncio(a: { archived: boolean; publishedAt: string; expiresAt: string | null }, agora = new Date()): FaseAnuncio {
+  if (a.archived) return "arquivado";
+  if (new Date(a.publishedAt) > agora) return "agendado";
+  if (a.expiresAt && new Date(a.expiresAt) <= agora) return "expirado";
+  return "em-vigor";
+}
+
+/** Horas (até 2 casas) em minutos inteiros; `null` se inválido ou não positivo. */
+export function horasParaMinutos(texto: string): number | null {
+  const t = texto.trim().replace(",", ".");
+  if (!/^\d{1,4}(\.\d{1,2})?$/.test(t)) return null;
+  const m = Math.round(Number(t) * 60 * 100) / 100;
+  return Number.isInteger(m) && m > 0 ? m : null;
+}
+
+export function minutosParaHoras(min: number | string): string {
+  const h = Number(min) / 60;
+  return (Number.isInteger(h) ? String(h) : h.toFixed(2).replace(/0+$/, "")).replace(".", ",");
+}
+
+export function errosSla(resposta: string, resolucao: string): { resposta?: string; resolucao?: string } {
+  const r = horasParaMinutos(resposta);
+  const s = horasParaMinutos(resolucao);
+  const e: { resposta?: string; resolucao?: string } = {};
+  if (r === null) e.resposta = "Horas positivas (até 2 casas; em minutos inteiros).";
+  if (s === null) e.resolucao = "Horas positivas (até 2 casas; em minutos inteiros).";
+  else if (r !== null && s < r) e.resolucao = "A resolução não pode ter prazo mais curto do que a resposta.";
+  return e;
+}
+
+export const MAXIMO_MENSAGEM_PEDIDO = 4000;
+
+export function erroMensagem(texto: string): string | undefined {
+  const t = normalizarTexto(texto, true);
+  return t === "" ? "Escreva a mensagem." : t.length > MAXIMO_MENSAGEM_PEDIDO ? `No máximo ${MAXIMO_MENSAGEM_PEDIDO} caracteres.` : undefined;
+}

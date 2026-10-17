@@ -1739,7 +1739,8 @@ Em quatro blocos, cada um com commit e verificação: (1) recrutamento e
 entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
 (4) declarações, desempenho, conquistas e importação. Menu novo «Talento».
 
-**Bloco 1 — recrutamento, entradas e saídas** (2026-10-17, por publicar)
+**Bloco 1 — recrutamento, entradas e saídas** (publicado a 2026-10-17,
+`f98a251`: CI verde, Vercel, smoke de produção 10/10)
 - **Ecrãs:** `/recrutamento` (vagas), `/recrutamento/:openingId` (vaga e
   funil; não há GET de uma vaga, lê-se da lista), `/entradas-saidas`
   (processos em cartões, com as tarefas). Permissões: `hr.recruitment.*`,
@@ -1758,6 +1759,30 @@ entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
   vaga fechada; tudo conferido no servidor. **Nenhuma escrita em produção.**
 - **Testes:** 143 unitários; interface 6 cenários × 3 motores; suite inteira
   360, sem instáveis.
+
+**Bloco 2 — anúncios e pedidos internos** (2026-10-17, por publicar)
+- **Ecrãs:** `/anuncios` (gestão; `hr.announcements.write`), `/pedidos-internos`
+  (fila e, em `?vista=prazos`, o SLA; `hr.tickets.read`) e
+  `/pedidos-internos/:ticketId`. Menu novo «Serviços».
+- **Factos:** a lista de pedidos não é paginada; a resposta da equipa é a
+  primeira resposta do SLA; atribuir põe um pedido aberto em curso; fechado não
+  aceita nada; SLA em minutos (o front mostra e pede horas, até 2 casas, em
+  minutos inteiros); anúncios ao dia em Luanda (`inicioDoDiaEmLuanda`) e a
+  correcção mantém a hora original se o dia não mudou.
+- **Correcção partilhada:** os filtros no URL partem de `window.location.search`
+  e não do último render — o React Router aplica as navegações em transição e
+  duas escolhas seguidas apagavam a primeira (visto no webkit). Aplicado à fila
+  de pedidos, ao filtro de colaborador (`escolhas.tsx`) e ao tipo das entradas
+  e saídas.
+- **Leituras em produção** (HR, 2026-10-17): 8 anúncios, 41 pedidos, 7
+  políticas de SLA (200); Manager 403. Dos pedidos só contagens.
+- **Escritas:** verificadas **na base local** (`f7c-servicos-escritas.spec.ts`,
+  conta Admin): anúncio publicado, corrigido (fixado) e arquivado; pedido
+  aberto em nome de um colaborador novo, respondido, atribuído, resolvido e
+  fechado (conferido no servidor, com a primeira resposta); prazo de «Outro»
+  mudado e reposto no fim. **Nenhuma escrita em produção.**
+- **Testes:** 148 unitários; interface 5 cenários × 3 motores; suite inteira
+  375, sem instáveis.
 
 ### B20 a B23 resolvidos (finanças, 2026-10-16)
 

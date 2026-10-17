@@ -124,3 +124,11 @@ export const CATEGORIA_TAREFA: Readonly<Record<string, string>> = {
   assets: "Bens e equipamento",
   finance: "Finanças",
 };
+
+/** Fora do prazo de resposta ou de resolução (SLA de um pedido interno). */
+export function SlaBadge({ p }: { p: { status: string; sla?: { responseBreached: boolean; resolutionBreached: boolean } | null } }) {
+  if (!p.sla) return null;
+  if (p.sla.resolutionBreached && p.status !== "Closed") return <Badge tom="erro">Resolução fora do prazo</Badge>;
+  if (p.sla.responseBreached) return <Badge tom="aviso">Resposta fora do prazo</Badge>;
+  return null;
+}

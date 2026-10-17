@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { errosCandidato, errosProcesso, errosVaga, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
+import { erroMensagem, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
 
 describe("funil de recrutamento", () => {
   it("avança um passo de cada vez; da proposta contrata-se, não se avança", () => {
@@ -56,5 +56,51 @@ describe("entrada ou saída", () => {
     expect(e.linhas).toEqual({ 1: "Falta o título desta tarefa." });
     // Uma linha vazia, sem prazo, ignora-se.
     expect(errosProcesso({ colaborador: "x", tipo: "Offboarding", ultimoDia: "2026-11-30", motivo: "", tarefas: [tarefa, { titulo: "", categoria: "hr", prazo: "" }] }).linhas).toEqual({});
+  });
+});
+
+describe("anúncios", () => {
+  const hoje = "2026-10-17";
+  it("título e texto obrigatórios; expira depois do dia de publicação (vazio = hoje)", () => {
+    expect(errosAnuncio({ titulo: "Feriado", texto: "Fechado.", publica: "", expira: "" }, hoje)).toEqual({});
+    expect(errosAnuncio({ titulo: "", texto: " ", publica: "", expira: hoje }, hoje)).toEqual({
+      titulo: "Indique o título.",
+      texto: "Escreva o texto do anúncio.",
+      expira: "Tem de expirar depois do dia de publicação.",
+    });
+    expect(errosAnuncio({ titulo: "x", texto: "y", publica: "2026-11-01", expira: "2026-11-01" }, hoje).expira).toBe("Tem de expirar depois do dia de publicação.");
+    expect(errosAnuncio({ titulo: "x", texto: "y", publica: "2026-11-01", expira: "2026-11-02" }, hoje)).toEqual({});
+  });
+  it("fase: arquivado, agendado, expirado ou em vigor", () => {
+    const agora = new Date("2026-10-17T12:00:00Z");
+    expect(faseAnuncio({ archived: true, publishedAt: "2026-10-01T00:00:00Z", expiresAt: null }, agora)).toBe("arquivado");
+    expect(faseAnuncio({ archived: false, publishedAt: "2026-10-18T00:00:00Z", expiresAt: null }, agora)).toBe("agendado");
+    expect(faseAnuncio({ archived: false, publishedAt: "2026-10-01T00:00:00Z", expiresAt: "2026-10-17T00:00:00Z" }, agora)).toBe("expirado");
+    expect(faseAnuncio({ archived: false, publishedAt: "2026-10-01T00:00:00Z", expiresAt: "2026-10-20T00:00:00Z" }, agora)).toBe("em-vigor");
+  });
+});
+
+describe("prazos dos pedidos (SLA)", () => {
+  it("horas em minutos inteiros e positivos", () => {
+    expect(horasParaMinutos("4")).toBe(240);
+    expect(horasParaMinutos("0,5")).toBe(30);
+    expect(horasParaMinutos("1,25")).toBe(75);
+    expect(horasParaMinutos("0,01")).toBeNull();
+    expect(horasParaMinutos("0")).toBeNull();
+    expect(horasParaMinutos("-1")).toBeNull();
+    expect(horasParaMinutos("abc")).toBeNull();
+    expect(minutosParaHoras(2880)).toBe("48");
+    expect(minutosParaHoras(90)).toBe("1,5");
+  });
+  it("a resolução não é mais curta do que a resposta", () => {
+    expect(errosSla("4", "48")).toEqual({});
+    expect(errosSla("4", "4")).toEqual({});
+    expect(errosSla("8", "4").resolucao).toBe("A resolução não pode ter prazo mais curto do que a resposta.");
+    expect(errosSla("", "x")).toEqual({ resposta: "Horas positivas (até 2 casas; em minutos inteiros).", resolucao: "Horas positivas (até 2 casas; em minutos inteiros)." });
+  });
+  it("mensagem obrigatória até 4000", () => {
+    expect(erroMensagem(" ")).toBe("Escreva a mensagem.");
+    expect(erroMensagem("x".repeat(4001))).toBe("No máximo 4000 caracteres.");
+    expect(erroMensagem("Olá")).toBeUndefined();
   });
 });
