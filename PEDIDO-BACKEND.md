@@ -1,8 +1,11 @@
 # Pedidos ao backend
 
 > 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração),
-> **B26**, **B27** e **B28** (salários), **B29** e **B30** (compras). **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
+> Revisto contra `main` @ `db34b07`. Em aberto: **B24** (configuração),
+> **B29** e **B30** (compras). **B26** a **B28** estão resolvidos (PR #107,
+> ADR-086) e o front já os usa: contratos de um colaborador paginados, uma
+> folha por mês e o colaborador uma vez por folha, tirar um item e anular um
+> rascunho. **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
 > os usa: anexos e comprovativos pelo contexto, IBAN repetido com o motivo,
 > nomes e escolhas no planeamento, previsão em rascunho revista e submetida. O **B25** está resolvido (PR #106) e o front já o
 > usa: o colaborador retira no portal o próprio pedido de férias. O **B13** está resolvido (ADR-080):
@@ -146,6 +149,8 @@ portal.
 
 ## B26 — Contratos de um colaborador com paginação dão 500
 
+> **Resolvido** (PR #107, ADR-086, em produção a 2026-10-17); o front usa-o e foi verificado na base local.
+
 **Facto:** `GET /hr/contracts?employeeId={id}&page=1&pageSize=25` responde
 **500** (base local, `33697a8`). Sem `page`/`pageSize` responde 200. Causa:
 `ListEmploymentContracts` não pagina o histórico de um colaborador e devolve
@@ -160,6 +165,8 @@ Qualquer outro cliente que pagine sempre recebe 500.
 (ou paginar também o histórico do colaborador).
 
 ## B27 — Duas folhas do mesmo mês e o mesmo colaborador duas vezes na folha
+
+> **Resolvido** (PR #107, ADR-086, em produção a 2026-10-17); o front usa-o e foi verificado na base local.
 
 **Facto:** o índice `ix_payroll_run_year_month` não é único e `OpenRun` não
 verifica se o mês já tem folha; `PayrollRun.AddItem` não verifica se o
@@ -176,6 +183,8 @@ dizer qual é a regra, se for intencional — por exemplo, folhas
 complementares).
 
 ## B28 — Um item da folha em rascunho não se tira
+
+> **Resolvido** (PR #107, ADR-086, em produção a 2026-10-17); o front usa-o e foi verificado na base local.
 
 **Facto:** há `POST /payroll/runs/{runId}/items`, mas nenhuma rota para tirar
 ou corrigir um item, nem para anular uma folha em rascunho.

@@ -5,9 +5,9 @@
 > planeamento; F7: recursos humanos completos — portal do colaborador, RH do
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
-> colaboradores; F8: salários — folhas de pagamento); **F9** em curso — 1.º
-> bloco (compras: requisições, ordens de compra, recepções) concluído e
-> verificado na base local, por publicar · actualizado a 2026-10-17.
+> colaboradores; F8: salários — folhas de pagamento) e o 1.º bloco da **F9**
+> (compras: requisições, ordens de compra, recepções) · actualizado a
+> 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -202,7 +202,7 @@ AM = AssetManager.
 | **Salários** | | | | | | | | | | |
 | Folhas de pagamento: lista com os totais; ver uma folha (bruto, IRT, INSS e líquido por colaborador) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Abrir a folha de um mês ¹² | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
-| Juntar colaboradores à folha em rascunho (bruto e subsídios; o servidor calcula o IRT, o INSS e o líquido) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Juntar colaboradores à folha em rascunho (bruto e subsídios; o servidor calcula o IRT, o INSS e o líquido); tirar um colaborador; anular o rascunho | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Submeter para aprovação; ver a decisão | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Recibos de uma folha aprovada: ver, descarregar e anexar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
@@ -723,22 +723,24 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Folhas de pagamento** (salários)
 - Folhas por mês, com o número de colaboradores, o bruto, o líquido, o estado
-  (rascunho, por aprovar, aprovada, recusada) e quando fechou.
-- **Abrir** a folha de um mês (a conta tem de estar ligada a uma ficha; avisa
-  se o mês já tem folha, porque duas folhas pagam duas vezes).
+  (rascunho, por aprovar, aprovada, recusada, anulada) e quando fechou.
+- **Abrir** a folha de um mês (a conta tem de estar ligada a uma ficha). Uma
+  folha por mês: outra só se a anterior foi recusada ou anulada (o ecrã avisa
+  e o servidor recusa).
 - **Folha:** totais (bruto, IRT retido, INSS do trabalhador, líquido a pagar)
   e, por colaborador, o bruto, os subsídios incluídos, o IRT, o INSS e o
   líquido — **calculados pelo servidor** com a configuração fiscal em vigor no
   fim do mês (o front não calcula impostos).
 - Em rascunho: **juntar** um colaborador (bruto e subsídios de alimentação,
   transporte, férias e Natal, que fazem parte do bruto e não o podem passar;
-  sugere o salário do contrato em vigor; avisa se o colaborador já está na
-  folha; um item juntado não se tira) e **submeter** para aprovação.
+  sugere o salário do contrato em vigor; o mesmo colaborador não entra duas
+  vezes), **tirar** um colaborador (para o juntar de novo com outros valores),
+  **anular** a folha (o mês fica livre) e **submeter** para aprovação.
 - Por aprovar: **ver a decisão** tomada em Aprovações (ou que ainda espera),
   com a ligação ao pedido.
 - Aprovada: por colaborador, os **recibos** anexados (descarregar) e
   **anexar** o PDF do recibo; sem anexo, o portal gera-o da folha.
-- Recusada: não se paga nem se altera.
+- Recusada ou anulada: não se paga nem se altera; o mês fica livre.
 
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e

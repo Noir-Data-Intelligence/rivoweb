@@ -11,7 +11,11 @@ const ESTADO: Record<string, { texto: string; tom: TomBadge }> = {
   PendingApproval: { texto: "Por aprovar", tom: "aviso" },
   Approved: { texto: "Aprovada", tom: "sucesso" },
   Refused: { texto: "Recusada", tom: "erro" },
+  Cancelled: { texto: "Anulada", tom: "neutro" },
 };
+
+/** Estados que deixam o mês livre para outra folha (B27). */
+export const libertaOMes = (estado: string) => estado === "Refused" || estado === "Cancelled";
 
 export function EstadoFolha({ estado }: { estado: string }) {
   const e = ESTADO[estado];

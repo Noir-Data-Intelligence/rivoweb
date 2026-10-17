@@ -139,8 +139,7 @@ export function useOrganograma() {
 export function useContratos(p: Pag & { colaborador: string | null }) {
   return useQuery({
     queryKey: [...chavesGestao.contratos, p.colaborador, p.pagina, p.tamanho],
-    // Com `employeeId`, o servidor não pagina e, se receber `page`, responde 500
-    // (B26): o histórico de uma pessoa vem inteiro.
+    // Com `employeeId`, o servidor devolve o histórico inteiro, sem paginar (B26).
     queryFn: ({ signal }) =>
       lerPagina(api.GET("/hr/contracts", { params: { query: p.colaborador ? { employeeId: p.colaborador } : { page: p.pagina, pageSize: p.tamanho } }, signal })),
     placeholderData: keepPreviousData,

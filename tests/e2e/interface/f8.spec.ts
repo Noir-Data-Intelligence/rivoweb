@@ -128,6 +128,44 @@ test.describe("salários", () => {
     expect(await violacoes()).toEqual([]);
   });
 
+  test("rascunho: tirar um colaborador e anular a folha (B28); o repetido não se junta (B27)", async ({ page, api }) => {
+    let itens = [itemCarlos(), itemAna()];
+    let estado = "Draft";
+    await comSalarios(api)
+      .em("GET", `/payroll/runs/${IDF8.rascunho}`, () => ({ status: 200, corpo: folha(estado, itens) }))
+      .em("DELETE", `/payroll/runs/${IDF8.rascunho}/items/${IDF8.itemAna}`, () => {
+        itens = [itemCarlos()];
+        return { status: 204 };
+      })
+      .em("POST", `/payroll/runs/${IDF8.rascunho}/cancellation`, () => {
+        estado = "Cancelled";
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, meRhF8.email);
+    await page.goto(`/salarios/${IDF8.rascunho}`);
+    await page.getByRole("button", { name: "Juntar colaborador" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Colaborador").selectOption(ID.emp2);
+    await d.getByLabel("Salário bruto (Kz)").fill("100 000");
+    await d.getByRole("button", { name: "Juntar" }).click();
+    await expect(d.getByText("Este colaborador já está nesta folha.")).toBeVisible();
+    expect(api.escritas("POST", `/payroll/runs/${IDF8.rascunho}/items`)).toHaveLength(0);
+    await page.keyboard.press("Escape");
+
+    await page.getByRole("button", { name: "Tirar Ana Teste da folha" }).click();
+    await d.getByRole("button", { name: "Tirar da folha" }).click();
+    await expect(d).toHaveCount(0);
+    await expect(page.getByRole("row").filter({ hasText: "Ana Teste" })).toHaveCount(0);
+    expect(api.escritas("DELETE", `/payroll/runs/${IDF8.rascunho}/items/${IDF8.itemAna}`)).toHaveLength(1);
+
+    await page.getByRole("button", { name: "Anular folha" }).click();
+    await d.getByRole("button", { name: "Anular folha" }).click();
+    await expect(page.getByText("Folha anulada: não se paga nem se altera.", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Juntar colaborador" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Tirar / })).toHaveCount(0);
+  });
+
   test("por aprovar: ver decisão — ainda à espera, depois aprovada", async ({ page, api }) => {
     let estado = "PendingApproval";
     let pedidas = 0;

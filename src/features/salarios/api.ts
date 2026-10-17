@@ -6,17 +6,18 @@
  * - quem abre a folha é a conta autenticada, que tem de estar ligada a uma
  *   ficha de colaborador (ADR-057; sem ficha: 400 com o motivo);
  * - Rascunho → Por aprovar (submeter cria o pedido de aprovação; 501 sem motor
- *   de governança) → Aprovada ou Recusada (aplicada por «ver decisão»);
+ *   de governança) → Aprovada ou Recusada (aplicada por «ver decisão»); um
+ *   rascunho anula-se (Anulada) e os itens tiram-se (B28, ADR-086);
+ * - uma folha por mês: outra só se a anterior foi recusada ou anulada (409), e
+ *   o mesmo colaborador não entra duas vezes na folha (409) (B27, ADR-086);
  * - itens só em rascunho; **o IRT, o INSS e o líquido calculam-se no
  *   servidor** ao juntar o item, à data do fim do mês (sem configuração fiscal
  *   em vigor: 400 com o que falta); os subsídios são parte do bruto e não
  *   podem somar mais do que ele;
- * - recibos anexam-se só a itens de uma folha aprovada;
- * - o servidor aceita duas folhas do mesmo mês e o mesmo colaborador duas
- *   vezes na folha, e não há forma de tirar um item (B27, B28): o front avisa.
+ * - recibos anexam-se só a itens de uma folha aprovada.
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, ler, lerPagina } from "@/lib/api/client";
+import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import { useEscrita } from "@/lib/api/escrita";
 import type { components } from "@/lib/api/schema";
 
@@ -59,6 +60,24 @@ export function useJuntarItem(runId: string) {
   const qc = useQueryClient();
   return useEscrita({
     mutationFn: (b: PedidoItem) => ler(api.POST("/payroll/runs/{runId}/items", { params: { path: { runId } }, body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.folhas }),
+  });
+}
+
+/** Só em rascunho (B28). */
+export function useTirarItem(runId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (itemId: string) => enviar(api.DELETE("/payroll/runs/{runId}/items/{itemId}", { params: { path: { runId, itemId } } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.folhas }),
+  });
+}
+
+/** Anula um rascunho: o mês fica livre para outra folha (B28). */
+export function useAnularFolha(runId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: () => enviar(api.POST("/payroll/runs/{runId}/cancellation", { params: { path: { runId } } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.folhas }),
   });
 }

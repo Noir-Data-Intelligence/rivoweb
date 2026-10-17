@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { subsidiosDe, totais } from "@/features/salarios/comum";
+import { libertaOMes, subsidiosDe, totais } from "@/features/salarios/comum";
 import { errosAbrir, errosItem } from "@/features/salarios/regras";
 
 const item = (bruto: number, irt: number | null, inss: number | null, liquido: number | null) => ({
@@ -45,5 +45,15 @@ describe("totais da folha", () => {
     expect(t.irt.toFixed(2)).toBe("0.20");
     expect(t.liquido.toFixed(2)).toBe("0.40");
     expect(subsidiosDe(item(1, 0, 0, 1)).toFixed(2)).toBe("15000.30");
+  });
+});
+
+describe("uma folha por mês (B27)", () => {
+  it("só a recusada ou a anulada deixam o mês livre", () => {
+    expect(libertaOMes("Refused")).toBe(true);
+    expect(libertaOMes("Cancelled")).toBe(true);
+    expect(libertaOMes("Draft")).toBe(false);
+    expect(libertaOMes("PendingApproval")).toBe(false);
+    expect(libertaOMes("Approved")).toBe(false);
   });
 });

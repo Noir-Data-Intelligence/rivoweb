@@ -16,7 +16,7 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useAbrirFolha, useFolhas, useTodasFolhas, type Folha } from "../api";
-import { EstadoFolha, kz, periodoFolha, totais } from "../comum";
+import { EstadoFolha, kz, libertaOMes, periodoFolha, totais } from "../comum";
 import { errosAbrir } from "../regras";
 
 function AbrirFolha() {
@@ -29,7 +29,7 @@ function AbrirFolha() {
   const navegar = useNavigate();
   const idForm = useId();
   const erros = errosAbrir({ ano, mes });
-  const repetidas = (todas.data?.items ?? []).filter((f) => String(f.year) === ano.trim() && Number(f.month) === Number(mes));
+  const repetidas = (todas.data?.items ?? []).filter((f) => String(f.year) === ano.trim() && Number(f.month) === Number(mes) && !libertaOMes(f.status));
   return (
     <>
       <Button onClick={() => setAberto(true)}>
@@ -79,7 +79,7 @@ function AbrirFolha() {
           </Field>
           {repetidas.length > 0 ? (
             <Alert tom="aviso" className="sm:col-span-2" titulo={`Já existe uma folha de ${nomeMes(Number(mes))} ${ano}.`}>
-              Duas folhas do mesmo mês pagam duas vezes. Confirme antes de abrir outra.
+              Só se abre outra se essa for recusada ou anulada. Para corrigir um rascunho, abra-o: os colaboradores tiram-se e juntam-se de novo.
             </Alert>
           ) : null}
         </form>

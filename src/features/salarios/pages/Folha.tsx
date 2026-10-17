@@ -21,7 +21,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useAnexarRecibo, useAnexosItem, useFolha, useJuntarItem, useSubmeterFolha, useVerDecisaoFolha, type Folha as TipoFolha, type ItemFolha } from "../api";
+import { useAnexarRecibo, useAnexosItem, useAnularFolha, useFolha, useJuntarItem, useSubmeterFolha, useTirarItem, useVerDecisaoFolha, type Folha as TipoFolha, type ItemFolha } from "../api";
 import { EstadoFolha, kz, periodoFolha, subsidiosDe, totais } from "../comum";
 import { errosItem, type CamposItem } from "../regras";
 
@@ -66,7 +66,7 @@ function JuntarColaborador({ f }: { f: TipoFolha }) {
         aoMudar={mudar}
         largo
         titulo={`Juntar à folha de ${periodoFolha(f)}`}
-        descricao="O servidor calcula o IRT, o INSS e o líquido com a configuração fiscal em vigor no fim do mês. Um colaborador juntado não se tira da folha: confirme os valores."
+        descricao="O servidor calcula o IRT, o INSS e o líquido com a configuração fiscal em vigor no fim do mês. Enquanto a folha estiver em rascunho, um colaborador tira-se e junta-se de novo."
         rotuloConfirmar="Juntar"
         aCarregar={juntar.isPending}
         erro={juntar.error ? <ErrorPanel erro={juntar.error} /> : undefined}
@@ -79,7 +79,7 @@ function JuntarColaborador({ f }: { f: TipoFolha }) {
           onSubmit={(e) => {
             e.preventDefault();
             setTentou(true);
-            if (Object.keys(erros).length > 0 || juntar.isPending) return;
+            if (Object.keys(erros).length > 0 || repetido || juntar.isPending) return;
             const bruto = lerDinheiroDigitado(v.bruto);
             if (!bruto) return;
             juntar.mutate(
@@ -99,8 +99,8 @@ function JuntarColaborador({ f }: { f: TipoFolha }) {
             {({ id, descricao, invalido }) => <SelectColaborador id={id} aria-describedby={descricao} invalido={invalido} valor={colaborador} aoMudar={setColaborador} />}
           </Field>
           {repetido ? (
-            <Alert tom="aviso" className="sm:col-span-2" titulo="Este colaborador já está nesta folha.">
-              Juntá-lo outra vez paga-lhe duas vezes no mesmo mês.
+            <Alert tom="erro" className="sm:col-span-2" titulo="Este colaborador já está nesta folha.">
+              Não entra duas vezes. Para mudar os valores, tire-o da folha e junte-o de novo.
             </Alert>
           ) : null}
           <Field
@@ -132,6 +132,58 @@ function JuntarColaborador({ f }: { f: TipoFolha }) {
           ) : null}
         </form>
       </Confirmar>
+    </>
+  );
+}
+
+function TirarItem({ f, i, quem }: { f: TipoFolha; i: ItemFolha; quem: string }) {
+  const [aberto, setAberto] = useState(false);
+  const tirar = useTirarItem(f.runId);
+  return (
+    <>
+      <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Tirar ${quem} da folha`}>
+        Tirar
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={(a) => {
+          setAberto(a);
+          if (!a) tirar.reset();
+        }}
+        titulo={`Tirar ${quem} da folha?`}
+        descricao={`Sai da folha de ${periodoFolha(f)} (${kz(i.grossSalary)} brutos). Pode juntá-lo de novo com outros valores.`}
+        rotuloConfirmar="Tirar da folha"
+        variante="destructive"
+        aCarregar={tirar.isPending}
+        erro={tirar.error ? <ErrorPanel erro={tirar.error} /> : undefined}
+        aoConfirmar={() => (tirar.isPending ? undefined : tirar.mutate(i.itemId, { onSuccess: () => setAberto(false) }))}
+      />
+    </>
+  );
+}
+
+function AnularFolha({ f }: { f: TipoFolha }) {
+  const [aberto, setAberto] = useState(false);
+  const anular = useAnularFolha(f.runId);
+  return (
+    <>
+      <Button variante="secondary" onClick={() => setAberto(true)}>
+        Anular folha
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={(a) => {
+          setAberto(a);
+          if (!a) anular.reset();
+        }}
+        titulo={`Anular a folha de ${periodoFolha(f)}?`}
+        descricao="O rascunho fica anulado, com os colaboradores que tem, e o mês fica livre para outra folha. Não se desfaz."
+        rotuloConfirmar="Anular folha"
+        variante="destructive"
+        aCarregar={anular.isPending}
+        erro={anular.error ? <ErrorPanel erro={anular.error} /> : undefined}
+        aoConfirmar={() => (anular.isPending ? undefined : anular.mutate(undefined, { onSuccess: () => setAberto(false) }))}
+      />
     </>
   );
 }
@@ -289,6 +341,7 @@ export default function Folha() {
     { id: "inss", cabecalho: "INSS", alinhar: "direita", esconderAte: "md", celula: (i) => kz(i.socialSecurityContribution) },
     { id: "liquido", cabecalho: "Líquido", alinhar: "direita", celula: (i) => <span className="font-medium">{kz(i.netSalary)}</span> },
     ...(f.status === "Approved" ? [{ id: "recibo", cabecalho: "", alinhar: "direita" as const, celula: (i: ItemFolha) => <Recibos f={f} i={i} quem={nomeDe(i.employeeId)} /> }] : []),
+    ...(f.status === "Draft" && escreve ? [{ id: "tirar", cabecalho: "", alinhar: "direita" as const, celula: (i: ItemFolha) => <TirarItem f={f} i={i} quem={nomeDe(i.employeeId)} /> }] : []),
   ];
   return (
     <>
@@ -305,6 +358,7 @@ export default function Folha() {
         accao={
           f.status === "Draft" && escreve ? (
             <div className="flex flex-wrap gap-2">
+              <AnularFolha f={f} />
               <Submeter f={f} />
               <JuntarColaborador f={f} />
             </div>
@@ -322,7 +376,8 @@ export default function Folha() {
           </Can>
         </Alert>
       ) : null}
-      {f.status === "Refused" ? <Alert tom="erro" className="mb-4" titulo="Folha recusada em Aprovações: não se paga nem se altera. Abra outra para o mesmo mês." /> : null}
+      {f.status === "Refused" ? <Alert tom="erro" className="mb-4" titulo="Folha recusada em Aprovações: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
+      {f.status === "Cancelled" ? <Alert tom="info" className="mb-4" titulo="Folha anulada: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {(
           [

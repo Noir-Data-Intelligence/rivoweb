@@ -1843,7 +1843,9 @@ F7c e a F7 no front.
 
 Em três blocos: (1) compras; (2) inventário; (3) activos fixos.
 
-**Bloco 1 — compras** (2026-10-17, por publicar)
+**Bloco 1 — compras** (publicado a 2026-10-17, `50f57f9`: CI verde — 438
+sem repetições, com a folga nova — e Vercel; o smoke de produção ficou por
+correr: às 13:30 a API `syyt.tech` não respondia na porta 443)
 - **Ecrãs:** `/requisicoes` e `/requisicoes/:id` (abrir, submeter, ver
   decisão, cancelar; emitir ordens da aprovada), `/encomendas` e
   `/encomendas/:id` (linhas com o que falta, recepções, registar, anular,
@@ -1871,6 +1873,19 @@ Em três blocos: (1) compras; (2) inventário; (3) activos fixos.
   (`23d366b`).
 - **Testes:** 167 unitários; interface 6 cenários × 3 motores; suite inteira
   438, sem instáveis.
+
+### B26 a B28 resolvidos (salários e contratos, 2026-10-17)
+
+- **B26:** `GET /hr/contracts` com `employeeId` e `page` deixa de dar 500
+  (lido 200 na base local); o front já pedia sem paginação.
+- **B27:** uma folha por mês (outra só se a anterior foi recusada ou anulada)
+  e o colaborador uma vez por folha, com 409. O aviso de mês repetido passou a
+  ignorar recusadas e anuladas; o colaborador repetido passou a bloquear.
+- **B28:** «Tirar» por colaborador e «Anular folha» em rascunho; estado
+  «Anulada».
+- **Verificação:** API local em `db34b07`; `f8-escritas.spec.ts` alargado
+  (tirar e juntar de novo, segunda folha do mês recusada pelo servidor,
+  rascunho anulado) e `f7b-escritas.spec.ts` a passar; interface F8 6 × 3.
 
 ### F8 — Salários (estado)
 

@@ -131,6 +131,16 @@ test("F8: folha aberta, preenchida, submetida, aprovada e com recibo anexado", a
     await dialogo(page).getByRole("button", { name: "Juntar" }).click();
     await expect(dialogo(page)).toHaveCount(0);
     await expect(page.getByRole("row").filter({ hasText: `${marca} Rui` })).toContainText("150 000,50");
+    // B28: tira-se do rascunho e junta-se de novo com outro valor.
+    await page.getByRole("button", { name: `Tirar ${marca} Rui da folha` }).click();
+    await dialogo(page).getByRole("button", { name: "Tirar da folha" }).click();
+    await expect(page.getByRole("row").filter({ hasText: `${marca} Rui` })).toHaveCount(0);
+    await page.getByRole("button", { name: "Juntar colaborador" }).click();
+    await dialogo(page).getByLabel("Colaborador").selectOption({ label: `${marca} Rui` });
+    await dialogo(page).getByLabel("Salário bruto (Kz)").fill("150 000,50");
+    await dialogo(page).getByRole("button", { name: "Juntar" }).click();
+    await expect(dialogo(page)).toHaveCount(0);
+    await expect(page.getByRole("row").filter({ hasText: `${marca} Rui` })).toContainText("150 000,50");
 
     const antes = await sa<{ items: { employeeId: string; grossSalary: number; foodAllowance: number; netSalary: number | null; withholdingTax: number | null; socialSecurityContribution: number | null }[] }>("GET", `/payroll/runs/${runId}`);
     const itemJoana = antes.corpo.items.find((i) => i.employeeId === joana);
@@ -174,6 +184,30 @@ test("F8: folha aberta, preenchida, submetida, aprovada e com recibo anexado", a
     const idItem = depois.corpo.items.find((i) => i.employeeId === joana)?.itemId ?? "";
     const docs = await sa<{ fileName: string; category: string }[]>("GET", `/payroll/runs/${runId}/items/${idItem}/documents`);
     expect(docs.corpo.map((d) => [d.fileName, d.category])).toEqual([[`recibo-${sufixo}.pdf`, "Recibo de vencimento"]]);
+
+    // B27: o mês já tem folha aprovada — outra é recusada com o motivo.
+    await page.keyboard.press("Escape");
+    await page.goto("/salarios");
+    await page.getByRole("button", { name: "Abrir folha" }).click();
+    await dialogo(page).getByLabel("Mês").selectOption(String(mes));
+    await dialogo(page).getByLabel("Ano").fill(String(ano));
+    await expect(dialogo(page).getByText(`Já existe uma folha de ${MESES[mes - 1]} ${ano}.`)).toBeVisible();
+    await dialogo(page).getByRole("button", { name: "Abrir folha" }).click();
+    await expect(dialogo(page).getByRole("alert").first()).toBeVisible();
+    await expect(page).toHaveURL(/\/salarios$/);
+    // B28: um rascunho de outro mês anula-se e o mês fica livre.
+    const outroMes = (mes % 12) + 1;
+    const outroAno = mes === 12 ? ano + 1 : ano;
+    await dialogo(page).getByLabel("Mês").selectOption(String(outroMes));
+    await dialogo(page).getByLabel("Ano").fill(String(outroAno));
+    await dialogo(page).getByRole("button", { name: "Abrir folha" }).click();
+    await expect(page.getByRole("heading", { name: `Folha de ${MESES[outroMes - 1]} ${outroAno}`, level: 1 })).toBeVisible();
+    const rascunhoId = page.url().split("/").pop() ?? "";
+    await page.getByRole("button", { name: "Anular folha" }).click();
+    await dialogo(page).getByRole("button", { name: "Anular folha" }).click();
+    await expect(page.getByText("Folha anulada", { exact: false })).toBeVisible();
+    const anulada = await sa<{ status: string }>("GET", `/payroll/runs/${rascunhoId}`);
+    expect(anulada.corpo.status).toBe("Cancelled");
   } finally {
     await sa("POST", `/approval/policies/${politica.corpo.policyId}/deactivation`);
   }
