@@ -1,8 +1,8 @@
 # Pedidos ao backend
 
-> 2026-10-16 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração) e
-> **B26**. **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
+> 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
+> Revisto contra `main` @ `64e6a8b`. Em aberto: **B24** (configuração),
+> **B26**, **B27** e **B28** (salários). **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
 > os usa: anexos e comprovativos pelo contexto, IBAN repetido com o motivo,
 > nomes e escolhas no planeamento, previsão em rascunho revista e submetida. O **B25** está resolvido (PR #106) e o front já o
 > usa: o colaborador retira no portal o próprio pedido de férias. O **B13** está resolvido (ADR-080):
@@ -158,3 +158,31 @@ Qualquer outro cliente que pagine sempre recebe 500.
 
 **Pedido:** em `ListContractsAsync`, escrever os cabeçalhos só quando há total
 (ou paginar também o histórico do colaborador).
+
+## B27 — Duas folhas do mesmo mês e o mesmo colaborador duas vezes na folha
+
+**Facto:** o índice `ix_payroll_run_year_month` não é único e `OpenRun` não
+verifica se o mês já tem folha; `PayrollRun.AddItem` não verifica se o
+colaborador já está na folha. Em produção há uma folha por mês (2025-11 a
+2026-10), mas nada o garante.
+
+**Consequência:** um engano paga duas vezes o mesmo mês ou o mesmo
+colaborador. O front avisa nos dois casos, mas não bloqueia (a regra é do
+domínio).
+
+**Pedido:** recusar com 409 uma segunda folha para o mesmo ano e mês que não
+esteja recusada, e um segundo item do mesmo colaborador na mesma folha (ou
+dizer qual é a regra, se for intencional — por exemplo, folhas
+complementares).
+
+## B28 — Um item da folha em rascunho não se tira
+
+**Facto:** há `POST /payroll/runs/{runId}/items`, mas nenhuma rota para tirar
+ou corrigir um item, nem para anular uma folha em rascunho.
+
+**Consequência:** um valor errado obriga a submeter e recusar a folha, ou a
+deixá-la parada em rascunho. O front avisa antes de juntar que o item não se
+tira.
+
+**Pedido:** `DELETE /payroll/runs/{runId}/items/{itemId}` (só em rascunho;
+409 fora dele) e, se fizer sentido, anular uma folha em rascunho.

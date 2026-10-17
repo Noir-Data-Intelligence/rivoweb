@@ -165,6 +165,8 @@ export const rotas: RouteObject[] = [
               { path: "declaracoes", element: protegido(R["/declaracoes"], pagina("declaracoes")) },
               { path: "desempenho", element: protegido(R["/desempenho"], pagina("desempenho")) },
               { path: "conquistas", element: protegido(R["/conquistas"], pagina("conquistas")) },
+              { path: "salarios", element: protegido(R["/salarios"], pagina("folhas")) },
+              { path: "salarios/:runId", element: protegido(R["/salarios"], pagina("folha")) },
             ],
           },
         ],

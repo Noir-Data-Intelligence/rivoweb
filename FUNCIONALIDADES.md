@@ -5,7 +5,8 @@
 > planeamento; F7: recursos humanos completos — portal do colaborador, RH do
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
-> colaboradores) · actualizado a 2026-10-17.
+> colaboradores); **F8** (salários) concluída e verificada na base local, por
+> publicar · actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -27,9 +28,9 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
@@ -189,6 +190,12 @@ AM = AssetManager.
 | **Conquistas:** catálogo (criar, corrigir, desactivar); classificação; atribuir a um colaborador | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Ficha: separadores Conquistas e Declarações | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Importar colaboradores** de um CSV (resumo por linha) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Salários** | | | | | | | | | | |
+| Folhas de pagamento: lista com os totais; ver uma folha (bruto, IRT, INSS e líquido por colaborador) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Abrir a folha de um mês ¹² | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Juntar colaboradores à folha em rascunho (bruto e subsídios; o servidor calcula o IRT, o INSS e o líquido) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Submeter para aprovação; ver a decisão | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Recibos de uma folha aprovada: ver, descarregar e anexar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -217,6 +224,7 @@ Recursos Humanos.»
 ⁹ A própria despesa não se decide.
 ¹⁰ Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
 ¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
+¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 
 ---
 
@@ -676,6 +684,25 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Na ficha, os separadores **Conquistas** (as do colaborador, com os pontos;
   atribuir) e **Declarações** (as emitidas; emitir).
 
+**Folhas de pagamento** (salários)
+- Folhas por mês, com o número de colaboradores, o bruto, o líquido, o estado
+  (rascunho, por aprovar, aprovada, recusada) e quando fechou.
+- **Abrir** a folha de um mês (a conta tem de estar ligada a uma ficha; avisa
+  se o mês já tem folha, porque duas folhas pagam duas vezes).
+- **Folha:** totais (bruto, IRT retido, INSS do trabalhador, líquido a pagar)
+  e, por colaborador, o bruto, os subsídios incluídos, o IRT, o INSS e o
+  líquido — **calculados pelo servidor** com a configuração fiscal em vigor no
+  fim do mês (o front não calcula impostos).
+- Em rascunho: **juntar** um colaborador (bruto e subsídios de alimentação,
+  transporte, férias e Natal, que fazem parte do bruto e não o podem passar;
+  sugere o salário do contrato em vigor; avisa se o colaborador já está na
+  folha; um item juntado não se tira) e **submeter** para aprovação.
+- Por aprovar: **ver a decisão** tomada em Aprovações (ou que ainda espera),
+  com a ligação ao pedido.
+- Aprovada: por colaborador, os **recibos** anexados (descarregar) e
+  **anexar** o PDF do recibo; sem anexo, o portal gera-o da folha.
+- Recusada: não se paga nem se altera.
+
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e
   responsável).
@@ -744,6 +771,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Desempenho**, **Conquistas**, **Anúncios**, **Pedidos internos**,
 **Declarações** e importação de colaboradores
 - Tudo o que o Admin faz.
+
+**Folhas de pagamento**
+- Tudo o que o Admin faz (abrir exige a conta ligada a uma ficha).
 
 **Departamentos**
 - Ver, **criar** e **corrigir**.
@@ -960,7 +990,6 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |
 | F11 | Comercial avançado (CRM, contratos) |

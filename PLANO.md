@@ -1839,6 +1839,33 @@ F7c e a F7 no front.
 - **Testes:** 158 unitários; interface 4 cenários × 3 motores; suite inteira
   405, sem instáveis.
 
+### F8 — Salários (estado)
+
+**Concluída e verificada na base local a 2026-10-17, por publicar.**
+- **Trave do ADR-049:** aceite a 2026-09-04 (parecer fiscal profissional
+  confirmou os valores implementados, sem alterações). O plano pede
+  confirmação do utilizador antes de publicar: pedida com o push.
+- **Ecrãs:** `/salarios` (folhas, abrir) e `/salarios/:runId` (totais, itens,
+  juntar, submeter, ver decisão, recibos). Menu «Salários › Folhas de
+  pagamento». Só o Admin e o HR têm `payroll.runs.*` (lido em produção).
+- **Regras:** o front não calcula impostos — IRT, INSS e líquido vêm do
+  servidor; os subsídios são parte do bruto (soma ≤ bruto); totais somados em
+  Big; o bruto pode vir do contrato em vigor (em AOA).
+- **B27 e B28 pedidos:** o servidor aceita duas folhas no mesmo mês e o mesmo
+  colaborador duas vezes, e não deixa tirar um item; o front avisa.
+- **Peças:** `rh/index` passa a exportar `SelectColaborador`,
+  `useNomeColaborador` e `useContratos`.
+- **Leituras em produção** (HR, 2026-10-17): 13 folhas (12 aprovadas, a de
+  Outubro em rascunho) (200). Dos itens, só contagens.
+- **Escritas:** verificadas **na base local** (`f8-escritas.spec.ts`): conta HR
+  ligada a uma ficha abre a folha de um mês futuro, junta dois colaboradores
+  (subsídios acima do bruto recusados; o líquido do servidor confere com bruto
+  − IRT − INSS), submete; o Admin, com cargo que aprova e política só da
+  corrida, aprova em Aprovações; o HR vê a decisão e anexa o recibo (conferido
+  no servidor). **Nenhuma escrita em produção.**
+- **Testes:** 162 unitários; interface 5 cenários × 3 motores; suite inteira
+  420, sem instáveis.
+
 ### B20 a B23 resolvidos (finanças, 2026-10-16)
 
 - **B20:** o comprovativo abre por `GET /finance/expenses/{id}/receipt` e os

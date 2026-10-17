@@ -70,6 +70,8 @@ export const REQUISITO_PAGINA = {
   "/declaracoes": "hr.declarations.write",
   "/desempenho": "hr.performance.read",
   "/conquistas": "hr.employees.read",
+  // F8 — salários (§5.9).
+  "/salarios": "payroll.runs.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */
