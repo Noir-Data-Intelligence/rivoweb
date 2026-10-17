@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { FileUp, Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
@@ -18,9 +18,11 @@ import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
+import { ResultadoImportacao } from "@/ui/ResultadoImportacao";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useAdmitir, useColaboradores, useTodosDepartamentos, type Colaborador } from "../api";
 import { AvisoListaIncompleta, EstadoColaborador, nomeDepartamento } from "../comum";
+import { useImportarColaboradores } from "../talento";
 import { emailOpcional, vazioParaNull } from "../validacao";
 
 const esquema = z.object({
@@ -136,6 +138,75 @@ function Admitir() {
   );
 }
 
+function Importar() {
+  const [aberto, setAberto] = useState(false);
+  const importar = useImportarColaboradores();
+  const [ficheiro, setFicheiro] = useState<File | null>(null);
+  const [erroFicheiro, setErroFicheiro] = useState<string | null>(null);
+  const id = useId();
+  const r = importar.data;
+  return (
+    <>
+      <Button variante="secondary" onClick={() => setAberto(true)}>
+        <FileUp strokeWidth={1.75} aria-hidden />
+        Importar CSV
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={(a) => {
+          setAberto(a);
+          if (!a) {
+            importar.reset();
+            setFicheiro(null);
+            setErroFicheiro(null);
+          }
+        }}
+        titulo="Importar colaboradores de um CSV"
+        descricao="Com cabeçalho na primeira linha, colunas por nome (qualquer ordem). Obrigatórias Nome e DataAdmissao (aaaa-mm-dd); opcional Departamento, pelo nome exacto. Separador ; ou ,. Até 5 MB. As fichas entram sem conta de acesso."
+        rotuloConfirmar={r ? "Importar outro" : "Importar"}
+        aCarregar={importar.isPending}
+        erro={importar.error ? <ErrorPanel erro={importar.error} /> : undefined}
+        aoConfirmar={() => {
+          if (r) {
+            importar.reset();
+            setFicheiro(null);
+            return;
+          }
+          if (!ficheiro) return setErroFicheiro("Escolha um ficheiro .csv.");
+          if (ficheiro.size > 5 * 1024 * 1024) return setErroFicheiro("O ficheiro passa de 5 MB.");
+          if (!/\.csv$/i.test(ficheiro.name)) return setErroFicheiro("O ficheiro tem de ser .csv.");
+          if (!importar.isPending) importar.mutate(ficheiro);
+        }}
+      >
+        {r ? (
+          <ResultadoImportacao r={r} />
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={id} className="text-sm font-medium text-foreground">
+              Ficheiro
+            </label>
+            <input
+              id={id}
+              type="file"
+              accept=".csv,text/csv"
+              className="text-sm file:mr-3 file:rounded-md file:border file:border-border file:bg-card file:px-3 file:py-1.5 file:text-foreground"
+              onChange={(e) => {
+                setFicheiro(e.target.files?.[0] ?? null);
+                setErroFicheiro(null);
+              }}
+            />
+            {erroFicheiro ? (
+              <p className="text-xs text-danger" role="alert">
+                {erroFicheiro}
+              </p>
+            ) : null}
+          </div>
+        )}
+      </Confirmar>
+    </>
+  );
+}
+
 export default function Colaboradores() {
   const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const colaboradores = useColaboradores({ pagina, tamanho });
@@ -170,9 +241,14 @@ export default function Colaboradores() {
         titulo="Colaboradores"
         descricao="Fichas dos colaboradores. Ligar a conta de acesso e atribuir o cargo faz-se em cada ficha."
         accao={
-          <Can requer={{ allOf: ["hr.employees.write", "hr.departments.read"] }}>
-            <Admitir />
-          </Can>
+          <div className="flex flex-wrap gap-2">
+            <Can requer="hr.employees.write">
+              <Importar />
+            </Can>
+            <Can requer={{ allOf: ["hr.employees.write", "hr.departments.read"] }}>
+              <Admitir />
+            </Can>
+          </div>
         }
       />
       <Tabela

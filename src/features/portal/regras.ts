@@ -56,12 +56,7 @@ export function lerValorResultado(texto: string): string | null {
   return v === null ? null : decimalParaApi(v);
 }
 
-/** Percentagem entre 0 e 100 para a barra de progresso. */
-export function percentagemBarra(progresso: number | string): number {
-  const n = Number(progresso);
-  if (!Number.isFinite(n)) return 0;
-  return Math.min(100, Math.max(0, n));
-}
+export { percentagemBarra } from "@/ui/BarraProgresso";
 
 /** Fixados primeiro; dentro de cada grupo, o mais recente primeiro. */
 export function ordenarAnuncios(lista: readonly Anuncio[]): Anuncio[] {

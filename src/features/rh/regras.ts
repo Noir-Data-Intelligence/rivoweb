@@ -4,7 +4,7 @@
  * servidor decide sempre; isto só evita um pedido que se sabe recusado.
  */
 import { hojeIso } from "@/lib/format/data";
-import { lerDecimalDigitado, lerDinheiroDigitado } from "@/lib/money/money";
+import { decimalParaApi, lerDecimalDigitado, lerDinheiroDigitado } from "@/lib/money/money";
 import { normalizarTexto, pareceEmail } from "@/lib/validation/normalizar";
 import { ibanValido } from "@/lib/validation/text";
 
@@ -262,5 +262,102 @@ export function errosEscala(p: { colaborador: string; tipo: string; de: string; 
     if (d === null) e.ate = "O último dia não pode ser anterior ao primeiro.";
     else if (d > MAXIMO_DIAS_ESCALA) e.ate = `No máximo ${MAXIMO_DIAS_ESCALA} dias de cada vez.`;
   }
+  return e;
+}
+
+// --- F7c: declarações, desempenho e conquistas (regras de `Talent.cs`, `ManageWorkplace.cs`)
+
+/** Marcadores que o servidor substitui ao emitir (`ManageDeclarations.Placeholders`). */
+export const MARCADORES_DECLARACAO = ["nome", "codigo", "cargo", "departamento", "admissao", "salario", "moeda", "nif", "bi", "data"] as const;
+
+/** Marcadores `{{…}}` do texto que o servidor não conhece (ficariam impressos tal como estão). */
+export function marcadoresDesconhecidos(texto: string): string[] {
+  const vistos = new Set<string>();
+  for (const m of texto.matchAll(/\{\{\s*([^}]*?)\s*\}\}/g)) {
+    const n = m[1] ?? "";
+    if (!(MARCADORES_DECLARACAO as readonly string[]).includes(n)) vistos.add(n);
+  }
+  return [...vistos];
+}
+
+export function errosModelo(p: { nome: string; titulo: string; texto: string }): { nome?: string; titulo?: string; texto?: string } {
+  const e: { nome?: string; titulo?: string; texto?: string } = {};
+  const n = normalizarTexto(p.nome);
+  if (n === "") e.nome = "Indique o nome do modelo.";
+  else if (n.length > 200) e.nome = "No máximo 200 caracteres.";
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título impresso.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  const x = normalizarTexto(p.texto, true);
+  if (x === "") e.texto = "Escreva o texto da declaração.";
+  else if (x.length > 8000) e.texto = "No máximo 8000 caracteres.";
+  else {
+    const d = marcadoresDesconhecidos(x);
+    if (d.length > 0) e.texto = `Marcador desconhecido: ${d.map((m) => `{{${m}}}`).join(", ")}.`;
+  }
+  return e;
+}
+
+/** Código de verificação: letras e dígitos, com ou sem hífenes. */
+export const codigoVerificacaoValido = (c: string) => /^[A-Za-z0-9-]{4,64}$/.test(c.trim());
+
+export function errosCiclo(p: { nome: string; inicio: string; fim: string }): { nome?: string; inicio?: string; fim?: string } {
+  const e: { nome?: string; inicio?: string; fim?: string } = {};
+  const n = normalizarTexto(p.nome);
+  if (n === "") e.nome = "Indique o nome do ciclo.";
+  else if (n.length > 150) e.nome = "No máximo 150 caracteres.";
+  if (p.inicio === "") e.inicio = "Indique o início.";
+  if (p.fim === "") e.fim = "Indique o fim.";
+  else if (p.inicio !== "" && p.fim < p.inicio) e.fim = "O ciclo não pode acabar antes de começar.";
+  return e;
+}
+
+export function errosObjectivo(p: { titulo: string; descricao: string; peso: string }): { titulo?: string; descricao?: string; peso?: string } {
+  const e: { titulo?: string; descricao?: string; peso?: string } = {};
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  if (normalizarTexto(p.descricao, true).length > 2000) e.descricao = "No máximo 2000 caracteres.";
+  if (p.peso.trim() !== "" && !(/^\d{1,3}$/.test(p.peso.trim()) && Number(p.peso) >= 1 && Number(p.peso) <= 100)) e.peso = "O peso é de 1 a 100.";
+  return e;
+}
+
+/** Decimal até 4 casas (resultados-chave), como texto para a API; `null` se inválido. */
+export function lerValorKr(texto: string): string | null {
+  const t = texto.trim();
+  if (t === "") return null;
+  const negativo = t.startsWith("-");
+  const v = lerDecimalDigitado(negativo ? t.slice(1) : t, 4);
+  if (v === null) return null;
+  const s = decimalParaApi(v);
+  return negativo && s !== "0" ? `-${s}` : s;
+}
+
+export function errosResultadoChave(p: { titulo: string; unidade: string; partida: string; meta: string }): { titulo?: string; unidade?: string; partida?: string; meta?: string } {
+  const e: { titulo?: string; unidade?: string; partida?: string; meta?: string } = {};
+  const t = normalizarTexto(p.titulo);
+  if (t === "") e.titulo = "Indique o título.";
+  else if (t.length > 200) e.titulo = "No máximo 200 caracteres.";
+  if (normalizarTexto(p.unidade).length > 30) e.unidade = "No máximo 30 caracteres.";
+  const partida = p.partida.trim() === "" ? "0" : lerValorKr(p.partida);
+  if (partida === null) e.partida = "Número inválido (até 4 casas decimais).";
+  const meta = lerValorKr(p.meta);
+  if (p.meta.trim() === "") e.meta = "Indique a meta.";
+  else if (meta === null) e.meta = "Número inválido (até 4 casas decimais).";
+  else if (partida !== null && Number(meta) === Number(partida)) e.meta = "A meta tem de ser diferente do ponto de partida.";
+  return e;
+}
+
+export function errosConquista(p: { codigo: string; nome: string; descricao: string; icone: string; pontos: string; nova: boolean }): { codigo?: string; nome?: string; descricao?: string; icone?: string; pontos?: string } {
+  const e: { codigo?: string; nome?: string; descricao?: string; icone?: string; pontos?: string } = {};
+  const c = normalizarTexto(p.codigo);
+  if (p.nova && c === "") e.codigo = "Indique o código.";
+  else if (c.length > 30) e.codigo = "No máximo 30 caracteres.";
+  const n = normalizarTexto(p.nome);
+  if (n === "") e.nome = "Indique o nome.";
+  else if (n.length > 150) e.nome = "No máximo 150 caracteres.";
+  if (normalizarTexto(p.descricao, true).length > 1000) e.descricao = "No máximo 1000 caracteres.";
+  if (normalizarTexto(p.icone).length > 50) e.icone = "No máximo 50 caracteres.";
+  if (p.pontos.trim() !== "" && !(/^\d{1,5}$/.test(p.pontos.trim()) && Number(p.pontos) <= 10000)) e.pontos = "Os pontos são de 0 a 10 000.";
   return e;
 }

@@ -67,6 +67,9 @@ export const REQUISITO_PAGINA = {
   "/pedidos-internos": "hr.tickets.read",
   "/formacao": "hr.training.read",
   "/turnos": "hr.shifts.read",
+  "/declaracoes": "hr.declarations.write",
+  "/desempenho": "hr.performance.read",
+  "/conquistas": "hr.employees.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */

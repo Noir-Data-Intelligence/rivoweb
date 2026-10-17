@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeftRight, Banknote, DoorOpen, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { ArrowLeftRight, Banknote, DoorOpen, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -61,8 +61,11 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/recrutamento", titulo: "Recrutamento", icone: UserSearch, requer: R["/recrutamento"], grupo: "Talento" },
     { caminho: "/entradas-saidas", titulo: "Entradas e saídas", icone: DoorOpen, requer: R["/entradas-saidas"], grupo: "Talento" },
     { caminho: "/formacao", titulo: "Formação", icone: GraduationCap, requer: R["/formacao"], grupo: "Talento" },
+    { caminho: "/desempenho", titulo: "Desempenho", icone: Target, requer: R["/desempenho"], grupo: "Talento" },
+    { caminho: "/conquistas", titulo: "Conquistas", icone: Trophy, requer: R["/conquistas"], grupo: "Talento" },
     { caminho: "/anuncios", titulo: "Anúncios", icone: Megaphone, requer: R["/anuncios"], grupo: "Serviços" },
     { caminho: "/pedidos-internos", titulo: "Pedidos internos", icone: MessageSquare, requer: R["/pedidos-internos"], grupo: "Serviços" },
+    { caminho: "/declaracoes", titulo: "Declarações", icone: FileText, requer: R["/declaracoes"], grupo: "Serviços" },
     { caminho: "/utilizadores", titulo: "Utilizadores", icone: KeyRound, requer: R["/utilizadores"], grupo: "Administração" },
     {
       caminho: "/configuracoes",

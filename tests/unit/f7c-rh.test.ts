@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { erroMensagem, errosConclusao, errosCurso, errosEscala, errosTipoTurno, horaDaApi, horaParaApi, passaMeiaNoite, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
+import { codigoVerificacaoValido, erroMensagem, errosCiclo, errosConquista, errosModelo, errosObjectivo, errosResultadoChave, lerValorKr, marcadoresDesconhecidos, errosConclusao, errosCurso, errosEscala, errosTipoTurno, horaDaApi, horaParaApi, passaMeiaNoite, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
 
 describe("funil de recrutamento", () => {
   it("avança um passo de cada vez; da proposta contrata-se, não se avança", () => {
@@ -152,5 +152,56 @@ describe("turnos", () => {
     expect(errosEscala({ ...b, ate: "2027-02-03" }).ate).toBe("No máximo 94 dias de cada vez.");
     expect(errosEscala({ ...b, ate: "2026-10-31" }).ate).toBe("O último dia não pode ser anterior ao primeiro.");
     expect(errosEscala({ colaborador: "", tipo: "", de: "", ate: "" })).toEqual({ colaborador: "Escolha o colaborador.", tipo: "Escolha o turno.", de: "Indique o primeiro dia." });
+  });
+});
+
+describe("declarações", () => {
+  it("modelo: nome, título e texto; marcadores desconhecidos não passam", () => {
+    expect(errosModelo({ nome: "Trabalho", titulo: "DECLARAÇÃO", texto: "Declara-se que {{nome}}, admitido a {{ admissao }}, trabalha aqui." })).toEqual({});
+    expect(marcadoresDesconhecidos("{{nome}} {{salario}} {{morada}} {{ NIF }}")).toEqual(["morada", "NIF"]);
+    expect(errosModelo({ nome: "", titulo: "", texto: "Olá {{morada}}" })).toEqual({
+      nome: "Indique o nome do modelo.",
+      titulo: "Indique o título impresso.",
+      texto: "Marcador desconhecido: {{morada}}.",
+    });
+  });
+  it("código de verificação: letras e algarismos, com ou sem hífenes", () => {
+    expect(codigoVerificacaoValido("AB12CD34EF56")).toBe(true);
+    expect(codigoVerificacaoValido("AB12-CD34-EF56")).toBe(true);
+    expect(codigoVerificacaoValido("AB 12")).toBe(false);
+    expect(codigoVerificacaoValido("x/y")).toBe(false);
+  });
+});
+
+describe("desempenho", () => {
+  it("ciclo: nome; fim não antes do início", () => {
+    expect(errosCiclo({ nome: "2026", inicio: "2026-01-01", fim: "2026-12-31" })).toEqual({});
+    expect(errosCiclo({ nome: "", inicio: "2026-02-01", fim: "2026-01-31" })).toEqual({ nome: "Indique o nome do ciclo.", fim: "O ciclo não pode acabar antes de começar." });
+  });
+  it("objectivo: peso de 1 a 100 (vazio vale 100)", () => {
+    expect(errosObjectivo({ titulo: "Vender", descricao: "", peso: "" })).toEqual({});
+    expect(errosObjectivo({ titulo: "Vender", descricao: "", peso: "101" }).peso).toBe("O peso é de 1 a 100.");
+    expect(errosObjectivo({ titulo: "", descricao: "", peso: "0" })).toEqual({ titulo: "Indique o título.", peso: "O peso é de 1 a 100." });
+  });
+  it("resultado-chave: meta diferente da partida; valores até 4 casas, negativos aceites", () => {
+    expect(lerValorKr("1 250,5")).toBe("1250.5");
+    expect(lerValorKr("-3")).toBe("-3");
+    expect(lerValorKr("1,23456")).toBeNull();
+    expect(errosResultadoChave({ titulo: "Clientes", unidade: "", partida: "", meta: "10" })).toEqual({});
+    expect(errosResultadoChave({ titulo: "Clientes", unidade: "", partida: "0", meta: "0" }).meta).toBe("A meta tem de ser diferente do ponto de partida.");
+    expect(errosResultadoChave({ titulo: "", unidade: "x".repeat(31), partida: "a", meta: "" })).toEqual({
+      titulo: "Indique o título.",
+      unidade: "No máximo 30 caracteres.",
+      partida: "Número inválido (até 4 casas decimais).",
+      meta: "Indique a meta.",
+    });
+  });
+});
+
+describe("conquistas", () => {
+  it("código só ao criar; pontos de 0 a 10 000", () => {
+    expect(errosConquista({ codigo: "PONTUAL", nome: "Pontualidade", descricao: "", icone: "star", pontos: "50", nova: true })).toEqual({});
+    expect(errosConquista({ codigo: "", nome: "Pontualidade", descricao: "", icone: "", pontos: "10001", nova: true })).toEqual({ codigo: "Indique o código.", pontos: "Os pontos são de 0 a 10 000." });
+    expect(errosConquista({ codigo: "", nome: "Pontualidade", descricao: "", icone: "", pontos: "0", nova: false })).toEqual({});
   });
 });

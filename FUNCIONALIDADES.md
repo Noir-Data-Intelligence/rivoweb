@@ -3,10 +3,11 @@
 > **Estado:** fases **F0 a F6**, **F7a** e **F7b** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7a: portal do colaborador completo, já com retirar férias;
-> F7b: RH do dia-a-dia na gestão) e os blocos 1 e 2 da **F7c** (recrutamento,
-> entradas e saídas; anúncios e pedidos internos); 3.º bloco da F7c (formação
-> e turnos) concluído e verificado na base local, por publicar · actualizado a
-> 2026-10-17.
+> F7b: RH do dia-a-dia na gestão) e os blocos 1 a 3 da **F7c** (recrutamento,
+> entradas e saídas; anúncios e pedidos internos; formação e turnos); 4.º e
+> último bloco da F7c (declarações, desempenho, conquistas, importação de
+> colaboradores) concluído e verificado na base local, por publicar ·
+> actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -28,9 +29,9 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Anúncios, Pedidos internos |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Fornecedores |
@@ -184,6 +185,12 @@ AM = AssetManager.
 | Prazos de resposta e resolução por categoria (SLA): ver e definir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Formação:** formações (planear, corrigir, cancelar); inscrever; concluir com avaliação e certificado; cancelar inscrição | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Turnos:** escala por período (escalar, tirar); decidir pedidos de troca; tipos de turno (criar, corrigir, desactivar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Declarações:** emitir em nome de um colaborador (regista e descarrega o PDF); emitidas; verificar um código | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Modelos de declaração (criar, corrigir, desactivar; marcadores validados) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Desempenho:** ciclos (planear, corrigir, iniciar, fechar); objectivos, resultados-chave e valor actual | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Conquistas:** catálogo (criar, corrigir, desactivar); classificação; atribuir a um colaborador | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Ficha: separadores Conquistas e Declarações | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Importar colaboradores** de um CSV (resumo por linha) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -630,6 +637,47 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Tipos de turno:** código, nome, horário e estado; **criar** (código único,
   em maiúsculas) e **corrigir** (nome, horas, activo; o código não muda).
 
+**Declarações**
+- **Emitir** uma declaração em nome de um colaborador: escolher o modelo e
+  confirmar — fica registada com um código de verificação impresso e o PDF
+  descarrega-se (não se desfaz).
+- **Emitidas:** de todos ou de um colaborador, com a data, quem a pediu (o
+  próprio no portal ou os Recursos Humanos) e o código.
+- **Modelos:** nome, título impresso, texto com marcadores ({{nome}},
+  {{codigo}}, {{cargo}}, {{departamento}}, {{admissao}}, {{salario}},
+  {{moeda}}, {{nif}}, {{bi}}, {{data}}; um marcador desconhecido não passa),
+  se o próprio a pode pedir no portal e se está activo; **criar** e
+  **corrigir**.
+- **Verificar um código** impresso (com ou sem hífenes): mostra a declaração,
+  o colaborador, a data e quem a pediu.
+
+**Desempenho**
+- **Ciclos:** escolher o ciclo (por omissão o que está em curso), com o
+  período, o estado, os objectivos e o progresso médio; **planear**,
+  **corrigir**, **iniciar** (os colaboradores passam a vê-lo no portal) e
+  **fechar** (fica só de leitura; não se reabre).
+- **Objectivos** do ciclo, filtrados por colaborador ou departamento: dono,
+  peso, progresso e resultados-chave; **definir** (título, dono — colaborador
+  ou departamento —, peso de 1 a 100, descrição), **corrigir** e
+  **abandonar** (sai da média).
+- **Resultados-chave:** **juntar** (título, ponto de partida, meta diferente,
+  unidade) e **registar o valor actual** (decimal até 4 casas).
+
+**Conquistas**
+- **Catálogo:** nome, descrição, pontos, quantas vezes atribuída e estado;
+  **criar** (código único, pontos de 0 a 10 000, ícone) e **corrigir**
+  (desactivar deixa de a atribuir).
+- **Classificação** por pontos (os 10 primeiros).
+- **Atribuir** uma conquista activa a um colaborador, com nota (uma vez por
+  pessoa; o servidor recusa repetidas com o motivo).
+
+**Colaboradores**
+- **Importar CSV** com cabeçalho (Nome e DataAdmissao obrigatórias,
+  Departamento opcional pelo nome exacto; até 5 MB): resumo de importados,
+  duplicados e recusados, com o motivo de cada linha.
+- Na ficha, os separadores **Conquistas** (as do colaborador, com os pontos;
+  atribuir) e **Declarações** (as emitidas; emitir).
+
 **Departamentos**
 - Lista paginada com o responsável; **criar** e **corrigir** (nome e
   responsável).
@@ -694,8 +742,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Benefícios** e **Validades de imigração**
 - Tudo o que o Admin faz.
 
-**Recrutamento**, **Entradas e saídas**, **Formação**, **Turnos**, **Anúncios**
-e **Pedidos internos**
+**Recrutamento**, **Entradas e saídas**, **Formação**, **Turnos**,
+**Desempenho**, **Conquistas**, **Anúncios**, **Pedidos internos**,
+**Declarações** e importação de colaboradores
 - Tudo o que o Admin faz.
 
 **Departamentos**
@@ -913,7 +962,6 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F7c | Resto do RH na gestão (declarações, desempenho, conquistas, importação) |
 | F8 | Salários |
 | F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |

@@ -3,12 +3,10 @@ import { Pin } from "lucide-react";
 import { useId } from "react";
 import { useSearchParams } from "react-router";
 import { formatarDataDeInstante } from "@/lib/format/data";
-import { formatarPercentagem } from "@/lib/format/numero";
 import { IsoDate } from "@/lib/validation/text";
 import { Card } from "@/ui/Card";
 import { Input } from "@/ui/Field";
 import type { Anuncio } from "./api";
-import { percentagemBarra } from "./regras";
 
 /**
  * Janela de datas no URL (`?de=…&ate=…`), para o «voltar» e uma ligação
@@ -64,18 +62,7 @@ export function FiltroJanela({ de, ate, mudar, erro }: { de: string; ate: string
   );
 }
 
-/** Barra de progresso com o valor em texto ao lado (a barra só reforça). */
-export function BarraProgresso({ valor, rotulo }: { valor: number | string; rotulo: string }) {
-  const p = percentagemBarra(valor);
-  return (
-    <div className="flex items-center gap-3">
-      <div role="progressbar" aria-label={rotulo} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(p)} className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full bg-primary" style={{ width: `${p}%` }} />
-      </div>
-      <span className="w-14 text-right text-sm tabular-nums text-muted-foreground">{formatarPercentagem(Math.round(p))}</span>
-    </div>
-  );
-}
+export { BarraProgresso } from "@/ui/BarraProgresso";
 
 export function CartaoAnuncio({ a }: { a: Anuncio }) {
   return (

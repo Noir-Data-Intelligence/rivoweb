@@ -1785,7 +1785,8 @@ entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
 - **Testes:** 148 unitários; interface 5 cenários × 3 motores; suite inteira
   375, sem instáveis.
 
-**Bloco 3 — formação e turnos** (2026-10-17, por publicar)
+**Bloco 3 — formação e turnos** (publicado a 2026-10-17, `5135cf2`: CI
+verde, Vercel, smoke de produção 10/10)
 - **Ecrãs:** `/formacao` e `/formacao/:courseId` (não há GET de uma formação:
   lê-se da lista com as canceladas); `/turnos` com três vistas — escala
   (janela no URL, por omissão 7 dias, máximo 94), pedidos de troca (por
@@ -1808,6 +1809,34 @@ entradas/saídas; (2) anúncios e pedidos internos; (3) formação e turnos;
 - **Testes:** 152 unitários; interface 6 cenários × 3 motores; suite inteira
   393 (uma corrida com um timeout de carga no webkit, que passou isolado 5× e
   na segunda corrida inteira do webkit).
+
+**Bloco 4 — declarações, desempenho, conquistas e importação** (2026-10-17,
+por publicar). Fecha a F7c no front.
+- **Ecrãs:** `/declaracoes` (emitidas, modelos, verificar; emitir),
+  `/desempenho` (ciclo no URL, objectivos e resultados-chave), `/conquistas`
+  (catálogo, classificação, atribuir), «Importar CSV» em `/colaboradores`, e
+  na ficha os separadores Conquistas e Declarações. «Desempenho» e
+  «Conquistas» no grupo Talento; «Declarações» em Serviços.
+- **Factos:** emitir uma declaração é um GET que regista (PDF com código) —
+  só depois de confirmar e verificado só na base local; o código ignora
+  hífenes, espaços e maiúsculas; marcadores fechados
+  (`ManageDeclarations.Placeholders`); ciclo fechado deixa os objectivos só de
+  leitura; conquistas uma vez por pessoa (409).
+- **Peças partilhadas** movidas para `src/ui`: `ResultadoImportacao` (de
+  `pagar/comum`) e `BarraProgresso`/`percentagemBarra` (do portal, que as
+  reexporta).
+- **Leituras em produção** (HR, 2026-10-17): 3 modelos, nenhuma declaração
+  emitida, 1 ciclo em curso com 39 objectivos, 8 conquistas e a classificação
+  (200); Manager 403. Nada emitido em produção.
+- **Escritas:** verificadas **na base local** (`f7c-talento-escritas.spec.ts`):
+  modelo criado, declaração emitida pela ficha e o código verificado (com
+  hífenes e minúsculas); ciclo planeado, corrigido, objectivo com peso 60,
+  resultado-chave, valor 2,5, iniciado e fechado (só de leitura); conquista
+  criada, atribuída pela ficha e a repetida recusada; CSV com uma linha
+  importada e outra recusada. Modelo e conquista desactivados no fim.
+  **Nenhuma escrita em produção.**
+- **Testes:** 158 unitários; interface 4 cenários × 3 motores; suite inteira
+  405, sem instáveis.
 
 ### B20 a B23 resolvidos (finanças, 2026-10-16)
 

@@ -43,6 +43,8 @@ import { AvisoListaIncompleta, EstadoColaborador, nomeDepartamento } from "../co
 import { DadosPessoais } from "../ficha/DadosPessoais";
 import { DocumentosFicha } from "../ficha/Documentos";
 import { AccoesAssiduidade, ListaAssiduidade } from "./Assiduidade";
+import { ConquistasDoColaborador } from "./Conquistas";
+import { EmitirDeclaracao, ListaEmitidas } from "./Declaracoes";
 import { Aderir, ListaAdesoes } from "./Beneficios";
 import { CelebrarContrato, ListaContratos } from "./Contratos";
 import { ListaAusencias, PedirAusencia, Saldos } from "./Ferias";
@@ -646,7 +648,7 @@ function ContaDeAcesso({ ficha }: { ficha: Ficha }) {
   );
 }
 
-type VistaFicha = "resumo" | "dados-pessoais" | "documentos" | "contratos" | "ferias" | "assiduidade" | "beneficios";
+type VistaFicha = "resumo" | "dados-pessoais" | "documentos" | "contratos" | "ferias" | "assiduidade" | "beneficios" | "conquistas" | "declaracoes";
 
 export default function Colaborador() {
   const { employeeId = "" } = useParams();
@@ -660,6 +662,8 @@ export default function Colaborador() {
     { valor: "ferias", texto: "Férias", visivel: pode("hr.leave.read") },
     { valor: "assiduidade", texto: "Assiduidade", visivel: pode("hr.attendance.read") },
     { valor: "beneficios", texto: "Benefícios", visivel: pode("hr.benefits.read") },
+    { valor: "conquistas", texto: "Conquistas" },
+    { valor: "declaracoes", texto: "Declarações", visivel: pode("hr.declarations.write") },
   ];
   const vista = useVista(vistas);
   const voltar = (
@@ -723,6 +727,15 @@ export default function Colaborador() {
         <div className="flex flex-col gap-4">
           <AccoesAssiduidade colaboradorFixo={employeeId} />
           <ListaAssiduidade colaborador={employeeId} comNome={false} />
+        </div>
+      ) : vista === "conquistas" ? (
+        <ConquistasDoColaborador employeeId={employeeId} />
+      ) : vista === "declaracoes" ? (
+        <div className="flex flex-col gap-4">
+          <div>
+            <EmitirDeclaracao colaboradorFixo={employeeId} />
+          </div>
+          <ListaEmitidas colaborador={employeeId} comNome={false} />
         </div>
       ) : vista === "beneficios" ? (
         <div className="flex flex-col gap-4">

@@ -134,3 +134,54 @@ export const escala = (dia: string): S["ShiftAssignmentView"][] => [
 export const trocasGestao = (dia: string, estado = "Pending"): S["ShiftChangeView"][] => [
   { requestId: IDF7C3.troca, assignmentId: IDF7C3.escalado, day: dia, requesterEmployeeId: ID.emp2, requesterName: "Carlos Teste", proposedEmployeeId: ID.emp1, proposedName: "Ana Teste", reason: "Consulta médica.", status: estado, requestedAt: "2026-10-16T10:00:00+00:00", decidedAt: estado === "Pending" ? null : "2026-10-17T10:00:00+00:00", decisionNotes: null },
 ];
+
+// --- Bloco 4: declarações, desempenho, conquistas, importação
+
+export const IDF7C4 = {
+  modelo: "00000000-0000-4000-8000-000000000961",
+  emitida: "00000000-0000-4000-8000-000000000962",
+  ciclo: "00000000-0000-4000-8000-000000000963",
+  cicloPlaneado: "00000000-0000-4000-8000-000000000964",
+  objectivo: "00000000-0000-4000-8000-000000000965",
+  kr: "00000000-0000-4000-8000-000000000966",
+  conquista: "00000000-0000-4000-8000-000000000967",
+} as const;
+
+export const modelosGestao = (): S["DocumentTemplateView"][] => [
+  { templateId: IDF7C4.modelo, name: "Declaração de trabalho", title: "DECLARAÇÃO", body: "Declara-se que {{nome}} trabalha nesta empresa desde {{admissao}}.", selfService: true, active: true },
+];
+
+export const emitidas = (): S["IssuedDeclarationView"][] => [
+  { declarationId: IDF7C4.emitida, templateId: IDF7C4.modelo, title: "DECLARAÇÃO", employeeId: ID.emp2, employeeName: "Carlos Teste", issuedAt: "2026-10-16T10:00:00+00:00", bySelf: true, verificationCode: "AB12CD34EF56", contentHash: "x" },
+];
+
+export const ciclos = (estadoPlaneado = "Planned"): S["ReviewCycleView"][] => [
+  { cycleId: IDF7C4.ciclo, name: "Avaliação 2026", startsOn: "2026-01-01", endsOn: "2026-12-31", status: "Active", objectives: 1, averageProgress: 40 },
+  { cycleId: IDF7C4.cicloPlaneado, name: "Avaliação 2027", startsOn: "2027-01-01", endsOn: "2027-12-31", status: estadoPlaneado, objectives: 0, averageProgress: 0 },
+];
+
+export const objectivosGestao = (valor = 4): S["ObjectiveView"][] => [
+  {
+    objectiveId: IDF7C4.objectivo,
+    cycleId: IDF7C4.ciclo,
+    title: "Visitar clientes",
+    description: null,
+    ownerEmployeeId: ID.emp2,
+    ownerName: "Carlos Teste",
+    departmentId: null,
+    weight: 50,
+    dropped: false,
+    progress: valor * 10,
+    keyResults: [{ keyResultId: IDF7C4.kr, title: "Clientes visitados", unit: "clientes", startValue: 0, targetValue: 10, currentValue: valor, progress: valor * 10 }],
+  },
+];
+
+export const conquistasGestao = (): S["AchievementView"][] => [
+  { achievementId: IDF7C4.conquista, code: "PONTUAL", name: "Pontualidade", description: "Um mês sem atrasos.", icon: "star", points: 50, active: true, awarded: 3 },
+];
+
+export const classificacao = (): S["LeaderboardEntry"][] => [{ employeeId: ID.emp2, employeeName: "Carlos Teste", points: 150, achievements: 3 }];
+
+export const conquistasDe = (): S["EmployeeAchievementView"][] => [
+  { awardId: "00000000-0000-4000-8000-000000000968", employeeId: ID.emp2, achievementId: IDF7C4.conquista, code: "PONTUAL", name: "Pontualidade", icon: "star", points: 50, awardedAt: "2026-10-01T10:00:00+00:00", note: "Bom trabalho." },
+];

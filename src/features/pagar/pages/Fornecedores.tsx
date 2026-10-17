@@ -18,10 +18,10 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Paginacao } from "@/ui/Paginacao";
+import { ResultadoImportacao } from "@/ui/ResultadoImportacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useFornecedores, useImportarFornecedores, useRegistarFornecedor, type Fornecedor } from "../api";
-import { ResultadoImportacao } from "../comum";
 
 /** IBAN com a verificação da norma ISO 13616 (a mesma do servidor). Vazio é permitido. */
 const iban = z.string().check(

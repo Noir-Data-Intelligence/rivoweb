@@ -191,7 +191,7 @@ test.describe("RH do dia-a-dia", () => {
     await entrar(page, meRhF7.email);
     await page.goto(`/colaboradores/${ID.emp2}`);
     const vistas = page.getByRole("navigation", { name: "Ficha" });
-    await expect(vistas.getByRole("link")).toHaveText(["Resumo", "Dados pessoais", "Documentos", "Contratos", "Férias", "Assiduidade", "Benefícios"]);
+    await expect(vistas.getByRole("link")).toHaveText(["Resumo", "Dados pessoais", "Documentos", "Contratos", "Férias", "Assiduidade", "Benefícios", "Conquistas", "Declarações"]);
     await vistas.getByRole("link", { name: "Dados pessoais" }).click();
     await expect(page.getByRole("button", { name: "Ver dados pessoais" })).toBeVisible();
     expect(api.pedidos.filter((p) => p.caminho.endsWith("/personal-data") || p.caminho.endsWith("/immigration"))).toHaveLength(0);
@@ -221,11 +221,11 @@ test.describe("RH do dia-a-dia", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("ficha: quem só lê colaboradores vê o resumo e os documentos", async ({ page, api }) => {
+  test("ficha: quem só lê colaboradores vê o resumo, os documentos e as conquistas", async ({ page, api }) => {
     await comF7b(api, meLeitorRh).ligar();
     await entrar(page, meLeitorRh.email);
     await page.goto(`/colaboradores/${ID.emp2}?vista=dados-pessoais`);
-    await expect(page.getByRole("navigation", { name: "Ficha" }).getByRole("link")).toHaveText(["Resumo", "Documentos"]);
+    await expect(page.getByRole("navigation", { name: "Ficha" }).getByRole("link")).toHaveText(["Resumo", "Documentos", "Conquistas"]);
     // A vista pedida sem acesso cai no resumo.
     await expect(page.getByRole("heading", { name: "Dados", exact: true })).toBeVisible();
     expect(api.pedidos.filter((p) => p.caminho.endsWith("/personal-data"))).toHaveLength(0);
