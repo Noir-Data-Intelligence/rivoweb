@@ -1,13 +1,11 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F6**, **F7a** e **F7b** publicadas em
+> **Estado:** fases **F0 a F7** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
-> planeamento; F7a: portal do colaborador completo, já com retirar férias;
-> F7b: RH do dia-a-dia na gestão) e os blocos 1 a 3 da **F7c** (recrutamento,
-> entradas e saídas; anúncios e pedidos internos; formação e turnos); 4.º e
-> último bloco da F7c (declarações, desempenho, conquistas, importação de
-> colaboradores) concluído e verificado na base local, por publicar ·
-> actualizado a 2026-10-17.
+> planeamento; F7: recursos humanos completos — portal do colaborador, RH do
+> dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
+> formação, turnos, declarações, desempenho, conquistas e importação de
+> colaboradores) · actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou

@@ -1810,8 +1810,9 @@ verde, Vercel, smoke de produção 10/10)
   393 (uma corrida com um timeout de carga no webkit, que passou isolado 5× e
   na segunda corrida inteira do webkit).
 
-**Bloco 4 — declarações, desempenho, conquistas e importação** (2026-10-17,
-por publicar). Fecha a F7c no front.
+**Bloco 4 — declarações, desempenho, conquistas e importação** (publicado a
+2026-10-17, `f2cbd28`: CI verde, Vercel, smoke de produção 10/10). Fecha a
+F7c e a F7 no front.
 - **Ecrãs:** `/declaracoes` (emitidas, modelos, verificar; emitir),
   `/desempenho` (ciclo no URL, objectivos e resultados-chave), `/conquistas`
   (catálogo, classificação, atribuir), «Importar CSV» em `/colaboradores`, e
