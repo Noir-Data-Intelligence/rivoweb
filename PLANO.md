@@ -1875,7 +1875,9 @@ produção 10/10 com `9953ca9`)
 - **Testes:** 167 unitários; interface 6 cenários × 3 motores; suite inteira
   438, sem instáveis.
 
-**Bloco 2 — inventário** (2026-10-17, por publicar)
+**Bloco 2 — inventário** (publicado a 2026-10-17, `9cc755d`: CI verde,
+Vercel, smoke de produção 10/10 — o Admin e o Finance falharam por tempo com
+dois trabalhadores e passaram sozinhos: o perfil Admin já percorre ~70 páginas)
 - **Ecrãs:** `/artigos` e `/artigos/:id` (em mão por armazém, movimentos,
   movimentar, activar), `/armazens`, `/contagens` e `/contagens/:id` (contar,
   fechar, ver decisão, cancelar), `/valorizacao` (janela no URL). Menu
@@ -1898,6 +1900,29 @@ produção 10/10 com `9953ca9`)
   armazéns desactivados no fim. **Nenhuma escrita em produção.**
 - **Testes:** 174 unitários; interface 5 cenários × 3 motores; suite inteira
   456, sem instáveis.
+
+**Bloco 3 — activos fixos** (2026-10-17, por publicar). Fecha a F9 no front.
+- **Ecrãs:** `/activos` (vistas: activos — registar, correr amortização —,
+  manutenção, custódia, seguros a caducar) e `/activos/:id` (plano,
+  corrigir, abater; manutenção, custódia, seguros). Menu «Activos».
+  `finance.assets.*`: Admin, Finance e AssetManager (Manager 403).
+- **Regras:** por omissão a amortização começa no **mês seguinte** à
+  aquisição (o domínio, linha `AddMonths(1)`; a primeira ajuda do formulário
+  dizia o contrário e foi corrigida); corrigir só sem amortização registada; o
+  `PUT` envia tudo (a factura de compra ligada mantém-se); a corrida mensal é
+  idempotente.
+- **Peças:** `pagar/index.ts` passa a expor `useFornecedores`.
+- **B31 pedido:** o Finance e o AssetManager não escolhem a quem entregar.
+- **Leituras em produção** (Admin, 2026-10-17): 32 activos (31 em uso, 1
+  abatido; todos em AOA e lineares), 8 manutenções, 19 custódias, 8 apólices
+  (200); Finance e AssetManager 200, Manager 403.
+- **Escritas:** verificadas **na base local** (`f9-activos-escritas.spec.ts`):
+  activo registado (Jan/2020) e amortizado em Fev/2020 pela corrida (10 000
+  Kz; deixou de se corrigir), outro corrigido e abatido, manutenção agendada e
+  concluída, custódia entregue e devolvida, apólice registada e cancelada;
+  tudo conferido no servidor. **Nenhuma escrita em produção.**
+- **Testes:** 180 unitários; interface 5 cenários × 3 motores; suite inteira
+  471, sem instáveis.
 
 ### B29 e B30 resolvidos (compras, 2026-10-17)
 

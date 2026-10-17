@@ -8,7 +8,7 @@ type S = components["schemas"];
 
 const COMPRAS = ["procurement.requisitions.read", "procurement.requisitions.write", "procurement.orders.read", "procurement.orders.write", "procurement.receipts.read", "procurement.receipts.write"];
 
-export const meAdminF9: S["CurrentUserResponse"] = { ...meAdminF5, permissions: [...new Set([...meAdminF5.permissions, ...COMPRAS, "approval.requests.read", "inventory.items.read", "inventory.items.write"])] };
+export const meAdminF9: S["CurrentUserResponse"] = { ...meAdminF5, permissions: [...new Set([...meAdminF5.permissions, ...COMPRAS, "approval.requests.read", "inventory.items.read", "inventory.items.write", "finance.assets.read", "finance.assets.write"])] };
 /** O Manager de produção: requisições e ordens, lê as recepções; não lê os RH. */
 export const meGestorF9: S["CurrentUserResponse"] = {
   ...meGestorF5,
@@ -21,7 +21,7 @@ export const meActivosF9: S["CurrentUserResponse"] = {
   email: "activos@teste.local",
   displayName: "Activos Teste",
   roles: ["AssetManager"],
-  permissions: ["procurement.orders.read", "procurement.receipts.read", "procurement.receipts.write", "procurement.suppliers.read", "inventory.items.read", "inventory.items.write"],
+  permissions: ["procurement.orders.read", "procurement.receipts.read", "procurement.receipts.write", "procurement.suppliers.read", "inventory.items.read", "inventory.items.write", "finance.assets.read", "finance.assets.write"],
 };
 
 export const IDF9 = {
@@ -131,3 +131,62 @@ export const contagem = (estado = "Open", contados = true): S["InventoryCountVie
 
 /** `/procurement/lookups` (B29). */
 export const escolhasCompras = (): S["ProcurementLookups"] => ({ departments: [{ id: ID.dep1, name: "Operações" }] });
+
+// --- Bloco 3: activos fixos
+
+export const IDF9C = {
+  portatil: "00000000-0000-4000-8000-000000000c01",
+  abatido: "00000000-0000-4000-8000-000000000c02",
+  manutencao: "00000000-0000-4000-8000-000000000c03",
+  custodia: "00000000-0000-4000-8000-000000000c04",
+  apolice: "00000000-0000-4000-8000-000000000c05",
+} as const;
+
+export const activo = (amortizado = false): S["FixedAssetView"] => ({
+  assetId: IDF9C.portatil,
+  code: "AF-001",
+  name: "Portátil Dell",
+  category: "Equipamento informático",
+  location: "Sede",
+  serialNumber: "SN123",
+  costCentreId: null,
+  supplierId: null,
+  purchaseInvoiceId: null,
+  acquiredOn: "2026-03-10",
+  depreciationStartsOn: "2026-03-01",
+  acquisitionCost: 850000,
+  residualValue: 50000,
+  currency: "AOA",
+  method: "StraightLine",
+  usefulLifeMonths: 36,
+  annualRate: null,
+  totalUnits: null,
+  accumulatedDepreciation: amortizado ? 22222.22 : 0,
+  netBookValue: amortizado ? 827777.78 : 850000,
+  status: "Active",
+  disposedOn: null,
+  disposalValue: null,
+  disposalReason: null,
+});
+
+export const activos = (): S["FixedAssetView"][] => [
+  activo(true),
+  { ...activo(true), assetId: IDF9C.abatido, code: "AF-002", name: "Cadeira antiga", category: "Mobiliário", status: "Disposed", disposedOn: "2026-09-30", disposalValue: 5000, disposalReason: "Partida" },
+];
+
+export const fichaActivo = (amortizado = true): S["FixedAssetDetailView"] => ({
+  asset: activo(amortizado),
+  schedule: [
+    { month: "2026-03-01", amount: 22222.22, accumulatedAfter: 22222.22, netBookValueAfter: 827777.78, recorded: amortizado, unitsUsed: null },
+    { month: "2026-04-01", amount: 22222.22, accumulatedAfter: 44444.44, netBookValueAfter: 805555.56, recorded: false, unitsUsed: null },
+  ],
+  maintenance: [{ maintenanceId: IDF9C.manutencao, assetId: IDF9C.portatil, kind: "Preventive", description: "Limpeza interna", scheduledOn: "2026-11-05", completedOn: null, cost: null, provider: "TecLuanda", notes: null, status: "Scheduled" }],
+});
+
+export const custodias = (aberta = true): S["AssetCustodyView"][] => [
+  { custodyId: IDF9C.custodia, assetId: IDF9C.portatil, assetCode: "AF-001", assetName: "Portátil Dell", employeeId: ID.emp2, employeeName: "Carlos Teste", assignedOn: "2026-03-15", conditionOnAssign: "Novo", returnedOn: aberta ? null : "2026-10-17", conditionOnReturn: null, notes: null, open: aberta },
+];
+
+export const apolices = (): S["AssetInsuranceView"][] => [
+  { policyId: IDF9C.apolice, assetId: IDF9C.portatil, insurer: "ENSA", policyNumber: "AP-77", coverage: "Danos e roubo", startsOn: "2026-01-01", endsOn: "2026-12-31", premium: 45000, insuredValue: 850000, currency: "AOA", cancelled: false, active: true, daysToExpiry: 75 },
+];

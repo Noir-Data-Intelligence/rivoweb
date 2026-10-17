@@ -37,6 +37,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/armazens", titulo: "Armazéns", icone: Warehouse, requer: R["/armazens"], grupo: "Inventário" },
     { caminho: "/contagens", titulo: "Contagens", icone: ClipboardCheck, requer: R["/contagens"], grupo: "Inventário" },
     { caminho: "/valorizacao", titulo: "Valorização do stock", icone: TrendingUp, requer: R["/valorizacao"], grupo: "Inventário" },
+    { caminho: "/activos", titulo: "Activos fixos", icone: Laptop, requer: R["/activos"], grupo: "Activos" },
     { caminho: "/fornecedores", titulo: "Fornecedores", icone: Truck, requer: R["/fornecedores"], grupo: "Pagamentos" },
     { caminho: "/facturas-compra", titulo: "Facturas de compra", icone: FileInput, requer: R["/facturas-compra"], grupo: "Pagamentos" },
     { caminho: "/pedidos-pagamento", titulo: "Pedidos de pagamento", icone: HandCoins, requer: R["/pedidos-pagamento"], grupo: "Pagamentos" },

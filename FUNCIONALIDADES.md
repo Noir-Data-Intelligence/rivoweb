@@ -6,9 +6,9 @@
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
 > colaboradores; F8: salários — folhas de pagamento) e o 1.º bloco da **F9**
-> (compras: requisições, ordens de compra, recepções); 2.º bloco da F9
-> (inventário) concluído e verificado na base local, por publicar ·
-> actualizado a 2026-10-17.
+> (compras: requisições, ordens de compra, recepções) e o 2.º (inventário);
+> 3.º e último bloco da F9 (activos fixos) concluído e verificado na base
+> local, por publicar · actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -30,12 +30,12 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
-| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores |
+| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
@@ -118,6 +118,13 @@ AM = AssetManager.
 | Armazéns: ver, registar, activar e desactivar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Contagens: abrir, contar artigos, fechar (com divergências pode ir a aprovação), ver a decisão, cancelar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Valorização do stock por período | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| **Activos fixos** | | | | | | | | | | |
+| Ver os activos (custo, amortizado, valor líquido), o plano de amortização, a manutenção, a custódia e os seguros | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Registar e corrigir (antes da primeira amortização); abater | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Correr a amortização de um mês | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Custódia: entregar a um colaborador ¹⁴ e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -243,6 +250,7 @@ Recursos Humanos.»
 ¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
+¹⁴ Escolher a quem entregar exige ler os Recursos Humanos: o Finance e o AssetManager não o têm (B31); devolver não.
 
 ---
 
@@ -443,6 +451,30 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Valorização do stock**
 - Valor dos movimentos de cada artigo num período (por omissão, o mês
   corrente), com o total.
+
+**Activos fixos**
+- **Activos:** por estado (em uso, abatidos) e categoria, com o custo, o
+  amortizado e o valor líquido; **registar** (nome, código — vazio gera um —,
+  categoria, localização, n.º de série, centro de custo, fornecedor, data de
+  aquisição e de início da amortização — vazio é o mês seguinte —, custo,
+  residual, moeda, método linear, decrescente com taxa anual ou por unidades
+  de produção com o total, vida útil de 1 a 1200 meses); **correr a
+  amortização** de um mês (as unidades usadas, nos activos por unidades;
+  correr de novo não duplica), com o resultado (registados, já registados,
+  total e saltados).
+- **Activo:** valores, plano de amortização com cada mês registado ou
+  previsto; **corrigir** (só antes da primeira amortização registada);
+  **abater** (data depois da aquisição, valor de venda, motivo).
+- **Manutenção:** de cada activo e de todos (agendadas, concluídas,
+  canceladas); **agendar** (tipo — preventiva, correctiva, inspecção —,
+  descrição, data, prestador, custo estimado), **concluir** (data, custo,
+  notas), **cancelar**.
+- **Custódia:** quem tem o activo e o histórico; **entregar** a um
+  colaborador (data, estado, notas; ele vê-o no portal) e **registar a
+  devolução** (não antes da entrega, estado, notas).
+- **Seguros:** apólices de cada activo e as que caducam em 30, 60 ou 90 dias;
+  **registar** e **corrigir** (seguradora, número, cobertura, vigência,
+  prémio, capital seguro), **cancelar**.
 
 **Fornecedores**
 - Lista paginada (nome, NIF, cidade, contacto, estado), com ou sem inactivos.
@@ -880,6 +912,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver as ordens e as recepções, com quem recebeu. Não vê requisições, não
   emite nem cancela ordens e não regista recepções.
 
+**Activos fixos**
+- Tudo o que o Admin faz, salvo escolher a quem entregar um activo (B31).
+
 **Fornecedores**
 - Ver a lista e a ficha (não regista nem corrige).
 
@@ -979,6 +1014,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Artigos**, **Armazéns**, **Contagens** e **Valorização do stock**
 - Tudo o que o Admin faz no inventário.
+
+**Activos fixos**
+- Tudo o que o Admin faz, salvo escolher a quem entregar um activo (B31).
 
 **Fornecedores**
 - Ver a lista e a ficha.
@@ -1080,7 +1118,6 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F9 | Compras, inventário e activos |
 | F10 | Portal do cliente, gestão documental e mensagens |
 | F11 | Comercial avançado (CRM, contratos) |
 | F12 | Projectos e frota |

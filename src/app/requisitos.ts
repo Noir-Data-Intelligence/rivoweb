@@ -80,6 +80,7 @@ export const REQUISITO_PAGINA = {
   "/armazens": "inventory.items.read",
   "/contagens": "inventory.items.read",
   "/valorizacao": "inventory.items.read",
+  "/activos": "finance.assets.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */

@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração) e
+> **B31** (activos).
 > **B29** e **B30** estão resolvidos (PR #108) e o front já os usa: nomes nas
 > requisições e recepções, departamentos em `/procurement/lookups`, linhas pela
 > ordem em que foram escritas. **B26** a **B28** estão resolvidos (PR #107,
@@ -233,3 +234,18 @@ escreveu.
 
 **Pedido:** guardar a posição de cada linha (como `LifecycleTask.Order`) e
 devolver as linhas por essa ordem.
+
+## B31 — Quem gere os activos não escolhe a quem os entrega
+
+**Facto:** `POST /finance/assets/{assetId}/custody` pede `employeeId`, mas o
+Finance e o AssetManager, que têm `finance.assets.write`, não têm
+`hr.employees.read` (lido em `/identity/me` de produção a 2026-10-17). A
+lista de custódia já traz `employeeName`.
+
+**Consequência:** esses perfis vêem e devolvem as custódias, mas não entregam
+um activo a ninguém: o front explica porquê e só mostra «Entregar» a quem lê
+os Recursos Humanos.
+
+**Pedido:** como o B22 e o B29, uma lista curta de colaboradores activos
+(id e nome) para quem tem `finance.assets.write`, por exemplo
+`GET /finance/assets/lookups`.
