@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
 > 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `db34b07`. Em aberto: **B24** (configuração),
-> **B29** e **B30** (compras). **B26** a **B28** estão resolvidos (PR #107,
+> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração).
+> **B29** e **B30** estão resolvidos (PR #108) e o front já os usa: nomes nas
+> requisições e recepções, departamentos em `/procurement/lookups`, linhas pela
+> ordem em que foram escritas. **B26** a **B28** estão resolvidos (PR #107,
 > ADR-086) e o front já os usa: contratos de um colaborador paginados, uma
 > folha por mês e o colaborador uma vez por folha, tirar um item e anular um
 > rascunho. **B20** a **B23** estão resolvidos (PR #105, ADR-085) e o front já
@@ -198,6 +200,8 @@ tira.
 
 ## B29 — Requisições e recepções só trazem ids de pessoas e departamentos
 
+> **Resolvido** (PR #108, 2026-10-17); o front usa-o e foi verificado na base local (`727666d`).
+
 **Facto:** `RequisitionView` traz `requestedByEmployeeId` e `departmentId`, e
 `GoodsReceiptView` traz `receivedByEmployeeId`, sem nomes. O Manager, o
 Finance e o AssetManager, que trabalham com compras, não têm
@@ -214,6 +218,8 @@ departamentos para quem tem `procurement.requisitions.write` (por exemplo
 `GET /procurement/lookups`).
 
 ## B30 — As linhas de requisições e ordens não têm ordem garantida
+
+> **Resolvido** (PR #108, 2026-10-17); o front usa-o e foi verificado na base local (`727666d`).
 
 **Facto:** as linhas de `RequisitionView` e `PurchaseOrderView` vêm sem ordem
 definida (a consulta não tem `ORDER BY` e não há coluna de posição). Na base

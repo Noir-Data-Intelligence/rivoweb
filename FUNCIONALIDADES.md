@@ -104,12 +104,12 @@ AM = AssetManager.
 | Registar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Anular | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Compras** | | | | | | | | | | |
-| Ver as requisições (linhas, total estimado, estado) ¹⁴ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Ver as requisições (quem pediu, departamento, linhas, total estimado, estado) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Abrir requisição, submeter para aprovação, ver a decisão, cancelar com motivo ¹³ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Emitir ordem de compra a partir da requisição aprovada | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Ver as ordens de compra (encomendado, recebido, o que falta) | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
 | Cancelar ordem de compra (com motivo, sem mercadoria recebida) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Ver as recepções ¹⁴ | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
+| Ver as recepções (quem recebeu) | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
 | Registar recepção (sem passar o que falta) e anular com motivo ¹³ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Inventário** | | | | | | | | | | |
 | Artigos: em mão, custo médio e valor; por armazém e movimentos | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
@@ -243,7 +243,6 @@ Recursos Humanos.»
 ¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
-¹⁴ Quem não lê os Recursos Humanos vê «Colaborador» e «Departamento» em vez dos nomes (B29).
 
 ---
 
@@ -878,8 +877,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver séries, canais de pagamento e taxas de IVA.
 
 **Ordens de compra** e **Recepções**
-- Ver as ordens e as recepções (com «Colaborador» em vez de quem recebeu, B29).
-  Não vê requisições, não emite nem cancela ordens e não regista recepções.
+- Ver as ordens e as recepções, com quem recebeu. Não vê requisições, não
+  emite nem cancela ordens e não regista recepções.
 
 **Fornecedores**
 - Ver a lista e a ficha (não regista nem corrige).
@@ -937,8 +936,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **avaliar agora**.
 
 **Requisições** e **Ordens de compra**
-- Tudo o que o Admin faz nas requisições e nas ordens (vê «Colaborador» e
-  «Departamento» em vez dos nomes, e não escolhe o departamento, B29).
+- Tudo o que o Admin faz nas requisições e nas ordens (os nomes e a escolha do
+  departamento vêm das compras, sem precisar dos Recursos Humanos).
 
 **Recepções**
 - Ver as recepções. Não as regista nem anula.
@@ -975,9 +974,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver alertas e regras.
 
 **Ordens de compra** e **Recepções**
-- Ver as ordens e as recepções; **registar** recepções e **anulá-las** com
-  motivo (vê «Colaborador» em vez de quem recebeu, B29). Não vê requisições,
-  não emite nem cancela ordens.
+- Ver as ordens e as recepções (com quem recebeu); **registar** recepções e
+  **anulá-las** com motivo. Não vê requisições, não emite nem cancela ordens.
 
 **Artigos**, **Armazéns**, **Contagens** e **Valorização do stock**
 - Tudo o que o Admin faz no inventário.

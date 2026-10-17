@@ -1,8 +1,6 @@
-/** Peças partilhadas das compras: estados, editor de linhas e nomes de colaboradores (só a quem lê os RH). */
+/** Peças partilhadas das compras: estados, editor de linhas e nomes. */
 import { Plus, Trash2 } from "lucide-react";
 import { moeda } from "@/features/facturacao";
-import { useUtilizador } from "@/features/identity";
-import { useNomeColaborador } from "@/features/rh";
 import { Badge, type TomBadge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Field, Input } from "@/ui/Field";
@@ -35,13 +33,8 @@ export const EstadoRecepcao = estado({
   Cancelled: { texto: "Anulada", tom: "neutro" },
 });
 
-/** Nome do colaborador; quem não lê os RH vê «Colaborador» (nunca o id — B29). */
-export function useNomePessoa() {
-  const { pode } = useUtilizador();
-  const le = pode("hr.employees.read");
-  const nomeDe = useNomeColaborador();
-  return (id: string) => (le ? nomeDe(id) : "Colaborador");
-}
+/** Nome vindo do servidor (B29); `null` quer dizer que os RH já não o conhecem. */
+export const nomeOuTraco = (nome: string | null) => nome ?? "—";
 
 export const valor = (v: number | string, m: string) => moeda(v, m);
 

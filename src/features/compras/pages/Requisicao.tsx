@@ -8,7 +8,6 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { Can, useUtilizador } from "@/features/identity";
-import { useTodosDepartamentos } from "@/features/rh";
 import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
@@ -31,7 +30,7 @@ import {
   type OrdemCompra,
   type Requisicao as TipoRequisicao,
 } from "../api";
-import { EditorLinhas, EstadoOrdem, EstadoRequisicao, useNomePessoa, valor } from "../comum";
+import { EditorLinhas, EstadoOrdem, EstadoRequisicao, nomeOuTraco, valor } from "../comum";
 import { errosOrdem, linhasParaApi, temErros, type LinhaRascunho } from "../regras";
 
 type Linha = TipoRequisicao["lines"][number];
@@ -213,8 +212,6 @@ export default function Requisicao() {
   const { requisitionId = "" } = useParams();
   const { pode } = useUtilizador();
   const q = useRequisicao(requisitionId);
-  const nomeDe = useNomePessoa();
-  const departamentos = useTodosDepartamentos(pode("hr.departments.read"));
   const leOrdens = pode("procurement.orders.read");
   const ordens = useOrdens({ requisicao: requisitionId, fornecedor: null, pagina: 1, tamanho: 200 }, leOrdens && q.data?.status === "Approved");
   const voltar = (
@@ -236,7 +233,7 @@ export default function Requisicao() {
   }
   const r = q.data;
   const escreve = pode("procurement.requisitions.write");
-  const dep = r.departmentId ? (departamentos.data?.items.find((d) => d.departmentId === r.departmentId)?.name ?? "Departamento") : "—";
+  const dep = r.departmentId ? nomeOuTraco(r.departmentName) : "—";
   const disponivel = new Big(r.estimatedTotal).minus(encomendado(ordens.data?.items ?? []));
   const colunas: Coluna<Linha>[] = [
     { id: "descricao", cabecalho: "Descrição", celula: (l) => l.description },
@@ -253,7 +250,7 @@ export default function Requisicao() {
           <span className="inline-flex flex-wrap items-center gap-2">
             <EstadoRequisicao estado={r.status} />
             <span>
-              {valor(r.estimatedTotal, r.currency)} · {nomeDe(r.requestedByEmployeeId)} · {formatarData(r.requestedOn)}
+              {valor(r.estimatedTotal, r.currency)} · {nomeOuTraco(r.requestedByName)} · {formatarData(r.requestedOn)}
             </span>
           </span>
         }

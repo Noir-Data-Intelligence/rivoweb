@@ -118,6 +118,8 @@ test("F9: requisição aprovada, ordem emitida, recepção registada e anulada",
     await page.getByRole("button", { name: "Submeter para aprovação" }).click();
     await dialogo(page).getByRole("button", { name: "Submeter" }).click();
     await expect(page.getByText("À espera de decisão em Aprovações.")).toBeVisible();
+    // B29: o Manager (sem RH) vê o próprio nome como requisitante.
+    await expect(page.getByText(`${marca} Quem pede`, { exact: false })).toBeVisible();
     await sair(page);
 
     // --- Admin: aprova ---
@@ -137,12 +139,12 @@ test("F9: requisição aprovada, ordem emitida, recepção registada e anulada",
     await expect(page.getByText("Aprovada", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Emitir ordem de compra" }).click();
     await dialogo(page).getByLabel("Fornecedor").selectOption({ label: `${fornecedor} · ${nif}` });
-    // A ordem das linhas não é garantida (B30): acha-se a do papel pela descrição.
-    const nPapel = (await dialogo(page).getByLabel("Descrição da linha 1").inputValue()) === "Papel A4" ? 1 : 2;
-    await dialogo(page).getByLabel(`Preço acordado da linha ${nPapel}`).fill("3 000");
+    // As linhas vêm pela ordem em que foram escritas (B30).
+    await expect(dialogo(page).getByLabel("Descrição da linha 1")).toHaveValue("Papel A4");
+    await dialogo(page).getByLabel("Preço acordado da linha 1").fill("3 000");
     await dialogo(page).getByRole("button", { name: "Emitir ordem" }).click();
     await expect(dialogo(page).getByText(/^Passa o valor aprovado/)).toBeVisible();
-    await dialogo(page).getByLabel(`Preço acordado da linha ${nPapel}`).fill("2 000");
+    await dialogo(page).getByLabel("Preço acordado da linha 1").fill("2 000");
     await dialogo(page).getByRole("button", { name: "Emitir ordem" }).click();
     await expect(page.getByRole("heading", { name: `Ordem a ${fornecedor}`, level: 1 })).toBeVisible();
     const ordemId = page.url().split("/").pop() ?? "";
@@ -158,6 +160,8 @@ test("F9: requisição aprovada, ordem emitida, recepção registada e anulada",
     await dialogo(page).getByRole("button", { name: "Registar recepção" }).click();
     await expect(dialogo(page)).toHaveCount(0);
     await expect(page.getByRole("table", { name: "Recepções da ordem" })).toContainText("4 × Papel A4");
+    // B29: quem recebeu, pelo nome.
+    await expect(page.getByRole("table", { name: "Recepções da ordem" })).toContainText(`${marca} Quem aprova`);
     await page.getByRole("button", { name: "Anular" }).click();
     await dialogo(page).getByLabel("Motivo").fill("Contagem errada.");
     await dialogo(page).getByRole("button", { name: "Anular recepção" }).click();
@@ -174,8 +178,7 @@ test("F9: requisição aprovada, ordem emitida, recepção registada e anulada",
     const o = await sa<{ status: string; total: number; fullyReceived: boolean; requisitionId: string; lines: { description: string; quantityReceived: number; unitPrice: number }[] }>("GET", `/procurement/orders/${ordemId}`);
     expect(o.corpo).toMatchObject({ status: "Issued", fullyReceived: true, requisitionId });
     expect(Number(o.corpo.total)).toBe(120000);
-    // A ordem das linhas na resposta não é garantida.
-    expect(o.corpo.lines.map((l) => [l.description, Number(l.quantityReceived), Number(l.unitPrice)]).sort()).toEqual([
+    expect(o.corpo.lines.map((l) => [l.description, Number(l.quantityReceived), Number(l.unitPrice)])).toEqual([
       ["Papel A4", 10, 2000],
       ["Toner", 2, 50000],
     ]);

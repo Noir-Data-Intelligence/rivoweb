@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://syyt.tech/"
+      "url": "http://localhost:5080/"
     }
   ],
   "paths": {
@@ -6637,6 +6637,37 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/procurement/lookups": {
+      "get": {
+        "tags": [
+          "ProcurementModuleEndpoints"
+        ],
+        "summary": "Departamentos (id e nome) para abrir uma requisição, sem as permissões de RH.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcurementLookups"
                 }
               }
             }
@@ -46117,6 +46148,7 @@
           "purchaseOrderId",
           "receivedOn",
           "receivedByEmployeeId",
+          "receivedByName",
           "deliveryNote",
           "status",
           "cancellationReason",
@@ -46139,6 +46171,12 @@
           "receivedByEmployeeId": {
             "type": "string",
             "format": "uuid"
+          },
+          "receivedByName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "deliveryNote": {
             "type": [
@@ -54603,6 +54641,36 @@
           }
         }
       },
+      "ProcurementLookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcurementLookups": {
+        "required": [
+          "departments"
+        ],
+        "type": "object",
+        "properties": {
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcurementLookupEntry"
+            }
+          }
+        }
+      },
       "ProformaRequest": {
         "required": [
           "customerId",
@@ -55744,6 +55812,7 @@
       "PurchaseOrderLineView": {
         "required": [
           "lineId",
+          "position",
           "description",
           "quantity",
           "unitPrice",
@@ -55755,6 +55824,14 @@
           "lineId": {
             "type": "string",
             "format": "uuid"
+          },
+          "position": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           },
           "description": {
             "type": "string"
@@ -57071,6 +57148,7 @@
       "RequisitionLineView": {
         "required": [
           "lineId",
+          "position",
           "description",
           "quantity",
           "estimatedUnitPrice",
@@ -57081,6 +57159,14 @@
           "lineId": {
             "type": "string",
             "format": "uuid"
+          },
+          "position": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           },
           "description": {
             "type": "string"
@@ -57131,7 +57217,9 @@
         "required": [
           "requisitionId",
           "requestedByEmployeeId",
+          "requestedByName",
           "departmentId",
+          "departmentName",
           "justification",
           "currency",
           "estimatedTotal",
@@ -57153,12 +57241,24 @@
             "type": "string",
             "format": "uuid"
           },
+          "requestedByName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "departmentId": {
             "type": [
               "null",
               "string"
             ],
             "format": "uuid"
+          },
+          "departmentName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "justification": {
             "type": "string"

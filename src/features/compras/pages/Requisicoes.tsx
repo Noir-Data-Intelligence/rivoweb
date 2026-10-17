@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { Can, useUtilizador } from "@/features/identity";
-import { useTodosDepartamentos } from "@/features/rh";
 import { formatarData } from "@/lib/format/data";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import { Button } from "@/ui/Button";
@@ -15,8 +14,8 @@ import { PageHeader } from "@/ui/Layout";
 import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
-import { useAbrirRequisicao, useRequisicoes, type Requisicao } from "../api";
-import { EditorLinhas, EstadoRequisicao, ESTADOS_REQUISICAO, useNomePessoa, valor } from "../comum";
+import { useAbrirRequisicao, useEscolhasCompras, useRequisicoes, type Requisicao } from "../api";
+import { EditorLinhas, EstadoRequisicao, ESTADOS_REQUISICAO, nomeOuTraco, valor } from "../comum";
 import { errosRequisicao, linhasParaApi, linhaVazia, temErros, type LinhaRascunho } from "../regras";
 
 const MOEDAS = ["AOA", "USD", "EUR"] as const;
@@ -31,8 +30,7 @@ function NovaRequisicao() {
   const [linhas, setLinhas] = useState<LinhaRascunho[]>([linhaVazia()]);
   const [tentou, setTentou] = useState(false);
   const abrir = useAbrirRequisicao();
-  const leDepartamentos = pode("hr.departments.read");
-  const departamentos = useTodosDepartamentos(aberto && leDepartamentos);
+  const escolhas = useEscolhasCompras(aberto && pode("procurement.requisitions.write"));
   const navegar = useNavigate();
   const idForm = useId();
   const erros = errosRequisicao({ justificacao, linhas });
@@ -86,13 +84,13 @@ function NovaRequisicao() {
           <Field rotulo="Justificação" erro={tentou ? erros.justificacao : undefined} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Textarea id={id} rows={3} maxLength={1000} aria-describedby={descricao} invalido={invalido} value={justificacao} onChange={(e) => setJustificacao(e.target.value)} />}
           </Field>
-          {leDepartamentos ? (
+          {escolhas.data ? (
             <Field rotulo="Departamento (opcional)">
               {({ id, descricao }) => (
                 <Select id={id} aria-describedby={descricao} value={departamento} onChange={(e) => setDepartamento(e.target.value)}>
                   <option value="">Nenhum</option>
-                  {(departamentos.data?.items ?? []).map((d) => (
-                    <option key={d.departmentId} value={d.departmentId}>
+                  {escolhas.data.departments.map((d) => (
+                    <option key={d.id} value={d.id}>
                       {d.name}
                     </option>
                   ))}
@@ -129,7 +127,6 @@ export default function Requisicoes() {
   const e = params.get("estado");
   const estado = e && e in ESTADOS_REQUISICAO ? e : null;
   const lista = useRequisicoes({ estado, requisitante: null, pagina, tamanho });
-  const nomeDe = useNomePessoa();
   const id = useId();
   const colunas: Coluna<Requisicao>[] = [
     {
@@ -141,7 +138,7 @@ export default function Requisicoes() {
             {r.justification}
           </Link>
           <span className="truncate text-sm text-muted-foreground">
-            {nomeDe(r.requestedByEmployeeId)} · {r.lines.length} {r.lines.length === 1 ? "linha" : "linhas"}
+            {nomeOuTraco(r.requestedByName)} · {r.lines.length} {r.lines.length === 1 ? "linha" : "linhas"}
           </span>
         </div>
       ),

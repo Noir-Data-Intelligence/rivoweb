@@ -37,7 +37,9 @@ export const IDF9 = {
 export const requisicao = (estado = "Draft", id: string = IDF9.rascunho): S["RequisitionView"] => ({
   requisitionId: id,
   requestedByEmployeeId: ID.emp2,
+  requestedByName: "Carlos Teste",
   departmentId: ID.dep1,
+  departmentName: "Operações",
   justification: "Material de escritório do trimestre",
   currency: "AOA",
   estimatedTotal: 125000,
@@ -48,8 +50,8 @@ export const requisicao = (estado = "Draft", id: string = IDF9.rascunho): S["Req
   closedAt: estado === "Approved" || estado === "Refused" || estado === "Cancelled" ? "2026-10-12T09:00:00+00:00" : null,
   closingReason: estado === "Refused" ? "Fora do orçamento." : null,
   lines: [
-    { lineId: "00000000-0000-4000-8000-000000000a08", description: "Papel A4", quantity: 10, estimatedUnitPrice: 2500, estimatedTotal: 25000 },
-    { lineId: "00000000-0000-4000-8000-000000000a09", description: "Toner", quantity: 2, estimatedUnitPrice: 50000, estimatedTotal: 100000 },
+    { lineId: "00000000-0000-4000-8000-000000000a08", position: 1, description: "Papel A4", quantity: 10, estimatedUnitPrice: 2500, estimatedTotal: 25000 },
+    { lineId: "00000000-0000-4000-8000-000000000a09", position: 2, description: "Toner", quantity: 2, estimatedUnitPrice: 50000, estimatedTotal: 100000 },
   ],
 });
 
@@ -66,13 +68,13 @@ export const ordem = (recebidoPapel = 0, estado = "Issued"): S["PurchaseOrderVie
   cancellationReason: estado === "Cancelled" ? "Fornecedor sem stock." : null,
   fullyReceived: false,
   lines: [
-    { lineId: IDF9.linhaPapel, description: "Papel A4", quantity: 10, unitPrice: 2000, lineTotal: 20000, quantityReceived: recebidoPapel },
-    { lineId: IDF9.linhaToner, description: "Toner", quantity: 2, unitPrice: 50000, lineTotal: 100000, quantityReceived: 0 },
+    { lineId: IDF9.linhaPapel, position: 1, description: "Papel A4", quantity: 10, unitPrice: 2000, lineTotal: 20000, quantityReceived: recebidoPapel },
+    { lineId: IDF9.linhaToner, position: 2, description: "Toner", quantity: 2, unitPrice: 50000, lineTotal: 100000, quantityReceived: 0 },
   ],
 });
 
 export const recepcoes = (): S["GoodsReceiptView"][] => [
-  { goodsReceiptId: IDF9.recepcao, purchaseOrderId: IDF9.ordem, receivedOn: "2026-10-15", receivedByEmployeeId: ID.emp1, deliveryNote: "GR 123", status: "Registered", cancellationReason: null, lines: [{ lineId: "x", purchaseOrderLineId: IDF9.linhaPapel, quantityReceived: 4 }] },
+  { goodsReceiptId: IDF9.recepcao, purchaseOrderId: IDF9.ordem, receivedOn: "2026-10-15", receivedByEmployeeId: ID.emp1, receivedByName: "Ana Teste", deliveryNote: "GR 123", status: "Registered", cancellationReason: null, lines: [{ lineId: "x", purchaseOrderLineId: IDF9.linhaPapel, quantityReceived: 4 }] },
 ];
 
 export const fornecedoresActivos = (): S["SupplierReference"][] => [{ supplierId: IDF5.fornecedor, name: "Fornecedor Teste", taxId: "5000000000", iban: null, status: "Active" }];
@@ -126,3 +128,6 @@ export const contagem = (estado = "Open", contados = true): S["InventoryCountVie
   cancellationReason: null,
   lines: contados ? [{ lineId: "00000000-0000-4000-8000-000000000b09", itemId: IDF9B.papel, expectedQuantity: 10, countedQuantity: 9, variance: -1 }] : [],
 });
+
+/** `/procurement/lookups` (B29). */
+export const escolhasCompras = (): S["ProcurementLookups"] => ({ departments: [{ id: ID.dep1, name: "Operações" }] });

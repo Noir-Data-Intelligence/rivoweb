@@ -1899,6 +1899,22 @@ produção 10/10 com `9953ca9`)
 - **Testes:** 174 unitários; interface 5 cenários × 3 motores; suite inteira
   456, sem instáveis.
 
+### B29 e B30 resolvidos (compras, 2026-10-17)
+
+- **B29:** `requestedByName`, `departmentName` e `receivedByName` nas vistas;
+  o front deixou de pedir as listas de RH nas compras (o Manager e o
+  AssetManager vêem os nomes) e o departamento da requisição escolhe-se em
+  `GET /procurement/lookups`.
+- **B30:** linhas com `position`, pela ordem em que foram escritas; saiu a
+  ordenação local pelo id. O teste local voltou a usar «linha 1» directamente.
+- **Tipos:** `openapi/v1.json` tirado da API local em `727666d`, porque a
+  produção ainda não tinha o PR #108 publicado à hora (a OpenAPI de produção
+  não mudara). Sem o backend novo, o front degrada: nomes «—» e sem escolha de
+  departamento. Publicar o front depois do backend.
+- **Verificação:** `f9-compras-escritas.spec.ts` (nomes do Manager e de quem
+  recebeu, linha 1 = a primeira escrita) e `f9-inventario-escritas.spec.ts`,
+  duas corridas seguidas; interface compras 6 × 3.
+
 ### B26 a B28 resolvidos (salários e contratos, 2026-10-17)
 
 - **B26:** `GET /hr/contracts` com `employeeId` e `page` deixa de dar 500

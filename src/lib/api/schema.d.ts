@@ -7053,6 +7053,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/procurement/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Departamentos (id e nome) para abrir uma requisição, sem as permissões de RH. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/procurement/requisitions": {
         parameters: {
             query?: never;
@@ -39889,6 +39939,7 @@ export interface components {
             receivedOn: string;
             /** Format: uuid */
             receivedByEmployeeId: string;
+            receivedByName: null | string;
             deliveryNote: null | string;
             status: string;
             cancellationReason: null | string;
@@ -41981,6 +42032,14 @@ export interface components {
             detail?: null | string;
             instance?: null | string;
         };
+        ProcurementLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        ProcurementLookups: {
+            departments: components["schemas"]["ProcurementLookupEntry"][];
+        };
         ProformaRequest: {
             /** Format: uuid */
             customerId: null | string;
@@ -42276,6 +42335,8 @@ export interface components {
         PurchaseOrderLineView: {
             /** Format: uuid */
             lineId: string;
+            /** Format: int32 */
+            position: number | string;
             description: string;
             /** Format: double */
             quantity: number | string;
@@ -42605,6 +42666,8 @@ export interface components {
         RequisitionLineView: {
             /** Format: uuid */
             lineId: string;
+            /** Format: int32 */
+            position: number | string;
             description: string;
             /** Format: double */
             quantity: number | string;
@@ -42623,8 +42686,10 @@ export interface components {
             requisitionId: string;
             /** Format: uuid */
             requestedByEmployeeId: string;
+            requestedByName: null | string;
             /** Format: uuid */
             departmentId: null | string;
+            departmentName: null | string;
             justification: string;
             currency: string;
             /** Format: double */

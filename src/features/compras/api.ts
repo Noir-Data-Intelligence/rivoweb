@@ -13,7 +13,10 @@
  *   esperada não é antes da emissão; cancela-se com motivo e só sem
  *   mercadoria recebida;
  * - recepção: contra uma ordem emitida, por quem recebe (a conta); uma
- *   contagem por linha, positiva e sem passar o que falta; anula-se com motivo.
+ *   contagem por linha, positiva e sem passar o que falta; anula-se com motivo;
+ * - as vistas trazem os nomes (requisitante, departamento, quem recebeu) e as
+ *   linhas pela ordem em que foram escritas (B29, B30); o departamento escolhe-se
+ *   em `/procurement/lookups`, sem as permissões de RH.
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
@@ -27,15 +30,6 @@ export type Recepcao = S["GoodsReceiptView"];
 export type FornecedorCompras = S["SupplierReference"];
 
 type Pag = { pagina: number; tamanho: number };
-
-/**
- * O servidor não garante a ordem das linhas (B30). Ordenar pelo id dá ao menos
- * a mesma ordem em todas as leituras (linhas do mesmo pedido têm ids do mesmo
- * milissegundo, por isso não é necessariamente a ordem em que foram escritas).
- */
-const porCriacao = <T extends { lineId: string }>(linhas: readonly T[]) => [...linhas].sort((a, b) => a.lineId.localeCompare(b.lineId));
-const ordenarRequisicao = (r: Requisicao): Requisicao => ({ ...r, lines: porCriacao(r.lines) });
-const ordenarOrdem = (o: OrdemCompra): OrdemCompra => ({ ...o, lines: porCriacao(o.lines) });
 
 export const chaves = {
   requisicoes: ["procurement", "requisitions"] as const,
@@ -67,7 +61,6 @@ export function useRequisicao(id: string) {
   return useQuery({
     queryKey: [...chaves.requisicoes, "detail", id],
     queryFn: ({ signal }) => ler(api.GET("/procurement/requisitions/{requisitionId}", { params: { path: { requisitionId: id } }, signal })),
-    select: ordenarRequisicao,
   });
 }
 
@@ -103,6 +96,11 @@ export function useCancelarRequisicao(id: string) {
   });
 }
 
+/** Departamentos para escolher na requisição (B29). Só com `procurement.requisitions.write`. */
+export function useEscolhasCompras(activo: boolean) {
+  return useQuery({ queryKey: ["procurement", "lookups"], queryFn: ({ signal }) => ler(api.GET("/procurement/lookups", { signal })), enabled: activo, staleTime: 60_000 });
+}
+
 // --- Ordens de compra
 
 export function useOrdens(p: Pag & { requisicao: string | null; fornecedor: string | null }, activo = true) {
@@ -124,7 +122,6 @@ export function useOrdem(id: string) {
   return useQuery({
     queryKey: [...chaves.ordens, "detail", id],
     queryFn: ({ signal }) => ler(api.GET("/procurement/orders/{purchaseOrderId}", { params: { path: { purchaseOrderId: id } }, signal })),
-    select: ordenarOrdem,
   });
 }
 

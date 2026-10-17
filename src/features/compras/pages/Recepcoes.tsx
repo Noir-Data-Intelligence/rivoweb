@@ -7,12 +7,11 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useRecepcoes, type Recepcao } from "../api";
-import { EstadoRecepcao, useNomePessoa } from "../comum";
+import { EstadoRecepcao, nomeOuTraco } from "../comum";
 
 export default function Recepcoes() {
   const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const lista = useRecepcoes({ ordem: null, pagina, tamanho });
-  const nomeDe = useNomePessoa();
   const colunas: Coluna<Recepcao>[] = [
     {
       id: "data",
@@ -23,7 +22,7 @@ export default function Recepcoes() {
         </Link>
       ),
     },
-    { id: "quem", cabecalho: "Por", celula: (r) => nomeDe(r.receivedByEmployeeId) },
+    { id: "quem", cabecalho: "Por", celula: (r) => nomeOuTraco(r.receivedByName) },
     { id: "guia", cabecalho: "Guia de remessa", esconderAte: "sm", celula: (r) => r.deliveryNote ?? "—" },
     { id: "linhas", cabecalho: "Linhas", alinhar: "direita", esconderAte: "md", celula: (r) => String(r.lines.length) },
     { id: "estado", cabecalho: "Estado", celula: (r) => <EstadoRecepcao estado={r.status} /> },

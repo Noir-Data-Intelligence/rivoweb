@@ -21,7 +21,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAnularRecepcao, useCancelarOrdem, useOrdem, useRecepcoes, useRegistarRecepcao, type OrdemCompra, type Recepcao } from "../api";
-import { EstadoOrdem, EstadoRecepcao, useNomePessoa, valor } from "../comum";
+import { EstadoOrdem, EstadoRecepcao, nomeOuTraco, valor } from "../comum";
 import { errosRecepcao } from "../regras";
 
 type LinhaOrdem = OrdemCompra["lines"][number];
@@ -156,7 +156,6 @@ export default function Ordem() {
   const { pode } = useUtilizador();
   const q = useOrdem(purchaseOrderId);
   const recepcoes = useRecepcoes({ ordem: purchaseOrderId, pagina: 1, tamanho: 200 }, pode("procurement.receipts.read"));
-  const nomeDe = useNomePessoa();
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/encomendas">
@@ -186,7 +185,7 @@ export default function Ordem() {
   ];
   const colunasRecepcao: Coluna<Recepcao>[] = [
     { id: "data", cabecalho: "Recebida a", celula: (r) => formatarData(r.receivedOn) },
-    { id: "quem", cabecalho: "Por", esconderAte: "sm", celula: (r) => nomeDe(r.receivedByEmployeeId) },
+    { id: "quem", cabecalho: "Por", esconderAte: "sm", celula: (r) => nomeOuTraco(r.receivedByName) },
     { id: "guia", cabecalho: "Guia", esconderAte: "md", celula: (r) => r.deliveryNote ?? "—" },
     {
       id: "linhas",

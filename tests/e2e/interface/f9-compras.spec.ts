@@ -10,7 +10,7 @@ import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSim
 import { comF1 } from "../apoio-f1";
 import { ID } from "../../fixtures/f1";
 import { IDF5 } from "../../fixtures/f5";
-import { fornecedoresActivos, IDF9, meActivosF9, meAdminF9, meGestorF9, ordem, recepcoes, requisicao } from "../../fixtures/f9";
+import { escolhasCompras, fornecedoresActivos, IDF9, meActivosF9, meAdminF9, meGestorF9, ordem, recepcoes, requisicao } from "../../fixtures/f9";
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 const problema = (status: number, detail: string) => ({ status, corpo: { status, title: "Conflito", detail }, cabecalhos: { "Content-Type": "application/problem+json" } });
@@ -23,7 +23,8 @@ function comCompras(api: ApiSimulada, me = meAdminF9): ApiSimulada {
     .em("GET", "/procurement/orders", pag([ordem()]))
     .em("GET", `/procurement/orders/${IDF9.ordem}`, { status: 200, corpo: ordem(4) })
     .em("GET", "/procurement/receipts", pag(recepcoes()))
-    .em("GET", "/procurement/suppliers", pag(fornecedoresActivos()));
+    .em("GET", "/procurement/suppliers", pag(fornecedoresActivos()))
+    .em("GET", "/procurement/lookups", { status: 200, corpo: escolhasCompras() });
 }
 
 async function verificar(page: Page) {
@@ -192,13 +193,18 @@ test.describe("compras", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("Manager, sem RH: vê «Colaborador» e «Departamento», nunca os ids", async ({ page, api }) => {
-    await comCompras(api, meGestorF9).ligar();
+  test("Manager, sem RH: vê os nomes vindos do servidor e escolhe o departamento (B29)", async ({ page, api }) => {
+    await comCompras(api, meGestorF9).em("POST", "/procurement/requisitions", { status: 201, corpo: { requisitionId: IDF9.rascunho, estimatedTotal: 0, estado: "Draft" } }).ligar();
     await entrar(page, meGestorF9.email);
     await page.goto("/requisicoes");
-    await expect(page.getByRole("row").filter({ hasText: "Material de escritório" }).first()).toContainText("Colaborador · 2 linhas");
+    await expect(page.getByRole("row").filter({ hasText: "Material de escritório" }).first()).toContainText("Carlos Teste · 2 linhas");
     await expect(page.getByText(ID.emp2)).toHaveCount(0);
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
+    await page.getByRole("button", { name: "Nova requisição" }).click();
+    await page.getByRole("dialog").getByLabel("Departamento (opcional)").selectOption({ label: "Operações" });
+    await page.keyboard.press("Escape");
     await page.goto(`/requisicoes/${IDF9.rascunho}`);
+    await expect(page.getByText("Operações")).toBeVisible();
     await expect(page.getByText(ID.dep1)).toHaveCount(0);
   });
 
@@ -212,6 +218,6 @@ test.describe("compras", () => {
     await expect(page.getByRole("button", { name: "Cancelar ordem" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Ver a requisição de origem" })).toHaveCount(0);
     await page.goto("/recepcoes");
-    await expect(page.getByRole("row").filter({ hasText: "GR 123" })).toContainText("Colaborador");
+    await expect(page.getByRole("row").filter({ hasText: "GR 123" })).toContainText("Ana Teste");
   });
 });
