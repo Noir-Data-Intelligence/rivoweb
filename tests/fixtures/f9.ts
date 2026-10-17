@@ -8,7 +8,7 @@ type S = components["schemas"];
 
 const COMPRAS = ["procurement.requisitions.read", "procurement.requisitions.write", "procurement.orders.read", "procurement.orders.write", "procurement.receipts.read", "procurement.receipts.write"];
 
-export const meAdminF9: S["CurrentUserResponse"] = { ...meAdminF5, permissions: [...new Set([...meAdminF5.permissions, ...COMPRAS, "approval.requests.read"])] };
+export const meAdminF9: S["CurrentUserResponse"] = { ...meAdminF5, permissions: [...new Set([...meAdminF5.permissions, ...COMPRAS, "approval.requests.read", "inventory.items.read", "inventory.items.write"])] };
 /** O Manager de produção: requisições e ordens, lê as recepções; não lê os RH. */
 export const meGestorF9: S["CurrentUserResponse"] = {
   ...meGestorF5,
@@ -21,7 +21,7 @@ export const meActivosF9: S["CurrentUserResponse"] = {
   email: "activos@teste.local",
   displayName: "Activos Teste",
   roles: ["AssetManager"],
-  permissions: ["procurement.orders.read", "procurement.receipts.read", "procurement.receipts.write", "procurement.suppliers.read"],
+  permissions: ["procurement.orders.read", "procurement.receipts.read", "procurement.receipts.write", "procurement.suppliers.read", "inventory.items.read", "inventory.items.write"],
 };
 
 export const IDF9 = {
@@ -76,3 +76,53 @@ export const recepcoes = (): S["GoodsReceiptView"][] => [
 ];
 
 export const fornecedoresActivos = (): S["SupplierReference"][] => [{ supplierId: IDF5.fornecedor, name: "Fornecedor Teste", taxId: "5000000000", iban: null, status: "Active" }];
+
+// --- Bloco 2: inventário
+
+export const IDF9B = {
+  papel: "00000000-0000-4000-8000-000000000b01",
+  inactivo: "00000000-0000-4000-8000-000000000b02",
+  central: "00000000-0000-4000-8000-000000000b03",
+  loja: "00000000-0000-4000-8000-000000000b04",
+  fechado: "00000000-0000-4000-8000-000000000b05",
+  contagem: "00000000-0000-4000-8000-000000000b06",
+} as const;
+
+export const armazens = (): S["WarehouseView"][] => [
+  { warehouseId: IDF9B.central, code: "CEN", name: "Central", status: "Active" },
+  { warehouseId: IDF9B.loja, code: "LOJ", name: "Loja", status: "Active" },
+  { warehouseId: IDF9B.fechado, code: "ANT", name: "Antigo", status: "Inactive" },
+];
+
+export const artigo = (emMaoCentral = 10): S["InventoryItemView"] => ({
+  itemId: IDF9B.papel,
+  sku: "PAP-A4",
+  name: "Papel A4",
+  unit: "resma",
+  quantityOnHand: emMaoCentral + 2,
+  averageCost: 2500.5,
+  totalValue: (emMaoCentral + 2) * 2500.5,
+  status: "Active",
+  quantitiesByWarehouse: [
+    { warehouseId: IDF9B.central, quantityOnHand: emMaoCentral, value: emMaoCentral * 2500.5 },
+    { warehouseId: IDF9B.loja, quantityOnHand: 2, value: 5001 },
+  ],
+  movements: [
+    { movementId: "00000000-0000-4000-8000-000000000b07", type: "Receipt", warehouseId: IDF9B.central, relatedWarehouseId: null, quantity: 12, unitCost: 2500.5, value: 30006, reason: null, occurredOn: "2026-10-01", recordedAt: "2026-10-01T09:00:00+00:00" },
+    { movementId: "00000000-0000-4000-8000-000000000b08", type: "TransferOut", warehouseId: IDF9B.central, relatedWarehouseId: IDF9B.loja, quantity: 2, unitCost: 2500.5, value: 5001, reason: "Reposição", occurredOn: "2026-10-05", recordedAt: "2026-10-05T09:00:00+00:00" },
+  ],
+});
+
+export const artigos = (): S["InventoryItemView"][] => [
+  artigo(),
+  { ...artigo(), itemId: IDF9B.inactivo, sku: "TON-01", name: "Toner antigo", unit: "un", quantityOnHand: 0, averageCost: 0, totalValue: 0, status: "Inactive", quantitiesByWarehouse: [], movements: [] },
+];
+
+export const contagem = (estado = "Open", contados = true): S["InventoryCountView"] => ({
+  countId: IDF9B.contagem,
+  warehouseId: IDF9B.central,
+  occurredOn: "2026-10-17",
+  status: estado,
+  cancellationReason: null,
+  lines: contados ? [{ lineId: "00000000-0000-4000-8000-000000000b09", itemId: IDF9B.papel, expectedQuantity: 10, countedQuantity: 9, variance: -1 }] : [],
+});

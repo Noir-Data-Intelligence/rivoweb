@@ -6,8 +6,9 @@
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
 > colaboradores; F8: salários — folhas de pagamento) e o 1.º bloco da **F9**
-> (compras: requisições, ordens de compra, recepções) · actualizado a
-> 2026-10-17.
+> (compras: requisições, ordens de compra, recepções); 2.º bloco da F9
+> (inventário) concluído e verificado na base local, por publicar ·
+> actualizado a 2026-10-17.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -29,12 +30,12 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
-| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Fornecedores |
+| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
@@ -110,6 +111,13 @@ AM = AssetManager.
 | Cancelar ordem de compra (com motivo, sem mercadoria recebida) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Ver as recepções ¹⁴ | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
 | Registar recepção (sem passar o que falta) e anular com motivo ¹³ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| **Inventário** | | | | | | | | | | |
+| Artigos: em mão, custo médio e valor; por armazém e movimentos | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Registar artigo; activar e desactivar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Movimentar: entrada com custo, saída, ajuste com motivo, transferência (sem deixar um armazém negativo) | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Armazéns: ver, registar, activar e desactivar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Contagens: abrir, contar artigos, fechar (com divergências pode ir a aprovação), ver a decisão, cancelar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Valorização do stock por período | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -410,6 +418,32 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Recepções**
 - Lista de tudo o que chegou: data, quem recebeu, guia, linhas e estado; leva
   à ordem.
+
+**Artigos**
+- Lista com a referência, a quantidade em mão, o custo médio, o valor e o
+  estado (os inactivos a pedido); **registar** (referência, nome, unidade).
+- **Artigo:** em mão, custo médio e valor; por armazém; os movimentos (data,
+  tipo, armazém — e o outro, nas transferências —, quantidade, custo, valor,
+  motivo); **movimentar**: entrada (quantidade e custo unitário, até 4 casas;
+  recalcula o custo médio), saída, ajuste (variação positiva ou negativa, com
+  motivo) e transferência entre armazéns diferentes — nenhum deixa um armazém
+  negativo; **activar** e **desactivar** (inactivo não se movimenta nem conta).
+
+**Armazéns**
+- Código, nome e estado; **registar**, **activar** e **desactivar**
+  (inactivo não recebe movimentos nem contagens).
+
+**Contagens**
+- Por armazém, com os artigos contados, as divergências e o estado.
+- **Abrir** uma contagem num armazém activo; **contar** um artigo (uma vez
+  por contagem; o servidor regista o esperado e a diferença, com o valor);
+  **fechar**: sem divergências fecha; com divergências e política que as cubra
+  fica por aprovar e o stock só muda depois da decisão; sem política, fecha e
+  aplica os ajustes; **ver a decisão**; **cancelar** com motivo.
+
+**Valorização do stock**
+- Valor dos movimentos de cada artigo num período (por omissão, o mês
+  corrente), com o total.
 
 **Fornecedores**
 - Lista paginada (nome, NIF, cidade, contacto, estado), com ou sem inactivos.
@@ -944,6 +978,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver as ordens e as recepções; **registar** recepções e **anulá-las** com
   motivo (vê «Colaborador» em vez de quem recebeu, B29). Não vê requisições,
   não emite nem cancela ordens.
+
+**Artigos**, **Armazéns**, **Contagens** e **Valorização do stock**
+- Tudo o que o Admin faz no inventário.
 
 **Fornecedores**
 - Ver a lista e a ficha.

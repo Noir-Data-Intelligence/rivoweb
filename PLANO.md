@@ -1844,8 +1844,9 @@ F7c e a F7 no front.
 Em três blocos: (1) compras; (2) inventário; (3) activos fixos.
 
 **Bloco 1 — compras** (publicado a 2026-10-17, `50f57f9`: CI verde — 438
-sem repetições, com a folga nova — e Vercel; o smoke de produção ficou por
-correr: às 13:30 a API `syyt.tech` não respondia na porta 443)
+sem repetições, com a folga nova — e Vercel; a API `syyt.tech` esteve sem
+responder na porta 443 entre as 13:30 e as ~14:15; com ela de volta, smoke de
+produção 10/10 com `9953ca9`)
 - **Ecrãs:** `/requisicoes` e `/requisicoes/:id` (abrir, submeter, ver
   decisão, cancelar; emitir ordens da aprovada), `/encomendas` e
   `/encomendas/:id` (linhas com o que falta, recepções, registar, anular,
@@ -1873,6 +1874,30 @@ correr: às 13:30 a API `syyt.tech` não respondia na porta 443)
   (`23d366b`).
 - **Testes:** 167 unitários; interface 6 cenários × 3 motores; suite inteira
   438, sem instáveis.
+
+**Bloco 2 — inventário** (2026-10-17, por publicar)
+- **Ecrãs:** `/artigos` e `/artigos/:id` (em mão por armazém, movimentos,
+  movimentar, activar), `/armazens`, `/contagens` e `/contagens/:id` (contar,
+  fechar, ver decisão, cancelar), `/valorizacao` (janela no URL). Menu
+  «Inventário», a seguir a Compras. Só `inventory.items.*`: Admin e
+  AssetManager (Finance e Manager 403, lido em produção).
+- **Regras:** quantidades e custos até 4 casas; nada deixa um armazém
+  negativo (o front avisa com a quantidade em mão do armazém escolhido);
+  ajuste com motivo e diferente de zero; transferência entre armazéns
+  diferentes e activos; uma linha por artigo na contagem; valores em kwanzas
+  com Big (o `kz` do inventário deixou de passar por `number`).
+- **Peças partilhadas:** `useJanelaUrl`/`FiltroJanela` passam do portal para
+  `src/ui/JanelaDatas` (o portal reexporta), já a partir do URL actual.
+- **Leituras em produção** (Admin, 2026-10-17): 84 artigos, 4 armazéns, 2
+  contagens (uma aberta, uma fechada), valorização do mês (200).
+- **Escritas:** verificadas **na base local** (`f9-inventario-escritas.spec.ts`,
+  à primeira): dois armazéns e um artigo; entrada a 2 500,5, saída (a maior do
+  que há recusada no front), transferência e ajuste; contagem com divergência
+  fechada sem política (aplicou o ajuste: 4 em A, 2 em B, conferido no
+  servidor); outra contagem cancelada; valorização com o artigo. Artigo e
+  armazéns desactivados no fim. **Nenhuma escrita em produção.**
+- **Testes:** 174 unitários; interface 5 cenários × 3 motores; suite inteira
+  456, sem instáveis.
 
 ### B26 a B28 resolvidos (salários e contratos, 2026-10-17)
 

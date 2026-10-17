@@ -76,6 +76,10 @@ export const REQUISITO_PAGINA = {
   "/requisicoes": "procurement.requisitions.read",
   "/encomendas": "procurement.orders.read",
   "/recepcoes": "procurement.receipts.read",
+  "/artigos": "inventory.items.read",
+  "/armazens": "inventory.items.read",
+  "/contagens": "inventory.items.read",
+  "/valorizacao": "inventory.items.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */
