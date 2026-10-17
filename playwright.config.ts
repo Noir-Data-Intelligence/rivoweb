@@ -16,11 +16,14 @@ export default defineConfig({
   // (GraphicsCriticalError, SWGL) e falhavam testes que passam sozinhos.
   workers: process.env.CI ? undefined : 4,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { trace: "retain-on-failure", locale: "pt-AO", timezoneId: "Africa/Luanda" },
   // Três motores em paralelo numa só máquina: 5 s davam esperas falhadas por carga.
-  expect: { timeout: 10_000 },
+  // No CI (2 vCPU partilhados), com 420 testes, 10 s e 30 s já davam dezenas de
+  // repetições por tempo (2026-10-17): lá, o dobro.
+  timeout: process.env.CI ? 60_000 : 30_000,
+  expect: { timeout: process.env.CI ? 20_000 : 10_000 },
   webServer: {
     command: "node scripts/serve-dist.mjs",
     url: "http://localhost:4173/entrar",
