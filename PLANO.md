@@ -1909,8 +1909,9 @@ produção 10/10 com `9953ca9`)
   ordenação local pelo id. O teste local voltou a usar «linha 1» directamente.
 - **Tipos:** `openapi/v1.json` tirado da API local em `727666d`, porque a
   produção ainda não tinha o PR #108 publicado à hora (a OpenAPI de produção
-  não mudara). Sem o backend novo, o front degrada: nomes «—» e sem escolha de
-  departamento. Publicar o front depois do backend.
+  não mudara); pouco depois a produção publicou-o e a OpenAPI de produção
+  ficou igual à local (paths e esquemas). Sem o backend novo, o front
+  degradaria: nomes «—» e sem escolha de departamento.
 - **Verificação:** `f9-compras-escritas.spec.ts` (nomes do Manager e de quem
   recebeu, linha 1 = a primeira escrita) e `f9-inventario-escritas.spec.ts`,
   duas corridas seguidas; interface compras 6 × 3.
