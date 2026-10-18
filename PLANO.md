@@ -1935,7 +1935,7 @@ contratos (403 nas cobranças); Finance lê contratos e cobranças (403 nas
 oportunidades). As vistas só trazem ids de pessoas, clientes, leads e
 facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
 
-**Bloco 1 — CRM** (2026-10-18, por publicar).
+**Bloco 1 — CRM** (2026-10-18, publicado em `437ce03`: CI verde; smoke de produção 9/10 à primeira, o Admin falhou um `toBeVisible` e passou ao repetir).
 - **Ecrãs** (grupo «CRM»): `/leads` e `/leads/:id`, `/oportunidades` (vistas
   quadro e lista; etapa no URL) e `/oportunidades/:id`, `/actividades` (por
   fazer, feitas, todas, no URL), `/relatorio-comercial` (período e moeda no
@@ -1961,7 +1961,7 @@ facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
 - **Testes:** 200 unitários; interface 7 cenários × 3 motores; suite inteira
   537, sem falhas nem instáveis (24 saltados: produção e base local).
 
-**Bloco 2 — propostas e modelos** (2026-10-18, por publicar).
+**Bloco 2 — propostas e modelos** (2026-10-18, publicado em `b30657a`, CI verde).
 - **Ecrãs:** `/propostas` (estado no URL) e `/propostas/:id`,
   `/modelos-proposta`; as propostas de cada oportunidade na sua ficha.
 - **Regras:** o PDF compõe-se a pedido e não fica guardado (`RenderAsync`):
@@ -1982,6 +1982,32 @@ facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
   linhas não se envia, com uma linha enviada e recusada.
 - **Testes:** 207 unitários; interface 5 cenários × 3 motores; suite inteira
   552, sem falhas nem instáveis (24 saltados: produção e base local).
+
+**Bloco 3 — contratos de clientes e cobranças** (2026-10-18, por publicar).
+**F11 fechada no código.**
+- **Ecrãs** (grupo «Vendas»): `/contratos-clientes` (estado, tipo e «acabam
+  em» no URL) e `/contratos-clientes/:id`, `/cobrancas` (vistas vencidas e
+  acções); separador «Comercial» na ficha do cliente (oportunidades,
+  propostas, contratos, acções de cobrança, cada bloco com a sua permissão).
+- **Regras:** referência só ao registar (o `PUT` ignora referência, cliente e
+  tipo, que vão como estavam); `autoRenew` sempre enviado (em falta, o
+  servidor põe `false`); sem valor, sem moeda; renovar tem de estender o fim;
+  aditamento muda o valor e/ou o fim sem o deixar negativo; terminar com data
+  e motivo; os anexos carregam-se na hora (categoria «Contrato de cliente» no
+  arquivo) e só abrem com `documents.read`, com o nome pelos metadados
+  (**B37**: sem nome nem descarga pelo contrato, e anexar aceita qualquer
+  documento); as cobranças tiram os nomes de cliente e o número da factura
+  das vencidas (`/finance/receivables/overdue`), e a moeda da promessa da
+  factura; promessa exige valor e data.
+- **Escritas:** verificadas **na base local** (`f11-contratos-escritas.spec.ts`):
+  como Sales, contrato registado, activado, renovado (2027-12-31), aditado
+  (+250 000,50 e fim 2028-06-30; valor 1 450 000,50), ficheiro anexado,
+  suspenso, reactivado e terminado com motivo; numa factura vencida (emitida
+  com data passada, só local), promessa de pagamento às 10:15 de Luanda
+  (09:15 UTC); o separador «Comercial» do cliente. As escritas do CRM, das
+  propostas e do lado da equipa da F10 voltaram a passar.
+- **Testes:** 213 unitários; interface 5 cenários × 3 motores; suite inteira
+  567, sem falhas nem instáveis (24 saltados: produção e base local).
 
 ### F10 — Portal do cliente, documentos e mensagens
 

@@ -196,3 +196,59 @@ export const modelos = (): S["ProposalTemplateView"][] => [
   { templateId: IDF11P.modelo, name: "Proposta padrão", body: "Exmos. {{cliente}},\nSegue a proposta «{{titulo}}», válida até {{validade}}.", active: true },
   { templateId: "00000000-0000-4000-8000-000000000c22", name: "Modelo antigo", body: "Antigo.", active: false },
 ];
+
+// --- Contratos e cobranças (3.º bloco)
+
+/** Como em produção: lê contratos, regista cobranças, lê facturas; não lê clientes. */
+export const meFinancasF11: S["CurrentUserResponse"] = { userId: "00000000-0000-4000-8000-000000000007", email: "financas@teste.local", displayName: "Finanças Teste", roles: ["Finance"], permissions: ["approval.requests.read","approval.requests.decide","documents.write","finance.invoices.read","finance.receipts.read","finance.receipts.write","finance.payables.read","finance.payments.execute","finance.treasury.read","finance.treasury.write","finance.reports.read","finance.invoices.cancel","finance.ledger.read","finance.ledger.write","finance.assets.read","finance.assets.write","finance.planning.read","finance.budgets.approve","finance.expenses.read","finance.expenses.write","finance.expenses.approve","fiscal.rates.read","fiscal.rates.write","fiscal.tax_entity.read","fiscal.tax_entity.write","procurement.suppliers.read","procurement.orders.read","procurement.receipts.read","commercial.collections.read","commercial.collections.write","commercial.contracts.read","alerts.alerts.read","ai.assistant.use"] };
+
+export const IDF11C = {
+  rascunho: "00000000-0000-4000-8000-000000000d01",
+  activo: "00000000-0000-4000-8000-000000000d02",
+  anexo: "00000000-0000-4000-8000-000000000d11",
+  documento: "00000000-0000-4000-8000-000000000d12",
+  factura: "00000000-0000-4000-8000-000000000d21",
+  factura2: "00000000-0000-4000-8000-000000000d22",
+};
+
+const contrato = (id: string, numero: string, titulo: string, estado: string, extra: Partial<S["CustomerContractView"]> = {}): S["CustomerContractView"] => ({
+  contractId: id,
+  number: numero,
+  title: titulo,
+  customerId: IDF3.cliente,
+  kind: "Commercial",
+  status: estado,
+  startsOn: "2026-01-01",
+  endsOn: "2026-12-31",
+  value: 1200000,
+  currency: "AOA",
+  slaResponseHours: 4,
+  slaResolutionHours: 24,
+  renewalNoticeDays: 30,
+  autoRenew: false,
+  notes: null,
+  terminatedOn: null,
+  terminationReason: null,
+  daysToExpiry: 74,
+  ...extra,
+});
+
+export const contratos = (): S["CustomerContractView"][] => [
+  contrato(IDF11C.activo, "CT-2026/07", "Manutenção anual", "Active", { endsOn: "2026-11-05", daysToExpiry: 18, notes: "<b>SLA</b> reforçado" }),
+  contrato(IDF11C.rascunho, "CT-2026/09", "Avença jurídica", "Draft", { kind: "Legal", endsOn: null, daysToExpiry: null, value: null, currency: null }),
+];
+
+export const aditamentos = (): S["ContractAmendmentView"][] => [
+  { amendmentId: "a1", number: 1, description: "Mais horas de suporte.", effectiveOn: "2026-06-01", valueChange: 200000, previousEndsOn: null, newEndsOn: null, recordedAt: "2026-06-01T10:00:00Z" },
+];
+
+export const anexos = (): S["ContractDocumentView"][] => [{ linkId: IDF11C.anexo, documentId: IDF11C.documento, category: "Contrato assinado", attachedAt: "2026-01-02T10:00:00Z" }];
+
+export const vencidas = (): S["OverdueReceivable"][] => [
+  { invoiceId: IDF11C.factura, number: "FT 2026/12", customerId: IDF3.cliente, customerName: "Cliente Teste, Lda", issuedOn: "2026-07-01", dueDate: "2026-07-31", daysOverdue: 79, grossTotal: 570000, outstanding: 570000, currency: "AOA" },
+  { invoiceId: IDF11C.factura2, number: "FT 2026/40", customerId: IDF3.cliente, customerName: "Cliente Teste, Lda", issuedOn: "2026-09-01", dueDate: "2026-09-30", daysOverdue: 18, grossTotal: 2000, outstanding: 1500, currency: "USD" },
+];
+
+export const accoes = (): S["CollectionActionView"][] => [
+  { actionId: "c1", customerId: IDF3.cliente, salesInvoiceId: IDF11C.factura2, kind: "PaymentPromise", notes: "Paga metade sexta.\n<script>x</script>", occurredAt: "2026-10-10T09:00:00Z", promisedAmount: 750, promisedDate: "2026-10-17", nextFollowUpOn: "2026-10-20", ownerEmployeeId: IDF11.dono },
+];

@@ -19,6 +19,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import { useCliente, useContactos, useCorrigirCliente, useEliminarCliente, useEstadoCliente, useGuardarContacto, useRemoverContacto, type Contacto, type FichaCliente } from "../api";
+import { ComercialDoCliente } from "./Comercial";
 import { PortalDoCliente } from "./Portal";
 import { CAMPOS_CLIENTE, CamposCliente, esquemaCliente, TIPOS_CONTA, type DadosCliente } from "./Clientes";
 
@@ -347,16 +348,17 @@ function Contactos({ customerId }: { customerId: string }) {
   );
 }
 
-type VistaCliente = "resumo" | "portal";
-const VISTAS: readonly Vista<VistaCliente>[] = [
-  { valor: "resumo", texto: "Resumo" },
-  { valor: "portal", texto: "Portal do cliente" },
-];
+type VistaCliente = "resumo" | "comercial" | "portal";
 
 export default function Cliente() {
   const { customerId = "" } = useParams();
   const cliente = useCliente(customerId);
   const { pode } = useUtilizador();
+  const VISTAS: readonly Vista<VistaCliente>[] = [
+    { valor: "resumo", texto: "Resumo" },
+    { valor: "comercial", texto: "Comercial", visivel: pode("commercial.crm.read") || pode("commercial.contracts.read") || pode("commercial.collections.read") },
+    { valor: "portal", texto: "Portal do cliente" },
+  ];
   const vista = useVista(VISTAS);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
@@ -405,6 +407,8 @@ export default function Cliente() {
       <Vistas rotulo="Cliente" vistas={VISTAS} actual={vista} />
       {vista === "portal" ? (
         <PortalDoCliente customerId={d.customerId} nome={d.name} />
+      ) : vista === "comercial" ? (
+        <ComercialDoCliente customerId={d.customerId} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>

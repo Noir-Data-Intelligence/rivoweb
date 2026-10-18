@@ -2,8 +2,8 @@
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
 > Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração),
-> **B35** (nomes, escolhas e ordem no comercial, F11) e **B36** (posição das
-> linhas das propostas).
+> **B35** (nomes, escolhas e ordem no comercial, F11), **B36** (posição das
+> linhas das propostas) e **B37** (anexos dos contratos).
 > **B34** está resolvido (PR #110) e o front já o usa: a fila de comprovativos
 > e o portal mostram a moeda da factura; ligar uma conta sem o perfil Cliente
 > dá 409 (verificado na base local).
@@ -401,3 +401,27 @@ números repetidos.
 
 **Pedido:** dar à linha nova a maior posição + 1 (ou renumerar ao tirar),
 como o B30 fez nas requisições.
+
+## B37 — Os anexos de um contrato não se descarregam e aceitam qualquer documento
+
+**Facto 1:** `GET /commercial/contracts/{id}/documents` devolve `linkId`,
+`documentId`, `category` e `attachedAt`, sem o nome do ficheiro, e não há
+rota para descarregar o anexo pelo contrato. O ficheiro só se lê em
+`GET /documents/{documentId}` (`documents.read`), que só o Admin e o HR têm;
+o Sales, o Finance e o Manager lêem contratos (`commercial.contracts.read`).
+
+**Consequência:** quem gere contratos anexa a cópia assinada mas não a volta a
+abrir; o front lista os anexos pela categoria e data, e só oferece
+descarregar a quem lê o arquivo.
+
+**Facto 2:** `AttachContractDocumentAsync` só confirma que o documento existe
+(`IDocumentCatalogue.FindAsync`), como a partilha com o cliente antes do B33.
+Quem tem `commercial.contracts.write` e saiba um id anexa a um contrato um
+ficheiro de outra área.
+
+**Pedido** (como o B20, o B32 e o B33):
+1. `fileName` em `ContractDocumentView` e
+   `GET /commercial/contracts/{contractId}/documents/{linkId}/content` com
+   `commercial.contracts.read`, sempre em anexo.
+2. Anexar só documentos carregados por quem anexa (salvo `documents.read`),
+   com a mesma resposta de «não existe».

@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { Archive, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { Archive, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -31,6 +31,8 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/recibos", titulo: "Recibos", icone: Receipt, requer: R["/recibos"], grupo: "Vendas" },
     { caminho: "/comprovativos", titulo: "Comprovativos", icone: BadgeCheck, requer: R["/comprovativos"], grupo: "Vendas" },
     { caminho: "/a-receber", titulo: "A receber", icone: Hourglass, requer: R["/a-receber"], grupo: "Vendas" },
+    { caminho: "/contratos-clientes", titulo: "Contratos de clientes", icone: FileBadge, requer: R["/contratos-clientes"], grupo: "Vendas" },
+    { caminho: "/cobrancas", titulo: "Cobranças", icone: PhoneCall, requer: R["/cobrancas"], grupo: "Vendas" },
     { caminho: "/leads", titulo: "Leads", icone: UserPlus, requer: R["/leads"], grupo: "CRM" },
     { caminho: "/oportunidades", titulo: "Oportunidades", icone: KanbanSquare, requer: R["/oportunidades"], grupo: "CRM" },
     { caminho: "/propostas", titulo: "Propostas", icone: FileSpreadsheet, requer: R["/propostas"], grupo: "CRM" },
