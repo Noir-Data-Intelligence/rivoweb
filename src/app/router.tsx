@@ -127,6 +127,14 @@ export const rotas: RouteObject[] = [
               { path: "base-conhecimento/novo", element: protegido(REQUISITO_NOVO_ARTIGO, pagina("novoArtigo")) },
               { path: "base-conhecimento/:articleId", element: protegido(R["/base-conhecimento"], pagina("artigoBase")) },
               { path: "documentos", element: protegido(R["/documentos"], pagina("arquivo")) },
+              // F11 — CRM (§5.12).
+              { path: "leads", element: protegido(R["/leads"], pagina("leads")) },
+              { path: "leads/:leadId", element: protegido(R["/leads"], pagina("lead")) },
+              { path: "oportunidades", element: protegido(R["/oportunidades"], pagina("oportunidades")) },
+              { path: "oportunidades/:opportunityId", element: protegido(R["/oportunidades"], pagina("oportunidade")) },
+              { path: "actividades", element: protegido(R["/actividades"], pagina("actividades")) },
+              { path: "relatorio-comercial", element: protegido(R["/relatorio-comercial"], pagina("relatorioComercial")) },
+              { path: "tipos-servico", element: protegido(R["/tipos-servico"], pagina("tiposServico")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).

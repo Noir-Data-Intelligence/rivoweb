@@ -49,6 +49,13 @@ export const PAGINAS = {
   artigoBase: () => import("@/features/apoio/pages/ArtigoBase"),
   novoArtigo: () => de(import("@/features/apoio/pages/ArtigoBase"), (m) => m.NovoArtigo),
   arquivo: () => import("@/features/documentos/pages/Arquivo"),
+  leads: () => import("@/features/crm/pages/Leads"),
+  lead: () => import("@/features/crm/pages/Lead"),
+  oportunidades: () => import("@/features/crm/pages/Oportunidades"),
+  oportunidade: () => import("@/features/crm/pages/Oportunidade"),
+  actividades: () => import("@/features/crm/pages/Actividades"),
+  relatorioComercial: () => import("@/features/crm/pages/RelatorioComercial"),
+  tiposServico: () => import("@/features/crm/pages/TiposServico"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

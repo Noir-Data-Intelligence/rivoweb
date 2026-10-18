@@ -86,6 +86,12 @@ export const REQUISITO_PAGINA = {
   "/conversas": "messaging.conversations.read",
   "/base-conhecimento": "messaging.conversations.read",
   "/documentos": "documents.read",
+  // F11 — comercial avançado (§5.12).
+  "/leads": "commercial.crm.read",
+  "/oportunidades": "commercial.crm.read",
+  "/actividades": "commercial.crm.read",
+  "/relatorio-comercial": "commercial.crm.read",
+  "/tipos-servico": "commercial.crm.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */

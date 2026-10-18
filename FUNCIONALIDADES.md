@@ -8,8 +8,10 @@
 > colaboradores; F8: salários — folhas de pagamento; F9: compras —
 > requisições, ordens de compra, recepções —, inventário e activos fixos;
 > F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
-> de conhecimento, portal na ficha do cliente e arquivo de documentos) ·
-> actualizado a 2026-10-18.
+> de conhecimento, portal na ficha do cliente e arquivo de documentos).
+> 1.º bloco da **F11** (CRM: leads, oportunidades, actividades, tipos de
+> serviço e relatório comercial) concluído e verificado na base local, por
+> publicar · actualizado a 2026-10-18.
 
 ---
 
@@ -17,13 +19,13 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Leads, Oportunidades, Actividades, Relatório comercial, Tipos de serviço, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Leads, Oportunidades, Actividades, Relatório comercial, Tipos de serviço, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Leads, Oportunidades, Actividades, Relatório comercial, Tipos de serviço, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores |
-| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Facturação |
+| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Leads, Oportunidades, Actividades, Relatório comercial, Tipos de serviço, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
 | **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Mensagens, Suporte, Ajuda |
@@ -79,6 +81,19 @@ AM = AssetManager.
 | Ligar a conta do portal (só contas Cliente por ligar) e desligá-la | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Partilhar com o cliente um ficheiro carregado na hora; revogar a partilha | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Ver o e-mail da conta ligada | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **CRM** | | | | | | | | | | |
+| Leads: ver (por estado) e a ficha, com as actividades | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Leads: registar, corrigir, marcar contactado e qualificado, desqualificar com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Converter um lead em cliente (novo ou já registado ¹⁵) e, se quiser, numa oportunidade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Oportunidades: quadro por etapa (com totais) e lista (todas as etapas), ficha com o histórico das etapas | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Oportunidades: registar, corrigir, mudar de etapa, ganhar (só com cliente) e perder com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Actividades (reuniões, chamadas, e-mails, tarefas, notas): ver | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Actividades: registar (no lead ou na oportunidade) e marcar feitas | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Tipos de serviço: ver | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Tipos de serviço: registar, corrigir, desactivar e reactivar | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Relatório comercial: funil por etapa, previsão por mês, ganhas e perdidas, taxa de ganho, leads por estado, por responsável | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Ver o cliente de cada oportunidade e actividade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Ver o responsável (nome) ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Comprovativos de pagamento** (enviados no portal) | | | | | | | | | | |
 | Ver a fila (cliente, factura, valor, datas, nota do cliente, estado) e descarregar o ficheiro | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Confirmar (regista o recibo) e rejeitar com o motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -261,6 +276,8 @@ Recursos Humanos.»
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
 ¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
+¹⁵ Escolher um cliente já registado exige ler clientes (Admin, Sales).
+¹⁶ Os nomes dos responsáveis só para quem lê os Recursos Humanos: as vistas do CRM trazem só o id (B35). O Manager também não vê o cliente de cada oportunidade (não lê clientes, B35).
 
 ---
 
@@ -390,6 +407,51 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     texto), com o título que o cliente vê e a categoria; **revogar** (o cliente
     deixa de o ver; fica no histórico).
   - **Comprovativos** que o cliente enviou, com as mesmas acções da fila.
+
+**Leads**
+- Lista paginada, filtro por estado (novo, contactado, qualificado,
+  desqualificado, convertido) no URL; nome, empresa, contacto, origem, data.
+- **Novo lead:** nome de quem contactar, empresa, e-mail, telefone, origem,
+  notas.
+- Ficha: dados, notas (como texto), responsável (com o nome), actividades;
+  **corrigir**, **marcar contactado**, **qualificar**, **desqualificar** com o
+  motivo (fica fechado), **converter em cliente**: um cliente novo (NIF,
+  morada, cidade, país; fica com o nome da empresa ou do lead, o e-mail, o
+  telefone e o lead como pessoa de contacto; um NIF já registado é recusado
+  com a indicação de converter para esse cliente) ou um já registado, e, se
+  quiser, uma oportunidade (título, valor estimado, moeda).
+
+**Oportunidades**
+- **Quadro:** uma coluna por etapa aberta (prospecção, qualificação,
+  proposta, negociação), com o número e os totais por moeda (valor e
+  ponderado); em cada cartão o cliente ou o lead, o valor, a probabilidade,
+  o fecho previsto e **mover para** outra etapa.
+- **Lista:** todas as etapas, ganhas e perdidas incluídas, filtro por etapa
+  no URL, mais recentes primeiro, com os totais.
+- **Nova oportunidade:** de um cliente ou de um lead em aberto; título,
+  valor, moeda, probabilidade (vazia fica 10%), fecho previsto, notas.
+- Ficha: dados, histórico das etapas (com os dias em cada uma), actividades;
+  **mudar de etapa**, **corrigir** (a probabilidade é obrigatória),
+  **marcar como ganha** (só com cliente; de um lead, diz para converter
+  primeiro), **marcar como perdida** com o motivo.
+
+**Actividades**
+- Todas as actividades do CRM, por fazer (por omissão), feitas ou todas, no
+  URL; tipo, assunto, notas, a que se referem (lead, oportunidade ou
+  cliente, com ligação), quando, estado (por fazer, atrasada, feita); **marcar
+  feita**. Registam-se no lead ou na oportunidade: tipo, quando (hora de
+  Luanda), assunto, notas, já feita.
+
+**Relatório comercial**
+- Período (do início do ano a hoje, por omissão) e moeda no URL: ganhas e
+  perdidas no período (e o valor ganho), taxa de ganho, conversão de leads,
+  actividades por fazer e atrasadas; funil aberto por etapa (número, valor,
+  ponderado), previsão por mês de fecho, leads do período por estado e
+  desempenho por responsável.
+
+**Tipos de serviço**
+- Catálogo (código, nome, descrição, preço, estado); **registar** (código
+  único) e **corrigir** (o código não muda; desactivar e reactivar).
 
 **Comprovativos**
 - Fila dos comprovativos enviados no portal do cliente, por omissão os **por
@@ -1040,6 +1102,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver, **resolver**; regras: **criar**, **rever**, **desactivar** e
   **avaliar agora**.
 
+**Leads**, **Oportunidades**, **Actividades**, **Relatório comercial** e **Tipos de serviço**
+- Ver tudo como o Admin (quadro, lista, fichas, histórico, relatório), sem
+  escrever. Não vê o cliente de cada oportunidade nem o nome dos
+  responsáveis (não lê clientes nem os RH, B35).
+
 **Requisições** e **Ordens de compra**
 - Tudo o que o Admin faz nas requisições e nas ordens (os nomes e a escolha do
   departamento vêm das compras, sem precisar dos Recursos Humanos).
@@ -1120,6 +1187,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **A receber**
 - Ver as vencidas.
+
+**Leads**, **Oportunidades**, **Actividades**, **Relatório comercial** e **Tipos de serviço**
+- Tudo o que o Admin faz no CRM, sem ver o nome dos responsáveis (não lê os
+  RH, B35); o responsável de um lead ou de uma oportunidade mantém-se ao
+  corrigir.
 
 **Conversas** e **Base de conhecimento**
 - Tudo o que o Admin faz: responder e fechar conversas e pedidos de suporte;
@@ -1222,7 +1294,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F11 | Comercial avançado (CRM, contratos) |
+| F11 | Comercial avançado: propostas, contratos e cobranças |
 | F12 | Projectos e frota |
 | F13 | Complementar (ESG, IA) |
 

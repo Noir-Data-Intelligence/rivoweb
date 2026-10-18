@@ -41,6 +41,8 @@ export function useClientes(p: { pagina: number; tamanho: number; inactivos: boo
 
 /** Lista de apoio (escolher o cliente de um documento): só activos, até ao tecto do servidor. */
 export const useClientesActivos = (activo = true) => useClientes({ pagina: 1, tamanho: MAXIMO_POR_PAGINA, inactivos: false }, activo);
+/** Activos e inactivos (até ao tecto), para dar nome a ids de outras áreas. */
+export const useTodosClientes = (activo = true) => useClientes({ pagina: 1, tamanho: MAXIMO_POR_PAGINA, inactivos: true }, activo);
 
 export function useCliente(id: string) {
   return useQuery({

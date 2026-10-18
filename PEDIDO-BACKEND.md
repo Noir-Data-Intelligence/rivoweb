@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração) e
+> **B35** (nomes, escolhas e ordem no comercial, F11).
 > **B34** está resolvido (PR #110) e o front já o usa: a fila de comprovativos
 > e o portal mostram a moeda da factura; ligar uma conta sem o perfil Cliente
 > dá 409 (verificado na base local).
@@ -337,3 +338,50 @@ só oferece as contas da lista, mas esconder não protege.
 1. `currency` em `PaymentClaimReviewView` e em `PaymentClaimView`.
 2. Em `POST /commercial/customers/{customerId}/account`, recusar (400 ou
    409) uma conta sem o perfil Cliente, como a lista já faz.
+
+## B35 — O comercial só traz ids de pessoas, clientes e facturas, e as listas não têm ordem
+
+**Facto 1 (nomes):** as vistas do comercial trazem só ids:
+- `ownerEmployeeId` em `LeadView`, `OpportunityView`, `CrmActivityView`,
+  `CollectionActionView` e `OwnerPerformance` (relatório);
+- `customerId` em `OpportunityView`, `CrmActivityView`, `ProposalView`,
+  `CustomerContractView` e `CollectionActionView`;
+- `leadId` em `OpportunityView`, `CrmActivityView` e `ProposalView`;
+- `salesInvoiceId` em `CollectionActionView`.
+
+Nenhum perfil comercial lê colaboradores (`hr.employees.read`: só Admin e
+HR, catálogo de produção a 2026-10-18). O Manager (`commercial.crm.read`,
+`commercial.contracts.read`) e o Finance (`commercial.contracts.read`,
+`commercial.collections.*`) também não lêem clientes.
+
+**Consequência:** o Sales vê os clientes (tem `commercial.customers.read`),
+mas nunca o responsável; o Manager e o Finance não vêem de que cliente é uma
+oportunidade, um contrato ou uma cobrança. O front nunca mostra um id: mostra
+«—».
+
+**Facto 2 (escolhas):** criar ou corrigir um lead, uma oportunidade, uma
+actividade ou uma acção de cobrança aceita `ownerEmployeeId`, e o servidor
+confirma que a ficha existe; mas quem escreve (Sales, Finance) não tem como
+listar colaboradores.
+
+**Consequência:** o front não oferece «Responsável» a esses perfis (o campo
+fica vazio).
+
+**Facto 3 (ordem e tamanho):** `GET /commercial/opportunities`, `…/activities`,
+`…/proposals`, `…/contracts` e `/commercial/collections/actions` não têm
+`ORDER BY` nem paginação (`CrmStore.cs`); em produção as actividades já são
+200 de uma vez.
+
+**Consequência:** a ordem muda entre leituras (o front ordena do seu lado, por
+data) e as listas crescem sem tecto.
+
+**Pedido** (como o B22, o B29 e o B31):
+1. Nas vistas, `ownerName`, `customerName`, `leadName` e `invoiceNumber` ao
+   lado dos ids.
+2. `GET /commercial/lookups` para quem escreve no comercial
+   (`commercial.crm.write`, `commercial.collections.write`,
+   `commercial.contracts.write`): colaboradores activos e clientes activos
+   (id e nome).
+3. Ordem definida (oportunidades e propostas pela criação, mais recentes
+   primeiro; actividades pela data marcada; contratos pelo fim; cobranças
+   pela data) e paginação com `X-Total-Count`, como nos leads.

@@ -85,3 +85,14 @@ export function inicioDoDiaEmLuanda(iso: string): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) throw new Error("Data inválida.");
   return `${iso}T00:00:00+01:00`;
 }
+
+/** Valor de um `<input type="datetime-local">` (`YYYY-MM-DDTHH:mm`) de um instante, em Africa/Luanda. */
+export function dataHoraLocalDeInstante(instante: string | Date): string {
+  const p = partesDataHora(instante);
+  return p ? `${p.year}-${p.month}-${p.day}T${p.hour === "24" ? "00" : p.hour}:${p.minute}` : "";
+}
+
+/** Instante da API a partir de `YYYY-MM-DDTHH:mm` lido em Africa/Luanda (UTC+1, sem hora de Verão), ou `null`. */
+export function instanteDeDataHoraLocal(v: string): string | null {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v) && !Number.isNaN(new Date(`${v}:00+01:00`).getTime()) ? `${v}:00+01:00` : null;
+}

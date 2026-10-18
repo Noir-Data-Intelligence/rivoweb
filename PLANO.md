@@ -1925,6 +1925,42 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 - **Testes:** 180 unitários; interface 5 cenários × 3 motores; suite inteira
   471, sem instáveis.
 
+### F11 — Comercial avançado
+
+**Inventário** (2026-10-18, contra `2b84331` e produção, só códigos e
+contagens): Sales 200 em tudo (120 leads, 98 oportunidades, 4 colunas no
+quadro, 200 actividades, 20 tipos de serviço, 2 modelos e 40 propostas, 30
+contratos, 70 acções de cobrança, relatório); Manager lê oportunidades e
+contratos (403 nas cobranças); Finance lê contratos e cobranças (403 nas
+oportunidades). As vistas só trazem ids de pessoas, clientes, leads e
+facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
+
+**Bloco 1 — CRM** (2026-10-18, por publicar).
+- **Ecrãs** (grupo «CRM»): `/leads` e `/leads/:id`, `/oportunidades` (vistas
+  quadro e lista; etapa no URL) e `/oportunidades/:id`, `/actividades` (por
+  fazer, feitas, todas, no URL), `/relatorio-comercial` (período e moeda no
+  URL) e `/tipos-servico`.
+- **Regras:** os nomes vêm do lado do front: clientes para quem lê clientes,
+  colaboradores para quem lê os RH, leads para quem lê o CRM; sem
+  permissão, «—», nunca o id (testado); o responsável não se escolhe (B35) e
+  mantém-se ao corrigir; a probabilidade vazia vira 10% no servidor também
+  ao corrigir, por isso ao corrigir é obrigatória; ganhar exige cliente (o
+  ecrã explica e liga ao lead); a hora das actividades é a de Luanda
+  (`+01:00`, helpers novos em `lib/format/data`); as listas sem ordem
+  ordenam-se no front (oportunidades pela criação, actividades por fazer à
+  frente); o quadro não arrasta: «Mover para» em cada cartão (teclado e
+  leitores de ecrã); converter um lead com NIF já registado explica que se
+  converta para esse cliente.
+- **Escritas:** verificadas **na base local** (`f11-crm-escritas.spec.ts`):
+  como Sales, lead registado, contactado e convertido num cliente novo (nome
+  da empresa, NIF, pessoa de contacto) com oportunidade; actividade às 09:30
+  de Luanda (08:30 UTC no servidor) marcada feita; etapa mudada, oportunidade
+  corrigida (1 750 000,25, 70%) e ganha (histórico Prospecting, Negotiation,
+  Won); outra perdida com motivo (USD); lead desqualificado; tipo de serviço
+  registado (25 000,50) e desactivado. **Nenhuma escrita em produção.**
+- **Testes:** 200 unitários; interface 7 cenários × 3 motores; suite inteira
+  537, sem falhas nem instáveis (24 saltados: produção e base local).
+
 ### F10 — Portal do cliente, documentos e mensagens
 
 **Inventário** (2026-10-17, contra `727666d` e produção, só códigos e
