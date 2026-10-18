@@ -132,3 +132,67 @@ export const relatorio = (): S["CrmReport"] => ({
   openActivities: 7,
   overdueActivities: 2,
 });
+
+// --- Propostas (2.º bloco)
+
+export const IDF11P = {
+  rascunho: "00000000-0000-4000-8000-000000000c01",
+  enviada: "00000000-0000-4000-8000-000000000c02",
+  linha1: "00000000-0000-4000-8000-000000000c11",
+  linha2: "00000000-0000-4000-8000-000000000c12",
+  modelo: "00000000-0000-4000-8000-000000000c21",
+  nova: "00000000-0000-4000-8000-000000000c03",
+};
+
+const linha = (id: string, n: number, desc: string, q: number, p: number, d: number, t: number): S["ProposalLineView"] => ({ lineId: id, position: n, serviceTypeId: null, description: desc, quantity: q, unitPrice: p, discountPercent: d, total: t });
+
+export const propostas = (): S["ProposalView"][] => [
+  {
+    proposalId: IDF11P.rascunho,
+    number: "PROP-20261015-A1B2C3",
+    title: "Auditoria 2027",
+    customerId: IDF3.cliente,
+    leadId: null,
+    opportunityId: IDF11.op1,
+    status: "Draft",
+    currency: "AOA",
+    validUntil: "2026-11-30",
+    body: "Exmos. Senhores,\n<img src=x onerror=alert(1)>",
+    notes: null,
+    decisionNotes: null,
+    total: 34688.89,
+    createdAt: "2026-10-15T10:00:00Z",
+    sentAt: null,
+    decidedAt: null,
+    lines: [linha(IDF11P.linha1, 1, "Horas de auditoria", 3, 12500.5, 7.5, 34688.89), linha(IDF11P.linha2, 3, "Deslocação", 1, 0, 0, 0)],
+  },
+  {
+    proposalId: IDF11P.enviada,
+    number: "PROP-20261001-D4E5F6",
+    title: "Consultoria fiscal",
+    customerId: null,
+    leadId: IDF11.lead,
+    opportunityId: null,
+    status: "Sent",
+    currency: "USD",
+    validUntil: null,
+    body: null,
+    notes: "Inclui IVA.",
+    decisionNotes: null,
+    total: 4500,
+    createdAt: "2026-10-01T10:00:00Z",
+    sentAt: "2026-10-02T10:00:00Z",
+    decidedAt: null,
+    lines: [linha("00000000-0000-4000-8000-000000000c13", 1, "Consultoria", 10, 450, 0, 4500)],
+  },
+];
+
+export const versoes = (): S["ProposalVersionView"][] => [
+  { versionId: "v1", number: 1, reason: "revised", total: 30000, createdAt: "2026-10-16T10:00:00Z", snapshot: { title: "Auditoria", total: 30000, lines: [{ description: "Horas de auditoria", total: 30000 }] } as unknown as S["ProposalVersionView"]["snapshot"] },
+  { versionId: "v2", number: 2, reason: "sent", total: 34688.89, createdAt: "2026-10-17T10:00:00Z", snapshot: { title: "Auditoria 2027", total: 34688.89, lines: [] } as unknown as S["ProposalVersionView"]["snapshot"] },
+];
+
+export const modelos = (): S["ProposalTemplateView"][] => [
+  { templateId: IDF11P.modelo, name: "Proposta padrão", body: "Exmos. {{cliente}},\nSegue a proposta «{{titulo}}», válida até {{validade}}.", active: true },
+  { templateId: "00000000-0000-4000-8000-000000000c22", name: "Modelo antigo", body: "Antigo.", active: false },
+];

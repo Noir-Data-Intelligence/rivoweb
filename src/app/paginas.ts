@@ -56,6 +56,9 @@ export const PAGINAS = {
   actividades: () => import("@/features/crm/pages/Actividades"),
   relatorioComercial: () => import("@/features/crm/pages/RelatorioComercial"),
   tiposServico: () => import("@/features/crm/pages/TiposServico"),
+  propostas: () => import("@/features/crm/pages/Propostas"),
+  proposta: () => import("@/features/crm/pages/Proposta"),
+  modelosProposta: () => import("@/features/crm/pages/Modelos"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

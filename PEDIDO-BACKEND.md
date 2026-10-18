@@ -1,8 +1,9 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração) e
-> **B35** (nomes, escolhas e ordem no comercial, F11).
+> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração),
+> **B35** (nomes, escolhas e ordem no comercial, F11) e **B36** (posição das
+> linhas das propostas).
 > **B34** está resolvido (PR #110) e o front já o usa: a fila de comprovativos
 > e o portal mostram a moeda da factura; ligar uma conta sem o perfil Cliente
 > dá 409 (verificado na base local).
@@ -385,3 +386,18 @@ data) e as listas crescem sem tecto.
 3. Ordem definida (oportunidades e propostas pela criação, mais recentes
    primeiro; actividades pela data marcada; contratos pelo fim; cobranças
    pela data) e paginação com `X-Total-Count`, como nos leads.
+
+## B36 — Tirar uma linha de uma proposta repete a posição da linha seguinte
+
+**Facto:** `Proposal.AddLine` dá a posição `_lines.Count + 1` e `RemoveLine`
+não renumera. Na base local (`2b84331`, 2026-10-18): linhas A, B, C; tirar
+B; acrescentar D → `1:A 3:D 3:C` em `GET /commercial/proposals/{id}`, com D
+antes de C (a ordem entre posições iguais não é estável).
+
+**Consequência:** duas linhas com a mesma posição, a ordem muda entre
+leituras e o PDF e as versões (que ordenam pela posição) podem sair noutra
+ordem. O front numera as linhas pela ordem em que chegam, para não mostrar
+números repetidos.
+
+**Pedido:** dar à linha nova a maior posição + 1 (ou renumerar ao tirar),
+como o B30 fez nas requisições.

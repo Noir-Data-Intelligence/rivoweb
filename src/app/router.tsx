@@ -135,6 +135,9 @@ export const rotas: RouteObject[] = [
               { path: "actividades", element: protegido(R["/actividades"], pagina("actividades")) },
               { path: "relatorio-comercial", element: protegido(R["/relatorio-comercial"], pagina("relatorioComercial")) },
               { path: "tipos-servico", element: protegido(R["/tipos-servico"], pagina("tiposServico")) },
+              { path: "propostas", element: protegido(R["/propostas"], pagina("propostas")) },
+              { path: "propostas/:proposalId", element: protegido(R["/propostas"], pagina("proposta")) },
+              { path: "modelos-proposta", element: protegido(R["/modelos-proposta"], pagina("modelosProposta")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).

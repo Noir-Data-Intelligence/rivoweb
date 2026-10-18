@@ -92,6 +92,8 @@ export const REQUISITO_PAGINA = {
   "/actividades": "commercial.crm.read",
   "/relatorio-comercial": "commercial.crm.read",
   "/tipos-servico": "commercial.crm.read",
+  "/propostas": "commercial.crm.read",
+  "/modelos-proposta": "commercial.crm.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */

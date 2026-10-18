@@ -1961,6 +1961,28 @@ facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
 - **Testes:** 200 unitários; interface 7 cenários × 3 motores; suite inteira
   537, sem falhas nem instáveis (24 saltados: produção e base local).
 
+**Bloco 2 — propostas e modelos** (2026-10-18, por publicar).
+- **Ecrãs:** `/propostas` (estado no URL) e `/propostas/:id`,
+  `/modelos-proposta`; as propostas de cada oportunidade na sua ficha.
+- **Regras:** o PDF compõe-se a pedido e não fica guardado (`RenderAsync`):
+  o `GET …/document` das propostas não tem efeitos (fecha a hipótese do
+  §5.15 para elas); as notas saem no PDF (não são internas); só o rascunho se
+  corrige; ao corrigir vão os valores de origem do destinatário, oportunidade
+  e moeda; linhas com serviço só do catálogo na moeda da proposta (o servidor
+  copia o preço sem converter), vazios a descrição e o preço ficam os do
+  serviço; o total previsto usa a regra do servidor (Big, metade para cima);
+  as linhas numeram-se pela ordem porque a posição se repete depois de tirar
+  uma (**B36**, confirmado na base local: `1:A 3:D 3:C`); o texto do modelo é
+  preenchido pelo servidor (o front manda `body: null`).
+- **Escritas:** verificadas **na base local** (`f11-propostas-escritas.spec.ts`,
+  à primeira): modelo; proposta a partir dele (texto com o cliente e a
+  validade); linha do catálogo (2,5 × 25 000), linha livre com desconto
+  (34 688,89), uma tirada; total 97 188,89; corrigida (versão «revised»), PDF
+  `PROP-…pdf`, enviada (versão «sent») e aceite com notas; outra em USD sem
+  linhas não se envia, com uma linha enviada e recusada.
+- **Testes:** 207 unitários; interface 5 cenários × 3 motores; suite inteira
+  552, sem falhas nem instáveis (24 saltados: produção e base local).
+
 ### F10 — Portal do cliente, documentos e mensagens
 
 **Inventário** (2026-10-17, contra `727666d` e produção, só códigos e

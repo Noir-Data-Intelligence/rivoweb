@@ -14,6 +14,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useActividades, useConcluirActividade, useLeads, useRegistarActividade, type Actividade, type EtapaAberta, type TipoActividade } from "./api";
+import { ESTADOS_PROPOSTA, type EstadoProposta } from "./propostas";
 import { actividadeParaApi, errosActividade, temErros, type CamposActividade } from "./regras";
 
 export const ESTADOS_LEAD: Readonly<Record<string, string>> = { New: "Novo", Contacted: "Contactado", Qualified: "Qualificado", Disqualified: "Desqualificado", Converted: "Convertido" };
@@ -26,6 +27,8 @@ const TOM_ETAPA: Record<string, TomBadge> = { Won: "sucesso", Lost: "erro" };
 
 export const EstadoLead = ({ estado }: { estado: string }) => <Badge tom={TOM_LEAD[estado] ?? "neutro"}>{ESTADOS_LEAD[estado] ?? estado}</Badge>;
 export const EtapaBadge = ({ etapa }: { etapa: string }) => <Badge tom={TOM_ETAPA[etapa] ?? "info"}>{ETAPAS[etapa] ?? etapa}</Badge>;
+const TOM_PROPOSTA: Record<string, TomBadge> = { Draft: "neutro", Sent: "info", Accepted: "sucesso", Rejected: "erro" };
+export const EstadoPropostaBadge = ({ estado }: { estado: string }) => <Badge tom={TOM_PROPOSTA[estado] ?? "neutro"}>{ESTADOS_PROPOSTA[estado as EstadoProposta] ?? estado}</Badge>;
 
 /**
  * Nomes para os ids que o comercial devolve (B35): clientes para quem lê

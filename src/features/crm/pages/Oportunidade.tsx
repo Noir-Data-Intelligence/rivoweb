@@ -18,7 +18,8 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { useGanharOportunidade, useGuardarOportunidade, useHistoricoOportunidade, useMoverOportunidade, useOportunidade, usePerderOportunidade, type EtapaAberta, type Oportunidade as TipoOportunidade } from "../api";
-import { ActividadesDe, ETAPAS, ETAPAS_ABERTAS, EtapaBadge, NomeCliente, useNomes } from "../comum";
+import { ActividadesDe, ETAPAS, ETAPAS_ABERTAS, EtapaBadge, EstadoPropostaBadge, NomeCliente, useNomes } from "../comum";
+import { usePropostas } from "../propostas";
 import { CamposDaOportunidade, camposDaOportunidade } from "../FormularioOportunidade";
 import { errosOportunidade, oportunidadeParaApi, temErros } from "../regras";
 
@@ -134,6 +135,35 @@ function Historico({ id }: { id: string }) {
   );
 }
 
+function PropostasDa({ id }: { id: string }) {
+  const lista = usePropostas({ estado: null, oportunidade: id });
+  return (
+    <Card>
+      <CardTitle>Propostas</CardTitle>
+      {lista.isPending ? (
+        <Skeleton className="mt-3 h-10" />
+      ) : lista.error ? (
+        <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} className="mt-3" />
+      ) : lista.data.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">Nenhuma proposta ligada a esta oportunidade.</p>
+      ) : (
+        <ul className="mt-2 divide-y divide-border text-sm" aria-label="Propostas da oportunidade">
+          {lista.data.map((p) => (
+            <li key={p.proposalId} className="flex flex-wrap items-center justify-between gap-2 py-2">
+              <Link to={`/propostas/${p.proposalId}`} className="font-medium text-foreground underline-offset-4 hover:underline">
+                {p.number} · {p.title}
+              </Link>
+              <span className="inline-flex items-center gap-2 tabular-nums">
+                {moeda(p.total, p.currency)} <EstadoPropostaBadge estado={p.status} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
 export default function Oportunidade() {
   const { opportunityId = "" } = useParams();
   const oportunidade = useOportunidade(opportunityId);
@@ -228,6 +258,9 @@ export default function Oportunidade() {
           {o.notes ? <p className="mt-4 whitespace-pre-line break-words text-sm text-foreground">{o.notes}</p> : null}
         </Card>
         <Historico id={o.opportunityId} />
+        <div className="lg:col-span-2">
+          <PropostasDa id={o.opportunityId} />
+        </div>
         <div className="lg:col-span-2">
           <ActividadesDe sobre={{ oportunidade: o.opportunityId }} rotulo={o.title} />
         </div>

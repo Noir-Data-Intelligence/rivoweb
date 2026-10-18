@@ -26,7 +26,8 @@ function comCrm(api: ApiSimulada, me = meVendasF11): ApiSimulada {
     .em("GET", `/commercial/opportunities/${IDF11.opLead}/history`, { status: 200, corpo: [] })
     .em("GET", "/commercial/activities", { status: 200, corpo: actividades() })
     .em("GET", "/commercial/service-types", { status: 200, corpo: servicos() })
-    .em("GET", "/commercial/crm/report", { status: 200, corpo: relatorio() });
+    .em("GET", "/commercial/crm/report", { status: 200, corpo: relatorio() })
+    .em("GET", "/commercial/proposals", { status: 200, corpo: [] });
 }
 
 async function verificar(page: Page) {
