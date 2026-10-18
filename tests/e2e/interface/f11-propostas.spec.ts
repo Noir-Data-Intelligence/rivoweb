@@ -9,7 +9,7 @@ import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { IDF3 } from "../../fixtures/f3";
-import { IDF11, IDF11P, leads, meGestorF11, meVendasF11, modelos, oportunidades, propostas, servicos, versoes } from "../../fixtures/f11";
+import { escolhasComerciais, IDF11, IDF11P, leads, meGestorF11, meVendasF11, modelos, oportunidades, propostas, servicos, versoes } from "../../fixtures/f11";
 
 /** Como o servidor: sem `includeInactive=true`, só os activos. */
 const inactivos = (url: string) => new URL(url).searchParams.get("includeInactive") === "true";
@@ -19,8 +19,9 @@ const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-P
 function comPropostas(api: ApiSimulada, me = meVendasF11): ApiSimulada {
   return comF3(api, me)
     .em("GET", "/commercial/leads", pag(leads()))
-    .em("GET", "/commercial/opportunities", { status: 200, corpo: oportunidades() })
-    .em("GET", "/commercial/proposals", { status: 200, corpo: propostas() })
+    .em("GET", "/commercial/lookups", { status: 200, corpo: escolhasComerciais() })
+    .em("GET", "/commercial/opportunities", pag(oportunidades()))
+    .em("GET", "/commercial/proposals", pag(propostas()))
     .em("GET", `/commercial/proposals/${IDF11P.rascunho}`, { status: 200, corpo: propostas()[0] })
     .em("GET", `/commercial/proposals/${IDF11P.enviada}`, { status: 200, corpo: propostas()[1] })
     .em("GET", `/commercial/proposals/${IDF11P.rascunho}/versions`, { status: 200, corpo: versoes() })
@@ -96,7 +97,7 @@ test.describe("propostas", () => {
     const linhas = page.getByRole("table", { name: "Linhas da proposta" });
     await expect(linhas.getByRole("row").nth(1)).toContainText("Horas de auditoria");
     await expect(linhas.getByRole("row").nth(1)).toContainText("7,5%");
-    // A posição repetida não aparece (B36): numera-se pela ordem.
+    // A posição das linhas vem do servidor (B36).
     await expect(linhas.getByRole("row").nth(2).getByRole("cell").first()).toHaveText("2");
     await expect(page.getByText("Total: 34 688,89 Kz")).toBeVisible();
     await expect(page.getByText("<img src=x onerror=alert(1)>", { exact: false })).toBeVisible();

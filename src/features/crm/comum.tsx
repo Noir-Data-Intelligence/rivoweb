@@ -1,9 +1,7 @@
 /** Peças comuns do CRM: rótulos, estados, nomes e o bloco de actividades. */
 import { useId, useState } from "react";
 import { Link } from "react-router";
-import { useTodosClientes } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
-import { useTodosColaboradores } from "@/features/rh";
 import { dataHoraLocalDeInstante, formatarDataHora } from "@/lib/format/data";
 import { Badge, type TomBadge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
@@ -13,7 +11,7 @@ import { Checkbox, Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useActividades, useConcluirActividade, useLeads, useRegistarActividade, type Actividade, type EtapaAberta, type TipoActividade } from "./api";
+import { useActividades, useConcluirActividade, useEscolhasComerciais, useLeads, useRegistarActividade, type Actividade, type EtapaAberta, type TipoActividade } from "./api";
 import { ESTADOS_PROPOSTA, type EstadoProposta } from "./propostas";
 import { actividadeParaApi, errosActividade, temErros, type CamposActividade } from "./regras";
 
@@ -31,28 +29,24 @@ const TOM_PROPOSTA: Record<string, TomBadge> = { Draft: "neutro", Sent: "info", 
 export const EstadoPropostaBadge = ({ estado }: { estado: string }) => <Badge tom={TOM_PROPOSTA[estado] ?? "neutro"}>{ESTADOS_PROPOSTA[estado as EstadoProposta] ?? estado}</Badge>;
 
 /**
- * Nomes para os ids que o comercial devolve (B35): clientes para quem lê
- * clientes, colaboradores para quem lê os RH, leads para quem lê o CRM. Sem
- * permissão, «—»; nunca o id.
+ * O que se escolhe num formulário do CRM: clientes e colaboradores activos
+ * (`/commercial/lookups`, B35) e os leads em aberto. Só para quem escreve.
  */
-export function useNomes() {
+export function useEscolhas(activo = true) {
   const { pode } = useUtilizador();
-  const clientes = useTodosClientes(pode("commercial.customers.read"));
-  const pessoas = useTodosColaboradores(pode("hr.employees.read"));
-  const leads = useLeads({ estado: null, pagina: 1, tamanho: 200 }, pode("commercial.crm.read"));
+  const escreve = pode("commercial.crm.write");
+  const escolhas = useEscolhasComerciais(activo && escreve);
+  const leads = useLeads({ estado: null, pagina: 1, tamanho: 200 }, activo && escreve);
   return {
-    cliente: (id: string | null) => (id === null ? null : (clientes.data?.items.find((c) => c.customerId === id)?.name ?? null)),
-    pessoa: (id: string | null) => (id === null ? null : (pessoas.data?.items.find((c) => c.employeeId === id)?.fullName ?? null)),
-    lead: (id: string | null) => {
-      if (id === null) return null;
-      const l = leads.data?.items.find((x) => x.leadId === id);
-      return l ? (l.company ? `${l.name} (${l.company})` : l.name) : null;
-    },
-    clientes: clientes.data?.items ?? [],
-    leads: leads.data?.items ?? [],
-    lePessoas: pode("hr.employees.read"),
+    clientes: escolhas.data?.customers ?? [],
+    pessoas: escolhas.data?.employees ?? [],
+    leads: (leads.data?.items ?? []).filter((l) => l.status !== "Converted" && l.status !== "Disqualified"),
+    aCarregar: escolhas.isPending,
   };
 }
+
+/** «Marta Lopes (Lopes & Filhos)». */
+export const nomeLead = (l: { name: string; company: string | null }) => (l.company ? `${l.name} (${l.company})` : l.name);
 
 /** Ligação à ficha do cliente quando se lê clientes; senão, o nome ou «—». */
 export function NomeCliente({ id, nome }: { id: string | null; nome: string | null }) {
@@ -73,10 +67,11 @@ export const ordenarActividades = (xs: readonly Actividade[]) => [...xs].sort((a
 
 function RegistarActividade({ sobre, rotulo }: { sobre: { lead?: string; oportunidade?: string; cliente?: string }; rotulo: string }) {
   const [aberto, setAberto] = useState(false);
-  const vazio = (): CamposActividade => ({ tipo: "Call", assunto: "", quando: dataHoraLocalDeInstante(new Date()), feita: false, notas: "" });
+  const vazio = (): CamposActividade => ({ tipo: "Call", assunto: "", quando: dataHoraLocalDeInstante(new Date()), feita: false, responsavel: "", notas: "" });
   const [v, setV] = useState(vazio);
   const [tentou, setTentou] = useState(false);
   const registar = useRegistarActividade();
+  const escolhas = useEscolhas(aberto);
   const idForm = useId();
   const erros = errosActividade(v);
   const fechar = (a: boolean) => {
@@ -121,6 +116,18 @@ function RegistarActividade({ sobre, rotulo }: { sobre: { lead?: string; oportun
           <Field rotulo="Assunto" erro={tentou ? erros.assunto : undefined} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={300} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.assunto} onChange={(e) => setV((x) => ({ ...x, assunto: e.target.value }))} />}
           </Field>
+          <Field rotulo="Responsável (opcional)" className="sm:col-span-2">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.responsavel} onChange={(e) => setV((x) => ({ ...x, responsavel: e.target.value }))}>
+                <option value="">Ninguém</option>
+                {escolhas.pessoas.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
           <Field rotulo="Notas (opcional)" erro={tentou ? erros.notas : undefined} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Textarea id={id} rows={3} maxLength={4000} aria-describedby={descricao} invalido={invalido} value={v.notas} onChange={(e) => setV((x) => ({ ...x, notas: e.target.value }))} />}
           </Field>
@@ -154,7 +161,10 @@ export function colunasActividade(escreve: boolean, extra: Coluna<Actividade>[] 
       celula: (a) => (
         <span className="flex flex-col">
           <span className="truncate font-medium">{a.subject}</span>
-          <span className="text-xs text-muted-foreground">{TIPOS_ACTIVIDADE[a.kind as TipoActividade] ?? a.kind}</span>
+          <span className="text-xs text-muted-foreground">
+            {TIPOS_ACTIVIDADE[a.kind as TipoActividade] ?? a.kind}
+            {a.ownerName ? ` · ${a.ownerName}` : ""}
+          </span>
           {a.notes ? <span className="whitespace-pre-line text-xs text-muted-foreground">{a.notes}</span> : null}
         </span>
       ),

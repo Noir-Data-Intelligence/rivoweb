@@ -19,8 +19,8 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { TIPOS_CONTRATO, useAditamentos, useAditar, useAnexar, useAnexos, useCicloContrato, useContratoCliente, useDescarregarAnexo, useGuardarContrato, useMetadadosDocumento, type Aditamento, type Anexo, type Contrato as TipoC, type TipoContrato } from "../api";
-import { EstadoContratoBadge, Fim, useNomeCliente, valorContrato } from "../comum";
+import { TIPOS_CONTRATO, useAditamentos, useAditar, useAnexar, useAnexos, useCicloContrato, useContratoCliente, useDescarregarAnexo, useGuardarContrato, type Aditamento, type Anexo, type Contrato as TipoC, type TipoContrato } from "../api";
+import { ClienteDoContrato, EstadoContratoBadge, Fim, valorContrato } from "../comum";
 import { CamposDoContrato } from "../Formulario";
 import { aditamentoParaApi, camposDoContrato, contratoParaApi, erroRenovacao, errosAditamento, errosContrato, type CamposAditamento } from "../regras";
 
@@ -328,16 +328,14 @@ function Anexar({ c }: { c: TipoC }) {
   );
 }
 
-/** Nome e descarga só para quem lê o arquivo (B37). */
-function DescarregarAnexo({ a }: { a: Anexo }) {
-  const meta = useMetadadosDocumento(a.documentId);
-  const d = useDescarregarAnexo();
-  const nome = meta.data?.fileName ?? `${a.category}.pdf`;
+/** Pelo contrato, em anexo (B37). */
+function DescarregarAnexo({ contractId, a }: { contractId: string; a: Anexo }) {
+  const d = useDescarregarAnexo(contractId);
   return (
     <span className="inline-flex flex-col items-end">
-      <Button variante="ghost" tamanho="sm" aCarregar={d.isPending} onClick={() => d.mutate({ documentId: a.documentId, nome })} aria-label={`Descarregar ${meta.data?.fileName ?? a.category}`}>
+      <Button variante="ghost" tamanho="sm" aCarregar={d.isPending} onClick={() => d.mutate(a)} aria-label={`Descarregar ${a.fileName ?? a.category}`}>
         <Download strokeWidth={1.75} aria-hidden />
-        {meta.data?.fileName ?? "Descarregar"}
+        Descarregar
       </Button>
       {d.error ? <ErrorPanel erro={d.error} /> : null}
     </span>
@@ -347,11 +345,20 @@ function DescarregarAnexo({ a }: { a: Anexo }) {
 function Anexos({ c, escreve }: { c: TipoC; escreve: boolean }) {
   const { pode } = useUtilizador();
   const lista = useAnexos(c.contractId);
-  const leArquivo = pode("documents.read");
   const colunas: Coluna<Anexo>[] = [
-    { id: "cat", cabecalho: "Categoria", celula: (a) => <span className="font-medium">{a.category}</span> },
-    { id: "quando", cabecalho: "Anexado a", celula: (a) => formatarDataHora(a.attachedAt) },
-    ...(leArquivo ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (a: Anexo) => <DescarregarAnexo a={a} /> }] : []),
+    {
+      id: "cat",
+      cabecalho: "Anexo",
+      className: "max-w-[16rem]",
+      celula: (a) => (
+        <span className="flex flex-col">
+          <span className="truncate font-medium">{a.fileName ?? a.category}</span>
+          {a.fileName ? <span className="truncate text-xs text-muted-foreground">{a.category}</span> : null}
+        </span>
+      ),
+    },
+    { id: "quando", cabecalho: "Anexado a", esconderAte: "sm", celula: (a) => formatarDataHora(a.attachedAt) },
+    { id: "accao", cabecalho: "", alinhar: "direita", celula: (a) => <DescarregarAnexo contractId={c.contractId} a={a} /> },
   ];
   return (
     <Card>
@@ -368,7 +375,6 @@ function Anexos({ c, escreve }: { c: TipoC; escreve: boolean }) {
         erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
         vazio="Sem anexos."
       />
-      {!leArquivo && (lista.data?.length ?? 0) > 0 ? <p className="mt-2 text-xs text-muted-foreground">Os anexos só se abrem com acesso ao arquivo de documentos (B37).</p> : null}
     </Card>
   );
 }
@@ -377,7 +383,6 @@ export default function Contrato() {
   const { contractId = "" } = useParams();
   const contrato = useContratoCliente(contractId);
   const { pode } = useUtilizador();
-  const nomeCliente = useNomeCliente();
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/contratos-clientes">
@@ -437,7 +442,7 @@ export default function Contrato() {
         <Card>
           <CardTitle>Dados</CardTitle>
           <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
-            {linha("Cliente", nomeCliente(c.customerId))}
+            {linha("Cliente", <ClienteDoContrato c={c} />)}
             {linha("Valor", valorContrato(c))}
             {linha("Início", formatarData(c.startsOn))}
             {linha("Fim", <Fim c={c} />)}

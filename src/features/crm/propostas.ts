@@ -8,12 +8,13 @@
  *   moeda (não muda depois), validade, texto e notas (2000, saem no PDF); número
  *   `PROP-AAAAMMDD-XXXXXX`; com modelo e sem texto, o texto vem do modelo com
  *   `{{cliente}}`, `{{titulo}}`, `{{validade}}` e `{{data}}` substituídos;
- *   a lista vem das mais recentes para as mais antigas;
+ *   a lista vem das mais recentes para as mais antigas, com `customerName` e
+ *   `leadName`, paginada com `page` (B35);
  * - só o rascunho se corrige (título, validade, texto, notas) e muda de
  *   linhas; linha: descrição (500; com tipo de serviço e sem descrição, a do
  *   tipo), quantidade > 0 (4 casas), preço ≥ 0 (2 casas; com tipo de serviço e
- *   sem preço, o do tipo), desconto 0–100 (2 casas; a posição repete-se
- *   depois de tirar uma linha, B36); total = quantidade ×
+ *   sem preço, o do tipo), desconto 0–100 (2 casas); a posição da linha nova
+ *   é a maior + 1 (B36); total = quantidade ×
  *   preço × (1 − desconto), arredondado a 2 casas (metade para cima);
  * - enviar exige linhas; aceitar ou recusar só a enviada, com notas
  *   opcionais (2000);
@@ -27,7 +28,7 @@
 import Big from "big.js";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { descarregar } from "@/lib/api/download";
-import { api, enviar, ler } from "@/lib/api/client";
+import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import { useEscrita } from "@/lib/api/escrita";
 import type { components } from "@/lib/api/schema";
 import { lerDecimalDigitado, lerDinheiroDigitado, paraApi, decimalParaApi, type Dinheiro } from "@/lib/money/money";
@@ -64,6 +65,14 @@ export function usePropostas(f: { estado: EstadoProposta | null; cliente?: strin
           signal,
         }),
       ),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function usePropostasPagina(f: { estado: EstadoProposta | null; pagina: number; tamanho: number }) {
+  return useQuery({
+    queryKey: [...chaves.propostas, "page", f],
+    queryFn: ({ signal }) => lerPagina(api.GET("/commercial/proposals", { params: { query: { page: f.pagina, pageSize: f.tamanho, ...(f.estado ? { status: f.estado } : {}) } }, signal })),
     placeholderData: keepPreviousData,
   });
 }

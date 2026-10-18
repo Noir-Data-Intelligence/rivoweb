@@ -1,16 +1,18 @@
 /** Os campos de um lead (novo ou a corrigir). */
 import type { Dispatch, SetStateAction } from "react";
-import { Textarea } from "@/ui/Controlos";
+import { Select, Textarea } from "@/ui/Controlos";
 import { Field, Input } from "@/ui/Field";
 import type { Lead } from "./api";
+import { useEscolhas } from "./comum";
 import type { CamposLead } from "./regras";
 
-export const LEAD_VAZIO: CamposLead = { nome: "", empresa: "", email: "", telefone: "", origem: "", notas: "" };
+export const LEAD_VAZIO: CamposLead = { nome: "", empresa: "", email: "", telefone: "", origem: "", responsavel: "", notas: "" };
 
-export const camposDoLead = (l: Lead): CamposLead => ({ nome: l.name, empresa: l.company ?? "", email: l.email ?? "", telefone: l.phone ?? "", origem: l.source ?? "", notas: l.notes ?? "" });
+export const camposDoLead = (l: Lead): CamposLead => ({ nome: l.name, empresa: l.company ?? "", email: l.email ?? "", telefone: l.phone ?? "", origem: l.source ?? "", responsavel: l.ownerEmployeeId ?? "", notas: l.notes ?? "" });
 
 export function CamposDoLead({ v, setV, erros }: { v: CamposLead; setV: Dispatch<SetStateAction<CamposLead>>; erros: Partial<Record<keyof CamposLead, string | undefined>> }) {
   const campo = (k: keyof CamposLead) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
+  const escolhas = useEscolhas();
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Field rotulo="Nome de quem contactar" erro={erros.nome}>
@@ -25,8 +27,20 @@ export function CamposDoLead({ v, setV, erros }: { v: CamposLead; setV: Dispatch
       <Field rotulo="Telefone (opcional)" erro={erros.telefone}>
         {({ id, descricao, invalido }) => <Input id={id} type="tel" maxLength={50} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.telefone} onChange={campo("telefone")} />}
       </Field>
-      <Field rotulo="Origem (opcional)" ajuda="Por exemplo: feira, site, indicação." erro={erros.origem} className="sm:col-span-2">
+      <Field rotulo="Origem (opcional)" ajuda="Por exemplo: feira, site, indicação." erro={erros.origem}>
         {({ id, descricao, invalido }) => <Input id={id} maxLength={100} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.origem} onChange={campo("origem")} />}
+      </Field>
+      <Field rotulo="Responsável (opcional)">
+        {({ id, descricao }) => (
+          <Select id={id} aria-describedby={descricao} value={v.responsavel} onChange={campo("responsavel")}>
+            <option value="">Ninguém</option>
+            {escolhas.pessoas.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
+        )}
       </Field>
       <Field rotulo="Notas (opcional)" erro={erros.notas} className="sm:col-span-2">
         {({ id, descricao, invalido }) => <Textarea id={id} rows={3} maxLength={2000} aria-describedby={descricao} invalido={invalido} value={v.notas} onChange={campo("notas")} />}

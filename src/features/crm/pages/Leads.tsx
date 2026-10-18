@@ -50,7 +50,7 @@ function NovoLead() {
             e.preventDefault();
             setTentou(true);
             if (temErros(erros) || guardar.isPending) return;
-            guardar.mutate({ id: null, corpo: leadParaApi(v, null) }, { onSuccess: (id) => void navegar(`/leads/${id}`) });
+            guardar.mutate({ id: null, corpo: leadParaApi(v) }, { onSuccess: (id) => void navegar(`/leads/${id}`) });
           }}
         >
           <CamposDoLead v={v} setV={setV} erros={tentou ? erros : {}} />
@@ -90,6 +90,7 @@ export default function Leads() {
     },
     { id: "contacto", cabecalho: "Contacto", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (l) => l.email ?? l.phone ?? "—" },
     { id: "origem", cabecalho: "Origem", esconderAte: "lg", celula: (l) => l.source ?? "—" },
+    { id: "dono", cabecalho: "Responsável", esconderAte: "lg", className: "max-w-[12rem] truncate", celula: (l) => l.ownerName ?? "—" },
     { id: "criado", cabecalho: "Registado a", esconderAte: "sm", celula: (l) => formatarDataDeInstante(l.createdAt) },
     { id: "estado", cabecalho: "Estado", celula: (l) => <EstadoLeadBadge estado={l.status} /> },
   ];

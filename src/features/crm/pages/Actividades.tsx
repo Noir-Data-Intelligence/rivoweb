@@ -10,26 +10,27 @@ import { useUtilizador } from "@/features/identity";
 import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
+import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useActividades, useOportunidades, type Actividade } from "../api";
-import { colunasActividade, NomeCliente, ordenarActividades, useNomes } from "../comum";
+import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
+import { useActividadesPagina, type Actividade } from "../api";
+import { colunasActividade, NomeCliente } from "../comum";
 
 export default function Actividades() {
   const [params, setParams] = useSearchParams();
   const { pode } = useUtilizador();
-  const nomes = useNomes();
-  const oportunidades = useOportunidades({ etapa: null, cliente: null });
+  const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const idFeitas = useId();
   const f = params.get("feitas");
   const feitas = f === "todas" ? null : f === "sim";
-  const lista = useActividades({ feitas });
+  const lista = useActividadesPagina({ feitas, pagina, tamanho });
   const filtrar = (x: string) => {
     const n = new URLSearchParams(window.location.search);
     if (x === "nao") n.delete("feitas");
     else n.set("feitas", x);
+    n.delete("pagina");
     setParams(n);
   };
-  const titulo = (id: string) => oportunidades.data?.find((o) => o.opportunityId === id)?.title ?? "Oportunidade";
   const sobre: Coluna<Actividade> = {
     id: "sobre",
     cabecalho: "Sobre",
@@ -38,14 +39,14 @@ export default function Actividades() {
     celula: (a) =>
       a.opportunityId ? (
         <Link to={`/oportunidades/${a.opportunityId}`} className="underline-offset-4 hover:underline">
-          {titulo(a.opportunityId)}
+          Oportunidade · {a.customerName ?? a.leadName ?? "abrir"}
         </Link>
       ) : a.leadId ? (
         <Link to={`/leads/${a.leadId}`} className="underline-offset-4 hover:underline">
-          {nomes.lead(a.leadId) ?? "Lead"}
+          {a.leadName ?? "Lead"}
         </Link>
       ) : (
-        <NomeCliente id={a.customerId} nome={nomes.cliente(a.customerId)} />
+        <NomeCliente id={a.customerId} nome={a.customerName ?? null} />
       ),
   };
   return (
@@ -64,11 +65,12 @@ export default function Actividades() {
       <Tabela
         rotulo="Actividades"
         colunas={colunasActividade(pode("commercial.crm.write"), [sobre])}
-        linhas={lista.data ? ordenarActividades(lista.data) : undefined}
+        linhas={lista.data?.items}
         chave={(a) => a.activityId}
         aCarregar={lista.isPending}
         erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
         vazio={feitas === false ? "Nada por fazer." : "Sem actividades."}
+        rodape={lista.data && lista.data.total > 0 ? <Paginacao pagina={pagina} tamanho={tamanho} total={lista.data.total} aoMudar={mudar} /> : undefined}
       />
     </>
   );

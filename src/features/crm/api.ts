@@ -20,9 +20,12 @@
  *   (4000); de um lead, de uma oportunidade ou de um cliente; concluir uma vez;
  * - tipo de serviço: código único (30), nome (200), descrição (1000), preço ≥ 0,
  *   moeda;
- * - `ownerEmployeeId` tem de ser uma ficha que existe; as vistas só trazem ids
- *   (pessoas, clientes, leads) e as listas, salvo os leads, não têm ordem nem
- *   paginação (B35): o front ordena do seu lado.
+ * - `ownerEmployeeId` tem de ser uma ficha que existe; as vistas trazem os
+ *   nomes (`ownerName`, `customerName`, `leadName`) e quem escreve escolhe o
+ *   responsável e o cliente em `GET /commercial/lookups` (B35);
+ * - as listas vêm ordenadas pelo servidor e, com `page`, paginadas com
+ *   `X-Total-Count`; sem `page`, vêm todas (o quadro, as escolhas e as listas
+ *   de uma ficha) (B35).
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
@@ -48,6 +51,8 @@ export type EtapaAberta = "Prospecting" | "Qualification" | "Proposal" | "Negoti
 export type Etapa = EtapaAberta | "Won" | "Lost";
 export type TipoActividade = PedidoActividade["kind"];
 
+export type EscolhasComerciais = S["CommercialLookups"];
+
 export const chaves = {
   crm: ["commercial", "crm"] as const,
   leads: ["commercial", "crm", "leads"] as const,
@@ -63,6 +68,13 @@ function useInvalidarCrm() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: chaves.crm });
 }
+
+/** Colaboradores e clientes activos, para quem escreve no comercial (B35). */
+export function useEscolhasComerciais(activo = true) {
+  return useQuery({ queryKey: ["commercial", "lookups"], queryFn: ({ signal }) => ler(api.GET("/commercial/lookups", { signal })), enabled: activo, staleTime: 60_000 });
+}
+
+type Pag = { pagina: number; tamanho: number };
 
 // --- Leads
 
@@ -128,6 +140,14 @@ export function useOportunidades(f: { etapa: Etapa | null; cliente: string | nul
     queryFn: ({ signal }) => ler(api.GET("/commercial/opportunities", { params: { query: { ...(f.etapa ? { stage: f.etapa } : {}), ...(f.cliente ? { customerId: f.cliente } : {}) } }, signal })),
     placeholderData: keepPreviousData,
     enabled: activo,
+  });
+}
+
+export function useOportunidadesPagina(f: { etapa: Etapa | null } & Pag) {
+  return useQuery({
+    queryKey: [...chaves.oportunidades, "page", f],
+    queryFn: ({ signal }) => lerPagina(api.GET("/commercial/opportunities", { params: { query: { page: f.pagina, pageSize: f.tamanho, ...(f.etapa ? { stage: f.etapa } : {}) } }, signal })),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -201,6 +221,14 @@ export function useActividades(f: { lead?: string; oportunidade?: string; client
       ),
     placeholderData: keepPreviousData,
     enabled: activo,
+  });
+}
+
+export function useActividadesPagina(f: { feitas: boolean | null } & Pag) {
+  return useQuery({
+    queryKey: [...chaves.actividades, "page", f],
+    queryFn: ({ signal }) => lerPagina(api.GET("/commercial/activities", { params: { query: { page: f.pagina, pageSize: f.tamanho, ...(f.feitas === null ? {} : { done: f.feitas }) } }, signal })),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { Select, Textarea } from "@/ui/Controlos";
 import { Field, Input } from "@/ui/Field";
 import { useOportunidades } from "./api";
-import { useNomes } from "./comum";
+import { nomeLead, useEscolhas } from "./comum";
 import { useModelos, type CamposProposta, type Proposta } from "./propostas";
 import { MOEDAS } from "./regras";
 
@@ -33,7 +33,7 @@ export function CamposDaProposta({
   erros: Partial<Record<keyof CamposProposta, string | undefined>>;
   nova: boolean;
 }) {
-  const nomes = useNomes();
+  const escolhas = useEscolhas(nova);
   const modelos = useModelos(false, nova);
   const oportunidades = useOportunidades({ etapa: null, cliente: null }, nova);
   const campo = (k: keyof CamposProposta) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
@@ -60,13 +60,11 @@ export function CamposDaProposta({
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.cliente} onChange={(e) => setV((x) => ({ ...x, cliente: e.target.value, oportunidade: "" }))}>
                   <option value="">Escolha…</option>
-                  {nomes.clientes
-                    .filter((c) => c.status === "Active")
-                    .map((c) => (
-                      <option key={c.customerId} value={c.customerId}>
-                        {c.name}
-                      </option>
-                    ))}
+                  {escolhas.clientes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </Select>
               )}
             </Field>
@@ -75,13 +73,11 @@ export function CamposDaProposta({
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.lead} onChange={(e) => setV((x) => ({ ...x, lead: e.target.value, oportunidade: "" }))}>
                   <option value="">Escolha…</option>
-                  {nomes.leads
-                    .filter((l) => l.status !== "Converted" && l.status !== "Disqualified")
-                    .map((l) => (
-                      <option key={l.leadId} value={l.leadId}>
-                        {l.company ? `${l.name} (${l.company})` : l.name}
-                      </option>
-                    ))}
+                  {escolhas.leads.map((l) => (
+                    <option key={l.leadId} value={l.leadId}>
+                      {nomeLead(l)}
+                    </option>
+                  ))}
                 </Select>
               )}
             </Field>

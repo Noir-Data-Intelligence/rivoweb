@@ -103,6 +103,17 @@ test("F11: propostas — modelo, linhas, correcção, envio, aceite e recusa", a
   }
   await page.getByRole("button", { name: "Tirar a linha A tirar" }).click();
   await expect(page.getByRole("table", { name: "Linhas da proposta" })).not.toContainText("A tirar");
+  // B36: depois de tirar, a linha nova fica com a maior posição + 1 (não repete).
+  await page.getByRole("button", { name: "Acrescentar linha" }).click();
+  await dialogo(page).getByLabel("Descrição").fill("Também a tirar");
+  await dialogo(page).getByLabel("Preço unitário em AOA").fill("1");
+  await dialogo(page).getByRole("button", { name: "Acrescentar" }).click();
+  await expect(dialogo(page)).toHaveCount(0);
+  const posicoes = await sa<{ lines: { position: number; description: string }[] }>("GET", `/commercial/proposals/${pid}`);
+  const ps = posicoes.corpo.lines.map((l) => Number(l.position));
+  expect(new Set(ps).size).toBe(ps.length);
+  await page.getByRole("button", { name: "Tirar a linha Também a tirar" }).click();
+  await expect(page.getByRole("table", { name: "Linhas da proposta" })).not.toContainText("Também a tirar");
   // 2,5 × 25 000 + 3 × 12 500,50 × 0,925 = 62 500 + 34 688,89
   await expect(page.getByText("Total: 97\u00A0188,89 Kz")).toBeVisible();
 

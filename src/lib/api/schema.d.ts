@@ -3149,6 +3149,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/commercial/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores activos e clientes activos (id e nome), para quem escreve no CRM, nos contratos ou nas cobranças. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CommercialLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/commercial/leads": {
         parameters: {
             query?: never;
@@ -3637,6 +3687,8 @@ export interface paths {
                     stage?: string;
                     customerId?: string;
                     ownerEmployeeId?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -3651,6 +3703,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["OpportunityView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -4149,6 +4210,8 @@ export interface paths {
                     opportunityId?: string;
                     customerId?: string;
                     done?: boolean;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -4163,6 +4226,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["CrmActivityView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -4665,6 +4737,8 @@ export interface paths {
                     status?: string;
                     customerId?: string;
                     opportunityId?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -4679,6 +4753,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["ProposalView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -5317,6 +5400,8 @@ export interface paths {
                     kind?: string;
                     status?: string;
                     expiringWithinDays?: number | string;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -5331,6 +5416,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["CustomerContractView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -5892,6 +5986,7 @@ export interface paths {
             };
         };
         put?: never;
+        /** Anexa um documento carregado por quem anexa (ou qualquer um, com `documents.read`); outro dá 404 (B37). */
         post: {
             parameters: {
                 query?: never;
@@ -5956,6 +6051,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/commercial/contracts/{contractId}/documents/{linkId}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descarrega um anexo do contrato (anexo, nosniff), pelo `linkId` da lista, sem `documents.read` (B37). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    contractId: string;
+                    linkId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/commercial/collections/actions": {
         parameters: {
             query?: never;
@@ -5969,6 +6126,8 @@ export interface paths {
                 query?: {
                     customerId?: string;
                     salesInvoiceId?: string;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -5983,6 +6142,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["CollectionActionView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -38798,6 +38966,9 @@ export interface components {
             nextFollowUpOn: null | string;
             /** Format: uuid */
             ownerEmployeeId: null | string;
+            ownerName?: null | string;
+            customerName?: null | string;
+            invoiceNumber?: null | string;
         };
         CollectionRequest: {
             /** Format: uuid */
@@ -38831,6 +39002,15 @@ export interface components {
             body: string;
             /** Format: date-time */
             postedAt: string;
+        };
+        CommercialLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        CommercialLookups: {
+            employees: components["schemas"]["CommercialLookupEntry"][];
+            customers: components["schemas"]["CommercialLookupEntry"][];
         };
         CompletePasswordRecoveryRequest: {
             /** Format: uuid */
@@ -38887,6 +39067,7 @@ export interface components {
             category: string;
             /** Format: date-time */
             attachedAt: string;
+            fileName?: null | string;
         };
         ContractDrawnResponse: {
             /** Format: uuid */
@@ -39202,6 +39383,9 @@ export interface components {
             customerId: null | string;
             /** Format: uuid */
             ownerEmployeeId: null | string;
+            ownerName?: null | string;
+            customerName?: null | string;
+            leadName?: null | string;
         };
         CrmReport: {
             currency: string;
@@ -39329,6 +39513,7 @@ export interface components {
             terminationReason: null | string;
             /** Format: int32 */
             daysToExpiry: null | number | string;
+            customerName?: null | string;
         };
         CustomerCreatedResponse: {
             /** Format: uuid */
@@ -40849,6 +41034,7 @@ export interface components {
             convertedOpportunityId: null | string;
             /** Format: date-time */
             createdAt: string;
+            ownerName?: null | string;
         };
         LeaveBalanceView: {
             /** Format: uuid */
@@ -41430,6 +41616,9 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             closedAt: null | string;
+            ownerName?: null | string;
+            customerName?: null | string;
+            leadName?: null | string;
         };
         OrgChart: {
             /** Format: date-time */
@@ -41554,6 +41743,7 @@ export interface components {
             winRate: number | string;
             /** Format: double */
             wonValue: number | string;
+            ownerName?: null | string;
         };
         OwnExpense: {
             /** Format: uuid */
@@ -42462,6 +42652,8 @@ export interface components {
             /** Format: date-time */
             decidedAt: null | string;
             lines: components["schemas"]["ProposalLineView"][];
+            customerName?: null | string;
+            leadName?: null | string;
         };
         PurchaseInvoiceMatchView: {
             /** Format: uuid */

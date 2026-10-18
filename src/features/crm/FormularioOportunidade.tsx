@@ -3,10 +3,10 @@ import type { Dispatch, SetStateAction } from "react";
 import { Select, Textarea } from "@/ui/Controlos";
 import { Field, Input } from "@/ui/Field";
 import type { Oportunidade } from "./api";
-import { useNomes } from "./comum";
+import { nomeLead, useEscolhas } from "./comum";
 import { MOEDAS, type CamposOportunidade } from "./regras";
 
-export const OPORTUNIDADE_VAZIA: CamposOportunidade = { titulo: "", para: "cliente", cliente: "", lead: "", valor: "", moeda: "AOA", probabilidade: "", fecho: "", notas: "" };
+export const OPORTUNIDADE_VAZIA: CamposOportunidade = { titulo: "", para: "cliente", cliente: "", lead: "", valor: "", moeda: "AOA", probabilidade: "", fecho: "", responsavel: "", notas: "" };
 
 export const camposDaOportunidade = (o: Oportunidade): CamposOportunidade => ({
   titulo: o.title,
@@ -17,6 +17,7 @@ export const camposDaOportunidade = (o: Oportunidade): CamposOportunidade => ({
   moeda: o.currency,
   probabilidade: String(o.probability),
   fecho: o.expectedCloseDate ?? "",
+  responsavel: o.ownerEmployeeId ?? "",
   notas: o.notes ?? "",
 });
 
@@ -31,9 +32,8 @@ export function CamposDaOportunidade({
   erros: Partial<Record<keyof CamposOportunidade, string | undefined>>;
   nova: boolean;
 }) {
-  const nomes = useNomes();
+  const escolhas = useEscolhas();
   const campo = (k: keyof CamposOportunidade) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
-  const leadsAbertos = nomes.leads.filter((l) => l.status !== "Converted" && l.status !== "Disqualified");
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       <Field rotulo="Título" erro={erros.titulo} className="sm:col-span-3">
@@ -54,13 +54,11 @@ export function CamposDaOportunidade({
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.cliente} onChange={campo("cliente")}>
                   <option value="">Escolha…</option>
-                  {nomes.clientes
-                    .filter((c) => c.status === "Active")
-                    .map((c) => (
-                      <option key={c.customerId} value={c.customerId}>
-                        {c.name}
-                      </option>
-                    ))}
+                  {escolhas.clientes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </Select>
               )}
             </Field>
@@ -69,9 +67,9 @@ export function CamposDaOportunidade({
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.lead} onChange={campo("lead")}>
                   <option value="">Escolha…</option>
-                  {leadsAbertos.map((l) => (
+                  {escolhas.leads.map((l) => (
                     <option key={l.leadId} value={l.leadId}>
-                      {l.company ? `${l.name} (${l.company})` : l.name}
+                      {nomeLead(l)}
                     </option>
                   ))}
                 </Select>
@@ -97,6 +95,18 @@ export function CamposDaOportunidade({
       </Field>
       <Field rotulo="Fecho previsto (opcional)" erro={erros.fecho}>
         {({ id, descricao, invalido }) => <Input id={id} type="date" aria-describedby={descricao} invalido={invalido} value={v.fecho} onChange={campo("fecho")} />}
+      </Field>
+      <Field rotulo="Responsável (opcional)" className="sm:col-span-3">
+        {({ id, descricao }) => (
+          <Select id={id} aria-describedby={descricao} value={v.responsavel} onChange={campo("responsavel")}>
+            <option value="">Ninguém</option>
+            {escolhas.pessoas.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
+        )}
       </Field>
       <Field rotulo="Notas (opcional)" erro={erros.notas} className="sm:col-span-3">
         {({ id, descricao, invalido }) => <Textarea id={id} rows={3} maxLength={2000} aria-describedby={descricao} invalido={invalido} value={v.notas} onChange={campo("notas")} />}

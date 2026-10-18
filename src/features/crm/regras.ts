@@ -27,6 +27,7 @@ export interface CamposLead {
   email: string;
   telefone: string;
   origem: string;
+  responsavel: string;
   notas: string;
 }
 
@@ -43,15 +44,14 @@ export function errosLead(v: CamposLead): Erros<CamposLead> {
   };
 }
 
-/** O responsável mantém-se: só quem lê os colaboradores o escolheria (B35). */
-export function leadParaApi(v: CamposLead, responsavel: string | null): PedidoLead {
+export function leadParaApi(v: CamposLead): PedidoLead {
   return {
     name: normalizarTexto(v.nome),
     company: opc(v.empresa),
     email: opc(v.email),
     phone: opc(v.telefone),
     source: opc(v.origem),
-    ownerEmployeeId: responsavel,
+    ownerEmployeeId: v.responsavel === "" ? null : v.responsavel,
     notes: opc(v.notas, true),
   };
 }
@@ -116,6 +116,7 @@ export interface CamposOportunidade {
   moeda: string;
   probabilidade: string;
   fecho: string;
+  responsavel: string;
   notas: string;
 }
 
@@ -135,7 +136,7 @@ export function errosOportunidade(v: CamposOportunidade, nova: boolean): Erros<C
   };
 }
 
-export function oportunidadeParaApi(v: CamposOportunidade, responsavel: string | null, original?: { customerId: string | null; leadId: string | null }): PedidoOportunidade {
+export function oportunidadeParaApi(v: CamposOportunidade, original?: { customerId: string | null; leadId: string | null }): PedidoOportunidade {
   return {
     title: normalizarTexto(v.titulo),
     customerId: original ? original.customerId : v.para === "cliente" ? v.cliente : null,
@@ -144,7 +145,7 @@ export function oportunidadeParaApi(v: CamposOportunidade, responsavel: string |
     currency: v.moeda,
     probability: v.probabilidade.trim() === "" ? null : Number(v.probabilidade.trim()),
     expectedCloseDate: v.fecho === "" ? null : v.fecho,
-    ownerEmployeeId: responsavel,
+    ownerEmployeeId: v.responsavel === "" ? null : v.responsavel,
     notes: opc(v.notas, true),
   };
 }
@@ -156,6 +157,7 @@ export interface CamposActividade {
   assunto: string;
   quando: string;
   feita: boolean;
+  responsavel: string;
   notas: string;
 }
 
@@ -178,7 +180,7 @@ export function actividadeParaApi(v: CamposActividade, sobre: { lead?: string; o
     leadId: sobre.lead ?? null,
     opportunityId: sobre.oportunidade ?? null,
     customerId: sobre.cliente ?? null,
-    ownerEmployeeId: null,
+    ownerEmployeeId: v.responsavel === "" ? null : v.responsavel,
   };
 }
 

@@ -39,6 +39,7 @@ export const leads = (): S["LeadView"][] => [
     source: "Feira",
     status: "New",
     ownerEmployeeId: IDF11.dono,
+    ownerName: "Joana Vendas",
     notes: "Quer auditoria.\n<script>alert(1)</script>",
     disqualificationReason: null,
     convertedCustomerId: null,
@@ -75,6 +76,9 @@ const op = (id: string, titulo: string, etapa: string, extra: Partial<S["Opportu
   weightedValue: 250000,
   expectedCloseDate: "2026-12-15",
   ownerEmployeeId: IDF11.dono,
+  ownerName: "Joana Vendas",
+  customerName: "Cliente Teste, Lda",
+  leadName: null,
   notes: null,
   lostReason: null,
   createdAt: "2026-10-05T10:00:00Z",
@@ -85,7 +89,7 @@ const op = (id: string, titulo: string, etapa: string, extra: Partial<S["Opportu
 export const oportunidades = (): S["OpportunityView"][] => [
   op(IDF11.op1, "Auditoria 2027", "Proposal", { createdAt: "2026-10-10T10:00:00Z" }),
   op(IDF11.op2, "Formação em Excel", "Prospecting", { estimatedValue: 5000, currency: "USD", probability: 10, weightedValue: 500, expectedCloseDate: null }),
-  op(IDF11.opLead, "Consultoria fiscal", "Qualification", { customerId: null, leadId: IDF11.lead, createdAt: "2026-10-12T10:00:00Z" }),
+  op(IDF11.opLead, "Consultoria fiscal", "Qualification", { customerId: null, customerName: null, leadId: IDF11.lead, leadName: "Marta Lopes (Lopes & Filhos)", createdAt: "2026-10-12T10:00:00Z" }),
   op(IDF11.opGanha, "Contabilidade 2026", "Won", { probability: 100, weightedValue: 1000000, closedAt: "2026-09-30T10:00:00Z", createdAt: "2026-08-01T10:00:00Z" }),
 ];
 
@@ -103,8 +107,8 @@ export const historico = (): S["StageChangeView"][] => [
 ];
 
 export const actividades = (): S["CrmActivityView"][] => [
-  { activityId: IDF11.act1, kind: "Call", subject: "Ligar à Marta", notes: null, scheduledAt: "2026-10-02T09:00:00Z", done: false, completedAt: null, leadId: IDF11.lead, opportunityId: null, customerId: null, ownerEmployeeId: null },
-  { activityId: IDF11.act2, kind: "Meeting", subject: "Reunião de proposta", notes: "Levar a proposta.", scheduledAt: "2099-01-10T09:00:00Z", done: false, completedAt: null, leadId: null, opportunityId: IDF11.op1, customerId: IDF3.cliente, ownerEmployeeId: null },
+  { activityId: IDF11.act1, kind: "Call", subject: "Ligar à Marta", notes: null, scheduledAt: "2026-10-02T09:00:00Z", done: false, completedAt: null, leadId: IDF11.lead, leadName: "Marta Lopes (Lopes & Filhos)", opportunityId: null, customerId: null, ownerEmployeeId: null },
+  { activityId: IDF11.act2, kind: "Meeting", subject: "Reunião de proposta", notes: "Levar a proposta.", scheduledAt: "2099-01-10T09:00:00Z", done: false, completedAt: null, leadId: null, opportunityId: IDF11.op1, customerId: IDF3.cliente, customerName: "Cliente Teste, Lda", ownerEmployeeId: IDF11.dono, ownerName: "Joana Vendas" },
 ];
 
 export const servicos = (): S["ServiceTypeView"][] => [
@@ -126,7 +130,7 @@ export const relatorio = (): S["CrmReport"] => ({
   leadsByStatus: { New: 5, Contacted: 2, Qualified: 1, Disqualified: 1, Converted: 3 },
   leadConversionRate: 75,
   byOwner: [
-    { ownerEmployeeId: IDF11.dono, won: 3, lost: 1, winRate: 75, wonValue: 3500000 },
+    { ownerEmployeeId: IDF11.dono, ownerName: "Joana Vendas", won: 3, lost: 1, winRate: 75, wonValue: 3500000 },
     { ownerEmployeeId: null, won: 1, lost: 0, winRate: 100, wonValue: 1000000 },
   ],
   openActivities: 7,
@@ -152,6 +156,7 @@ export const propostas = (): S["ProposalView"][] => [
     number: "PROP-20261015-A1B2C3",
     title: "Auditoria 2027",
     customerId: IDF3.cliente,
+    customerName: "Cliente Teste, Lda",
     leadId: null,
     opportunityId: IDF11.op1,
     status: "Draft",
@@ -164,7 +169,7 @@ export const propostas = (): S["ProposalView"][] => [
     createdAt: "2026-10-15T10:00:00Z",
     sentAt: null,
     decidedAt: null,
-    lines: [linha(IDF11P.linha1, 1, "Horas de auditoria", 3, 12500.5, 7.5, 34688.89), linha(IDF11P.linha2, 3, "Deslocação", 1, 0, 0, 0)],
+    lines: [linha(IDF11P.linha1, 1, "Horas de auditoria", 3, 12500.5, 7.5, 34688.89), linha(IDF11P.linha2, 2, "Deslocação", 1, 0, 0, 0)],
   },
   {
     proposalId: IDF11P.enviada,
@@ -172,6 +177,7 @@ export const propostas = (): S["ProposalView"][] => [
     title: "Consultoria fiscal",
     customerId: null,
     leadId: IDF11.lead,
+    leadName: "Marta Lopes (Lopes & Filhos)",
     opportunityId: null,
     status: "Sent",
     currency: "USD",
@@ -216,6 +222,7 @@ const contrato = (id: string, numero: string, titulo: string, estado: string, ex
   number: numero,
   title: titulo,
   customerId: IDF3.cliente,
+  customerName: "Cliente Teste, Lda",
   kind: "Commercial",
   status: estado,
   startsOn: "2026-01-01",
@@ -242,7 +249,7 @@ export const aditamentos = (): S["ContractAmendmentView"][] => [
   { amendmentId: "a1", number: 1, description: "Mais horas de suporte.", effectiveOn: "2026-06-01", valueChange: 200000, previousEndsOn: null, newEndsOn: null, recordedAt: "2026-06-01T10:00:00Z" },
 ];
 
-export const anexos = (): S["ContractDocumentView"][] => [{ linkId: IDF11C.anexo, documentId: IDF11C.documento, category: "Contrato assinado", attachedAt: "2026-01-02T10:00:00Z" }];
+export const anexos = (): S["ContractDocumentView"][] => [{ linkId: IDF11C.anexo, documentId: IDF11C.documento, category: "Contrato assinado", fileName: "contrato-assinado.pdf", attachedAt: "2026-01-02T10:00:00Z" }];
 
 export const vencidas = (): S["OverdueReceivable"][] => [
   { invoiceId: IDF11C.factura, number: "FT 2026/12", customerId: IDF3.cliente, customerName: "Cliente Teste, Lda", issuedOn: "2026-07-01", dueDate: "2026-07-31", daysOverdue: 79, grossTotal: 570000, outstanding: 570000, currency: "AOA" },
@@ -250,5 +257,11 @@ export const vencidas = (): S["OverdueReceivable"][] => [
 ];
 
 export const accoes = (): S["CollectionActionView"][] => [
-  { actionId: "c1", customerId: IDF3.cliente, salesInvoiceId: IDF11C.factura2, kind: "PaymentPromise", notes: "Paga metade sexta.\n<script>x</script>", occurredAt: "2026-10-10T09:00:00Z", promisedAmount: 750, promisedDate: "2026-10-17", nextFollowUpOn: "2026-10-20", ownerEmployeeId: IDF11.dono },
+  { actionId: "c1", customerId: IDF3.cliente, customerName: "Cliente Teste, Lda", salesInvoiceId: IDF11C.factura2, invoiceNumber: "FT 2026/40", ownerName: "Joana Vendas", kind: "PaymentPromise", notes: "Paga metade sexta.\n<script>x</script>", occurredAt: "2026-10-10T09:00:00Z", promisedAmount: 750, promisedDate: "2026-10-17", nextFollowUpOn: "2026-10-20", ownerEmployeeId: IDF11.dono },
 ];
+
+/** `/commercial/lookups` (B35). */
+export const escolhasComerciais = (): S["CommercialLookups"] => ({
+  employees: [{ id: IDF11.dono, name: "Joana Vendas" }],
+  customers: [{ id: IDF3.cliente, name: "Cliente Teste, Lda" }],
+});

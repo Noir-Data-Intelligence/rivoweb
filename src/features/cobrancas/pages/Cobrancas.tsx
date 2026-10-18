@@ -6,7 +6,7 @@
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link } from "react-router";
-import { useTodosClientes } from "@/features/clientes";
+import { useEscolhasComerciais } from "@/features/crm";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
 import { dataHoraLocalDeInstante, formatarData, formatarDataHora } from "@/lib/format/data";
@@ -19,29 +19,21 @@ import { Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
+import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
+import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
-import { accaoParaApi, errosAccao, TIPOS_ACCAO, useAccoesCobranca, useRegistarAccao, useVencidas, type AccaoCobranca, type CamposAccao, type TipoAccao, type Vencida } from "../api";
+import { accaoParaApi, errosAccao, TIPOS_ACCAO, useAccoesPagina, useRegistarAccao, useVencidas, type AccaoCobranca, type CamposAccao, type TipoAccao, type Vencida } from "../api";
 
 const temErros = (e: Record<string, string | undefined>) => Object.values(e).some(Boolean);
 
-/** Clientes a quem se pode registar uma acção: os das vencidas e, para quem lê clientes, todos os activos. */
-function useClientesParaCobrar(vencidas: readonly Vencida[]) {
-  const { pode } = useUtilizador();
-  const todos = useTodosClientes(pode("commercial.customers.read"));
-  const m = new Map<string, string>();
-  for (const v of vencidas) if (v.customerId) m.set(v.customerId, v.customerName);
-  for (const c of todos.data?.items ?? []) if (c.status === "Active" && !m.has(c.customerId)) m.set(c.customerId, c.name);
-  return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1], "pt"));
-}
-
 function RegistarAccao({ vencidas, inicial, rotulo }: { vencidas: readonly Vencida[]; inicial?: Vencida; rotulo: string }) {
-  const vazio = (): CamposAccao => ({ cliente: inicial?.customerId ?? "", factura: inicial?.invoiceId ?? "", tipo: "Call", notas: "", quando: dataHoraLocalDeInstante(new Date()), valorPrometido: "", dataPrometida: "", proximo: "" });
+  const vazio = (): CamposAccao => ({ cliente: inicial?.customerId ?? "", factura: inicial?.invoiceId ?? "", tipo: "Call", notas: "", quando: dataHoraLocalDeInstante(new Date()), valorPrometido: "", dataPrometida: "", proximo: "", responsavel: "" });
   const [aberto, setAberto] = useState(false);
   const [v, setV] = useState(vazio);
   const [tentou, setTentou] = useState(false);
   const registar = useRegistarAccao();
-  const clientes = useClientesParaCobrar(vencidas);
+  const escolhas = useEscolhasComerciais(aberto);
   const idForm = useId();
   const erros = errosAccao(v);
   const fechar = (a: boolean) => {
@@ -85,9 +77,9 @@ function RegistarAccao({ vencidas, inicial, rotulo }: { vencidas: readonly Venci
                 {({ id, descricao, invalido }) => (
                   <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.cliente} onChange={(e) => setV((x) => ({ ...x, cliente: e.target.value, factura: "" }))}>
                     <option value="">Escolha…</option>
-                    {clientes.map(([cid, nome]) => (
-                      <option key={cid} value={cid}>
-                        {nome}
+                    {(escolhas.data?.customers ?? []).map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
                       </option>
                     ))}
                   </Select>
@@ -133,6 +125,18 @@ function RegistarAccao({ vencidas, inicial, rotulo }: { vencidas: readonly Venci
           <Field rotulo="Próximo contacto (opcional)" erro={tentou ? erros.proximo : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} type="date" aria-describedby={descricao} invalido={invalido} value={v.proximo} onChange={campo("proximo")} />}
           </Field>
+          <Field rotulo="Responsável (opcional)">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.responsavel} onChange={campo("responsavel")}>
+                <option value="">Ninguém</option>
+                {(escolhas.data?.employees ?? []).map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
         </form>
       </Confirmar>
     </>
@@ -163,19 +167,17 @@ function Vencidas({ vencidas, aCarregar, erro, escreve }: { vencidas: readonly V
 }
 
 function Accoes({ vencidas }: { vencidas: readonly Vencida[] }) {
-  const lista = useAccoesCobranca();
+  const { pagina, tamanho, mudar } = usePaginacaoUrl();
+  const lista = useAccoesPagina({ pagina, tamanho });
   const { pode } = useUtilizador();
-  const todos = useTodosClientes(pode("commercial.customers.read"));
-  const nomeCliente = (id: string) => vencidas.find((f) => f.customerId === id)?.customerName ?? todos.data?.items.find((c) => c.customerId === id)?.name ?? "—";
-  const factura = (id: string | null) => {
-    if (id === null) return null;
-    const f = vencidas.find((x) => x.invoiceId === id);
-    return (
-      <Link to={`/facturas/${id}`} className="underline-offset-4 hover:underline">
-        {f?.number ?? "Abrir a factura"}
+  const factura = (a: AccaoCobranca) =>
+    a.salesInvoiceId === null ? null : pode("finance.invoices.read") ? (
+      <Link to={`/facturas/${a.salesInvoiceId}`} className="underline-offset-4 hover:underline">
+        {a.invoiceNumber ?? "Abrir a factura"}
       </Link>
+    ) : (
+      (a.invoiceNumber ?? null)
     );
-  };
   const moedaDe = (id: string | null) => vencidas.find((x) => x.invoiceId === id)?.currency ?? null;
   const prometido = (a: AccaoCobranca) => {
     if (a.promisedAmount === null) return null;
@@ -192,6 +194,7 @@ function Accoes({ vencidas }: { vencidas: readonly Vencida[] }) {
         <span className="flex flex-col">
           <span className="font-medium">{TIPOS_ACCAO[a.kind as TipoAccao] ?? a.kind}</span>
           <span className="whitespace-pre-line break-words text-xs text-muted-foreground">{a.notes}</span>
+          {a.ownerName ? <span className="text-xs text-muted-foreground">Responsável: {a.ownerName}</span> : null}
         </span>
       ),
     },
@@ -202,8 +205,8 @@ function Accoes({ vencidas }: { vencidas: readonly Vencida[] }) {
       className: "max-w-[14rem]",
       celula: (a) => (
         <span className="flex flex-col">
-          <span className="truncate">{nomeCliente(a.customerId)}</span>
-          {a.salesInvoiceId ? <span className="text-xs">{factura(a.salesInvoiceId)}</span> : null}
+          <span className="truncate">{a.customerName ?? "—"}</span>
+          {a.salesInvoiceId ? <span className="text-xs">{factura(a)}</span> : null}
         </span>
       ),
     },
@@ -215,11 +218,12 @@ function Accoes({ vencidas }: { vencidas: readonly Vencida[] }) {
     <Tabela
       rotulo="Acções de cobrança"
       colunas={colunas}
-      linhas={lista.data}
+      linhas={lista.data?.items}
       chave={(a) => a.actionId}
       aCarregar={lista.isPending}
       erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
       vazio="Ainda não há acções de cobrança."
+      rodape={lista.data && lista.data.total > 0 ? <Paginacao pagina={pagina} tamanho={tamanho} total={lista.data.total} aoMudar={mudar} /> : undefined}
     />
   );
 }

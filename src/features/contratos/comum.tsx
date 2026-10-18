@@ -1,6 +1,5 @@
 /** Peças comuns dos contratos de clientes. */
 import { Link } from "react-router";
-import { useTodosClientes } from "@/features/clientes";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
 import { formatarData } from "@/lib/format/data";
@@ -10,22 +9,17 @@ import { ESTADOS_CONTRATO, type Contrato, type EstadoContrato } from "./api";
 const TOM: Record<string, TomBadge> = { Draft: "neutro", Active: "sucesso", Suspended: "aviso", Terminated: "erro" };
 export const EstadoContratoBadge = ({ estado }: { estado: string }) => <Badge tom={TOM[estado] ?? "neutro"}>{ESTADOS_CONTRATO[estado as EstadoContrato] ?? estado}</Badge>;
 
-/** Nome do cliente para quem lê clientes; senão «—» (B35). */
-export function useNomeCliente() {
+/** O nome do cliente (da vista, B35); ligação à ficha para quem lê clientes. */
+export function ClienteDoContrato({ c }: { c: Pick<Contrato, "customerId" | "customerName"> }) {
   const { pode } = useUtilizador();
-  const le = pode("commercial.customers.read");
-  const clientes = useTodosClientes(le);
-  return (id: string) => {
-    const nome = clientes.data?.items.find((c) => c.customerId === id)?.name ?? null;
-    if (!nome) return "—";
-    return le ? (
-      <Link to={`/clientes/${id}`} className="underline-offset-4 hover:underline">
-        {nome}
-      </Link>
-    ) : (
-      nome
-    );
-  };
+  const nome = c.customerName ?? "—";
+  return pode("commercial.customers.read") && c.customerName ? (
+    <Link to={`/clientes/${c.customerId}`} className="underline-offset-4 hover:underline">
+      {nome}
+    </Link>
+  ) : (
+    <>{nome}</>
+  );
 }
 
 export const valorContrato = (c: Contrato) => (c.value === null ? "—" : moeda(c.value, c.currency ?? "AOA"));

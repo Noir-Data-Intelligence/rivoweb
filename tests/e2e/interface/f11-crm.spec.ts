@@ -9,7 +9,7 @@ import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { IDF3 } from "../../fixtures/f3";
-import { actividades, historico, IDF11, leads, meGestorF11, meVendasF11, oportunidades, quadro, relatorio, servicos } from "../../fixtures/f11";
+import { actividades, escolhasComerciais, historico, IDF11, leads, meGestorF11, meVendasF11, oportunidades, quadro, relatorio, servicos } from "../../fixtures/f11";
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": String(itens.length) } });
 
@@ -18,16 +18,17 @@ function comCrm(api: ApiSimulada, me = meVendasF11): ApiSimulada {
     .em("GET", "/commercial/leads", pag(leads()))
     .em("GET", `/commercial/leads/${IDF11.lead}`, { status: 200, corpo: leads()[0] })
     .em("GET", `/commercial/leads/${IDF11.leadConvertido}`, { status: 200, corpo: leads()[1] })
-    .em("GET", "/commercial/opportunities", { status: 200, corpo: oportunidades() })
+    .em("GET", "/commercial/lookups", { status: 200, corpo: escolhasComerciais() })
+    .em("GET", "/commercial/opportunities", pag(oportunidades()))
     .em("GET", "/commercial/opportunities/board", { status: 200, corpo: quadro() })
     .em("GET", `/commercial/opportunities/${IDF11.op1}`, { status: 200, corpo: oportunidades()[0] })
     .em("GET", `/commercial/opportunities/${IDF11.opLead}`, { status: 200, corpo: oportunidades()[2] })
     .em("GET", `/commercial/opportunities/${IDF11.op1}/history`, { status: 200, corpo: historico() })
     .em("GET", `/commercial/opportunities/${IDF11.opLead}/history`, { status: 200, corpo: [] })
-    .em("GET", "/commercial/activities", { status: 200, corpo: actividades() })
+    .em("GET", "/commercial/activities", pag(actividades()))
     .em("GET", "/commercial/service-types", { status: 200, corpo: servicos() })
     .em("GET", "/commercial/crm/report", { status: 200, corpo: relatorio() })
-    .em("GET", "/commercial/proposals", { status: 200, corpo: [] });
+    .em("GET", "/commercial/proposals", pag([]));
 }
 
 async function verificar(page: Page) {
@@ -68,14 +69,17 @@ test.describe("leads", () => {
     await d.getByLabel("Nome de quem contactar").fill("  Marta Lopes ");
     await d.getByLabel("E-mail (opcional)").fill("marta@lopes.ao");
     await d.getByLabel("Origem (opcional)").fill("Feira");
+    // O responsável escolhe-se da lista do comercial, sem ler os RH (B35).
+    await d.getByLabel("Responsável (opcional)").selectOption({ label: "Joana Vendas" });
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(page).toHaveURL(new RegExp(`/leads/${IDF11.lead}$`));
-    expect(api.escritas("POST", "/commercial/leads")[0]?.corpo).toEqual({ name: "Marta Lopes", company: null, email: "marta@lopes.ao", phone: null, source: "Feira", ownerEmployeeId: null, notes: null });
+    expect(api.escritas("POST", "/commercial/leads")[0]?.corpo).toEqual({ name: "Marta Lopes", company: null, email: "marta@lopes.ao", phone: null, source: "Feira", ownerEmployeeId: IDF11.dono, notes: null });
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
 
     await expect(page.getByText("<script>alert(1)</script>", { exact: false })).toBeVisible();
     expect(await page.locator("main script").count()).toBe(0);
-    // O Sales não lê os RH: não há «Responsável» nem id à vista.
-    await expect(page.getByText("Responsável")).toHaveCount(0);
+    // O nome do responsável vem da vista (B35); nunca o id.
+    await expect(page.getByText("Joana Vendas").first()).toBeVisible();
     await semIds(page);
     await verificar(page);
     await page.getByRole("button", { name: "Marcar contactado" }).click();
@@ -130,7 +134,7 @@ test.describe("leads", () => {
 });
 
 test.describe("oportunidades", () => {
-  test("Sales: quadro com totais por moeda e «Mover para»; lista com a etapa no URL, mais recentes primeiro", async ({ page, api, violacoes }) => {
+  test("Sales: quadro com totais por moeda e «Mover para»; lista paginada pelo servidor, com a etapa no URL", async ({ page, api, violacoes }) => {
     await comCrm(api).em("POST", `/commercial/opportunities/${IDF11.op2}/stage`, { status: 204 }).ligar();
     await entrar(page, meVendasF11.email);
     await page.getByRole("link", { name: "Oportunidades" }).click();
@@ -146,9 +150,11 @@ test.describe("oportunidades", () => {
     await expect.poll(() => api.escritas("POST", `/commercial/opportunities/${IDF11.op2}/stage`)[0]?.corpo).toEqual({ stage: "Negotiation", boardOrder: null });
 
     await page.getByRole("link", { name: "Lista" }).click();
+    // A ordem é a do servidor (B35), pedida por páginas.
     const linhas = page.getByRole("table", { name: "Oportunidades" }).getByRole("row");
-    await expect(linhas.nth(1)).toContainText("Consultoria fiscal");
-    await expect(linhas.nth(4)).toContainText("Contabilidade 2026");
+    await expect(linhas.nth(1)).toContainText("Auditoria 2027");
+    await expect(linhas.nth(3)).toContainText("Marta Lopes (Lopes & Filhos)");
+    await expect.poll(() => api.pedidos.some((p) => p.caminho === "/commercial/opportunities" && p.query.includes("page=1"))).toBe(true);
     await page.getByLabel("Etapa").selectOption("Won");
     await expect(page).toHaveURL(/etapa=Won/);
     await expect.poll(() => api.pedidos.some((p) => p.caminho === "/commercial/opportunities" && p.query.includes("stage=Won"))).toBe(true);
@@ -220,12 +226,13 @@ test.describe("oportunidades", () => {
     await expect(page.getByRole("link", { name: "Abrir o lead" })).toHaveAttribute("href", `/leads/${IDF11.lead}`);
   });
 
-  test("Manager: lê o quadro e o relatório, sem botões nem clientes (não os lê)", async ({ page, api, violacoes }) => {
+  test("Manager: lê o quadro e o relatório com os nomes (B35), sem botões nem ligação aos clientes", async ({ page, api, violacoes }) => {
     await comCrm(api, meGestorF11).ligar();
     await entrar(page, meGestorF11.email);
     await page.goto("/oportunidades");
     await expect(page.getByRole("region", { name: "Proposta (1)" })).toContainText("Auditoria 2027");
-    await expect(page.getByRole("region", { name: "Proposta (1)" })).not.toContainText("Cliente Teste, Lda");
+    await expect(page.getByRole("region", { name: "Proposta (1)" })).toContainText("Cliente Teste, Lda");
+    await expect(page.getByRole("region", { name: "Proposta (1)" }).getByRole("link", { name: "Cliente Teste, Lda" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Nova oportunidade" })).toHaveCount(0);
     await expect(page.getByLabel(/^Mover /)).toHaveCount(0);
     expect(api.pedidos.some((p) => p.caminho === "/commercial/customers")).toBe(false);
@@ -237,7 +244,7 @@ test.describe("oportunidades", () => {
     await expect(page.getByRole("table", { name: "Previsão por mês" })).toContainText("2026");
     await expect(page.getByRole("table", { name: "Leads por estado" })).toContainText("Convertido");
     await expect(page.getByRole("table", { name: "Desempenho por responsável" })).toContainText("Sem responsável");
-    await expect(page.getByText("(B35)", { exact: false })).toBeVisible();
+    await expect(page.getByRole("table", { name: "Desempenho por responsável" })).toContainText("Joana Vendas");
     await semIds(page);
     await verificar(page);
     await page.getByLabel("Moeda").selectOption("USD");
@@ -259,7 +266,7 @@ test.describe("actividades e tipos de serviço", () => {
     const tabela = page.getByRole("table", { name: "Actividades" });
     await expect(tabela.getByRole("row").filter({ hasText: "Ligar à Marta" })).toContainText("Atrasada");
     await expect(tabela.getByRole("link", { name: "Marta Lopes (Lopes & Filhos)" })).toHaveAttribute("href", `/leads/${IDF11.lead}`);
-    await expect(tabela.getByRole("link", { name: "Auditoria 2027" })).toHaveAttribute("href", `/oportunidades/${IDF11.op1}`);
+    await expect(tabela.getByRole("link", { name: "Oportunidade · Cliente Teste, Lda" })).toHaveAttribute("href", `/oportunidades/${IDF11.op1}`);
     await verificar(page);
 
     await page.getByRole("link", { name: "Tipos de serviço" }).click();

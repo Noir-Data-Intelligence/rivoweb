@@ -17,12 +17,12 @@ import { dataHoraLocalDeInstante, instanteDeDataHoraLocal } from "@/lib/format/d
 
 describe("lead", () => {
   it("nome obrigatório, e-mail válido e limites do servidor", () => {
-    expect(errosLead({ nome: " ", empresa: "", email: "x@", telefone: "", origem: "o".repeat(101), notas: "" })).toMatchObject({
+    expect(errosLead({ nome: " ", empresa: "", email: "x@", telefone: "", origem: "o".repeat(101), responsavel: "", notas: "" })).toMatchObject({
       nome: "Indique o nome de quem contactar.",
       email: "E-mail inválido.",
       origem: "No máximo 100 caracteres.",
     });
-    expect(errosLead({ nome: "Ana", empresa: "", email: "ana@cliente.ao", telefone: "", origem: "", notas: "" })).toEqual({
+    expect(errosLead({ nome: "Ana", empresa: "", email: "ana@cliente.ao", telefone: "", origem: "", responsavel: "", notas: "" })).toEqual({
       nome: undefined,
       empresa: undefined,
       email: undefined,
@@ -31,8 +31,8 @@ describe("lead", () => {
       notas: undefined,
     });
   });
-  it("vai à API aparado, opcionais a null e o responsável mantido", () => {
-    expect(leadParaApi({ nome: " Ana ", empresa: " Lda ", email: "", telefone: "", origem: "", notas: "" }, "e1")).toEqual({
+  it("vai à API aparado, opcionais a null, com o responsável escolhido", () => {
+    expect(leadParaApi({ nome: " Ana ", empresa: " Lda ", email: "", telefone: "", origem: "", responsavel: "e1", notas: "" })).toEqual({
       name: "Ana",
       company: "Lda",
       email: null,
@@ -81,7 +81,7 @@ describe("converter um lead", () => {
 });
 
 describe("oportunidade", () => {
-  const base: CamposOportunidade = { titulo: "Auditoria", para: "cliente", cliente: "c1", lead: "", valor: "500 000", moeda: "AOA", probabilidade: "", fecho: "2026-12-15", notas: "" };
+  const base: CamposOportunidade = { titulo: "Auditoria", para: "cliente", cliente: "c1", lead: "", valor: "500 000", moeda: "AOA", probabilidade: "", fecho: "2026-12-15", responsavel: "", notas: "" };
   it("probabilidade vazia só ao criar (o servidor poria 10% ao corrigir)", () => {
     expect(errosOportunidade(base, true).probabilidade).toBeUndefined();
     expect(errosOportunidade(base, false).probabilidade).toBe("Entre 0 e 100.");
@@ -90,8 +90,8 @@ describe("oportunidade", () => {
     expect(errosOportunidade({ ...base, cliente: "" }, true).cliente).toBe("Escolha o cliente.");
   });
   it("ao corrigir, o cliente e o lead ficam os de origem", () => {
-    expect(oportunidadeParaApi({ ...base, probabilidade: "40" }, null)).toMatchObject({ customerId: "c1", leadId: null, estimatedValue: "500000.00", probability: 40, expectedCloseDate: "2026-12-15" });
-    expect(oportunidadeParaApi({ ...base, probabilidade: "40", cliente: "outro" }, "e1", { customerId: null, leadId: "l1" })).toMatchObject({ customerId: null, leadId: "l1", ownerEmployeeId: "e1" });
+    expect(oportunidadeParaApi({ ...base, probabilidade: "40" })).toMatchObject({ customerId: "c1", leadId: null, estimatedValue: "500000.00", probability: 40, expectedCloseDate: "2026-12-15" });
+    expect(oportunidadeParaApi({ ...base, probabilidade: "40", cliente: "outro", responsavel: "e1" }, { customerId: null, leadId: "l1" })).toMatchObject({ customerId: null, leadId: "l1", ownerEmployeeId: "e1" });
   });
 });
 
@@ -100,7 +100,7 @@ describe("actividade e tipo de serviço", () => {
     expect(instanteDeDataHoraLocal("2026-10-20T09:30")).toBe("2026-10-20T09:30:00+01:00");
     expect(instanteDeDataHoraLocal("2026-13-20T09:30")).toBeNull();
     expect(dataHoraLocalDeInstante("2026-10-20T08:30:00Z")).toBe("2026-10-20T09:30");
-    expect(actividadeParaApi({ tipo: "Meeting", assunto: " Visita ", quando: "2026-10-20T09:30", feita: false, notas: "" }, { oportunidade: "o1" })).toEqual({
+    expect(actividadeParaApi({ tipo: "Meeting", assunto: " Visita ", quando: "2026-10-20T09:30", feita: false, responsavel: "", notas: "" }, { oportunidade: "o1" })).toEqual({
       kind: "Meeting",
       subject: "Visita",
       notes: null,
@@ -111,7 +111,7 @@ describe("actividade e tipo de serviço", () => {
       customerId: null,
       ownerEmployeeId: null,
     });
-    expect(errosActividade({ tipo: "Call", assunto: "", quando: "x", feita: false, notas: "" })).toMatchObject({ assunto: "Indique o assunto.", quando: "Data e hora inválidas." });
+    expect(errosActividade({ tipo: "Call", assunto: "", quando: "x", feita: false, responsavel: "", notas: "" })).toMatchObject({ assunto: "Indique o assunto.", quando: "Data e hora inválidas." });
   });
   it("o código só conta ao criar; preço em texto", () => {
     expect(errosServico({ codigo: "", nome: "", descricao: "", preco: "-5", moeda: "AOA", activo: true }, true)).toMatchObject({

@@ -2,7 +2,7 @@
  * F11 (3.º bloco) — contratos de clientes e cobranças, com a API simulada:
  * lista com filtros no URL, registar validado, activar, renovar (estende o
  * fim), aditamento (sem deixar o valor negativo), terminar com motivo,
- * anexar um ficheiro carregado (descarregar só com o arquivo, B37); cobranças:
+ * anexar um ficheiro carregado e descarregá-lo pelo contrato (B37); cobranças:
  * vencidas, acção sobre uma factura, promessa validada, histórico com nomes
  * das vencidas; o separador «Comercial» na ficha do cliente.
  */
@@ -10,12 +10,14 @@ import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { IDF3 } from "../../fixtures/f3";
-import { meAdminF10 } from "../../fixtures/f10b";
-import { accoes, aditamentos, anexos, contratos, IDF11C, meFinancasF11, meVendasF11, oportunidades, propostas, vencidas } from "../../fixtures/f11";
+import { accoes, aditamentos, anexos, contratos, escolhasComerciais, IDF11C, meFinancasF11, meVendasF11, oportunidades, propostas, vencidas } from "../../fixtures/f11";
+
+const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 
 function comContratos(api: ApiSimulada, me = meVendasF11): ApiSimulada {
   return comF3(api, me)
-    .em("GET", "/commercial/contracts", { status: 200, corpo: contratos() })
+    .em("GET", "/commercial/lookups", { status: 200, corpo: escolhasComerciais() })
+    .em("GET", "/commercial/contracts", pag(contratos()))
     .em("GET", `/commercial/contracts/${IDF11C.activo}`, { status: 200, corpo: contratos()[0] })
     .em("GET", `/commercial/contracts/${IDF11C.rascunho}`, { status: 200, corpo: contratos()[1] })
     .em("GET", `/commercial/contracts/${IDF11C.activo}/amendments`, { status: 200, corpo: aditamentos() })
@@ -23,7 +25,7 @@ function comContratos(api: ApiSimulada, me = meVendasF11): ApiSimulada {
     .em("GET", `/commercial/contracts/${IDF11C.activo}/documents`, { status: 200, corpo: anexos() })
     .em("GET", `/commercial/contracts/${IDF11C.rascunho}/documents`, { status: 200, corpo: [] })
     .em("GET", "/finance/receivables/overdue", { status: 200, corpo: vencidas() })
-    .em("GET", "/commercial/collections/actions", { status: 200, corpo: accoes() });
+    .em("GET", "/commercial/collections/actions", pag(accoes()));
 }
 
 async function verificar(page: Page) {
@@ -98,16 +100,19 @@ test.describe("contratos de clientes", () => {
       .em("POST", "/documents", { status: 201, corpo: { documentId: IDF11C.documento, fileName: "contrato.pdf", contentType: "application/pdf", sizeInBytes: 1000, category: "Contrato de cliente", contentHash: "x", uploadedBy: null, uploadedAt: "2026-10-18T10:00:00Z" } })
       .em("POST", `/commercial/contracts/${IDF11C.activo}/documents`, { status: 201, corpo: { linkId: "l2" } })
       .em("POST", `/commercial/contracts/${IDF11C.activo}/termination`, { status: 204 })
+      .em("GET", `/commercial/contracts/${IDF11C.activo}/documents/${IDF11C.anexo}/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .ligar();
     await entrar(page, meVendasF11.email);
     await page.goto(`/contratos-clientes/${IDF11C.activo}`);
     await expect(page.getByRole("heading", { name: "Manutenção anual", level: 1 })).toBeVisible();
     await expect(page.getByText("<b>SLA</b> reforçado")).toBeVisible();
     await expect(page.getByRole("table", { name: "Aditamentos" })).toContainText("+200 000,00 Kz");
-    // Sem o arquivo, os anexos não se abrem (B37).
-    await expect(page.getByRole("table", { name: "Anexos" })).toContainText("Contrato assinado");
-    await expect(page.getByText("(B37)", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Descarregar/ })).toHaveCount(0);
+    // O anexo traz o nome e descarrega-se pelo contrato, sem o arquivo (B37).
+    await expect(page.getByRole("table", { name: "Anexos" })).toContainText("contrato-assinado.pdf");
+    const descarga = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar contrato-assinado.pdf" }).click();
+    expect((await descarga).suggestedFilename()).toBe("contrato-assinado.pdf");
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/documents/"))).toBe(false);
     await verificar(page);
 
     await page.getByRole("button", { name: "Renovar" }).click();
@@ -148,17 +153,6 @@ test.describe("contratos de clientes", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("Admin abre o anexo pelo arquivo, com o nome do ficheiro", async ({ page, api }) => {
-    await comContratos(api, { ...meAdminF10, permissions: [...meAdminF10.permissions, "commercial.contracts.read", "commercial.contracts.write"] })
-      .em("GET", `/documents/${IDF11C.documento}/metadata`, { status: 200, corpo: { documentId: IDF11C.documento, fileName: "contrato-assinado.pdf", contentType: "application/pdf", sizeInBytes: 1000, category: "Contrato de cliente", contentHash: "x", uploadedBy: null, uploadedAt: "2026-01-02T10:00:00Z" } })
-      .em("GET", `/documents/${IDF11C.documento}`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
-      .ligar();
-    await entrar(page, meAdminF10.email);
-    await page.goto(`/contratos-clientes/${IDF11C.activo}`);
-    const descarga = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Descarregar contrato-assinado.pdf" }).click();
-    expect((await descarga).suggestedFilename()).toBe("contrato-assinado.pdf");
-  });
 });
 
 test.describe("cobranças", () => {
@@ -205,11 +199,13 @@ test.describe("cobranças", () => {
     await expect(accao).toContainText("<script>x</script>");
     expect(await page.locator("main script").count()).toBe(0);
 
-    // O Finance lê contratos, sem botões nem o nome do cliente (não lê clientes).
+    // O Finance lê contratos com o nome do cliente (B35), sem botões nem ligação à ficha (não lê clientes); abre os anexos (B37).
     await page.goto(`/contratos-clientes/${IDF11C.activo}`);
     await expect(page.getByRole("button", { name: "Renovar" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Anexar ficheiro" })).toHaveCount(0);
-    await expect(page.getByText("Cliente Teste, Lda")).toHaveCount(0);
+    await expect(page.getByText("Cliente Teste, Lda")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Cliente Teste, Lda" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Descarregar contrato-assinado.pdf" })).toBeVisible();
     expect(api.pedidos.some((p) => p.caminho === "/commercial/customers")).toBe(false);
     expect(await violacoes()).toEqual([]);
   });
@@ -218,8 +214,8 @@ test.describe("cobranças", () => {
 test.describe("ficha do cliente", () => {
   test("separador «Comercial»: oportunidades, propostas, contratos e cobranças do cliente", async ({ page, api }) => {
     await comContratos(api)
-      .em("GET", "/commercial/opportunities", { status: 200, corpo: oportunidades() })
-      .em("GET", "/commercial/proposals", { status: 200, corpo: propostas() })
+      .em("GET", "/commercial/opportunities", pag(oportunidades()))
+      .em("GET", "/commercial/proposals", pag(propostas()))
       .ligar();
     await entrar(page, meVendasF11.email);
     await page.goto(`/clientes/${IDF3.cliente}?vista=comercial`);

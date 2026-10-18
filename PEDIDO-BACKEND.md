@@ -1,9 +1,13 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração),
-> **B35** (nomes, escolhas e ordem no comercial, F11), **B36** (posição das
-> linhas das propostas) e **B37** (anexos dos contratos).
+> Revisto contra `main` @ `a281377`. Em aberto: **B24** (configuração).
+> **B35** a **B37** estão resolvidos (PR #111 e #112) e o front já os usa:
+> nomes de clientes, leads, responsáveis e facturas nas vistas do comercial;
+> responsável e cliente escolhidos em `/commercial/lookups`; listas
+> ordenadas e paginadas; posição das linhas das propostas sem repetir;
+> anexos dos contratos com nome, descarregados pelo contrato, e só os
+> próprios se anexam (404 verificado na base local).
 > **B34** está resolvido (PR #110) e o front já o usa: a fila de comprovativos
 > e o portal mostram a moeda da factura; ligar uma conta sem o perfil Cliente
 > dá 409 (verificado na base local).
@@ -342,6 +346,8 @@ só oferece as contas da lista, mas esconder não protege.
 
 ## B35 — O comercial só traz ids de pessoas, clientes e facturas, e as listas não têm ordem
 
+> **Resolvido** (PR #111, 2026-10-18); o front usa-o e foi verificado na base local (`a281377`).
+
 **Facto 1 (nomes):** as vistas do comercial trazem só ids:
 - `ownerEmployeeId` em `LeadView`, `OpportunityView`, `CrmActivityView`,
   `CollectionActionView` e `OwnerPerformance` (relatório);
@@ -389,6 +395,8 @@ data) e as listas crescem sem tecto.
 
 ## B36 — Tirar uma linha de uma proposta repete a posição da linha seguinte
 
+> **Resolvido** (PR #112, 2026-10-18); o front usa-o e foi verificado na base local (`a281377`).
+
 **Facto:** `Proposal.AddLine` dá a posição `_lines.Count + 1` e `RemoveLine`
 não renumera. Na base local (`2b84331`, 2026-10-18): linhas A, B, C; tirar
 B; acrescentar D → `1:A 3:D 3:C` em `GET /commercial/proposals/{id}`, com D
@@ -403,6 +411,8 @@ números repetidos.
 como o B30 fez nas requisições.
 
 ## B37 — Os anexos de um contrato não se descarregam e aceitam qualquer documento
+
+> **Resolvido** (PR #112, 2026-10-18); o front usa-o e foi verificado na base local (`a281377`).
 
 **Facto 1:** `GET /commercial/contracts/{id}/documents` devolve `linkId`,
 `documentId`, `category` e `attachedAt`, sem o nome do ficheiro, e não há

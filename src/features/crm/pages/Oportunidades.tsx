@@ -17,9 +17,11 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
+import { Paginacao } from "@/ui/Paginacao";
+import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
-import { useGuardarOportunidade, useMoverOportunidade, useOportunidades, useQuadro, type Etapa, type EtapaAberta, type Oportunidade } from "../api";
-import { ETAPAS, ETAPAS_ABERTAS, EtapaBadge, NomeCliente, useNomes } from "../comum";
+import { useGuardarOportunidade, useMoverOportunidade, useOportunidadesPagina, useQuadro, type Etapa, type EtapaAberta, type Oportunidade } from "../api";
+import { ETAPAS, ETAPAS_ABERTAS, EtapaBadge, NomeCliente } from "../comum";
 import { CamposDaOportunidade, OPORTUNIDADE_VAZIA } from "../FormularioOportunidade";
 import { errosOportunidade, oportunidadeParaApi, temErros } from "../regras";
 
@@ -63,7 +65,7 @@ function NovaOportunidade() {
             e.preventDefault();
             setTentou(true);
             if (temErros(erros) || guardar.isPending) return;
-            guardar.mutate({ id: null, corpo: oportunidadeParaApi(v, null) }, { onSuccess: (id) => void navegar(`/oportunidades/${id}`) });
+            guardar.mutate({ id: null, corpo: oportunidadeParaApi(v) }, { onSuccess: (id) => void navegar(`/oportunidades/${id}`) });
           }}
         >
           <CamposDaOportunidade v={v} setV={setV} erros={tentou ? erros : {}} nova />
@@ -83,7 +85,7 @@ function totais(xs: readonly Oportunidade[]) {
   return [...m.entries()].map(([c, t]) => `${moeda(t.total.toFixed(2), c)} (ponderado ${moeda(t.ponderado.toFixed(2), c)})`);
 }
 
-const deQuem = (o: Oportunidade, nomes: ReturnType<typeof useNomes>) => (o.customerId ? <NomeCliente id={o.customerId} nome={nomes.cliente(o.customerId)} /> : (nomes.lead(o.leadId) ?? "—"));
+const deQuem = (o: Oportunidade) => (o.customerId ? <NomeCliente id={o.customerId} nome={o.customerName ?? null} /> : (o.leadName ?? "—"));
 
 function Mover({ o }: { o: Oportunidade }) {
   const mover = useMoverOportunidade();
@@ -107,7 +109,6 @@ function Mover({ o }: { o: Oportunidade }) {
 
 function Quadro() {
   const quadro = useQuadro();
-  const nomes = useNomes();
   const { pode } = useUtilizador();
   const escreve = pode("commercial.crm.write");
   if (quadro.isPending) return <Skeleton className="h-64" />;
@@ -138,7 +139,7 @@ function Quadro() {
                     <Link to={`/oportunidades/${o.opportunityId}`} className="block break-words font-medium text-foreground underline-offset-4 hover:underline">
                       {o.title}
                     </Link>
-                    <p className="mt-1 text-sm text-muted-foreground">{deQuem(o, nomes)}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{deQuem(o)}</p>
                     <p className="mt-1 text-sm tabular-nums text-foreground">
                       {moeda(o.estimatedValue, o.currency)} · {String(o.probability)}%
                     </p>
@@ -157,19 +158,19 @@ function Quadro() {
 
 function Lista() {
   const [params, setParams] = useSearchParams();
-  const nomes = useNomes();
+  const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const idEtapa = useId();
   const e = params.get("etapa");
   const etapa = e !== null && e in ETAPAS ? (e as Etapa) : null;
-  const lista = useOportunidades({ etapa, cliente: null });
+  const lista = useOportunidadesPagina({ etapa, pagina, tamanho });
   const filtrar = (x: string) => {
     const n = new URLSearchParams(window.location.search);
     if (x) n.set("etapa", x);
     else n.delete("etapa");
+    n.delete("pagina");
     setParams(n);
   };
-  // Sem ordem do servidor (B35): mais recentes primeiro.
-  const linhas = lista.data ? [...lista.data].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : undefined;
+  const linhas = lista.data?.items;
   const colunas: Coluna<Oportunidade>[] = [
     {
       id: "titulo",
@@ -180,7 +181,7 @@ function Lista() {
           <Link to={`/oportunidades/${o.opportunityId}`} className="truncate font-medium text-foreground underline-offset-4 hover:underline">
             {o.title}
           </Link>
-          <span className="truncate text-xs text-muted-foreground">{deQuem(o, nomes)}</span>
+          <span className="truncate text-xs text-muted-foreground">{deQuem(o)}</span>
         </span>
       ),
     },
@@ -204,7 +205,7 @@ function Lista() {
           ))}
         </Select>
       </div>
-      {linhas && linhas.length > 0 ? <p className="mb-3 text-sm text-muted-foreground">{totais(linhas).join(" · ")}</p> : null}
+      {linhas && linhas.length > 0 ? <p className="mb-3 text-sm text-muted-foreground">Nesta página: {totais(linhas).join(" · ")}</p> : null}
       <Tabela
         rotulo="Oportunidades"
         colunas={colunas}
@@ -213,6 +214,7 @@ function Lista() {
         aCarregar={lista.isPending}
         erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
         vazio={etapa ? "Nenhuma oportunidade nesta etapa." : "Ainda não há oportunidades."}
+        rodape={lista.data && lista.data.total > 0 ? <Paginacao pagina={pagina} tamanho={tamanho} total={lista.data.total} aoMudar={mudar} /> : undefined}
       />
     </>
   );

@@ -59,7 +59,7 @@ describe("contrato", () => {
 });
 
 describe("acção de cobrança", () => {
-  const acc: CamposAccao = { cliente: "c1", factura: "", tipo: "Call", notas: "Ligou, paga sexta.", quando: "2026-10-18T10:15", valorPrometido: "", dataPrometida: "", proximo: "2026-10-25" };
+  const acc: CamposAccao = { cliente: "c1", factura: "", tipo: "Call", notas: "Ligou, paga sexta.", quando: "2026-10-18T10:15", valorPrometido: "", dataPrometida: "", proximo: "2026-10-25", responsavel: "" };
   it("notas obrigatórias; promessa exige valor positivo e data", () => {
     expect(Object.values(errosAccao(acc)).filter(Boolean)).toEqual([]);
     expect(errosAccao({ ...acc, cliente: "", notas: " " })).toMatchObject({ cliente: "Escolha o cliente.", notas: "Registe o que foi feito ou combinado." });

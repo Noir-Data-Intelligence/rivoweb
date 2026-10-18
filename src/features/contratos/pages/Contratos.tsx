@@ -12,9 +12,11 @@ import { Confirmar } from "@/ui/Confirmar";
 import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
+import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { ESTADOS_CONTRATO, TIPOS_CONTRATO, useContratosClientes, useGuardarContrato, type Contrato, type EstadoContrato, type TipoContrato } from "../api";
-import { EstadoContratoBadge, Fim, useNomeCliente, valorContrato } from "../comum";
+import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
+import { ESTADOS_CONTRATO, TIPOS_CONTRATO, useContratosPagina, useGuardarContrato, type Contrato, type EstadoContrato, type TipoContrato } from "../api";
+import { ClienteDoContrato, EstadoContratoBadge, Fim, valorContrato } from "../comum";
 import { CamposDoContrato, CONTRATO_VAZIO } from "../Formulario";
 import { contratoParaApi, errosContrato } from "../regras";
 
@@ -72,7 +74,7 @@ function NovoContrato() {
 
 export default function Contratos() {
   const [params, setParams] = useSearchParams();
-  const nomeCliente = useNomeCliente();
+  const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const idEstado = useId();
   const idTipo = useId();
   const idPrazo = useId();
@@ -82,11 +84,12 @@ export default function Contratos() {
   const tipo = t !== null && t in TIPOS_CONTRATO ? (t as TipoContrato) : null;
   const p = params.get("acabam");
   const aExpirar = p === "30" || p === "60" || p === "90" ? Number(p) : null;
-  const lista = useContratosClientes({ estado, tipo, aExpirar });
+  const lista = useContratosPagina({ estado, tipo, aExpirar, pagina, tamanho });
   const filtrar = (k: string, x: string) => {
     const n = new URLSearchParams(window.location.search);
     if (x) n.set(k, x);
     else n.delete(k);
+    n.delete("pagina");
     setParams(n);
   };
   const colunas: Coluna<Contrato>[] = [
@@ -105,7 +108,7 @@ export default function Contratos() {
         </span>
       ),
     },
-    { id: "cliente", cabecalho: "Cliente", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (c) => nomeCliente(c.customerId) },
+    { id: "cliente", cabecalho: "Cliente", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (c) => <ClienteDoContrato c={c} /> },
     { id: "inicio", cabecalho: "Início", esconderAte: "lg", celula: (c) => formatarData(c.startsOn) },
     { id: "fim", cabecalho: "Fim", celula: (c) => <Fim c={c} /> },
     { id: "valor", cabecalho: "Valor", alinhar: "direita", esconderAte: "sm", celula: (c) => valorContrato(c) },
@@ -164,11 +167,12 @@ export default function Contratos() {
       <Tabela
         rotulo="Contratos de clientes"
         colunas={colunas}
-        linhas={lista.data}
+        linhas={lista.data?.items}
         chave={(c) => c.contractId}
         aCarregar={lista.isPending}
         erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
         vazio={estado || tipo || aExpirar !== null ? "Nenhum contrato com estes filtros." : "Ainda não há contratos."}
+        rodape={lista.data && lista.data.total > 0 ? <Paginacao pagina={pagina} tamanho={tamanho} total={lista.data.total} aoMudar={mudar} /> : undefined}
       />
     </>
   );

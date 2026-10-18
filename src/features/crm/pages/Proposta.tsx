@@ -24,7 +24,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useTiposServico } from "../api";
-import { EstadoPropostaBadge, NomeCliente, useNomes } from "../comum";
+import { EstadoPropostaBadge, NomeCliente } from "../comum";
 import { CamposDaProposta, camposDaProposta } from "../FormularioProposta";
 import {
   errosLinha,
@@ -314,7 +314,6 @@ export default function Proposta() {
   const { proposalId = "" } = useParams();
   const proposta = useProposta(proposalId);
   const { pode } = useUtilizador();
-  const nomes = useNomes();
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/propostas">
@@ -342,8 +341,7 @@ export default function Proposta() {
     </div>
   );
   const colunas: Coluna<LinhaProposta>[] = [
-    // A posição pode repetir-se depois de tirar uma linha (B36): numera-se pela ordem.
-    { id: "pos", cabecalho: "#", esconderAte: "sm", celula: (l) => String(p.lines.indexOf(l) + 1) },
+    { id: "pos", cabecalho: "#", esconderAte: "sm", celula: (l) => String(l.position) },
     { id: "desc", cabecalho: "Descrição", className: "max-w-[20rem] whitespace-normal break-words", celula: (l) => l.description },
     { id: "q", cabecalho: "Qtd.", alinhar: "direita", celula: (l) => qtd(l.quantity) },
     { id: "p", cabecalho: "Preço", alinhar: "direita", esconderAte: "md", celula: (l) => moeda(l.unitPrice, p.currency) },
@@ -404,7 +402,7 @@ export default function Proposta() {
         <div className="flex min-w-0 flex-col gap-6">
           <Card>
             <dl className="grid gap-3">
-              {linha("Para", p.customerId ? <NomeCliente id={p.customerId} nome={nomes.cliente(p.customerId)} /> : p.leadId ? <Link to={`/leads/${p.leadId}`} className="underline-offset-4 hover:underline">{nomes.lead(p.leadId) ?? "Abrir o lead"}</Link> : "—")}
+              {linha("Para", p.customerId ? <NomeCliente id={p.customerId} nome={p.customerName ?? null} /> : p.leadId ? <Link to={`/leads/${p.leadId}`} className="underline-offset-4 hover:underline">{p.leadName ?? "Abrir o lead"}</Link> : "—")}
               {linha("Oportunidade", p.opportunityId ? <Link to={`/oportunidades/${p.opportunityId}`} className="underline-offset-4 hover:underline">Abrir a oportunidade</Link> : "—")}
               {linha("Moeda", p.currency)}
               {linha("Válida até", p.validUntil ? formatarData(p.validUntil) : "—")}

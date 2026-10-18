@@ -9,13 +9,14 @@
  *   sobre um cliente e, se quiser, uma factura desse cliente (404 se não for);
  *   notas obrigatórias (2000); uma promessa de pagamento exige valor > 0 e
  *   data; data da acção (por omissão, agora), próximo contacto; as mais
- *   recentes primeiro; não se corrigem nem apagam;
+ *   recentes primeiro, com o cliente, a factura e o responsável pelo nome,
+ *   paginadas com `page` (B35); não se corrigem nem apagam;
+ * - o cliente e o responsável escolhem-se em `/commercial/lookups` (B35);
  * - vencidas: `GET /finance/receivables/overdue` (`finance.invoices.read`), com
- *   o cliente (nome) e o número da factura — daí vêm os nomes das acções, que
- *   só trazem ids (B35).
+ *   o cliente, o número e a moeda da factura (a da promessa).
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, ler } from "@/lib/api/client";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, ler, lerPagina } from "@/lib/api/client";
 import { useEscrita } from "@/lib/api/escrita";
 import type { components } from "@/lib/api/schema";
 import { instanteDeDataHoraLocal } from "@/lib/format/data";
@@ -44,6 +45,14 @@ export function useAccoesCobranca(f: { cliente?: string; factura?: string } = {}
   });
 }
 
+export function useAccoesPagina(f: { pagina: number; tamanho: number }) {
+  return useQuery({
+    queryKey: ["commercial", "collections", "page", f],
+    queryFn: ({ signal }) => lerPagina(api.GET("/commercial/collections/actions", { params: { query: { page: f.pagina, pageSize: f.tamanho } }, signal })),
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useVencidas(activo = true) {
   return useQuery({ queryKey: ["finance", "receivables", "overdue"], queryFn: ({ signal }) => ler(api.GET("/finance/receivables/overdue", { signal })), enabled: activo });
 }
@@ -65,6 +74,7 @@ export interface CamposAccao {
   valorPrometido: string;
   dataPrometida: string;
   proximo: string;
+  responsavel: string;
 }
 
 export function errosAccao(v: CamposAccao) {
@@ -93,6 +103,6 @@ export function accaoParaApi(v: CamposAccao): S["CollectionRequest"] {
     promisedAmount: valor ? paraApi(valor) : null,
     promisedDate: v.dataPrometida === "" ? null : v.dataPrometida,
     nextFollowUpOn: v.proximo === "" ? null : v.proximo,
-    ownerEmployeeId: null,
+    ownerEmployeeId: v.responsavel === "" ? null : v.responsavel,
   };
 }

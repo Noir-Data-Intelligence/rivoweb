@@ -107,7 +107,11 @@ test("F11: contratos e cobranças — ciclo de vida, aditamento, anexo, promessa
   await expect(dialogo(page).getByText("contrato.pdf")).toBeVisible();
   await dialogo(page).getByRole("button", { name: "Anexar" }).click();
   await expect(dialogo(page)).toHaveCount(0);
-  await expect(page.getByRole("table", { name: "Anexos" })).toContainText("Contrato assinado");
+  await expect(page.getByRole("table", { name: "Anexos" })).toContainText("contrato.pdf");
+  // B37: o anexo descarrega-se pelo contrato.
+  const descarga = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Descarregar contrato.pdf" }).click();
+  expect((await descarga).suggestedFilename()).toBe("contrato.pdf");
   await page.getByRole("button", { name: "Suspender" }).click();
   await dialogo(page).getByRole("button", { name: "Suspender" }).click();
   await expect(page.getByText("Suspenso", { exact: true })).toBeVisible();
@@ -118,8 +122,15 @@ test("F11: contratos e cobranças — ciclo de vida, aditamento, anexo, promessa
   expect([k.corpo.status, Number(k.corpo.value), k.corpo.endsOn, Number(k.corpo.slaResponseHours)]).toEqual(["Active", 1450000.5, "2028-06-30", 4]);
   const ads = await sa<{ number: number; previousEndsOn: string }[]>("GET", `/commercial/contracts/${kid}/amendments`);
   expect(ads.corpo.map((a) => [Number(a.number), a.previousEndsOn])).toEqual([[1, "2027-12-31"]]);
-  const docs = await sa<{ category: string }[]>("GET", `/commercial/contracts/${kid}/documents`);
-  expect(docs.corpo.map((d) => d.category)).toEqual(["Contrato assinado"]);
+  const docs = await sa<{ category: string; fileName: string }[]>("GET", `/commercial/contracts/${kid}/documents`);
+  expect(docs.corpo.map((d) => [d.category, d.fileName])).toEqual([["Contrato assinado", "contrato.pdf"]]);
+  // B37: o Sales não anexa um ficheiro que não carregou (o mesmo 404 de «não existe»).
+  const tokenSa = await request.post(`${API_LOCAL}/identity/login`, { data: { email: process.env.RIVO_LOCAL_EMAIL, password: process.env.RIVO_LOCAL_PASSWORD } });
+  const { accessToken } = (await tokenSa.json()) as { accessToken: string };
+  const alheio = await request.post(`${API_LOCAL}/documents`, { headers: { Authorization: `Bearer ${accessToken}` }, multipart: { file: { name: "alheio.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\n%%EOF\n") }, category: "Outra área" } });
+  const { documentId: idAlheio } = (await alheio.json()) as { documentId: string };
+  const vd = await sessaoApi(request, email, PASSWORD_LOCAL);
+  expect((await vd("POST", `/commercial/contracts/${kid}/documents`, { documentId: idAlheio, category: "Alheio" })).status).toBe(404);
   await page.getByRole("button", { name: "Terminar" }).click();
   await dialogo(page).getByLabel("Motivo").fill(`${marca} Mudou de fornecedor.`);
   await dialogo(page).getByRole("button", { name: "Terminar" }).click();

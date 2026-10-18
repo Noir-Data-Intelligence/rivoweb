@@ -13,10 +13,12 @@ import { Confirmar } from "@/ui/Confirmar";
 import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
+import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { EstadoPropostaBadge, NomeCliente, useNomes } from "../comum";
+import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
+import { EstadoPropostaBadge, NomeCliente } from "../comum";
 import { CamposDaProposta, PROPOSTA_VAZIA } from "../FormularioProposta";
-import { errosProposta, ESTADOS_PROPOSTA, propostaParaApi, useGuardarProposta, usePropostas, type EstadoProposta, type Proposta } from "../propostas";
+import { errosProposta, ESTADOS_PROPOSTA, propostaParaApi, useGuardarProposta, usePropostasPagina, type EstadoProposta, type Proposta } from "../propostas";
 import { temErros } from "../regras";
 
 function NovaProposta() {
@@ -71,15 +73,16 @@ function NovaProposta() {
 
 export default function Propostas() {
   const [params, setParams] = useSearchParams();
-  const nomes = useNomes();
+  const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const idEstado = useId();
   const e = params.get("estado");
   const estado = e !== null && e in ESTADOS_PROPOSTA ? (e as EstadoProposta) : null;
-  const lista = usePropostas({ estado });
+  const lista = usePropostasPagina({ estado, pagina, tamanho });
   const filtrar = (x: string) => {
     const n = new URLSearchParams(window.location.search);
     if (x) n.set("estado", x);
     else n.delete("estado");
+    n.delete("pagina");
     setParams(n);
   };
   const colunas: Coluna<Proposta>[] = [
@@ -96,7 +99,7 @@ export default function Propostas() {
         </span>
       ),
     },
-    { id: "para", cabecalho: "Para", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (p) => (p.customerId ? <NomeCliente id={p.customerId} nome={nomes.cliente(p.customerId)} /> : (nomes.lead(p.leadId) ?? "—")) },
+    { id: "para", cabecalho: "Para", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (p) => (p.customerId ? <NomeCliente id={p.customerId} nome={p.customerName ?? null} /> : (p.leadName ?? "—")) },
     { id: "criada", cabecalho: "Criada a", esconderAte: "lg", celula: (p) => formatarDataDeInstante(p.createdAt) },
     { id: "validade", cabecalho: "Válida até", esconderAte: "sm", celula: (p) => (p.validUntil ? formatarData(p.validUntil) : "—") },
     { id: "total", cabecalho: "Total", alinhar: "direita", celula: (p) => moeda(p.total, p.currency) },
@@ -129,11 +132,12 @@ export default function Propostas() {
       <Tabela
         rotulo="Propostas"
         colunas={colunas}
-        linhas={lista.data}
+        linhas={lista.data?.items}
         chave={(p) => p.proposalId}
         aCarregar={lista.isPending}
         erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined}
         vazio={estado ? "Nenhuma proposta neste estado." : "Ainda não há propostas."}
+        rodape={lista.data && lista.data.total > 0 ? <Paginacao pagina={pagina} tamanho={tamanho} total={lista.data.total} aoMudar={mudar} /> : undefined}
       />
     </>
   );

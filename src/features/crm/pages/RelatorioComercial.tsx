@@ -18,7 +18,7 @@ import { GrelhaKpis, Kpi } from "@/ui/Kpi";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela } from "@/ui/Tabela";
 import { useRelatorioComercial } from "../api";
-import { ESTADOS_LEAD, ETAPAS, useNomes } from "../comum";
+import { ESTADOS_LEAD, ETAPAS } from "../comum";
 import { MOEDAS } from "../regras";
 
 const mes = (aaaamm: string) => {
@@ -35,7 +35,6 @@ export default function RelatorioComercial() {
   const moedaSel = MOEDAS.find((x) => x === m) ?? "AOA";
   const erroJanela = de > ate ? "O fim não pode ser antes do início." : undefined;
   const r = useRelatorioComercial({ de, ate, moeda: moedaSel }, !erroJanela);
-  const nomes = useNomes();
   const escolherMoeda = (x: string) => {
     const n = new URLSearchParams(window.location.search);
     if (x === "AOA") n.delete("moeda");
@@ -123,7 +122,7 @@ export default function RelatorioComercial() {
               <Tabela
                 rotulo="Desempenho por responsável"
                 colunas={[
-                  { id: "quem", cabecalho: "Responsável", celula: (p) => (p.ownerEmployeeId === null ? "Sem responsável" : (nomes.pessoa(p.ownerEmployeeId) ?? "—")) },
+                  { id: "quem", cabecalho: "Responsável", celula: (p) => (p.ownerEmployeeId === null ? "Sem responsável" : (p.ownerName ?? "—")) },
                   { id: "g", cabecalho: "Ganhas", alinhar: "direita", celula: (p) => String(p.won) },
                   { id: "p", cabecalho: "Perdidas", alinhar: "direita", esconderAte: "sm", celula: (p) => String(p.lost) },
                   { id: "t", cabecalho: "Taxa", alinhar: "direita", celula: (p) => formatarPercentagem(p.winRate, 1) },
@@ -134,7 +133,6 @@ export default function RelatorioComercial() {
                 aCarregar={false}
                 vazio="Nada fechado no período."
               />
-              {!nomes.lePessoas && d.byOwner.some((p) => p.ownerEmployeeId !== null) ? <p className="mt-2 text-xs text-muted-foreground">Os nomes dos responsáveis só aparecem a quem lê os Recursos Humanos (B35).</p> : null}
             </Card>
           </div>
         </div>

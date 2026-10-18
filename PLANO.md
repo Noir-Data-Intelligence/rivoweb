@@ -1983,6 +1983,22 @@ facturas, e as listas (salvo os leads) não têm ordem nem paginação: **B35**.
 - **Testes:** 207 unitários; interface 5 cenários × 3 motores; suite inteira
   552, sem falhas nem instáveis (24 saltados: produção e base local).
 
+**B35 a B37 resolvidos** (PR #111 e #112, 2026-10-18; API local em `a281377`,
+produção confirmada só com nomes de campos e contagens). O front passou a
+usar: os nomes das vistas (cliente, lead, responsável, factura) em vez dos
+calculados do lado do front — o Manager e o Finance vêem os clientes, todos
+vêem os responsáveis; o responsável escolhe-se em leads, oportunidades,
+actividades e cobranças a partir de `/commercial/lookups`, e o cliente nas
+oportunidades, propostas, conversão, contratos e cobranças (o Finance regista
+cobranças a qualquer cliente activo); as listas de oportunidades,
+actividades, propostas, contratos e cobranças paginam no servidor (o quadro,
+as escolhas e as listas de uma ficha pedem tudo); as linhas das propostas
+mostram a posição do servidor; os anexos dos contratos trazem o nome e
+descarregam-se pelo contrato para quem lê contratos. Escritas locais
+acrescentadas: responsável escolhido e gravado com o nome; posições
+distintas depois de tirar uma linha; anexo descarregado pelo contrato e
+anexar um ficheiro alheio dá 404. Testes: suite inteira 564, sem falhas nem instáveis (24 saltados).
+
 **Bloco 3 — contratos de clientes e cobranças** (2026-10-18, por publicar).
 **F11 fechada no código.**
 - **Ecrãs** (grupo «Vendas»): `/contratos-clientes` (estado, tipo e «acabam

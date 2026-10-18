@@ -1,6 +1,6 @@
 /** Os campos de um contrato de cliente (novo ou a corrigir). */
 import type { Dispatch, SetStateAction } from "react";
-import { useTodosClientes } from "@/features/clientes";
+import { useEscolhasComerciais } from "@/features/crm";
 import { Checkbox, Select, Textarea } from "@/ui/Controlos";
 import { Field, Input } from "@/ui/Field";
 import { TIPOS_CONTRATO, type TipoContrato } from "./api";
@@ -35,7 +35,8 @@ export function CamposDoContrato({
   erros: Partial<Record<keyof CamposContrato, string | undefined>>;
   novo: boolean;
 }) {
-  const clientes = useTodosClientes(novo);
+  // Os clientes activos, sem precisar de ler clientes (B35).
+  const clientes = useEscolhasComerciais(novo);
   const campo = (k: keyof CamposContrato) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
   return (
     <div className="grid gap-4 sm:grid-cols-3">
@@ -48,13 +49,11 @@ export function CamposDoContrato({
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.cliente} onChange={campo("cliente")}>
                 <option value="">{clientes.isPending ? "A carregar…" : "Escolha…"}</option>
-                {(clientes.data?.items ?? [])
-                  .filter((c) => c.status === "Active")
-                  .map((c) => (
-                    <option key={c.customerId} value={c.customerId}>
-                      {c.name}
-                    </option>
-                  ))}
+                {(clientes.data?.customers ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </Select>
             )}
           </Field>

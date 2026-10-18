@@ -84,7 +84,7 @@ AM = AssetManager.
 | **CRM** | | | | | | | | | | |
 | Leads: ver (por estado) e a ficha, com as actividades | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
 | Leads: registar, corrigir, marcar contactado e qualificado, desqualificar com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
-| Converter um lead em cliente (novo ou já registado ¹⁵) e, se quiser, numa oportunidade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Converter um lead em cliente (novo ou já registado) e, se quiser, numa oportunidade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Oportunidades: quadro por etapa (com totais) e lista (todas as etapas), ficha com o histórico das etapas | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
 | Oportunidades: registar, corrigir, mudar de etapa, ganhar (só com cliente) e perder com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Actividades (reuniões, chamadas, e-mails, tarefas, notas): ver | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
@@ -96,17 +96,17 @@ AM = AssetManager.
 | Tipos de serviço: ver | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
 | Tipos de serviço: registar, corrigir, desactivar e reactivar | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Relatório comercial: funil por etapa, previsão por mês, ganhas e perdidas, taxa de ganho, leads por estado, por responsável | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
-| Ver o cliente de cada oportunidade e actividade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
-| Ver o responsável (nome) ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Ver o cliente e o responsável (nomes) de cada lead, oportunidade, actividade e proposta | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
+| Escolher o responsável de um lead, oportunidade ou actividade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Contratos de clientes** | | | | | | | | | | |
 | Ver (por estado, tipo e fim próximo), a ficha, os aditamentos e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
 | Registar, corrigir, activar, suspender, renovar, aditar (valor e/ou fim) e terminar com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anexar um ficheiro carregado na hora | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
-| Abrir os anexos ¹⁷ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Abrir os anexos (descarregados pelo contrato) | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
 | **Cobranças** | | | | | | | | | | |
 | Ver as facturas vencidas (por atraso) e o histórico das acções de cobrança | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Registar uma acção (chamada, e-mail, carta, visita, promessa de pagamento, escalamento), sobre o cliente ou uma factura vencida | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
-| **Ficha do cliente › Comercial**: oportunidades, propostas, contratos e acções de cobrança do cliente ¹⁸ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| **Ficha do cliente › Comercial**: oportunidades, propostas, contratos e acções de cobrança do cliente ¹⁵ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Comprovativos de pagamento** (enviados no portal) | | | | | | | | | | |
 | Ver a fila (cliente, factura, valor, datas, nota do cliente, estado) e descarregar o ficheiro | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Confirmar (regista o recibo) e rejeitar com o motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -289,10 +289,7 @@ Recursos Humanos.»
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
 ¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
-¹⁵ Escolher um cliente já registado exige ler clientes (Admin, Sales).
-¹⁶ Os nomes dos responsáveis só para quem lê os Recursos Humanos: as vistas do CRM trazem só o id (B35). O Manager também não vê o cliente de cada oportunidade (não lê clientes, B35).
-¹⁷ Só para quem lê o arquivo de documentos: os anexos não trazem o nome do ficheiro nem se descarregam pelo contrato (B37).
-¹⁸ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
+¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
 
 ---
 
@@ -427,9 +424,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Leads**
 - Lista paginada, filtro por estado (novo, contactado, qualificado,
-  desqualificado, convertido) no URL; nome, empresa, contacto, origem, data.
+  desqualificado, convertido) no URL; nome, empresa, contacto, origem,
+  responsável, data.
 - **Novo lead:** nome de quem contactar, empresa, e-mail, telefone, origem,
-  notas.
+  responsável (da lista de colaboradores activos do comercial), notas.
 - Ficha: dados, notas (como texto), responsável (com o nome), actividades;
   **corrigir**, **marcar contactado**, **qualificar**, **desqualificar** com o
   motivo (fica fechado), **converter em cliente**: um cliente novo (NIF,
@@ -444,9 +442,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   ponderado); em cada cartão o cliente ou o lead, o valor, a probabilidade,
   o fecho previsto e **mover para** outra etapa.
 - **Lista:** todas as etapas, ganhas e perdidas incluídas, filtro por etapa
-  no URL, mais recentes primeiro, com os totais.
-- **Nova oportunidade:** de um cliente ou de um lead em aberto; título,
-  valor, moeda, probabilidade (vazia fica 10%), fecho previsto, notas.
+  no URL, paginada pelo servidor (pela ordem do quadro), com os totais da
+  página.
+- **Nova oportunidade:** de um cliente activo ou de um lead em aberto;
+  título, valor, moeda, probabilidade (vazia fica 10%), fecho previsto,
+  responsável, notas.
 - Ficha: dados, histórico das etapas (com os dias em cada uma), actividades;
   **mudar de etapa**, **corrigir** (a probabilidade é obrigatória),
   **marcar como ganha** (só com cliente; de um lead, diz para converter
@@ -478,10 +478,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Actividades**
 - Todas as actividades do CRM, por fazer (por omissão), feitas ou todas, no
-  URL; tipo, assunto, notas, a que se referem (lead, oportunidade ou
-  cliente, com ligação), quando, estado (por fazer, atrasada, feita); **marcar
-  feita**. Registam-se no lead ou na oportunidade: tipo, quando (hora de
-  Luanda), assunto, notas, já feita.
+  URL, paginadas (as mais recentes primeiro); tipo, assunto, responsável,
+  notas, a que se referem (lead, oportunidade ou cliente, com ligação),
+  quando, estado (por fazer, atrasada, feita); **marcar feita**. Registam-se
+  no lead ou na oportunidade: tipo, quando (hora de Luanda), assunto,
+  responsável, notas, já feita.
 
 **Relatório comercial**
 - Período (do início do ano a hoje, por omissão) e moeda no URL: ganhas e
@@ -514,12 +515,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Cobranças**
 - **Facturas vencidas**, das mais atrasadas para as menos: factura, cliente,
   vencimento, dias de atraso, em aberto; **registar acção** em cada uma.
-- **Acções**: as mais recentes primeiro; tipo, o que foi feito (como texto),
-  cliente e factura, quando, promessa (valor na moeda da factura e data),
-  próximo contacto.
-- **Registar acção**: cliente e factura vencida (opcional), tipo, quando
-  (hora de Luanda), o que foi feito ou combinado, valor e data prometidos
-  (obrigatórios numa promessa de pagamento), próximo contacto.
+- **Acções**: paginadas, as mais recentes primeiro; tipo, o que foi feito
+  (como texto), responsável, cliente e factura, quando, promessa (valor na
+  moeda da factura e data), próximo contacto.
+- **Registar acção**: cliente (qualquer cliente activo) e factura vencida
+  (opcional), tipo, quando (hora de Luanda), o que foi feito ou combinado,
+  valor e data prometidos (obrigatórios numa promessa de pagamento), próximo
+  contacto, responsável.
 
 **Comprovativos**
 - Fila dos comprovativos enviados no portal do cliente, por omissão os **por
@@ -1101,8 +1103,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver (listas, fichas e PDF); **anular** notas de crédito e recibos.
 
 **Contratos de clientes**
-- Ver a lista, a ficha, os aditamentos e os anexos (sem os abrir nem ver o
-  cliente, B35/B37). Não regista nem muda contratos.
+- Ver a lista (com o cliente), a ficha, os aditamentos e **abrir os
+  anexos**. Não regista nem muda contratos.
 
 **Cobranças**
 - Tudo o que o Admin faz: as vencidas, o histórico e **registar acções**.
@@ -1178,13 +1180,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **avaliar agora**.
 
 **Leads**, **Oportunidades**, **Propostas**, **Actividades**, **Relatório comercial**, **Tipos de serviço** e **Modelos de proposta**
-- Ver tudo como o Admin (com o PDF das propostas) (quadro, lista, fichas, histórico, relatório), sem
-  escrever. Não vê o cliente de cada oportunidade nem o nome dos
-  responsáveis (não lê clientes nem os RH, B35).
+- Ver tudo como o Admin (quadro, lista, fichas, histórico, relatório, PDF
+  das propostas), com os nomes dos clientes e dos responsáveis, sem
+  escrever.
 
 **Contratos de clientes**
-- Ver a lista, a ficha, os aditamentos e os anexos (sem os abrir nem ver o
-  cliente, B35/B37).
+- Ver a lista (com o cliente), a ficha, os aditamentos e **abrir os
+  anexos**.
 
 **Requisições** e **Ordens de compra**
 - Tudo o que o Admin faz nas requisições e nas ordens (os nomes e a escolha do
@@ -1262,8 +1264,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver a fila e **descarregar** o ficheiro. Não confirma nem rejeita.
 
 **Contratos de clientes** e **Cobranças**
-- Tudo o que o Admin faz, salvo abrir os anexos dos contratos (B37); o
-  separador **Comercial** na ficha do cliente.
+- Tudo o que o Admin faz; o separador **Comercial** na ficha do cliente.
 
 **Pró-formas**
 - Ver, **criar**, **converter** em factura e **anular**.
@@ -1272,9 +1273,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver as vencidas.
 
 **Leads**, **Oportunidades**, **Propostas**, **Actividades**, **Relatório comercial**, **Tipos de serviço** e **Modelos de proposta**
-- Tudo o que o Admin faz no CRM e nas propostas, sem ver o nome dos responsáveis (não lê os
-  RH, B35); o responsável de um lead ou de uma oportunidade mantém-se ao
-  corrigir.
+- Tudo o que o Admin faz no CRM e nas propostas, incluindo escolher o
+  responsável (da lista do comercial, sem os RH).
 
 **Conversas** e **Base de conhecimento**
 - Tudo o que o Admin faz: responder e fechar conversas e pedidos de suporte;

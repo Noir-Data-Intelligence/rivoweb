@@ -2806,6 +2806,37 @@
         ]
       }
     },
+    "/commercial/lookups": {
+      "get": {
+        "tags": [
+          "CrmEndpoints"
+        ],
+        "summary": "Colaboradores activos e clientes activos (id e nome), para quem escreve no CRM, nos contratos ou nas cobranças.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialLookups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/commercial/leads": {
       "get": {
         "tags": [
@@ -3311,6 +3342,30 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -3323,6 +3378,16 @@
                   "items": {
                     "$ref": "#/components/schemas/OpportunityView"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3804,6 +3869,30 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -3816,6 +3905,16 @@
                   "items": {
                     "$ref": "#/components/schemas/CrmActivityView"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -4299,6 +4398,30 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -4311,6 +4434,16 @@
                   "items": {
                     "$ref": "#/components/schemas/ProposalView"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -4938,6 +5071,30 @@
               ],
               "format": "int32"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -4950,6 +5107,16 @@
                   "items": {
                     "$ref": "#/components/schemas/CustomerContractView"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -5472,6 +5639,7 @@
         "tags": [
           "CrmEndpoints"
         ],
+        "summary": "Anexa um documento carregado por quem anexa (ou qualquer um, com `documents.read`); outro dá 404 (B37).",
         "parameters": [
           {
             "name": "contractId",
@@ -5538,6 +5706,67 @@
         ]
       }
     },
+    "/commercial/contracts/{contractId}/documents/{linkId}/content": {
+      "get": {
+        "tags": [
+          "CrmEndpoints"
+        ],
+        "summary": "Descarrega um anexo do contrato (anexo, nosniff), pelo `linkId` da lista, sem `documents.read` (B37).",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/commercial/collections/actions": {
       "get": {
         "tags": [
@@ -5560,6 +5789,30 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -5572,6 +5825,16 @@
                   "items": {
                     "$ref": "#/components/schemas/CollectionActionView"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -41036,6 +41299,24 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "invoiceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -41162,6 +41443,43 @@
           "postedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "CommercialLookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CommercialLookups": {
+        "required": [
+          "employees",
+          "customers"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommercialLookupEntry"
+            }
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommercialLookupEntry"
+            }
           }
         }
       },
@@ -41377,6 +41695,12 @@
           "attachedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "fileName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -42669,6 +42993,24 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "leadName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -43205,6 +43547,12 @@
               "string"
             ],
             "format": "int32"
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -49397,6 +49745,12 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -51683,6 +52037,24 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "leadName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -52158,6 +52530,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -55802,6 +56180,18 @@
             "items": {
               "$ref": "#/components/schemas/ProposalLineView"
             }
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "leadName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

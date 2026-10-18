@@ -19,7 +19,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { useAvancarLead, useConverterLead, useDesqualificarLead, useGuardarLead, useLead, type Lead as TipoLead } from "../api";
-import { ActividadesDe, EstadoLead, NomeCliente, useNomes } from "../comum";
+import { ActividadesDe, EstadoLead, useEscolhas } from "../comum";
 import { CamposDoLead, camposDoLead } from "../FormularioLead";
 import { conversaoParaApi, errosConversao, errosLead, leadParaApi, MOEDAS, temErros, type CamposConversao } from "../regras";
 
@@ -51,7 +51,7 @@ function Corrigir({ l }: { l: TipoLead }) {
             e.preventDefault();
             setTentou(true);
             if (temErros(erros) || guardar.isPending) return;
-            guardar.mutate({ id: l.leadId, corpo: leadParaApi(v, l.ownerEmployeeId) }, { onSuccess: () => fechar(false) });
+            guardar.mutate({ id: l.leadId, corpo: leadParaApi(v) }, { onSuccess: () => fechar(false) });
           }}
         >
           <CamposDoLead v={v} setV={setV} erros={tentou ? erros : {}} />
@@ -80,8 +80,8 @@ function Avancar({ l }: { l: TipoLead }) {
 
 function Converter({ l }: { l: TipoLead }) {
   const { pode } = useUtilizador();
-  const nomes = useNomes();
-  const escolheCliente = pode("commercial.customers.read");
+  const escolhas = useEscolhas();
+  const escolheCliente = escolhas.clientes.length > 0 || pode("commercial.customers.read");
   const vazio = (): CamposConversao => ({ destino: "novo", cliente: "", nif: "", morada: "", cidade: "", pais: "AO", abrirOportunidade: true, titulo: l.company ? `${l.company}` : l.name, valor: "", moeda: "AOA" });
   const [aberto, setAberto] = useState(false);
   const [v, setV] = useState(vazio);
@@ -146,13 +146,11 @@ function Converter({ l }: { l: TipoLead }) {
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.cliente} onChange={campo("cliente")}>
                   <option value="">Escolha…</option>
-                  {nomes.clientes
-                    .filter((c) => c.status === "Active")
-                    .map((c) => (
-                      <option key={c.customerId} value={c.customerId}>
-                        {c.name} · NIF {c.taxId}
-                      </option>
-                    ))}
+                  {escolhas.clientes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </Select>
               )}
             </Field>
@@ -205,7 +203,6 @@ export default function Lead() {
   const { leadId = "" } = useParams();
   const lead = useLead(leadId);
   const { pode } = useUtilizador();
-  const nomes = useNomes();
   const desqualificar = useDesqualificarLead(leadId);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
@@ -233,7 +230,6 @@ export default function Lead() {
       <dd className="break-words text-base text-foreground">{v ?? "—"}</dd>
     </div>
   );
-  const responsavel = nomes.pessoa(l.ownerEmployeeId);
   return (
     <>
       {voltar}
@@ -270,9 +266,11 @@ export default function Lead() {
         <Alert tom="sucesso" className="mb-6" titulo="Convertido.">
           <span className="flex flex-wrap gap-x-4 gap-y-1">
             {l.convertedCustomerId ? (
-              <span>
-                Cliente: <NomeCliente id={l.convertedCustomerId} nome={nomes.cliente(l.convertedCustomerId)} />
-              </span>
+              pode("commercial.customers.read") ? (
+                <Link to={`/clientes/${l.convertedCustomerId}`} className="underline underline-offset-4">
+                  Ver o cliente
+                </Link>
+              ) : null
             ) : null}
             {l.convertedOpportunityId ? (
               <Link to={`/oportunidades/${l.convertedOpportunityId}`} className="underline underline-offset-4">
@@ -289,7 +287,7 @@ export default function Lead() {
             {linha("E-mail", l.email)}
             {linha("Telefone", l.phone)}
             {linha("Origem", l.source)}
-            {nomes.lePessoas ? linha("Responsável", responsavel) : null}
+            {linha("Responsável", l.ownerName ?? "—")}
           </dl>
           {l.notes ? <p className="mt-4 whitespace-pre-line break-words text-sm text-foreground">{l.notes}</p> : null}
         </Card>

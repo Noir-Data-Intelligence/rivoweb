@@ -18,7 +18,7 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { useGanharOportunidade, useGuardarOportunidade, useHistoricoOportunidade, useMoverOportunidade, useOportunidade, usePerderOportunidade, type EtapaAberta, type Oportunidade as TipoOportunidade } from "../api";
-import { ActividadesDe, ETAPAS, ETAPAS_ABERTAS, EtapaBadge, EstadoPropostaBadge, NomeCliente, useNomes } from "../comum";
+import { ActividadesDe, ETAPAS, ETAPAS_ABERTAS, EtapaBadge, EstadoPropostaBadge, NomeCliente } from "../comum";
 import { usePropostas } from "../propostas";
 import { CamposDaOportunidade, camposDaOportunidade } from "../FormularioOportunidade";
 import { errosOportunidade, oportunidadeParaApi, temErros } from "../regras";
@@ -51,7 +51,7 @@ function Corrigir({ o }: { o: TipoOportunidade }) {
             e.preventDefault();
             setTentou(true);
             if (temErros(erros) || guardar.isPending) return;
-            guardar.mutate({ id: o.opportunityId, corpo: oportunidadeParaApi(v, o.ownerEmployeeId, { customerId: o.customerId, leadId: o.leadId }) }, { onSuccess: () => fechar(false) });
+            guardar.mutate({ id: o.opportunityId, corpo: oportunidadeParaApi(v, { customerId: o.customerId, leadId: o.leadId }) }, { onSuccess: () => fechar(false) });
           }}
         >
           <CamposDaOportunidade v={v} setV={setV} erros={tentou ? erros : {}} nova={false} />
@@ -169,7 +169,6 @@ export default function Oportunidade() {
   const oportunidade = useOportunidade(opportunityId);
   const perder = usePerderOportunidade(opportunityId);
   const { pode } = useUtilizador();
-  const nomes = useNomes();
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/oportunidades">
@@ -239,12 +238,12 @@ export default function Oportunidade() {
         <Card>
           <CardTitle>Dados</CardTitle>
           <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
-            {linha("Cliente", o.customerId ? <NomeCliente id={o.customerId} nome={nomes.cliente(o.customerId)} /> : "—")}
+            {linha("Cliente", o.customerId ? <NomeCliente id={o.customerId} nome={o.customerName ?? null} /> : "—")}
             {linha(
               "Lead",
               o.leadId ? (
                 <Link to={`/leads/${o.leadId}`} className="underline-offset-4 hover:underline">
-                  {nomes.lead(o.leadId) ?? "Abrir o lead"}
+                  {o.leadName ?? "Abrir o lead"}
                 </Link>
               ) : (
                 "—"
@@ -253,7 +252,7 @@ export default function Oportunidade() {
             {linha("Valor estimado", moeda(o.estimatedValue, o.currency))}
             {linha("Probabilidade", `${String(o.probability)}% · ponderado ${moeda(o.weightedValue, o.currency)}`)}
             {linha("Fecho previsto", o.expectedCloseDate ? formatarData(o.expectedCloseDate) : "—")}
-            {nomes.lePessoas ? linha("Responsável", nomes.pessoa(o.ownerEmployeeId)) : null}
+            {linha("Responsável", o.ownerName ?? "—")}
           </dl>
           {o.notes ? <p className="mt-4 whitespace-pre-line break-words text-sm text-foreground">{o.notes}</p> : null}
         </Card>

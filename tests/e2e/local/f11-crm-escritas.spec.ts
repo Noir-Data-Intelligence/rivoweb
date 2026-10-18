@@ -65,8 +65,13 @@ test("F11: CRM — lead convertido, oportunidade ganha e perdida, actividade, ti
   await dialogo(page).getByLabel("Empresa (opcional)").fill(`${marca} Lopes Lda`);
   await dialogo(page).getByLabel("E-mail (opcional)").fill(`marta-${sufixo.toLowerCase()}@lopes.ao`);
   await dialogo(page).getByLabel("Origem (opcional)").fill("Feira");
+  // B35: o responsável escolhe-se da lista do comercial (a primeira pessoa activa).
+  await dialogo(page).getByLabel("Responsável (opcional)").selectOption({ index: 1 });
+  const dono = await dialogo(page).getByLabel("Responsável (opcional)").inputValue();
+  const nomeDono = (await dialogo(page).getByLabel("Responsável (opcional)").locator("option:checked").textContent()) ?? "";
   await dialogo(page).getByRole("button", { name: "Registar" }).click();
   await expect(page.getByRole("heading", { name: `${marca} Marta`, level: 1 })).toBeVisible();
+  await expect(page.getByText(nomeDono, { exact: true }).first()).toBeVisible();
   const lid = page.url().split("/").pop() ?? "";
   await page.getByRole("button", { name: "Marcar contactado" }).click();
   await expect(page.getByText("Contactado", { exact: true })).toBeVisible();
@@ -79,8 +84,9 @@ test("F11: CRM — lead convertido, oportunidade ganha e perdida, actividade, ti
   await dialogo(page).getByRole("button", { name: "Converter" }).click();
   await expect(dialogo(page)).toHaveCount(0);
   await expect(page.getByText("Convertido.", { exact: true })).toBeVisible();
-  const lead = await sa<{ status: string; convertedCustomerId: string; convertedOpportunityId: string }>("GET", `/commercial/leads/${lid}`);
+  const lead = await sa<{ status: string; convertedCustomerId: string; convertedOpportunityId: string; ownerEmployeeId: string; ownerName: string }>("GET", `/commercial/leads/${lid}`);
   expect(lead.corpo.status).toBe("Converted");
+  expect([lead.corpo.ownerEmployeeId, lead.corpo.ownerName]).toEqual([dono, nomeDono]);
   const cliente = await sa<{ name: string; taxId: string; contactPerson: string }>("GET", `/commercial/customers/${lead.corpo.convertedCustomerId}`);
   expect(cliente.corpo).toMatchObject({ name: `${marca} Lopes Lda`, taxId: nif, contactPerson: `${marca} Marta` });
 

@@ -19,15 +19,17 @@
  * - aditamento: descrição (2000), data de efeito (ou hoje), soma ao valor e/ou
  *   muda o fim (pelo menos um), sem deixar o valor negativo; numerado; o
  *   contrato fica com os valores novos;
- * - anexo: um documento carregado em `/documents` e a categoria (60; vazia,
- *   «contrato»); a lista não traz o nome do ficheiro nem há como o descarregar
- *   pelo contrato (B37): só quem lê o arquivo o abre;
- * - a lista vem ordenada pelo fim (sem fim, no fim) e diz os dias até
- *   acabar; `expiringWithinDays` filtra os que acabam dentro desse prazo.
+ * - anexo: um documento carregado em `/documents` por quem anexa (ou
+ *   qualquer um, com `documents.read`; outro dá 404) e a categoria (60;
+ *   vazia, «contrato»); a lista traz o nome do ficheiro e descarrega-se pelo
+ *   contrato, em anexo, com `commercial.contracts.read` (B37);
+ * - a lista vem ordenada pelo fim (sem fim, no fim), com o nome do cliente,
+ *   paginada com `page` (B35), e diz os dias até acabar; `expiringWithinDays`
+ *   filtra os que acabam dentro desse prazo.
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { descarregar } from "@/lib/api/download";
-import { api, enviar, ler } from "@/lib/api/client";
+import { api, enviar, ler, lerPagina } from "@/lib/api/client";
 import { useEscrita } from "@/lib/api/escrita";
 import type { components } from "@/lib/api/schema";
 
@@ -61,6 +63,20 @@ export function useContratosClientes(f: { estado: EstadoContrato | null; tipo: T
           params: {
             query: { ...(f.estado ? { status: f.estado } : {}), ...(f.tipo ? { kind: f.tipo } : {}), ...(f.aExpirar !== null ? { expiringWithinDays: f.aExpirar } : {}), ...(f.cliente ? { customerId: f.cliente } : {}) },
           },
+          signal,
+        }),
+      ),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useContratosPagina(f: { estado: EstadoContrato | null; tipo: TipoContrato | null; aExpirar: number | null; pagina: number; tamanho: number }) {
+  return useQuery({
+    queryKey: [...chaves.contratos, "page", f],
+    queryFn: ({ signal }) =>
+      lerPagina(
+        api.GET("/commercial/contracts", {
+          params: { query: { page: f.pagina, pageSize: f.tamanho, ...(f.estado ? { status: f.estado } : {}), ...(f.tipo ? { kind: f.tipo } : {}), ...(f.aExpirar !== null ? { expiringWithinDays: f.aExpirar } : {}) } },
           signal,
         }),
       ),
@@ -122,12 +138,10 @@ export function useAnexar(id: string) {
   return useEscrita({ mutationFn: (corpo: S["AttachRequest"]) => ler(api.POST("/commercial/contracts/{contractId}/documents", { params: { path: { contractId: id } }, body: corpo })), onSuccess: invalidar });
 }
 
-/** Só com `documents.read` (B37): pelo arquivo, sempre em anexo. */
-export function useDescarregarAnexo() {
-  return useEscrita({ mutationFn: (a: { documentId: string; nome: string }) => descarregar(`/documents/${encodeURIComponent(a.documentId)}`, a.nome) });
-}
-
-/** Nome do ficheiro anexado, pelo arquivo (`documents.read`, B37). */
-export function useMetadadosDocumento(documentId: string) {
-  return useQuery({ queryKey: ["documents", "metadata", documentId], queryFn: ({ signal }) => ler(api.GET("/documents/{documentId}/metadata", { params: { path: { documentId } }, signal })) });
+/** Pelo contrato, sempre em anexo (B37). */
+export function useDescarregarAnexo(contractId: string) {
+  return useEscrita({
+    mutationFn: (a: Pick<Anexo, "linkId" | "fileName" | "category">) =>
+      descarregar(`/commercial/contracts/${encodeURIComponent(contractId)}/documents/${encodeURIComponent(a.linkId)}/content`, a.fileName ?? `${a.category}.pdf`),
+  });
 }
