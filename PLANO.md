@@ -1940,7 +1940,7 @@ como texto, sem `SafeHtml`. Os projectos do portal ficam na F12 (§5.13).
 nem factura, nem ficheiro) e **B33** (o Sales não liga contas nem partilha
 documentos; nota de segurança sobre partilhar qualquer `documentId`).
 
-**Bloco 1 — portal do cliente** (2026-10-17, por publicar).
+**Bloco 1 — portal do cliente** (2026-10-17, publicado em `ff82398`; CI verde).
 - **Ecrãs:** `/cliente` (em dívida hoje, facturado no mês, facturas com
   «Enviar comprovativo»), `/cliente/extracto` (período no URL),
   `/cliente/pagamentos` (`?factura=` abre o envio), `/cliente/documentos`,
@@ -1986,7 +1986,7 @@ ligar só contas Cliente).
 **B31 no front:** «Entregar a um colaborador» escolhe da lista dos activos;
 o aviso «(B31)» saiu e o AssetManager e o Finance entregam.
 
-**Bloco 2 — o lado da equipa** (2026-10-18, por publicar).
+**Bloco 2 — o lado da equipa** (2026-10-18, publicado em `e8537e6`: CI `39083133764` verde, deploy da Vercel confirmado, smoke de produção 10/10 só com leituras e sem abrir artigos do portal). **F10 fechada.**
 - **Ecrãs:** `/comprovativos` (Vendas; por omissão os por confirmar, estado
   no URL), `/conversas` e `/conversas/:id` (grupo «Apoio ao cliente»;
   abertas por omissão, estado e tipo no URL), `/base-conhecimento`,

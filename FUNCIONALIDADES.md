@@ -1,30 +1,15 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F9** publicadas em
+> **Estado:** fases **F0 a F10** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7: recursos humanos completos — portal do colaborador, RH do
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
 > formação, turnos, declarações, desempenho, conquistas e importação de
 > colaboradores; F8: salários — folhas de pagamento; F9: compras —
-> requisições, ordens de compra, recepções —, inventário e activos fixos).
-> **F10** concluída e verificada na base local, por publicar: portal do
-> cliente (1.º bloco) e o lado da equipa — comprovativos, conversas, base de
-> conhecimento, portal na ficha do cliente e arquivo de documentos (2.º
-> bloco) · actualizado a 2026-10-18.
->
-> Este documento cresce com o front: no fim de cada fase entram as
-> funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
-pronto a publicar quando o estado acima o diz). O
-> que o backend tem e o front ainda não mostra está na última secção.
->
-> **Fonte:** o catálogo real de perfis (`GET /settings/overview`, guardado em
-> `tests/fixtures/catalogo-perfis.json`) cruzado com as permissões que cada ecrã
-> e cada botão exigem no código (`src/app/requisitos.ts` e as guardas `Can`).
-> O teste `tests/unit/menu.test.tsx` e o smoke por perfil em produção
-> (`tests/e2e/leitura/perfis.spec.ts`) confirmam os menus aqui descritos.
->
-> **Regra de fundo:** esconder não protege. O front só mostra o que a conta
-> pode usar, mas quem decide é sempre o backend.
+> requisições, ordens de compra, recepções —, inventário e activos fixos;
+> F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
+> de conhecimento, portal na ficha do cliente e arquivo de documentos) ·
+> actualizado a 2026-10-18.
 
 ---
 
