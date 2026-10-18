@@ -142,7 +142,7 @@ export default function Pagamentos() {
         </div>
       ),
     },
-    { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (c) => moeda(c.amount, daFactura(c.salesInvoiceId)?.currency) },
+    { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (c) => moeda(c.amount, c.currency ?? daFactura(c.salesInvoiceId)?.currency) },
   ];
   return (
     <>

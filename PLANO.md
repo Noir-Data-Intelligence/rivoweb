@@ -1983,6 +1983,11 @@ catálogo de perfis dos testes foi actualizado a partir de produção (+
 `documents.write` no Sales). Novo pedido: **B34** (moeda nos comprovativos;
 ligar só contas Cliente).
 
+**B34 resolvido** (PR #110, 2026-10-18, `2b84331`): a fila e o portal
+mostram a moeda da factura (`currency`); ligar uma conta sem o perfil Cliente
+dá 409 (verificado nas escritas locais). Produção já traz `currency` (só
+nomes de campos).
+
 **B31 no front:** «Entregar a um colaborador» escolhe da lista dos activos;
 o aviso «(B31)» saiu e o AssetManager e o Finance entregam.
 

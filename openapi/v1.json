@@ -52940,6 +52940,7 @@
           "customerId",
           "customerName",
           "amount",
+          "currency",
           "paidOn",
           "status",
           "rejectionReason",
@@ -52980,6 +52981,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "paidOn": {
             "type": "string",
@@ -53078,6 +53085,12 @@
           "submittedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

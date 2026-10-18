@@ -60,7 +60,7 @@ test.describe("comprovativos", () => {
     await expect(tabela.getByRole("link", { name: "FT 2026/57" }).first()).toHaveAttribute("href", `/facturas/${IDF10B.factura}`);
     await expect(tabela).toContainText('Nota do cliente: <img src=x onerror="alert(1)"> Transferência do BAI.');
     await semHtmlInjectado(page);
-    await expect(tabela).toContainText("500 000,00");
+    await expect(tabela).toContainText("500 000,00 Kz");
     await verificar(page);
 
     const descarga = page.waitForEvent("download");
@@ -79,6 +79,7 @@ test.describe("comprovativos", () => {
 
     await page.getByRole("button", { name: "Confirmar o pagamento de Cliente Teste, Lda (FT 2026/57)" }).first().click();
     await expect(d).toContainText("por transferência bancária a 15/10/2026");
+    await expect(d).toContainText("Regista um recibo de 500 000,00 Kz para FT 2026/57");
     await d.getByRole("button", { name: "Confirmar e registar o recibo" }).click();
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`)).toHaveLength(1);
@@ -96,6 +97,7 @@ test.describe("comprovativos", () => {
     await page.goto("/comprovativos?estado=todos");
     await expect(page.getByRole("table", { name: "Comprovativos" }).getByRole("link", { name: "Cliente Teste, Lda" }).first()).toHaveAttribute("href", `/clientes/${IDF3.cliente}`);
     await expect(page.getByText("O valor não entrou na conta.")).toBeVisible();
+    await expect(page.getByRole("table", { name: "Comprovativos" })).toContainText("120 000,50 USD");
     await expect(page.getByRole("button", { name: /^Descarregar o comprovativo/ })).toHaveCount(2);
     await expect(page.getByRole("button", { name: /^Confirmar o pagamento/ })).toHaveCount(0);
     await expect(page.getByRole("button", { name: /^Rejeitar o comprovativo/ })).toHaveCount(0);

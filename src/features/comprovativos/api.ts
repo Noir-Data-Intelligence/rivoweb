@@ -11,6 +11,7 @@
  *   bancária na data do pagamento e devolve o `receiptId`; só um pedido
  *   pendente se confirma (409); se o recibo falhar (série em falta, período
  *   fechado), o pedido continua pendente e o motivo vem no 409;
+ * - o valor vem na moeda da factura (`currency`, B34);
  * - rejeitar pede o motivo (até 500 caracteres); não apaga nada.
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";

@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `87807cc`. Em aberto: **B24** (configuração) e
-> **B34** (comprovativos e contas do portal).
+> Revisto contra `main` @ `2b84331`. Em aberto: **B24** (configuração).
+> **B34** está resolvido (PR #110) e o front já o usa: a fila de comprovativos
+> e o portal mostram a moeda da factura; ligar uma conta sem o perfil Cliente
+> dá 409 (verificado na base local).
 > **B31** a **B33** estão resolvidos (PR #109, ADR-087) e o front já os usa:
 > o Finance e o AssetManager entregam activos pela lista dos activos; a fila
 > de comprovativos traz o cliente, a factura, a nota e o ficheiro, que se
@@ -311,6 +313,8 @@ documentos carregados para partilha (por exemplo, uma categoria própria) ou
 pedir também `documents.read`.
 
 ## B34 — A fila de comprovativos não diz a moeda; ligar aceita qualquer conta
+
+> **Resolvido** (PR #110, 2026-10-18); o front usa-o e foi verificado na base local (`2b84331`).
 
 **Facto 1:** `PaymentClaimReviewView` (e `PaymentClaimView`, no portal) traz
 `amount` sem a moeda. A factura pode estar em AOA, USD ou EUR, e confirmar

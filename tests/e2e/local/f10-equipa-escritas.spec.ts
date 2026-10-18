@@ -7,7 +7,8 @@
  * artigo; a fila de comprovativos sem decidir. Como Admin: descarregar,
  * confirmar (regista o recibo) e rejeitar comprovativos, ler o arquivo e
  * revogar a partilha. Confere no servidor. B33: o Sales não partilha um
- * ficheiro que não carregou (404).
+ * ficheiro que não carregou (404). B34: ligar uma conta sem o perfil Cliente
+ * dá 409; a fila mostra a moeda da factura.
  */
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
@@ -115,6 +116,11 @@ test("F10: o lado da equipa — conta e partilha no cliente, suporte, artigos, c
   const roubo = await vd("POST", `/commercial/customers/${cid}/shared-documents`, { documentId: alheio, title: `${marca} alheio`, category: null });
   expect(roubo.status).toBe(404);
 
+  // B34: só uma conta com o perfil Cliente se liga a um cliente (a de um Sales dá 409).
+  const outro = await sa<{ customerId: string }>("POST", "/commercial/customers", { name: `${marca} Outro`, taxId: `8${nif.slice(1)}`, addressDetail: "Rua do Teste, 2", city: "Luanda" });
+  expect(outro.status, JSON.stringify(outro.corpo)).toBe(201);
+  expect((await sa("POST", `/commercial/customers/${outro.corpo.customerId}/account`, { userId: contaVendas.userId })).status).toBe(409);
+
   // --- O cliente (API): dois comprovativos e um pedido de suporte ---
   const { chamar: cl, token: tokenCl } = await sessaoApi(request, contaCliente.email, PASSWORD_LOCAL);
   const doc1 = await carregar(request, tokenCl, "transferencia-1.pdf", "Comprovativo de pagamento");
@@ -183,6 +189,7 @@ test("F10: o lado da equipa — conta e partilha no cliente, suporte, artigos, c
   await entrar(admin, process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "", process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "");
   await admin.goto("/comprovativos");
   const nome = `${marca} Cliente`;
+  await expect(admin.getByRole("row").filter({ hasText: `${marca} primeira` })).toContainText("60 000,00 Kz");
   const descarga = admin.waitForEvent("download");
   await admin.getByRole("row").filter({ hasText: `${marca} primeira` }).getByRole("button", { name: `Descarregar o comprovativo de ${nome} (transferencia-1.pdf)` }).click();
   expect((await descarga).suggestedFilename()).toBe("transferencia-1.pdf");

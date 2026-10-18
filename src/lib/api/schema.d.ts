@@ -41765,6 +41765,7 @@ export interface components {
             customerName: null | string;
             /** Format: double */
             amount: number | string;
+            currency: null | string;
             /** Format: date */
             paidOn: string;
             /** @enum {string} */
@@ -41793,6 +41794,7 @@ export interface components {
             rejectionReason: null | string;
             /** Format: date-time */
             submittedAt: string;
+            currency?: null | string;
         };
         PaymentExecutedResponse: {
             estado: string;

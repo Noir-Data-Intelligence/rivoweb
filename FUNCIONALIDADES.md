@@ -395,7 +395,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Fila dos comprovativos enviados no portal do cliente, por omissão os **por
   confirmar** (também confirmados, rejeitados ou todos; o estado fica no
   URL): cliente (ligação à ficha), factura (ligação), data do pagamento, data
-  do envio, valor pago (na moeda da factura), estado, motivo da rejeição e a
+  do envio, valor pago (com a moeda da factura), estado, motivo da rejeição e a
   nota do cliente (sempre como texto).
 - **Descarregar** o ficheiro do comprovativo (sempre em anexo).
 - **Confirmar**: regista um recibo por transferência bancária na data do

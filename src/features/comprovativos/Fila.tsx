@@ -5,6 +5,7 @@
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
 import { EstadoComprovativo } from "@/features/portalcliente";
 import { formatarData, formatarDataHora } from "@/lib/format/data";
@@ -23,8 +24,8 @@ import { erroMotivo, MAXIMO_MOTIVO, useConfirmarComprovativo, useDescarregarComp
 
 const quem = (p: PedidoComprovativo) => p.customerName ?? "Cliente";
 const qual = (p: PedidoComprovativo) => p.invoiceNumber ?? "a factura";
-/** Na moeda da factura, que o pedido não diz (B34). */
-const valor = (p: PedidoComprovativo) => formatarNumeroDecimal(paraApi(dinheiro(p.amount)), 2);
+/** Na moeda da factura (B34); sem ela, só o número. */
+const valor = (p: PedidoComprovativo) => (p.currency ? moeda(p.amount, p.currency) : formatarNumeroDecimal(paraApi(dinheiro(p.amount)), 2));
 
 function Descarregar({ p }: { p: PedidoComprovativo }) {
   const d = useDescarregarComprovativo();
@@ -55,7 +56,7 @@ function ConfirmarPedido({ p, aoConfirmar }: { p: PedidoComprovativo; aoConfirma
           if (!x) confirmar.reset();
         }}
         titulo={`Confirmar o pagamento de ${quem(p)}`}
-        descricao={`Regista um recibo de ${valor(p)} (na moeda da factura) para ${qual(p)}, por transferência bancária a ${formatarData(p.paidOn)}. Confira o ficheiro antes: o recibo só se desfaz anulando-o.`}
+        descricao={`Regista um recibo de ${valor(p)} para ${qual(p)}, por transferência bancária a ${formatarData(p.paidOn)}. Confira o ficheiro antes: o recibo só se desfaz anulando-o.`}
         rotuloConfirmar="Confirmar e registar o recibo"
         aCarregar={confirmar.isPending}
         erro={confirmar.error ? <ErrorPanel erro={confirmar.error} /> : undefined}
