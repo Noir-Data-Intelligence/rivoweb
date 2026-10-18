@@ -62,6 +62,8 @@ export const PAGINAS = {
   contratosClientes: () => import("@/features/contratos/pages/Contratos"),
   contratoCliente: () => import("@/features/contratos/pages/Contrato"),
   cobrancas: () => import("@/features/cobrancas/pages/Cobrancas"),
+  projectos: () => import("@/features/projectos/pages/Projectos"),
+  projecto: () => import("@/features/projectos/pages/Projecto"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `a281377`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `a281377`. Em aberto: **B24** (configuração) e
+> **B38** (nomes e escolhas nos projectos, F12).
 > **B35** a **B37** estão resolvidos (PR #111 e #112) e o front já os usa:
 > nomes de clientes, leads, responsáveis e facturas nas vistas do comercial;
 > responsável e cliente escolhidos em `/commercial/lookups`; listas
@@ -435,3 +436,32 @@ ficheiro de outra área.
    `commercial.contracts.read`, sempre em anexo.
 2. Anexar só documentos carregados por quem anexa (salvo `documents.read`),
    com a mesma resposta de «não existe».
+
+## B38 — Os projectos só trazem ids de pessoas, recursos e autores, e o ProjectManager não os escolhe
+
+**Facto 1 (nomes):** `ProjectTaskView`, `BoardCard` e `TaskPlanView` trazem
+`assignedEmployeeId`; `TimeEntryView` e `TimeByEmployee`, `employeeId`;
+`ResourceAllocationView`, `resourceId` (colaborador ou viatura); `CommentView`,
+`authorUserId`. O ProjectManager só tem `projects.projects.read/.write`
+(catálogo de produção, 2026-10-18): não lê colaboradores, clientes nem
+viaturas.
+
+**Consequência:** o ProjectManager não vê a quem está atribuída uma tarefa,
+quem registou as horas, que recurso está alocado nem quem comentou. O front
+mostra «—», nunca o id.
+
+**Facto 2 (escolhas):** atribuir uma tarefa, registar tempo e alocar um
+recurso pedem o id e o servidor confirma que existe (`IEmployeeDirectory`,
+`IVehicleDirectory`); ligar o projecto a um cliente (visibilidade no portal)
+pede o `customerId` (`ICustomerDirectory`). O ProjectManager não tem como
+listar nenhum deles.
+
+**Consequência:** o ProjectManager não atribui tarefas, não regista tempo de
+ninguém, não aloca recursos nem mostra o projecto a um cliente; o front
+explica porquê.
+
+**Pedido** (como o B22, o B29, o B31 e o B35):
+1. `assignedEmployeeName`, `employeeName`, `resourceName` e `authorName` ao
+   lado dos ids.
+2. `GET /projects/lookups` para quem tem `projects.projects.write`:
+   colaboradores activos, viaturas activas e clientes activos (id e nome).

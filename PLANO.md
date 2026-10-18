@@ -1925,6 +1925,37 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 - **Testes:** 180 unitários; interface 5 cenários × 3 motores; suite inteira
   471, sem instáveis.
 
+### F12 — Projectos e frota
+
+**Inventário** (2026-10-18, contra `a281377` e produção, só códigos e
+contagens): 25 projectos (ProjectManager 200 em tudo), registo de tempo 200,
+o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
+(atribuições, tempo, autores) e recursos, e o ProjectManager só tem
+`projects.*`: **B38** (nomes e `GET /projects/lookups`).
+
+**Bloco 1 — projectos** (2026-10-18, por publicar).
+- **Ecrãs:** `/projectos` (fechados no URL) e `/projectos/:id` com as vistas
+  resumo, tarefas, quadro e Gantt (no URL); grupo «Projectos» no menu
+  (Admin, ProjectManager).
+- **Regras:** um só `useAcaoProjecto` por acto; datas de marcos e tarefas
+  não antes do início do projecto, prazo não antes do início da tarefa; a
+  moeda do orçamento não muda numa revisão; mover para «Feita» conclui;
+  dependências informativas, ciclos recusados pelo servidor; os comentários
+  de marco assinam com o nome da conta (editável; vazio, «Equipa») porque o
+  cliente os vê; atribuir só a quem lê os RH (B38), e o porquê para os
+  outros; o Gantt é uma tabela com o texto completo e a barra como reforço,
+  com scroll próprio (focável) e `relative` para o `sr-only` não alargar a
+  página.
+- **Escritas:** verificadas **na base local** (`f12-projectos-escritas.spec.ts`,
+  à primeira): como ProjectManager, projecto aberto, orçamento 5 000 000,50,
+  marco alcançado e comentado, três tarefas (uma planeada com 24,5 h e
+  prioridade alta, uma cancelada), dependência, quadro (em curso; feita
+  conclui), Gantt com a dependência, progresso 50% (1 de 2 não canceladas),
+  fecho recusado antes do início e aceite a 30/06/2026. **Nenhuma escrita em
+  produção.**
+- **Testes:** 219 unitários; interface 4 cenários × 3 motores; suite inteira
+  576, sem falhas nem instáveis (24 saltados).
+
 ### F11 — Comercial avançado
 
 **Inventário** (2026-10-18, contra `2b84331` e produção, só códigos e

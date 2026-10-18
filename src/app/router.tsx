@@ -141,6 +141,9 @@ export const rotas: RouteObject[] = [
               { path: "contratos-clientes", element: protegido(R["/contratos-clientes"], pagina("contratosClientes")) },
               { path: "contratos-clientes/:contractId", element: protegido(R["/contratos-clientes"], pagina("contratoCliente")) },
               { path: "cobrancas", element: protegido(R["/cobrancas"], pagina("cobrancas")) },
+              // F12 — projectos (§5.13).
+              { path: "projectos", element: protegido(R["/projectos"], pagina("projectos")) },
+              { path: "projectos/:projectId", element: protegido(R["/projectos"], pagina("projecto")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).
