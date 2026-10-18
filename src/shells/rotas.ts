@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeftRight, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { Archive, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -29,7 +29,10 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/proformas", titulo: "Pró-formas", icone: FileClock, requer: R["/proformas"], grupo: "Vendas" },
     { caminho: "/notas-credito", titulo: "Notas de crédito", icone: FileMinus, requer: R["/notas-credito"], grupo: "Vendas" },
     { caminho: "/recibos", titulo: "Recibos", icone: Receipt, requer: R["/recibos"], grupo: "Vendas" },
+    { caminho: "/comprovativos", titulo: "Comprovativos", icone: BadgeCheck, requer: R["/comprovativos"], grupo: "Vendas" },
     { caminho: "/a-receber", titulo: "A receber", icone: Hourglass, requer: R["/a-receber"], grupo: "Vendas" },
+    { caminho: "/conversas", titulo: "Conversas", icone: MessagesSquare, requer: R["/conversas"], grupo: "Apoio ao cliente" },
+    { caminho: "/base-conhecimento", titulo: "Base de conhecimento", icone: Library, requer: R["/base-conhecimento"], grupo: "Apoio ao cliente" },
     { caminho: "/requisicoes", titulo: "Requisições", icone: ClipboardList, requer: R["/requisicoes"], grupo: "Compras" },
     { caminho: "/encomendas", titulo: "Ordens de compra", icone: ShoppingCart, requer: R["/encomendas"], grupo: "Compras" },
     { caminho: "/recepcoes", titulo: "Recepções", icone: PackageCheck, requer: R["/recepcoes"], grupo: "Compras" },
@@ -75,6 +78,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/pedidos-internos", titulo: "Pedidos internos", icone: MessageSquare, requer: R["/pedidos-internos"], grupo: "Serviços" },
     { caminho: "/declaracoes", titulo: "Declarações", icone: FileText, requer: R["/declaracoes"], grupo: "Serviços" },
     { caminho: "/salarios", titulo: "Folhas de pagamento", icone: Banknote, requer: R["/salarios"], grupo: "Salários" },
+    { caminho: "/documentos", titulo: "Arquivo de documentos", icone: Archive, requer: R["/documentos"], grupo: "Administração" },
     { caminho: "/utilizadores", titulo: "Utilizadores", icone: KeyRound, requer: R["/utilizadores"], grupo: "Administração" },
     {
       caminho: "/configuracoes",

@@ -274,7 +274,8 @@
    "messaging.conversations.read",
    "messaging.conversations.write",
    "messaging.knowledge_base.write",
-   "ai.assistant.use"
+   "ai.assistant.use",
+   "documents.write"
   ]
  }
 ]

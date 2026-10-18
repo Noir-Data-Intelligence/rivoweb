@@ -81,7 +81,15 @@ export const REQUISITO_PAGINA = {
   "/contagens": "inventory.items.read",
   "/valorizacao": "inventory.items.read",
   "/activos": "finance.assets.read",
+  // F10 — portal do cliente: o lado da equipa (§5.13).
+  "/comprovativos": "finance.receipts.read",
+  "/conversas": "messaging.conversations.read",
+  "/base-conhecimento": "messaging.conversations.read",
+  "/documentos": "documents.read",
 } as const satisfies Record<string, Requisito>;
+
+/** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */
+export const REQUISITO_NOVO_ARTIGO = { allOf: ["messaging.knowledge_base.write", "messaging.conversations.read"] } as const satisfies Requisito;
 
 /** Lançar à mão: escrever no razão e ler os diários e as contas. */
 export const REQUISITO_NOVO_LANCAMENTO = { allOf: ["finance.ledger.write", "finance.ledger.read"] } as const satisfies Requisito;

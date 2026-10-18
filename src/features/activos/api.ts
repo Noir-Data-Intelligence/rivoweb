@@ -15,6 +15,8 @@
  *   que saltou;
  * - abate depois da aquisição, valor de venda não negativo; um activo abatido
  *   não recebe manutenção nem se entrega;
+ * - a quem entregar: `GET /finance/assets/lookups` dá os colaboradores activos
+ *   (id e nome) a quem tem `finance.assets.write`, sem as permissões de RH (B31);
  * - manutenção agendada conclui-se (custo ≥ 0) ou cancela-se; custódia só de um
  *   activo em uso, devolução não antes da entrega; apólice não acaba antes de
  *   começar, prémio e capital ≥ 0; cancelada não se altera.
@@ -37,6 +39,11 @@ export const chaves = {
   activos: ["finance", "assets"] as const,
 };
 const invalidar = (qc: ReturnType<typeof useQueryClient>) => qc.invalidateQueries({ queryKey: chaves.activos });
+
+/** Colaboradores activos a quem entregar um activo (B31). */
+export function useEscolhasActivos(activo = true) {
+  return useQuery({ queryKey: [...chaves.activos, "lookups"], queryFn: ({ signal }) => ler(api.GET("/finance/assets/lookups", { signal })), enabled: activo, staleTime: 60_000 });
+}
 
 export function useActivos(f: { estado: "Active" | "Disposed" | null; categoria: string | null }) {
   return useQuery({

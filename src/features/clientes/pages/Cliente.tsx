@@ -17,7 +17,9 @@ import { Checkbox } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
+import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import { useCliente, useContactos, useCorrigirCliente, useEliminarCliente, useEstadoCliente, useGuardarContacto, useRemoverContacto, type Contacto, type FichaCliente } from "../api";
+import { PortalDoCliente } from "./Portal";
 import { CAMPOS_CLIENTE, CamposCliente, esquemaCliente, TIPOS_CONTA, type DadosCliente } from "./Clientes";
 
 type Ficha = { dados: FichaCliente; versao: string | null; recarregar: () => void };
@@ -345,10 +347,17 @@ function Contactos({ customerId }: { customerId: string }) {
   );
 }
 
+type VistaCliente = "resumo" | "portal";
+const VISTAS: readonly Vista<VistaCliente>[] = [
+  { valor: "resumo", texto: "Resumo" },
+  { valor: "portal", texto: "Portal do cliente" },
+];
+
 export default function Cliente() {
   const { customerId = "" } = useParams();
   const cliente = useCliente(customerId);
   const { pode } = useUtilizador();
+  const vista = useVista(VISTAS);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/clientes">
@@ -393,25 +402,30 @@ export default function Cliente() {
           <EstadoEEliminar ficha={ficha} />
         </div>
       </Can>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardTitle>Dados</CardTitle>
-          <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
-            {linha("Morada de facturação", `${d.billingAddress.detail}, ${d.billingAddress.city}, ${d.billingAddress.country}`)}
-            {linha("E-mail", d.email)}
-            {linha("Telefone", d.phone)}
-            {linha("Pessoa de contacto", d.contactPerson)}
-            {linha("Sector", d.industry)}
-            {linha("Sítio na internet", d.website)}
-          </dl>
-          {pode("finance.invoices.read") ? (
-            <Button asChild variante="link" className="mt-4">
-              <Link to={`/facturas?cliente=${d.customerId}`}>Ver facturas deste cliente</Link>
-            </Button>
-          ) : null}
-        </Card>
-        <Contactos customerId={d.customerId} />
-      </div>
+      <Vistas rotulo="Cliente" vistas={VISTAS} actual={vista} />
+      {vista === "portal" ? (
+        <PortalDoCliente customerId={d.customerId} nome={d.name} />
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardTitle>Dados</CardTitle>
+            <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+              {linha("Morada de facturação", `${d.billingAddress.detail}, ${d.billingAddress.city}, ${d.billingAddress.country}`)}
+              {linha("E-mail", d.email)}
+              {linha("Telefone", d.phone)}
+              {linha("Pessoa de contacto", d.contactPerson)}
+              {linha("Sector", d.industry)}
+              {linha("Sítio na internet", d.website)}
+            </dl>
+            {pode("finance.invoices.read") ? (
+              <Button asChild variante="link" className="mt-4">
+                <Link to={`/facturas?cliente=${d.customerId}`}>Ver facturas deste cliente</Link>
+              </Button>
+            ) : null}
+          </Card>
+          <Contactos customerId={d.customerId} />
+        </div>
+      )}
     </>
   );
 }

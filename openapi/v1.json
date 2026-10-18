@@ -2551,6 +2551,40 @@
         ]
       }
     },
+    "/commercial/customers/account-candidates": {
+      "get": {
+        "tags": [
+          "CommercialModuleEndpoints"
+        ],
+        "summary": "Contas com o perfil Cliente ainda sem cliente (id e e-mail), para ligar ao portal.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerAccountCandidate"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/commercial/customers/{customerId}/account": {
       "post": {
         "tags": [
@@ -5982,7 +6016,7 @@
         "tags": [
           "RelationshipEndpoints"
         ],
-        "summary": "Partilha com o cliente um documento já carregado em /documents. Aparece em /customer-portal/me/documents.",
+        "summary": "Partilha com o cliente um documento carregado em /documents por quem partilha (ou qualquer um, com `documents.read`). Aparece em /customer-portal/me/documents.",
         "parameters": [
           {
             "name": "customerId",
@@ -9117,7 +9151,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PaymentClaimView"
+                    "$ref": "#/components/schemas/PaymentClaimReviewView"
                   }
                 }
               }
@@ -9129,6 +9163,58 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/payment-claims/{claimId}/document": {
+      "get": {
+        "tags": [
+          "FinanceModuleEndpoints"
+        ],
+        "summary": "Descarrega o comprovativo do pedido de confirmação (anexo, nosniff), sem `documents.read` (B32).",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -13299,6 +13385,37 @@
                   "items": {
                     "$ref": "#/components/schemas/AssetCustodyView"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/assets/lookups": {
+      "get": {
+        "tags": [
+          "SpendingEndpoints"
+        ],
+        "summary": "Colaboradores activos (id e nome) a quem entregar um activo, sem as permissões de RH (B31).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetLookups"
                 }
               }
             }
@@ -38538,6 +38655,20 @@
           }
         }
       },
+      "AssetLookups": {
+        "required": [
+          "employees"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LookupEntry"
+            }
+          }
+        }
+      },
       "AssetMaintenanceView": {
         "required": [
           "maintenanceId",
@@ -42826,6 +42957,22 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "CustomerAccountCandidate": {
+        "required": [
+          "userId",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
           }
         }
       },
@@ -52782,6 +52929,91 @@
           "receiptId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "PaymentClaimReviewView": {
+        "required": [
+          "id",
+          "salesInvoiceId",
+          "invoiceNumber",
+          "customerId",
+          "customerName",
+          "amount",
+          "paidOn",
+          "status",
+          "rejectionReason",
+          "submittedAt",
+          "notes",
+          "fileName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "salesInvoiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoiceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "enum": [
+              "Pending",
+              "Confirmed",
+              "Rejected"
+            ],
+            "type": "string"
+          },
+          "rejectionReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fileName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

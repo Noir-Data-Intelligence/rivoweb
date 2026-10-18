@@ -1,8 +1,14 @@
 # Pedidos ao backend
 
-> 2026-10-17 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `727666d`. Em aberto: **B24** (configuração),
-> **B31** (activos), **B32** e **B33** (portal do cliente).
+> 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
+> Revisto contra `main` @ `87807cc`. Em aberto: **B24** (configuração) e
+> **B34** (comprovativos e contas do portal).
+> **B31** a **B33** estão resolvidos (PR #109, ADR-087) e o front já os usa:
+> o Finance e o AssetManager entregam activos pela lista dos activos; a fila
+> de comprovativos traz o cliente, a factura, a nota e o ficheiro, que se
+> descarrega pelo pedido; o Sales liga contas pela lista de contas Cliente por
+> ligar e partilha ficheiros que carrega (e não os alheios: 404, verificado na
+> base local).
 > **B29** e **B30** estão resolvidos (PR #108) e o front já os usa: nomes nas
 > requisições e recepções, departamentos em `/procurement/lookups`, linhas pela
 > ordem em que foram escritas. **B26** a **B28** estão resolvidos (PR #107,
@@ -237,6 +243,8 @@ devolver as linhas por essa ordem.
 
 ## B31 — Quem gere os activos não escolhe a quem os entrega
 
+> **Resolvido** (PR #109, 2026-10-18); o front usa-o e foi verificado na base local (`87807cc`).
+
 **Facto:** `POST /finance/assets/{assetId}/custody` pede `employeeId`, mas o
 Finance e o AssetManager, que têm `finance.assets.write`, não têm
 `hr.employees.read` (lido em `/identity/me` de produção a 2026-10-17). A
@@ -251,6 +259,8 @@ os Recursos Humanos.
 `GET /finance/assets/lookups`.
 
 ## B32 — Quem confirma um comprovativo não o vê
+
+> **Resolvido** (PR #109, 2026-10-18); o front usa-o e foi verificado na base local (`87807cc`).
 
 **Facto:** `GET /finance/payment-claims` (`finance.receipts.read`) devolve
 `PaymentClaimView` com `id`, `salesInvoiceId`, `amount`, `paidOn`, `status`,
@@ -272,6 +282,8 @@ da factura. O front não deve oferecer «Confirmar» às cegas.
    sempre em anexo (`Content-Disposition: attachment`).
 
 ## B33 — O Sales gere o portal do cliente, mas não liga contas nem partilha
+
+> **Resolvido** (PR #109, ADR-087, 2026-10-18); o front usa-o e foi verificado na base local (`87807cc`).
 
 **Facto:** ligar uma conta (`POST /commercial/customers/{id}/account`) e
 partilhar um documento (`POST …/shared-documents`) pedem
@@ -297,3 +309,27 @@ saiba um id pode partilhar com um cliente um ficheiro de outra área (um
 recibo de vencimento, o comprovativo de outro cliente). Sugere-se limitar aos
 documentos carregados para partilha (por exemplo, uma categoria própria) ou
 pedir também `documents.read`.
+
+## B34 — A fila de comprovativos não diz a moeda; ligar aceita qualquer conta
+
+**Facto 1:** `PaymentClaimReviewView` (e `PaymentClaimView`, no portal) traz
+`amount` sem a moeda. A factura pode estar em AOA, USD ou EUR, e confirmar
+regista o recibo nessa moeda.
+
+**Consequência:** a fila mostra o valor sem moeda («500 000,00», com a nota
+«na moeda da factura»); quem confirma não vê se são kwanzas ou dólares sem
+abrir a factura.
+
+**Facto 2:** `LinkCustomerAccount` confirma que a conta existe, que não é a
+de quem liga e que não está ligada a outro cliente, mas não que tem o perfil
+Cliente. A lista `account-candidates` já filtra; a escrita não.
+
+**Consequência:** quem tem `commercial.customers.write` pode, pela API, ligar
+a conta de um colega (Sales, Finance) a um cliente; esse colega passa a
+entrar no portal como o cliente e a enviar comprovativos em seu nome. O front
+só oferece as contas da lista, mas esconder não protege.
+
+**Pedido:**
+1. `currency` em `PaymentClaimReviewView` e em `PaymentClaimView`.
+2. Em `POST /commercial/customers/{customerId}/account`, recusar (400 ou
+   409) uma conta sem o perfil Cliente, como a lista já faz.

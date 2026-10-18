@@ -6,7 +6,7 @@ import { ErroDeRota, NaoEncontrado } from "@/features/sistema/paginas";
 import { CarregandoPagina } from "@/ui/Layout";
 import type { Requisito } from "@/lib/auth/permissions";
 import { AreaAutenticada, Exige } from "./guardas";
-import { REQUISITO_NOVA_FACTURA, REQUISITO_NOVO_LANCAMENTO, REQUISITO_PAGINA as R } from "./requisitos";
+import { REQUISITO_NOVA_FACTURA, REQUISITO_NOVO_ARTIGO, REQUISITO_NOVO_LANCAMENTO, REQUISITO_PAGINA as R } from "./requisitos";
 import type { NomePagina } from "./paginas";
 import { registarRotas } from "./rotasConhecidas";
 
@@ -119,6 +119,14 @@ export const rotas: RouteObject[] = [
               { path: "notas-credito/:creditNoteId", element: protegido(R["/notas-credito"], pagina("notaCredito")) },
               { path: "recibos", element: protegido(R["/recibos"], pagina("recibos")) },
               { path: "recibos/:receiptId", element: protegido(R["/recibos"], pagina("recibo")) },
+              { path: "comprovativos", element: protegido(R["/comprovativos"], pagina("comprovativos")) },
+              // F10 — apoio ao cliente e arquivo (§5.13).
+              { path: "conversas", element: protegido(R["/conversas"], pagina("conversas")) },
+              { path: "conversas/:conversationId", element: protegido(R["/conversas"], pagina("conversa")) },
+              { path: "base-conhecimento", element: protegido(R["/base-conhecimento"], pagina("baseConhecimento")) },
+              { path: "base-conhecimento/novo", element: protegido(REQUISITO_NOVO_ARTIGO, pagina("novoArtigo")) },
+              { path: "base-conhecimento/:articleId", element: protegido(R["/base-conhecimento"], pagina("artigoBase")) },
+              { path: "documentos", element: protegido(R["/documentos"], pagina("arquivo")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).

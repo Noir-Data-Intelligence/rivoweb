@@ -1973,6 +1973,63 @@ documentos; nota de segurança sobre partilhar qualquer `documentId`).
 - **Testes:** 186 unitários; interface 7 cenários × 3 motores; suite inteira
   491, sem instáveis.
 
+**B31 a B33 resolvidos** (PR #109, ADR-087, 2026-10-18; API local em
+`87807cc`, produção confirmada só com códigos e contagens): lista de
+colaboradores dos activos (`/finance/assets/lookups`), fila de comprovativos
+com cliente, factura, nota e ficheiro (descarga pelo pedido), contas Cliente
+por ligar (`/commercial/customers/account-candidates`), `documents.write` no
+Sales e partilha só de ficheiros próprios (salvo `documents.read`). O
+catálogo de perfis dos testes foi actualizado a partir de produção (+
+`documents.write` no Sales). Novo pedido: **B34** (moeda nos comprovativos;
+ligar só contas Cliente).
+
+**B31 no front:** «Entregar a um colaborador» escolhe da lista dos activos;
+o aviso «(B31)» saiu e o AssetManager e o Finance entregam.
+
+**Bloco 2 — o lado da equipa** (2026-10-18, por publicar).
+- **Ecrãs:** `/comprovativos` (Vendas; por omissão os por confirmar, estado
+  no URL), `/conversas` e `/conversas/:id` (grupo «Apoio ao cliente»;
+  abertas por omissão, estado e tipo no URL), `/base-conhecimento`,
+  `/base-conhecimento/novo` e `/base-conhecimento/:id` (pesquisa, estado e
+  categoria no URL), `/documentos` («Arquivo de documentos», Administração;
+  categoria e período no URL) e o separador «Portal do cliente» na ficha do
+  cliente (`?vista=portal`: conta, documentos partilhados, comprovativos).
+- **Regras:** confirmar regista um recibo por transferência na data do
+  pagamento (o servidor recusa o que já não está pendente e deixa pendente
+  se o recibo falhar); rejeitar pede o motivo (até 500); o valor vem sem
+  moeda (B34) e mostra-se «na moeda da factura»; os filtros das conversas vão
+  como inteiros (0/1), como o OpenAPI os descreve; a conversa não traz o
+  cliente: o nome vem da lista pelo estado da navegação, nunca pelo URL;
+  artigos em texto simples (título 200, texto 20 000, categoria 100,
+  endereço gerado do título e único); abrir um artigo na equipa não conta
+  visualização (verificado); partilhar só oferece carregar na hora (categoria
+  «Partilhado com cliente»), nunca escolher do arquivo; ligar só oferece as
+  contas da lista; o e-mail da conta ligada só para quem lê as contas.
+- **Revisão de segurança do bloco (§7.9):** S10 (notas, mensagens e artigos
+  com `<img onerror>` e `<script>` aparecem como texto; nenhum `img` ou
+  `script` injectado, testado); S17 (comprovativos e arquivo descarregam em
+  anexo, com o nome do ficheiro, testado); S19 (URLs só com ids e filtros; o
+  nome do cliente vai no estado da navegação); S21 (`useEscrita` em todas as
+  escritas); S13/S26 (zero violações de CSP); B33 confirmado na base local: o
+  Sales que tenta partilhar um ficheiro que não carregou recebe 404. Achado
+  novo para o backend: ligar aceita contas sem o perfil Cliente (B34).
+- **Escritas:** verificadas **na base local** (`f10-equipa-escritas.spec.ts`,
+  à primeira): como Sales, conta Cliente ligada pela lista, ficheiro
+  carregado e partilhado, pedido de suporte respondido e fechado, artigo
+  escrito, publicado (visível no portal) e arquivado, fila de comprovativos
+  sem botões de decisão; como Admin, comprovativo descarregado, confirmado
+  (recibo registado, em aberto da factura 54 000) e outro rejeitado com o
+  motivo, arquivo filtrado pela categoria, partilha revogada (o portal fica
+  vazio). As escritas da F9 (activos) e do bloco 1 voltaram a passar.
+  **Nenhuma escrita em produção.**
+- **Testes:** 192 unitários; interface 8 cenários × 3 motores; suite inteira
+  516, sem falhas nem instáveis (24 saltados: produção e base local).
+- **Testes instáveis corrigidos:** `entrar` (apoio dos testes) devolvia logo
+  depois do clique e um `goto` a seguir recarregava a página a meio do login
+  (webkit, `f7c` 1 em 5); agora espera sair de `/entrar` (o teste de
+  credenciais erradas passa `esperar: false`); um pedido verificado logo a
+  seguir a mudar o URL passou a `expect.poll`.
+
 ### B29 e B30 resolvidos (compras, 2026-10-17)
 
 - **B29:** `requestedByName`, `departmentName` e `receivedByName` nas vistas;

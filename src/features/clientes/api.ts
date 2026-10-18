@@ -3,6 +3,7 @@ import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-quer
 import { useEscrita } from "@/lib/api/escrita";
 import { api, enviar, ler, lerComVersao, lerPagina, seVersao } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
+import { normalizarTexto } from "@/lib/validation/normalizar";
 
 type S = components["schemas"];
 export type ResumoCliente = S["CustomerListItem"];
@@ -12,6 +13,9 @@ export type PedidoContacto = S["ContactRequest"];
 export type PedidoNovoCliente = S["RegisterCustomerRequest"];
 export type PedidoCorrigirCliente = S["UpdateCustomerRequest"];
 export type ResumoImportacao = S["CsvImportSummary"];
+export type LigacaoConta = S["CustomerAccountLinkView"];
+export type CandidataConta = S["CustomerAccountCandidate"];
+export type Partilha = S["SharedDocumentView"];
 
 export const MAXIMO_POR_PAGINA = 200;
 
@@ -20,6 +24,9 @@ export const chaves = {
   lista: (p: { pagina: number; tamanho: number; inactivos: boolean }) => ["commercial", "customers", "list", p.pagina, p.tamanho, p.inactivos] as const,
   ficha: (id: string) => ["commercial", "customers", "detail", id] as const,
   contactos: (id: string) => ["commercial", "customers", "detail", id, "contacts"] as const,
+  conta: (id: string) => ["commercial", "customers", "detail", id, "account-history"] as const,
+  candidatas: ["commercial", "customers", "account-candidates"] as const,
+  partilhas: (id: string) => ["commercial", "customers", "detail", id, "shared-documents"] as const,
 };
 
 export function useClientes(p: { pagina: number; tamanho: number; inactivos: boolean }, activo = true) {
@@ -114,4 +121,84 @@ export function useImportarClientes() {
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.todos }),
   });
+}
+
+// --- Portal do cliente (F10): a conta ligada e os documentos partilhados.
+//
+// Factos (`CommercialModuleEndpoints.cs`, `ManageCustomers.cs`,
+// `ManageRelationships.cs`, B33/ADR-087):
+// - ligar e desligar pedem `commercial.customers.write`; recusa a própria conta,
+//   uma conta inexistente, uma conta já ligada a outro cliente e um cliente que
+//   já tem conta (409 `{erro}`); a ficha não diz a conta: está no histórico
+//   (a ligação em vigor não tem `unlinkedOn`);
+// - as contas por ligar (perfil Cliente, sem cliente) vêm de
+//   `/commercial/customers/account-candidates`, com a mesma permissão;
+// - partilhar pede um documento carregado em `/documents` por quem partilha
+//   (ou qualquer um, com `documents.read`; outro dá 404); título até 200,
+//   categoria até 100; o mesmo documento não se partilha duas vezes (409);
+//   revogar deixa a partilha no histórico.
+
+/** Categoria dos ficheiros carregados para partilhar (vê-se no arquivo). */
+export const CATEGORIA_PARTILHA = "Partilhado com cliente";
+export const MAXIMO_TITULO = 200;
+export const MAXIMO_CATEGORIA = 100;
+
+/** A ligação em vigor, se houver. */
+export const contaLigada = (h: readonly LigacaoConta[] | undefined) => h?.find((l) => l.unlinkedOn === null) ?? null;
+
+export function useHistoricoContaCliente(id: string) {
+  return useQuery({ queryKey: chaves.conta(id), queryFn: ({ signal }) => ler(api.GET("/commercial/customers/{customerId}/account-history", { params: { path: { customerId: id } }, signal })) });
+}
+
+export function useContasPorLigar(activo: boolean) {
+  return useQuery({ queryKey: chaves.candidatas, queryFn: ({ signal }) => ler(api.GET("/commercial/customers/account-candidates", { signal })), enabled: activo });
+}
+
+export function useLigarContaCliente(customerId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (userId: string) => enviar(api.POST("/commercial/customers/{customerId}/account", { params: { path: { customerId } }, body: { userId } })),
+    onSettled: () => Promise.all([qc.invalidateQueries({ queryKey: chaves.conta(customerId) }), qc.invalidateQueries({ queryKey: chaves.candidatas })]),
+  });
+}
+
+export function useDesligarContaCliente(customerId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: () => enviar(api.DELETE("/commercial/customers/{customerId}/account", { params: { path: { customerId } } })),
+    onSettled: () => Promise.all([qc.invalidateQueries({ queryKey: chaves.conta(customerId) }), qc.invalidateQueries({ queryKey: chaves.candidatas })]),
+  });
+}
+
+export function usePartilhas(id: string) {
+  return useQuery({
+    queryKey: chaves.partilhas(id),
+    queryFn: ({ signal }) => ler(api.GET("/commercial/customers/{customerId}/shared-documents", { params: { path: { customerId: id }, query: { includeRevoked: true } }, signal })),
+  });
+}
+
+export function usePartilhar(customerId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["ShareDocumentRequest"]) => ler(api.POST("/commercial/customers/{customerId}/shared-documents", { params: { path: { customerId } }, body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.partilhas(customerId) }),
+  });
+}
+
+export function useRevogarPartilha(customerId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (shareId: string) => enviar(api.POST("/commercial/customers/{customerId}/shared-documents/{shareId}/revocation", { params: { path: { customerId, shareId } } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.partilhas(customerId) }),
+  });
+}
+
+export function errosPartilha(v: { titulo: string; categoria: string; documento: { documentId: string } | null }) {
+  const titulo = normalizarTexto(v.titulo);
+  const categoria = normalizarTexto(v.categoria);
+  return {
+    documento: v.documento === null ? "Carregue o ficheiro." : undefined,
+    titulo: titulo === "" ? "Dê um título ao documento." : titulo.length > MAXIMO_TITULO ? `No máximo ${String(MAXIMO_TITULO)} caracteres.` : undefined,
+    categoria: categoria.length > MAXIMO_CATEGORIA ? `No máximo ${String(MAXIMO_CATEGORIA)} caracteres.` : undefined,
+  };
 }

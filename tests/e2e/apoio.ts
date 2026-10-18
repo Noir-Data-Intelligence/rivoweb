@@ -97,11 +97,14 @@ export const test = base.extend<{ api: ApiSimulada; violacoes: () => Promise<str
   },
 });
 
-export async function entrar(page: Page, email = "admin@teste.local", { navegar = true } = {}): Promise<void> {
+export async function entrar(page: Page, email = "admin@teste.local", { navegar = true, esperar = true } = {}): Promise<void> {
   if (navegar) await page.goto("/entrar");
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Password").fill("Qualquer!2026x");
   await page.getByRole("button", { name: "Entrar" }).click();
+  // Até a sessão estar aberta: um `goto` logo a seguir recarregava a página a
+  // meio do login e a sessão (só em memória) perdia-se — instável no webkit.
+  if (esperar) await page.waitForURL((u) => !u.pathname.startsWith("/entrar"));
 }
 
 export async function semViolacoesAxe(page: Page): Promise<void> {

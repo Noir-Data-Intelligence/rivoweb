@@ -18,6 +18,7 @@ function comActivos(api: ApiSimulada, me = meAdminF9): ApiSimulada {
     .em("GET", "/finance/assets/maintenance", { status: 200, corpo: fichaActivo().maintenance })
     .em("GET", "/finance/assets/custody", { status: 200, corpo: custodias() })
     .em("GET", "/finance/assets/insurance", { status: 200, corpo: apolices() })
+    .em("GET", "/finance/assets/lookups", { status: 200, corpo: { employees: [{ id: ID.emp1, name: "Ana Teste" }] } })
     .em("GET", "/finance/planning/cost-centres", { status: 200, corpo: [], cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "0" } })
     .em("GET", "/procurement/suppliers", { status: 200, corpo: [], cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "0" } });
 }
@@ -194,12 +195,20 @@ test.describe("activos fixos", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("AssetManager sem RH: não escolhe a quem entregar e vê o porquê (B31); seguros a caducar", async ({ page, api }) => {
-    await comActivos(api, meActivosF9).em("GET", "/finance/assets/custody", { status: 200, corpo: custodias(false) }).ligar();
+  test("AssetManager sem RH: entrega pela lista dos activos (B31), sem pedir nada aos RH; seguros a caducar", async ({ page, api }) => {
+    await comActivos(api, meActivosF9)
+      .em("GET", "/finance/assets/custody", { status: 200, corpo: custodias(false) })
+      .em("POST", `/finance/assets/${IDF9C.portatil}/custody`, { status: 201, corpo: { id: "c2" } })
+      .ligar();
     await entrar(page, meActivosF9.email);
     await page.goto(`/activos/${IDF9C.portatil}?vista=custodia`);
-    await expect(page.getByText("(B31)", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Entregar a um colaborador" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Entregar a um colaborador" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Colaborador").selectOption({ label: "Ana Teste" });
+    await d.getByRole("button", { name: "Entregar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/assets/${IDF9C.portatil}/custody`)[0]?.corpo).toMatchObject({ employeeId: ID.emp1 });
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
     await page.goto("/activos?vista=seguros");
     await expect(page.getByRole("row").filter({ hasText: "AP-77" })).toContainText("em 75 dias");
     await expect.poll(() => api.pedidos.some((p) => p.caminho === "/finance/assets/insurance" && p.query.includes("expiringWithinDays=90"))).toBe(true);

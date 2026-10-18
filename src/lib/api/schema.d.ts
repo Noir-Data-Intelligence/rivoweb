@@ -2862,6 +2862,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/commercial/customers/account-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contas com o perfil Cliente ainda sem cliente (id e e-mail), para ligar ao portal. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CustomerAccountCandidate"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/commercial/customers/{customerId}/account": {
         parameters: {
             query?: never;
@@ -6356,7 +6406,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** Partilha com o cliente um documento já carregado em /documents. Aparece em /customer-portal/me/documents. */
+        /** Partilha com o cliente um documento carregado em /documents por quem partilha (ou qualquer um, com `documents.read`). Aparece em /customer-portal/me/documents. */
         post: {
             parameters: {
                 query?: never;
@@ -9512,7 +9562,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaymentClaimView"][];
+                        "application/json": components["schemas"]["PaymentClaimReviewView"][];
                     };
                 };
                 /** @description Bad Request */
@@ -9537,6 +9587,67 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/payment-claims/{claimId}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descarrega o comprovativo do pedido de confirmação (anexo, nosniff), sem `documents.read` (B32). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    claimId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -13763,6 +13874,56 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["AssetCustodyView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/assets/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores activos (id e nome) a quem entregar um activo, sem as permissões de RH (B31). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AssetLookups"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -38030,6 +38191,9 @@ export interface components {
             /** Format: int32 */
             daysToExpiry: number | string;
         };
+        AssetLookups: {
+            employees: components["schemas"]["LookupEntry"][];
+        };
         AssetMaintenanceView: {
             /** Format: uuid */
             maintenanceId: string;
@@ -39102,6 +39266,11 @@ export interface components {
             on: null | string;
             condition: null | string;
             notes: null | string;
+        };
+        CustomerAccountCandidate: {
+            /** Format: uuid */
+            userId: string;
+            email: string;
         };
         CustomerAccountLinkView: {
             /** Format: uuid */
@@ -41584,6 +41753,27 @@ export interface components {
         PaymentClaimConfirmedResponse: {
             /** Format: uuid */
             receiptId: string;
+        };
+        PaymentClaimReviewView: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            salesInvoiceId: string;
+            invoiceNumber: null | string;
+            /** Format: uuid */
+            customerId: string;
+            customerName: null | string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: date */
+            paidOn: string;
+            /** @enum {string} */
+            status: "Pending" | "Confirmed" | "Rejected";
+            rejectionReason: null | string;
+            /** Format: date-time */
+            submittedAt: string;
+            notes: null | string;
+            fileName: null | string;
         };
         PaymentClaimSubmittedResponse: {
             /** Format: uuid */

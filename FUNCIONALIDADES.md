@@ -7,8 +7,10 @@
 > formação, turnos, declarações, desempenho, conquistas e importação de
 > colaboradores; F8: salários — folhas de pagamento; F9: compras —
 > requisições, ordens de compra, recepções —, inventário e activos fixos).
-> 1.º bloco da **F10** (portal do cliente) concluído e verificado na base
-> local, por publicar · actualizado a 2026-10-17.
+> **F10** concluída e verificada na base local, por publicar: portal do
+> cliente (1.º bloco) e o lado da equipa — comprovativos, conversas, base de
+> conhecimento, portal na ficha do cliente e arquivo de documentos (2.º
+> bloco) · actualizado a 2026-10-18.
 >
 > Este documento cresce com o front: no fim de cada fase entram as
 > funcionalidades novas. Só está aqui o que o front **já faz** (em produção, ou
@@ -30,13 +32,13 @@ pronto a publicar quando o estado acima o diz). O
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores |
-| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, A receber, Facturação |
+| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
 | **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Mensagens, Suporte, Ajuda |
@@ -88,6 +90,21 @@ AM = AssetManager.
 | Resolver alertas; criar, rever e desactivar regras; avaliar agora | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Clientes** | | | | | | | | | | |
 | Ver a lista (com inactivos) e a ficha, com contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Portal do cliente na ficha: a conta ligada e o histórico, os documentos partilhados e os comprovativos ¹⁴ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Ligar a conta do portal (só contas Cliente por ligar) e desligá-la | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Partilhar com o cliente um ficheiro carregado na hora; revogar a partilha | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Ver o e-mail da conta ligada | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Comprovativos de pagamento** (enviados no portal) | | | | | | | | | | |
+| Ver a fila (cliente, factura, valor, datas, nota do cliente, estado) e descarregar o ficheiro | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
+| Confirmar (regista o recibo) e rejeitar com o motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| **Apoio ao cliente** | | | | | | | | | | |
+| Conversas e pedidos de suporte: ver (abertas, fechadas, por tipo) | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Responder ao cliente e fechar | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Base de conhecimento: ver todos os artigos (rascunhos, publicados, arquivados), com visualizações e votos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Escrever, corrigir, publicar e arquivar artigos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| **Arquivo de documentos** | | | | | | | | | | |
+| Ver todos os ficheiros carregados (por categoria e período) e descarregar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Ver quem carregou cada ficheiro | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Facturas** | | | | | | | | | | |
 | Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
@@ -131,7 +148,7 @@ AM = AssetManager.
 | Registar e corrigir (antes da primeira amortização); abater | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Correr a amortização de um mês | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
-| Custódia: entregar a um colaborador ¹⁴ e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -258,7 +275,7 @@ Recursos Humanos.»
 ¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
-¹⁴ Escolher a quem entregar exige ler os Recursos Humanos: o Finance e o AssetManager não o têm (B31); devolver não.
+¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
 
 ---
 
@@ -378,6 +395,50 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   reactivar**, **eliminar** (só sem história; com história oferece desactivar),
   **contactos** (criar, rever, remover; decide compras; contacto de facturação)
   e ligação às facturas do cliente.
+- Separador **Portal do cliente** da ficha:
+  - **Conta do portal:** o e-mail da conta ligada e desde quando; **ligar**
+    uma conta (só as que têm o perfil Cliente e ainda não estão ligadas a
+    nenhum cliente; a conta cria-se em Utilizadores) e **desligar** (a conta
+    continua activa); histórico das ligações.
+  - **Documentos partilhados** (em vigor e revogados): **partilhar** um
+    ficheiro carregado na hora (PDF, imagem, documento de escritório ou
+    texto), com o título que o cliente vê e a categoria; **revogar** (o cliente
+    deixa de o ver; fica no histórico).
+  - **Comprovativos** que o cliente enviou, com as mesmas acções da fila.
+
+**Comprovativos**
+- Fila dos comprovativos enviados no portal do cliente, por omissão os **por
+  confirmar** (também confirmados, rejeitados ou todos; o estado fica no
+  URL): cliente (ligação à ficha), factura (ligação), data do pagamento, data
+  do envio, valor pago (na moeda da factura), estado, motivo da rejeição e a
+  nota do cliente (sempre como texto).
+- **Descarregar** o ficheiro do comprovativo (sempre em anexo).
+- **Confirmar**: regista um recibo por transferência bancária na data do
+  pagamento e mostra a ligação para ele; o servidor recusa um pedido que já
+  não está por confirmar e diz porque o recibo falhou (por exemplo, série em
+  falta), deixando-o por confirmar.
+- **Rejeitar** com o motivo (até 500 caracteres), que o cliente vê no portal.
+
+**Conversas**
+- Mensagens e pedidos de suporte abertos pelos clientes: por omissão as
+  abertas (também fechadas ou todas), por tipo; cliente, assunto, data,
+  número de mensagens, estado; paginadas, com os filtros no URL.
+- Conversa: as mensagens (as do cliente sempre como texto), **responder**
+  (até 4000 caracteres; o cliente vê «Equipa») e **fechar** (num pedido, o
+  cliente passa a poder avaliar; numa conversa, se voltar a escrever, abre-se
+  outra).
+
+**Base de conhecimento**
+- Todos os artigos (rascunhos, publicados, arquivados), com pesquisa, estado e
+  categoria no URL; categoria, quem vê (clientes, clientes e equipa, só a
+  equipa), visualizações, votos «foi útil» e data de publicação.
+- **Novo artigo** (fica em rascunho): título (até 200), categoria, quem vê,
+  endereço no portal (gera-se do título se ficar vazio; único) e texto simples
+  (até 20 000, com as quebras de linha).
+- Artigo: o texto como o cliente o vê, o endereço no portal, visualizações e
+  votos; **corrigir** (publicado, a alteração aparece logo no portal),
+  **publicar** e **arquivar** (arquivado não se corrige nem volta a
+  publicar). Abrir um artigo aqui não conta visualização.
 
 **Facturas**
 - Emitidas: lista paginada com filtros por cliente e por datas.
@@ -478,8 +539,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   descrição, data, prestador, custo estimado), **concluir** (data, custo,
   notas), **cancelar**.
 - **Custódia:** quem tem o activo e o histórico; **entregar** a um
-  colaborador (data, estado, notas; ele vê-o no portal) e **registar a
-  devolução** (não antes da entrega, estado, notas).
+  colaborador activo (escolhido de uma lista própria dos activos, sem precisar
+  dos Recursos Humanos; data, estado, notas; ele vê-o no portal) e **registar
+  a devolução** (não antes da entrega, estado, notas).
 - **Seguros:** apólices de cada activo e as que caducam em 30, 60 ou 90 dias;
   **registar** e **corrigir** (seguradora, número, cobertura, vigência,
   prémio, capital seguro), **cancelar**.
@@ -824,6 +886,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   autoridade fixa-se ao criar) e **corrigir** (nome e nível); ver as
   **ocupações** de cada cargo.
 
+**Arquivo de documentos**
+- Todos os ficheiros carregados na Rivo (comprovativos, anexos, documentos
+  pessoais e partilhados), com a categoria e o período do carregamento no URL;
+  nome, tamanho, categoria, data e quem carregou; **descarregar** (sempre em
+  anexo). Não se apagam documentos.
+
 **Utilizadores**
 - Lista com pesquisa por e-mail e filtro por estado.
 - **Convidar** (e-mail e perfil).
@@ -887,6 +955,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Folhas de pagamento**
 - Tudo o que o Admin faz (abrir exige a conta ligada a uma ficha).
 
+**Arquivo de documentos**
+- Ver, filtrar e descarregar todos os ficheiros, como o Admin, sem a coluna de
+  quem carregou (não lê as contas).
+
 **Departamentos**
 - Ver, **criar** e **corrigir**.
 
@@ -913,6 +985,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Notas de crédito**, **Recibos**, **Pró-formas** e **A receber**
 - Ver (listas, fichas e PDF); **anular** notas de crédito e recibos.
 
+**Comprovativos**
+- Tudo o que o Admin faz: a fila, **descarregar**, **confirmar** (regista o
+  recibo) e **rejeitar** com o motivo. O cliente aparece sem ligação à ficha
+  (o Finance não lê clientes).
+
 **Facturação**
 - Ver séries, canais de pagamento e taxas de IVA.
 
@@ -921,7 +998,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   emite nem cancela ordens e não regista recepções.
 
 **Activos fixos**
-- Tudo o que o Admin faz, salvo escolher a quem entregar um activo (B31).
+- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
 
 **Fornecedores**
 - Ver a lista e a ficha (não regista nem corrige).
@@ -1024,7 +1101,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz no inventário.
 
 **Activos fixos**
-- Tudo o que o Admin faz, salvo escolher a quem entregar um activo (B31).
+- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
 
 **Fornecedores**
 - Ver a lista e a ficha.
@@ -1036,6 +1113,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Clientes**
 - Tudo o que o Admin faz em Clientes (ver, registar, importar, corrigir,
   desactivar, eliminar sem história, contactos).
+- **Portal do cliente** na ficha: ligar e desligar a conta, o histórico,
+  partilhar um ficheiro carregado na hora e revogar, os comprovativos do
+  cliente (sem os decidir). Não vê o e-mail da conta ligada (não lê as
+  contas).
 
 **Facturas**
 - Ver; **nova factura** (rascunhos FT, FR, ND) e **emitir**. Vê o IVA e o
@@ -1046,11 +1127,18 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Notas de crédito** e **Recibos**
 - Ver, **PDF** e **enviar ao cliente**.
 
+**Comprovativos**
+- Ver a fila e **descarregar** o ficheiro. Não confirma nem rejeita.
+
 **Pró-formas**
 - Ver, **criar**, **converter** em factura e **anular**.
 
 **A receber**
 - Ver as vencidas.
+
+**Conversas** e **Base de conhecimento**
+- Tudo o que o Admin faz: responder e fechar conversas e pedidos de suporte;
+  escrever, corrigir, publicar e arquivar artigos.
 
 **Facturação**
 - Ver séries e canais de pagamento.
@@ -1149,9 +1237,8 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F10 | Gestão documental, mensagens e base de conhecimento (equipa), comprovativos (Finanças), contas e documentos partilhados nos clientes |
 | F11 | Comercial avançado (CRM, contratos) |
 | F12 | Projectos e frota |
-| F13 | Complementar (ESG, IA, base de conhecimento) |
+| F13 | Complementar (ESG, IA) |
 
 O login com Google (D4) entra quando o backend o tiver.

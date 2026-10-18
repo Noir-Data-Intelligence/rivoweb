@@ -42,6 +42,13 @@ export const PAGINAS = {
   notaCredito: () => de(import("@/features/facturacao/pages/NotasCredito"), (m) => m.FichaNotaCredito),
   recibos: () => de(import("@/features/facturacao/pages/Recibos"), (m) => m.ListaRecibos),
   recibo: () => de(import("@/features/facturacao/pages/Recibos"), (m) => m.FichaRecibo),
+  comprovativos: () => import("@/features/comprovativos/pages/Comprovativos"),
+  conversas: () => import("@/features/apoio/pages/Conversas"),
+  conversa: () => import("@/features/apoio/pages/Conversa"),
+  baseConhecimento: () => import("@/features/apoio/pages/BaseConhecimento"),
+  artigoBase: () => import("@/features/apoio/pages/ArtigoBase"),
+  novoArtigo: () => de(import("@/features/apoio/pages/ArtigoBase"), (m) => m.NovoArtigo),
+  arquivo: () => import("@/features/documentos/pages/Arquivo"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

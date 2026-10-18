@@ -9,7 +9,6 @@ import { useId, useState } from "react";
 import { Link, useParams } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { Can, useUtilizador } from "@/features/identity";
-import { SelectColaborador } from "@/features/rh";
 import { formatarData, hojeIso } from "@/lib/format/data";
 import { nomeMes } from "@/lib/format/periodo";
 import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
@@ -28,6 +27,7 @@ import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import {
   useAbater,
   useActivo,
+  useEscolhasActivos,
   useActivos,
   useAgendarManutencao,
   useApolices,
@@ -366,6 +366,7 @@ function Entregar({ a }: { a: TipoActivo }) {
   const [v, setV] = useState({ colaborador: "", data: hojeIso(), estado: "", notas: "" });
   const [tentou, setTentou] = useState(false);
   const entregar = useEntregar(a.assetId);
+  const escolhas = useEscolhasActivos(aberto);
   const idForm = useId();
   const erro = v.colaborador === "" ? "Escolha o colaborador." : undefined;
   return (
@@ -384,7 +385,7 @@ function Entregar({ a }: { a: TipoActivo }) {
         descricao="O colaborador vê-o no portal, em «Bens à minha guarda»."
         rotuloConfirmar="Entregar"
         aCarregar={entregar.isPending}
-        erro={entregar.error ? <ErrorPanel erro={entregar.error} /> : undefined}
+        erro={entregar.error ? <ErrorPanel erro={entregar.error} /> : escolhas.error ? <ErrorPanel erro={escolhas.error} /> : undefined}
         formulario={idForm}
       >
         <form
@@ -399,7 +400,16 @@ function Entregar({ a }: { a: TipoActivo }) {
           }}
         >
           <Field rotulo="Colaborador" erro={tentou ? erro : undefined} className="sm:col-span-2">
-            {({ id, descricao, invalido }) => <SelectColaborador id={id} aria-describedby={descricao} invalido={invalido} valor={v.colaborador} aoMudar={(c) => setV((x) => ({ ...x, colaborador: c }))} />}
+            {({ id, descricao, invalido }) => (
+              <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.colaborador} onChange={(e) => setV((x) => ({ ...x, colaborador: e.target.value }))}>
+                <option value="">{escolhas.isPending ? "A carregar…" : "Escolha…"}</option>
+                {(escolhas.data?.employees ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
           </Field>
           <Field rotulo="Entregue a">
             {({ id, descricao }) => <Input id={id} type="date" aria-describedby={descricao} value={v.data} onChange={(e) => setV((x) => ({ ...x, data: e.target.value }))} />}
@@ -477,13 +487,9 @@ function CustodiaDoActivo({ a }: { a: TipoActivo }) {
   return (
     <div className="flex flex-col gap-4">
       {escreve && a.status === "Active" && !aberta ? (
-        pode("hr.employees.read") ? (
-          <div>
-            <Entregar a={a} />
-          </div>
-        ) : (
-          <Alert tom="info" titulo="Entregar a um colaborador exige escolher a pessoa, o que pede a leitura dos Recursos Humanos (B31)." />
-        )
+        <div>
+          <Entregar a={a} />
+        </div>
       ) : null}
       <Tabela rotulo="Custódia do activo" colunas={colunas} linhas={lista.data} chave={(c) => c.custodyId} aCarregar={lista.isPending} erro={lista.error ? <ErrorPanel erro={lista.error} /> : undefined} vazio="Nunca foi entregue a ninguém." />
     </div>

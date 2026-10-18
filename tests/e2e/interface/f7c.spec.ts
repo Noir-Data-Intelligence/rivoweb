@@ -165,7 +165,7 @@ test.describe("recrutamento e entradas/saídas", () => {
     expect(api.escritas("POST", `/hr/lifecycle/${IDF7C.processo}/completion`)).toHaveLength(1);
     await page.getByLabel("Tipo").selectOption("Onboarding");
     await expect(page).toHaveURL(/tipo=Onboarding/);
-    expect(api.pedidos.some((p) => p.caminho === "/hr/lifecycle" && p.query.includes("kind=Onboarding"))).toBe(true);
+    await expect.poll(() => api.pedidos.some((p) => p.caminho === "/hr/lifecycle" && p.query.includes("kind=Onboarding"))).toBe(true);
     expect(await violacoes()).toEqual([]);
   });
 

@@ -75,7 +75,7 @@ test.describe("sessão", () => {
 
   test("credenciais erradas: mensagem própria, sem sessão", async ({ page, api }) => {
     await api.em("POST", "/identity/login", { status: 401 }).ligar();
-    await entrar(page);
+    await entrar(page, undefined, { esperar: false });
     await expect(page.getByText("E-mail ou password incorrectos.")).toBeVisible();
     expect(await page.evaluate(() => sessionStorage.getItem("rivo.sessao"))).toBeNull();
   });
