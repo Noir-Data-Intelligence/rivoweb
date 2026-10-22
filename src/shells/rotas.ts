@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { Archive, FolderKanban, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { Archive, FolderKanban, Timer, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -43,6 +43,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/conversas", titulo: "Conversas", icone: MessagesSquare, requer: R["/conversas"], grupo: "Apoio ao cliente" },
     { caminho: "/base-conhecimento", titulo: "Base de conhecimento", icone: Library, requer: R["/base-conhecimento"], grupo: "Apoio ao cliente" },
     { caminho: "/projectos", titulo: "Projectos", icone: FolderKanban, requer: R["/projectos"], grupo: "Projectos" },
+    { caminho: "/projectos/tempo", titulo: "Registo de tempo", icone: Timer, requer: R["/projectos/tempo"], grupo: "Projectos" },
     { caminho: "/requisicoes", titulo: "Requisições", icone: ClipboardList, requer: R["/requisicoes"], grupo: "Compras" },
     { caminho: "/encomendas", titulo: "Ordens de compra", icone: ShoppingCart, requer: R["/encomendas"], grupo: "Compras" },
     { caminho: "/recepcoes", titulo: "Recepções", icone: PackageCheck, requer: R["/recepcoes"], grupo: "Compras" },
@@ -120,6 +121,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/cliente/extracto", titulo: "Extracto", icone: ScrollText, requer: "autenticado", grupo: "Contas" },
     { caminho: "/cliente/pagamentos", titulo: "Pagamentos", icone: HandCoins, requer: "autenticado", grupo: "Contas" },
     { caminho: "/cliente/documentos", titulo: "Documentos", icone: FolderOpen, requer: "autenticado", grupo: "Contas" },
+    { caminho: "/cliente/projectos", titulo: "Projectos", icone: FolderKanban, requer: "autenticado", grupo: "Contas" },
     { caminho: "/cliente/mensagens", titulo: "Mensagens", icone: MessageSquare, requer: "autenticado", grupo: "Apoio" },
     { caminho: "/cliente/suporte", titulo: "Suporte", icone: LifeBuoy, requer: "autenticado", grupo: "Apoio" },
     { caminho: "/cliente/ajuda", titulo: "Ajuda", icone: BookOpen, requer: "autenticado", grupo: "Apoio" },

@@ -159,3 +159,26 @@ export function useAvaliarArtigo() {
       enviar(api.POST("/customer-portal/me/knowledge-base/{articleId}/feedback", { params: { path: { articleId } }, body: { helpful } })),
   });
 }
+
+// --- Projectos (F12): os que a empresa decidiu mostrar a este cliente.
+
+export type ProjectoCliente = S["CustomerProjectView"];
+
+const chavesProjectos = ["customer-portal", "me", "projects"] as const;
+
+export function useProjectosCliente() {
+  return useQuery({ queryKey: [...chavesProjectos, "list"], queryFn: ({ signal }) => ler(api.GET("/customer-portal/me/projects", { signal })) });
+}
+
+export function useProjectoCliente(id: string) {
+  return useQuery({ queryKey: [...chavesProjectos, "detail", id], queryFn: ({ signal }) => ler(api.GET("/customer-portal/me/projects/{projectId}", { params: { path: { projectId: id } }, signal })) });
+}
+
+export function useComentarMarco(projectId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: ({ marco, texto }: { marco: string; texto: string }) =>
+      ler(api.POST("/customer-portal/me/projects/{projectId}/milestones/{milestoneId}/comments", { params: { path: { projectId, milestoneId: marco } }, body: { body: texto } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chavesProjectos }),
+  });
+}

@@ -15,6 +15,7 @@ import { Field, Input } from "@/ui/Field";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAcaoProjecto, useDependencias, type Prioridade, type Projecto, type Tarefa } from "./api";
 import { EstadoTarefa, ETAPAS, PRIORIDADES, PrioridadeBadge, usePessoas } from "./comum";
+import { ChecklistDaTarefa, ComentariosDaTarefa } from "./TarefaDetalhe";
 import { errosNovaTarefa, errosPlano, planoParaApi, temErros, type CamposPlano } from "./regras";
 
 function NovaTarefa({ p }: { p: Projecto }) {
@@ -319,6 +320,8 @@ export function TarefasDoProjecto({ p }: { p: Projecto }) {
       alinhar: "direita",
       celula: (t) => (
         <span className="inline-flex flex-wrap justify-end gap-1">
+          <ComentariosDaTarefa p={p} t={t} escreve={escreve} />
+          <ChecklistDaTarefa p={p} t={t} escreve={escreve} />
           <Dependencias p={p} t={t} />
           {escreve && t.status === "Pending" ? (
             <>

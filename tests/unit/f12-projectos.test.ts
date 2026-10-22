@@ -1,5 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { erroFecho, errosComentarioMarco, errosMarco, errosNovaTarefa, errosOrcamento, errosPlano, errosProjecto, orcamentoParaApi, planoParaApi, type CamposPlano } from "@/features/projectos/regras";
+import {
+  erroComentario,
+  erroFecho,
+  erroFimAlocacao,
+  erroMotivoFicheiro,
+  erroPasso,
+  errosAlocacao,
+  errosComentarioMarco,
+  errosLinhaOrcamento,
+  errosMarco,
+  errosNovaTarefa,
+  errosOrcamento,
+  errosPlano,
+  errosProjecto,
+  errosTempo,
+  linhaOrcamentoParaApi,
+  orcamentoParaApi,
+  planoParaApi,
+  tempoParaApi,
+  type CamposPlano,
+} from "@/features/projectos/regras";
 
 describe("projecto, orçamento e marcos", () => {
   it("nome e início; fecho não antes do início", () => {
@@ -34,5 +54,31 @@ describe("tarefas", () => {
   it("vai à API com as horas em texto e os vazios a null", () => {
     expect(planoParaApi(base)).toEqual({ title: "Levantamento", description: null, startDate: "2026-02-01", dueDate: "2026-02-15", estimatedHours: "12.5", priority: "High", progress: 40 });
     expect(planoParaApi({ ...base, inicio: "", prazo: "", horas: "", progresso: "" })).toMatchObject({ startDate: null, dueDate: null, estimatedHours: null, progress: null });
+  });
+});
+
+describe("trabalho do projecto", () => {
+  it("comentário e passo obrigatórios, nos limites", () => {
+    expect(erroComentario("  ")).toBe("Escreva o comentário.");
+    expect(erroPasso("x".repeat(301))).toBe("No máximo 300 caracteres.");
+  });
+  it("tempo: colaborador, dia não futuro, horas entre 0 e 24", () => {
+    const v = { pessoa: "e1", tarefa: "", dia: "2026-10-20", horas: "7,5", descricao: "", facturavel: true };
+    expect(Object.values(errosTempo(v, "2026-10-22")).filter(Boolean)).toEqual([]);
+    expect(errosTempo({ ...v, pessoa: "", dia: "2026-10-23", horas: "25" }, "2026-10-22")).toMatchObject({
+      pessoa: "Escolha o colaborador.",
+      dia: "Não se regista tempo num dia futuro.",
+      horas: "Horas entre 0 e 24 (até 2 casas decimais).",
+    });
+    expect(tempoParaApi(v)).toEqual({ employeeId: "e1", taskId: null, day: "2026-10-20", hours: "7.5", description: null, billable: true });
+  });
+  it("linha de orçamento: categoria e valores não negativos, em texto", () => {
+    expect(errosLinhaOrcamento({ categoria: "", descricao: "", previsto: "-1", gasto: "x" })).toMatchObject({ categoria: "Indique a categoria.", previsto: "Valor não negativo (até 2 casas decimais).", gasto: "Valor não negativo (até 2 casas decimais)." });
+    expect(linhaOrcamentoParaApi({ categoria: " Materiais ", descricao: "", previsto: "1 200 000", gasto: "" })).toEqual({ category: "Materiais", description: null, plannedAmount: "1200000.00", actualAmount: null });
+  });
+  it("retirar ficheiro pede motivo; alocação não antes do projecto nem fim antes do início", () => {
+    expect(erroMotivoFicheiro("")).toBe("Diga porque retira o ficheiro do projecto.");
+    expect(errosAlocacao({ recurso: "", inicio: "2025-12-01" }, "2026-01-01")).toEqual({ recurso: "Escolha o recurso.", inicio: "A alocação não pode começar antes do início do projecto." });
+    expect(erroFimAlocacao("2026-01-31", "2026-02-01")).toBe("A data de fim não pode ser anterior ao início da alocação.");
   });
 });

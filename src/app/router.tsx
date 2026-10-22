@@ -84,6 +84,8 @@ export const rotas: RouteObject[] = [
               { path: "suporte/:conversationId", element: preguicoso(pagina("pedidoSuporteCliente")) },
               { path: "ajuda", element: preguicoso(pagina("ajudaCliente")) },
               { path: "ajuda/:slug", element: preguicoso(pagina("artigoAjudaCliente")) },
+              { path: "projectos", element: preguicoso(pagina("projectosCliente")) },
+              { path: "projectos/:projectId", element: preguicoso(pagina("projectoCliente")) },
               { path: "conta", element: preguicoso(pagina("minhaConta")) },
               { path: "notificacoes", element: preguicoso(pagina("notificacoes")) },
             ],
@@ -143,6 +145,7 @@ export const rotas: RouteObject[] = [
               { path: "cobrancas", element: protegido(R["/cobrancas"], pagina("cobrancas")) },
               // F12 — projectos (§5.13).
               { path: "projectos", element: protegido(R["/projectos"], pagina("projectos")) },
+              { path: "projectos/tempo", element: protegido(R["/projectos/tempo"], pagina("tempoProjectos")) },
               { path: "projectos/:projectId", element: protegido(R["/projectos"], pagina("projecto")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },

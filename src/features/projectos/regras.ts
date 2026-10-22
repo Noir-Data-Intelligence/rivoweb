@@ -91,3 +91,89 @@ export function errosComentarioMarco(v: { texto: string; autor: string }) {
   const texto = normalizarTexto(v.texto, true);
   return { texto: texto === "" ? "Escreva o comentário." : max(texto, 4000), autor: max(normalizarTexto(v.autor), 200) };
 }
+
+// --- Bloco 2: comentários, checklist, tempo, orçamento por linhas, ficheiros, recursos.
+
+export const erroComentario = (t: string) => {
+  const v = normalizarTexto(t, true);
+  return v === "" ? "Escreva o comentário." : max(v, 4000);
+};
+
+export const erroPasso = (t: string) => {
+  const v = normalizarTexto(t);
+  return v === "" ? "Indique o passo." : max(v, 300);
+};
+
+export interface CamposTempo {
+  pessoa: string;
+  tarefa: string;
+  dia: string;
+  horas: string;
+  descricao: string;
+  facturavel: boolean;
+}
+
+export function errosTempo(v: CamposTempo, hoje: string) {
+  const h = lerDecimalDigitado(v.horas, 2);
+  return {
+    pessoa: v.pessoa === "" ? "Escolha o colaborador." : undefined,
+    dia: !data(v.dia) ? "Indique o dia." : v.dia > hoje ? "Não se regista tempo num dia futuro." : undefined,
+    horas: h === null || !h.gt(0) || h.gt(24) ? "Horas entre 0 e 24 (até 2 casas decimais)." : undefined,
+    descricao: max(normalizarTexto(v.descricao), 500),
+  };
+}
+
+export function tempoParaApi(v: CamposTempo): S["TimeEntryRequest"] {
+  const d = normalizarTexto(v.descricao);
+  return {
+    employeeId: v.pessoa,
+    taskId: v.tarefa === "" ? null : v.tarefa,
+    day: v.dia,
+    hours: decimalParaApi(lerDecimalDigitado(v.horas, 2) as NonNullable<ReturnType<typeof lerDecimalDigitado>>),
+    description: d === "" ? null : d,
+    billable: v.facturavel,
+  };
+}
+
+export interface CamposLinhaOrcamento {
+  categoria: string;
+  descricao: string;
+  previsto: string;
+  gasto: string;
+}
+
+export function errosLinhaOrcamento(v: CamposLinhaOrcamento) {
+  const cat = normalizarTexto(v.categoria);
+  const previsto = lerDinheiroDigitado(v.previsto);
+  const gasto = v.gasto.trim() === "" ? null : lerDinheiroDigitado(v.gasto);
+  return {
+    categoria: cat === "" ? "Indique a categoria." : max(cat, 100),
+    descricao: max(normalizarTexto(v.descricao), 500),
+    previsto: previsto === null || previsto.lt(0) ? "Valor não negativo (até 2 casas decimais)." : undefined,
+    gasto: v.gasto.trim() !== "" && (gasto === null || gasto.lt(0)) ? "Valor não negativo (até 2 casas decimais)." : undefined,
+  };
+}
+
+export function linhaOrcamentoParaApi(v: CamposLinhaOrcamento): S["BudgetLineRequest"] {
+  const d = normalizarTexto(v.descricao);
+  return {
+    category: normalizarTexto(v.categoria),
+    description: d === "" ? null : d,
+    plannedAmount: paraApi(lerDinheiroDigitado(v.previsto) as Dinheiro),
+    actualAmount: v.gasto.trim() === "" ? null : paraApi(lerDinheiroDigitado(v.gasto) as Dinheiro),
+  };
+}
+
+export const erroMotivoFicheiro = (t: string) => {
+  const v = normalizarTexto(t, true);
+  return v === "" ? "Diga porque retira o ficheiro do projecto." : v.length > 500 ? "O motivo tem no máximo 500 caracteres." : undefined;
+};
+
+export function errosAlocacao(v: { recurso: string; inicio: string }, inicioProjecto: string) {
+  return {
+    recurso: v.recurso === "" ? "Escolha o recurso." : undefined,
+    inicio: !data(v.inicio) ? "Indique o início." : v.inicio < inicioProjecto ? "A alocação não pode começar antes do início do projecto." : undefined,
+  };
+}
+
+export const erroFimAlocacao = (fim: string, inicio: string) => (!data(fim) ? "Indique o fim." : fim < inicio ? "A data de fim não pode ser anterior ao início da alocação." : undefined);

@@ -64,6 +64,7 @@ export const PAGINAS = {
   cobrancas: () => import("@/features/cobrancas/pages/Cobrancas"),
   projectos: () => import("@/features/projectos/pages/Projectos"),
   projecto: () => import("@/features/projectos/pages/Projecto"),
+  tempoProjectos: () => import("@/features/projectos/pages/Tempo"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4
@@ -101,6 +102,8 @@ export const PAGINAS = {
   pedidoSuporteCliente: () => import("@/features/portalcliente/pages/PedidoSuporte"),
   ajudaCliente: () => import("@/features/portalcliente/pages/Ajuda"),
   artigoAjudaCliente: () => import("@/features/portalcliente/pages/ArtigoAjuda"),
+  projectosCliente: () => import("@/features/portalcliente/pages/Projectos"),
+  projectoCliente: () => import("@/features/portalcliente/pages/Projecto"),
   // F7b — RH do dia-a-dia (§5.8).
   organograma: () => import("@/features/rh/pages/Organograma"),
   contratos: () => import("@/features/rh/pages/Contratos"),

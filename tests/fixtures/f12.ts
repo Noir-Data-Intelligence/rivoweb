@@ -102,3 +102,53 @@ export const dependencias = (): S["DependencyView"][] => [{ dependencyId: IDF12.
 export const comentariosMarcos = (): S["MilestoneCommentView"][] => [
   { commentId: "mc1", milestoneId: IDF12.marco1, fromCustomer: true, authorName: "Cliente Teste", body: "Óptimo arranque!\n<img src=x onerror=alert(1)>", postedAt: "2026-02-15T10:00:00Z" },
 ];
+
+// --- Bloco 2: trabalho do projecto e portal do cliente.
+
+export const comentariosTarefa = (): S["CommentView"][] => [
+  { commentId: "c1", taskId: IDF12.t2, authorUserId: null, body: "Falta a tabela de IVA.\n<script>x</script>", postedAt: "2026-03-05T10:00:00Z" },
+];
+
+export const checklist = (): S["ChecklistItemView"][] => [
+  { itemId: "i1", taskId: IDF12.t2, title: "Plano de contas", order: 1, done: true, doneAt: "2026-03-04T10:00:00Z" },
+  { itemId: "i2", taskId: IDF12.t2, title: "Séries de facturação", order: 2, done: false, doneAt: null },
+];
+
+export const tempo = (): S["TimeSummary"] => ({
+  totalHours: 22.5,
+  billableHours: 16,
+  byEmployee: [{ employeeId: ID.emp1, hours: 22.5 }],
+  entries: [
+    { entryId: "e1", projectId: IDF12.projecto, taskId: IDF12.t2, employeeId: ID.emp1, day: "2026-03-05", hours: 6.5, description: "Configuração inicial", billable: true },
+    { entryId: "e2", projectId: IDF12.projecto, taskId: null, employeeId: ID.emp1, day: "2026-03-04", hours: 16, description: null, billable: false },
+  ],
+});
+
+export const orcamentoLinhas = (): S["BudgetBreakdown"] => ({
+  approvedAmount: 5000000,
+  currency: "AOA",
+  plannedTotal: 5500000,
+  actualTotal: 1200000,
+  variance: 4300000,
+  plannedExceedsApproved: true,
+  lines: [{ lineId: "l1", category: "Mão-de-obra", description: "Consultores", plannedAmount: 5500000, actualAmount: 1200000, variance: 4300000 }],
+});
+
+export const ficheirosProjecto = (): S["ProjectFileView"][] => [{ linkId: "f1", documentId: "00000000-0000-4000-8000-000000000e41", taskId: IDF12.t1, category: "Caderno de encargos", attachedAt: "2026-02-02T10:00:00Z" }];
+
+export const visibilidade = (comCliente = false): S["CustomerVisibilityView"] => ({ projectId: IDF12.projecto, customerId: comCliente ? "00000000-0000-4000-8000-000000000701" : null, customerName: comCliente ? "Cliente Teste, Lda" : null, visibleToCustomer: false });
+
+export const projectosCliente = (): S["CustomerProjectView"][] => [
+  {
+    projectId: IDF12.projecto,
+    name: "Implementação ERP",
+    status: "Active",
+    startDate: "2026-02-01",
+    endDate: null,
+    completionPercent: 33,
+    milestones: [
+      { milestoneId: IDF12.marco1, name: "Arranque", targetDate: "2026-02-15", status: "Reached", reachedOn: "2026-02-14", comments: [{ commentId: "mc0", fromCustomer: false, authorName: "Paula Projectos", body: "Arranque feito.\n<img src=x onerror=alert(1)>", postedAt: "2026-02-14T10:00:00Z" }] },
+      { milestoneId: IDF12.marco2, name: "Go-live", targetDate: "2026-06-30", status: "Pending", reachedOn: null, comments: [] },
+    ],
+  },
+];

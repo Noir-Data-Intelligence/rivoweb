@@ -1933,7 +1933,7 @@ o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
 (atribuições, tempo, autores) e recursos, e o ProjectManager só tem
 `projects.*`: **B38** (nomes e `GET /projects/lookups`).
 
-**Bloco 1 — projectos** (2026-10-18, por publicar).
+**Bloco 1 — projectos** (2026-10-18, publicado em `83456c7`: CI verde, smoke de produção 10/10).
 - **Ecrãs:** `/projectos` (fechados no URL) e `/projectos/:id` com as vistas
   resumo, tarefas, quadro e Gantt (no URL); grupo «Projectos» no menu
   (Admin, ProjectManager).
@@ -1955,6 +1955,30 @@ o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
   produção.**
 - **Testes:** 219 unitários; interface 4 cenários × 3 motores; suite inteira
   576, sem falhas nem instáveis (24 saltados).
+
+**Bloco 2 — trabalho do projecto e portal do cliente** (2026-10-22, por
+publicar).
+- **Ecrãs:** vistas tempo, orçamento, ficheiros, recursos e cliente na ficha
+  do projecto; comentários e checklist em cada tarefa (diálogos);
+  `/projectos/tempo` («Registo de tempo»); no portal do cliente,
+  `/cliente/projectos` e `/cliente/projectos/:id` (menu «Projectos»).
+- **Regras:** tempo só com colaborador escolhido (RH), dia não futuro, até
+  24 h por dia (o servidor soma o dia); linhas de orçamento com valores em
+  texto; ficheiros carregados na hora e retirados com motivo (eliminação
+  lógica), abertos pelo arquivo; alocação de colaborador (RH) ou viatura
+  (frota); ligar o cliente (clientes) e mostrar no portal só com cliente;
+  cada escolha só para quem lê essa área, e o porquê para os outros (**B38**,
+  alargado aos ficheiros: nome, descarga pelo projecto, anexar só os
+  próprios, `documents.write` ao ProjectManager); o cliente comenta os
+  marcos dos projectos visíveis (texto simples).
+- **Escritas:** verificadas **na base local** (`f12-trabalho-escritas.spec.ts`):
+  como Admin, comentário e checklist (um passo marcado), tempo de 6,5 h e
+  outro registo apagado, linha de orçamento (1 200 000 / 300 000,50), ficheiro
+  junto e retirado, colaboradora alocada e libertada, cliente ligado e
+  projecto mostrado no portal; como cliente, comentário no marco (do cliente,
+  no servidor). **Nenhuma escrita em produção.**
+- **Testes:** 223 unitários; interface 4 cenários × 3 motores; suite inteira
+  588, sem falhas nem instáveis (24 saltados).
 
 ### F11 — Comercial avançado
 

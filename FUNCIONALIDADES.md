@@ -10,9 +10,11 @@
 > F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
 > de conhecimento, portal na ficha do cliente e arquivo de documentos).
 > **F11** (comercial avançado: CRM, propostas, contratos de clientes e
-> cobranças) concluída e verificada na base local. 1.º bloco da **F12**
-> (projectos: marcos, tarefas, quadro, Gantt, dependências) concluído e
-> verificado na base local, por publicar · actualizado a 2026-10-18.
+> cobranças) concluída e verificada na base local. Projectos da **F12**
+> (marcos, tarefas, quadro, Gantt, dependências — publicados; comentários,
+> checklist, tempo, orçamento por linhas, ficheiros, recursos, visibilidade
+> ao cliente e projectos no portal do cliente — verificados na base local,
+> por publicar) · actualizado a 2026-10-22.
 
 ---
 
@@ -20,16 +22,16 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
-| **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos |
+| **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
-| **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Mensagens, Suporte, Ajuda |
+| **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Projectos, Mensagens, Suporte, Ajuda |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
 perfil de gestão e ficha de colaborador vê também «O meu portal» no menu da
@@ -114,6 +116,14 @@ AM = AssetManager.
 | Marcos: criar, marcar alcançado, comentar (o cliente vê, se o projecto lhe for visível) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tarefas: criar, planear (datas, horas, prioridade, progresso), mover no quadro, concluir, cancelar, dependências | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Atribuir tarefas e ver a quem estão atribuídas ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Tarefas: comentários e checklist (juntar, marcar, tirar passos) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Tempo: ver os registos e os totais (por projecto e no registo de tempo global) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Tempo: registar e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Orçamento por linhas: ver, juntar, corrigir e apagar linhas (previsto, gasto, desvio) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Ficheiros do projecto: ver; juntar, abrir e retirar ¹⁷ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Recursos (colaboradores e viaturas): ver; alocar e terminar ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Ligar o projecto a um cliente ¹⁶ e mostrá-lo ou escondê-lo no portal | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Portal: ver os projectos que a empresa mostra, o progresso e os marcos; comentar um marco | — | — | — | — | — | — | — | — | — | ✓ |
 | **Comprovativos de pagamento** (enviados no portal) | | | | | | | | | | |
 | Ver a fila (cliente, factura, valor, datas, nota do cliente, estado) e descarregar o ficheiro | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Confirmar (regista o recibo) e rejeitar com o motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -297,7 +307,8 @@ Recursos Humanos.»
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
 ¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
 ¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
-¹⁶ Atribuir e ver os nomes exige ler os Recursos Humanos: as vistas dos projectos só trazem ids (B38). O ProjectManager não lê os RH.
+¹⁶ Escolher e ver colaboradores exige ler os Recursos Humanos; viaturas, a frota; clientes, os clientes; nomes de quem comentou, as contas. As vistas dos projectos só trazem ids (B38). O ProjectManager não lê nenhum: mostrar no portal só depois de alguém ligar o cliente.
+¹⁷ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os ficheiros do projecto não trazem o nome nem se descarregam pelo projecto (B38). O ProjectManager vê a lista.
 
 ---
 
@@ -557,6 +568,27 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   - **Gantt:** cada tarefa com as datas, o progresso, as horas registadas e
     estimadas e as dependências (em texto, com a barra como reforço), e os
     marcos no tempo.
+  - **Tempo:** horas registadas, facturáveis e por colaborador; os registos
+    (dia, colaborador, tarefa, descrição, horas, facturável); **registar**
+    (colaborador, tarefa, dia não futuro, horas até 24 por dia, descrição,
+    facturável) e **apagar**.
+  - **Orçamento:** aprovado, previsto nas linhas, gasto e desvio, com aviso
+    quando o previsto passa o aprovado; **linhas** (categoria, descrição,
+    previsto, gasto) — juntar, corrigir, apagar.
+  - **Ficheiros:** os ficheiros juntos (categoria, tarefa, data); **juntar**
+    um ficheiro carregado na hora (categoria, tarefa), **abrir** (sempre em
+    anexo) e **retirar** com o motivo (fica no registo).
+  - **Recursos:** colaboradores e viaturas alocados (desde, até); **alocar**
+    (não antes do início do projecto; o mesmo recurso uma vez em aberto) e
+    **terminar** com a data.
+  - **Cliente:** o cliente ligado e se o projecto aparece no portal;
+    **ligar a um cliente** e **mostrar ou esconder no portal do cliente**.
+- Na lista de tarefas, cada tarefa tem **comentários** (lista e novo, com o
+  autor para quem lê as contas) e **checklist** (passos, feitos, juntar,
+  marcar e tirar).
+- **Registo de tempo:** as horas de todos os projectos num período (por
+  omissão, o mês corrente; no URL): totais, por projecto, por colaborador e
+  os registos, com ligação ao projecto.
 
 **Comprovativos**
 - Fila dos comprovativos enviados no portal do cliente, por omissão os **por
@@ -1323,8 +1355,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Resumo pessoal.
 
 **Projectos**
-- Tudo o que o Admin faz nos projectos, salvo atribuir tarefas e ver a quem
-  estão atribuídas (não lê os Recursos Humanos, B38).
+- Tudo o que o Admin faz nos projectos, salvo o que pede escolher ou ver
+  pessoas, viaturas e clientes — atribuir tarefas, registar tempo, alocar
+  recursos, ligar o cliente — e juntar ou abrir ficheiros (B38). Comenta,
+  gere a checklist, o orçamento por linhas e mostra no portal um projecto já
+  ligado a um cliente.
 
 ### Colaborador
 Entra no **portal do colaborador** (`/eu`). Tudo é do próprio: o servidor
@@ -1394,6 +1429,10 @@ conta; nenhum pedido diz de que cliente é.
   por dia; o servidor confirma o tipo pelo conteúdo) e notas.
 - **Documentos:** os que a empresa partilhou (título, categoria, data,
   tamanho) e os ficheiros que carregou; descarregar, sempre em anexo.
+- **Projectos:** os projectos que a empresa lhe mostra, com o período, o
+  progresso e o próximo marco; em cada projecto, os marcos (data, alcançado)
+  com os comentários da equipa e os seus (como texto), e **comentar** um
+  marco enquanto o projecto está em curso.
 - **Mensagens:** a conversa aberta com a equipa comercial e as anteriores;
   escrever (se a equipa fechou a conversa, a mensagem abre outra).
 - **Suporte:** pedidos com assunto, vários abertos ao mesmo tempo; **abrir**
@@ -1416,7 +1455,7 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F12 | Tempo, orçamento por linhas, ficheiros, recursos e visibilidade ao cliente nos projectos; projectos no portal do cliente; frota |
+| F12 | Frota |
 | F13 | Complementar (ESG, IA) |
 
 O login com Google (D4) entra quando o backend o tiver.

@@ -465,3 +465,20 @@ explica porquê.
    lado dos ids.
 2. `GET /projects/lookups` para quem tem `projects.projects.write`:
    colaboradores activos, viaturas activas e clientes activos (id e nome).
+
+**Facto 3 (ficheiros):** `GET /projects/{id}/files` traz `documentId`,
+`category` e `attachedAt`, sem o nome do ficheiro, e não há rota para o
+descarregar pelo projecto (só `GET /documents/{id}`, com `documents.read`).
+`AttachFileAsync` só confirma que o documento existe, como os contratos antes
+do B37. O ProjectManager também não tem `documents.write`, por isso nem
+carrega ficheiros.
+
+**Consequência:** o ProjectManager não junta nem abre ficheiros do projecto;
+o Admin junta e abre pelo arquivo.
+
+**Pedido (cont.):**
+3. `fileName` em `ProjectFileView`,
+   `GET /projects/{projectId}/files/{linkId}/content` com
+   `projects.projects.read` (em anexo), anexar só documentos carregados por
+   quem anexa (salvo `documents.read`) e `documents.write` para o
+   ProjectManager — como o B33 e o B37.

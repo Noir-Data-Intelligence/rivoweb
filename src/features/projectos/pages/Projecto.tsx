@@ -27,6 +27,7 @@ import { GanttDoProjecto } from "../GanttProjecto";
 import { QuadroDoProjecto } from "../Quadro";
 import { erroFecho, errosComentarioMarco, errosMarco, errosOrcamento, orcamentoParaApi, temErros } from "../regras";
 import { TarefasDoProjecto } from "../Tarefas";
+import { ClienteDoProjecto, FicheirosDoProjecto, OrcamentoDoProjecto, RecursosDoProjecto, TempoDoProjecto } from "../Trabalho";
 
 const MOEDAS = ["AOA", "USD", "EUR"] as const;
 
@@ -301,12 +302,17 @@ function Marcos({ p, escreve }: { p: TipoP; escreve: boolean }) {
   );
 }
 
-type VistaP = "resumo" | "tarefas" | "quadro" | "gantt";
+type VistaP = "resumo" | "tarefas" | "quadro" | "gantt" | "tempo" | "orcamento" | "ficheiros" | "recursos" | "cliente";
 const VISTAS: readonly Vista<VistaP>[] = [
   { valor: "resumo", texto: "Resumo" },
   { valor: "tarefas", texto: "Tarefas" },
   { valor: "quadro", texto: "Quadro" },
   { valor: "gantt", texto: "Gantt" },
+  { valor: "tempo", texto: "Tempo" },
+  { valor: "orcamento", texto: "Orçamento" },
+  { valor: "ficheiros", texto: "Ficheiros" },
+  { valor: "recursos", texto: "Recursos" },
+  { valor: "cliente", texto: "Cliente" },
 ];
 
 export default function Projecto() {
@@ -369,6 +375,16 @@ export default function Projecto() {
         <QuadroDoProjecto p={p} />
       ) : vista === "gantt" ? (
         <GanttDoProjecto p={p} />
+      ) : vista === "tempo" ? (
+        <TempoDoProjecto p={p} />
+      ) : vista === "orcamento" ? (
+        <OrcamentoDoProjecto p={p} />
+      ) : vista === "ficheiros" ? (
+        <FicheirosDoProjecto p={p} />
+      ) : vista === "recursos" ? (
+        <RecursosDoProjecto p={p} />
+      ) : vista === "cliente" ? (
+        <ClienteDoProjecto p={p} />
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Card>
