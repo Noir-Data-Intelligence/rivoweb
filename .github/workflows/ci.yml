@@ -43,9 +43,17 @@ jobs:
       - run: npm run licenses
 
   # Um job por motor, em paralelo: os três seguidos já passavam dos 25 minutos.
+  # No contentor oficial do Playwright (navegadores e dependências já lá estão):
+  # o `install --with-deps` pelo apt chegou a levar 21 minutos. A versão da
+  # imagem acompanha a do @playwright/test; fixada por digest (§7.7).
   interface:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+    env:
+      # O Firefox recusa arrancar como root com outro HOME.
+      HOME: /root
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +71,6 @@ jobs:
         run: npx vite build
         env:
           VITE_API_URL: http://localhost:5080
-      - run: npx playwright install --with-deps ${{ matrix.motor }}
       - run: npx playwright test --project=${{ matrix.motor }}
       - if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
