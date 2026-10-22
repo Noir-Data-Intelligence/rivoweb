@@ -20,8 +20,9 @@
  *   concluir (100 %) ou cancelar encerra, e encerrada não se altera;
  * - relatório do ano: por pilar, cada indicador com o agregado, o ano
  *   anterior, a meta e se a cumpre; pontuação = % dos com meta que a cumprem;
- * - a iniciativa só traz o id do responsável (B41): o nome e a escolha vêm dos
- *   RH, para quem os lê.
+ * - a iniciativa traz o nome do responsável (`ownerName`) e os colaboradores
+ *   activos escolhem-se em `/esg/lookups`, para quem escreve no ESG, sem os
+ *   RH (B41).
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, enviar, ler } from "@/lib/api/client";
@@ -52,6 +53,10 @@ export function useMedicoes(f: { indicador: string; de: string; ate: string }, a
 
 export function useIniciativas() {
   return useQuery({ queryKey: [...CHAVE, "initiatives"], queryFn: ({ signal }) => ler(api.GET("/esg/initiatives", { signal })) });
+}
+
+export function useEscolhasEsg(activo: boolean) {
+  return useQuery({ queryKey: [...CHAVE, "lookups"], queryFn: ({ signal }) => ler(api.GET("/esg/lookups", { signal })), enabled: activo, staleTime: 60_000 });
 }
 
 export function useRelatorioEsg(ano: number) {

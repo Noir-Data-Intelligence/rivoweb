@@ -1955,8 +1955,10 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
   seguem); metas e medições até 4 casas, factor até 6, em texto; período da
   medição é o 1.º dia do mês (repetir corrige); desactivado sem medições nem
   escolha em iniciativas novas; iniciativa com datas por ordem, orçamento
-  ≥ 0, moeda ISO, progresso 0–100; encerrada sem acções; responsável só para
-  quem lê os RH (B41).
+  ≥ 0, moeda ISO, progresso 0–100; encerrada sem acções; responsável pelo
+  nome na vista e pelos colaboradores de `/esg/lookups` (B41, resolvido no
+  PR #116: o Manager vê-o e escolhe-o sem ler os RH; um responsável que já
+  não está activo continua escolhido ao corrigir).
 - **Escritas:** verificadas **na base local** (`f13-esg-escritas.spec.ts`):
   como Manager, indicador com meta 5 000 e factor 2,68, medições de janeiro
   (100) e fevereiro (999 corrigido para 150,5), relatório com 671,34 kgCO2e,

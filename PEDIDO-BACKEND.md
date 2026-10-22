@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `57c6d14`. Em aberto: **B24** (configuração) e
-> **B41** (responsável das iniciativas ESG, F13).
+> Revisto contra `main` @ `7c9b867`. Em aberto: **B24** (configuração).
+> **B41** está resolvido (PR #116) e o front já o usa: o nome do responsável
+> nas iniciativas ESG e os colaboradores em `/esg/lookups`; o Manager vê-o e
+> escolhe-o sem ler os RH (verificado na base local).
 > **B40** está resolvido (PR #115) e o front já o usa: nomes de quem tem a
 > viatura e de quem conduziu, colaboradores em `/fleet/lookups`, documentos
 > abertos pela viatura; o AssetManager junta os seus (um documento alheio dá
@@ -537,6 +539,8 @@ mas não os junta nem abre; o Admin junta e abre pelo arquivo.
    anexa (salvo `documents.read`) e `documents.write` para o AssetManager.
 
 ## B41 — As iniciativas ESG só trazem o id do responsável e o Manager não o escolhe
+
+> **Resolvido** (PR #116, 2026-10-22); o front usa-o e foi verificado na base local (`7c9b867`).
 
 **Facto:** `InitiativeView` traz `ownerEmployeeId`, sem o nome; planear ou
 corrigir pede o id e o servidor confirma-o contra os RH (ADR-084). O Manager

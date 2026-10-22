@@ -25715,6 +25715,7 @@
         "tags": [
           "EsgModuleEndpoints"
         ],
+        "summary": "Iniciativas, com `ownerName` ao lado do responsável (B41).",
         "responses": {
           "200": {
             "description": "OK",
@@ -25783,6 +25784,37 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/esg/lookups": {
+      "get": {
+        "tags": [
+          "EsgModuleEndpoints"
+        ],
+        "summary": "Colaboradores activos (id e nome), para escolher o responsável de uma iniciativa sem `hr.employees.read` (B41).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EsgLookups"
                 }
               }
             }
@@ -45516,6 +45548,36 @@
           }
         }
       },
+      "EsgLookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "EsgLookups": {
+        "required": [
+          "employees"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EsgLookupEntry"
+            }
+          }
+        }
+      },
       "EsgReport": {
         "required": [
           "year",
@@ -47965,6 +48027,12 @@
           },
           "status": {
             "type": "string"
+          },
+          "ownerName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

@@ -26284,6 +26284,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Iniciativas, com `ownerName` ao lado do responsável (B41). */
         get: {
             parameters: {
                 query?: never;
@@ -26375,6 +26376,56 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/esg/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores activos (id e nome), para escolher o responsável de uma iniciativa sem `hr.employees.read` (B41). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EsgLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -40195,6 +40246,14 @@ export interface components {
             /** Format: uuid */
             id: string;
         };
+        EsgLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        EsgLookups: {
+            employees: components["schemas"]["EsgLookupEntry"][];
+        };
         EsgReport: {
             /** Format: int32 */
             year: number | string;
@@ -40767,6 +40826,7 @@ export interface components {
             /** Format: int32 */
             progress: number | string;
             status: string;
+            ownerName?: null | string;
         };
         Insight: {
             area: string;

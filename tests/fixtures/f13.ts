@@ -82,6 +82,8 @@ export const IDF13 = {
   inactivo: "00000000-0000-4000-8000-000000001303",
   solar: "00000000-0000-4000-8000-000000001311",
   fechada: "00000000-0000-4000-8000-000000001312",
+  antiga: "00000000-0000-4000-8000-000000001321",
+  ana: "00000000-0000-4000-8000-000000001322",
 };
 
 export const indicadoresEsg = (): S["IndicatorView"][] => [
@@ -93,9 +95,12 @@ export const indicadoresEsg = (): S["IndicatorView"][] => [
 export const medicoesEsg = (): S["MeasurementView"][] => [{ measurementId: "m1", indicatorId: IDF13.gasoleo, period: "2026-02-01", value: 1200, reportedValue: 3216, source: "Facturas de combustível", notes: "<script>x</script>" }];
 
 export const iniciativasEsg = (): S["InitiativeView"][] => [
-  { initiativeId: IDF13.solar, title: "Painéis solares", pillar: "Environmental", description: "Armazém central.", indicatorId: IDF13.gasoleo, ownerEmployeeId: null, startsOn: "2026-03-01", endsOn: "2026-09-30", budget: 2500000, currency: "AOA", progress: 20, status: "InProgress" },
-  { initiativeId: IDF13.fechada, title: "Código de conduta", pillar: "Governance", description: null, indicatorId: null, ownerEmployeeId: null, startsOn: null, endsOn: null, budget: null, currency: "AOA", progress: 100, status: "Completed" },
+  { initiativeId: IDF13.solar, title: "Painéis solares", pillar: "Environmental", description: "Armazém central.", indicatorId: IDF13.gasoleo, ownerEmployeeId: IDF13.antiga, ownerName: "Joana <b>Antiga</b>", startsOn: "2026-03-01", endsOn: "2026-09-30", budget: 2500000, currency: "AOA", progress: 20, status: "InProgress" },
+  { initiativeId: IDF13.fechada, title: "Código de conduta", pillar: "Governance", description: null, indicatorId: null, ownerEmployeeId: null, ownerName: null, startsOn: null, endsOn: null, budget: null, currency: "AOA", progress: 100, status: "Completed" },
 ];
+
+/** Colaboradores activos para escolher o responsável (B41); a Joana já saiu. */
+export const escolhasEsg = (): S["EsgLookups"] => ({ employees: [{ id: IDF13.ana, name: "Ana Sustentável" }] });
 
 export const relatorioEsg = (ano = 2026): S["EsgReport"] => ({
   year: ano,
@@ -123,7 +128,6 @@ export const relatorioEsg = (ano = 2026): S["EsgReport"] => ({
   ],
 });
 
-export const meAdminEsg: S["CurrentUserResponse"] = { ...meAdminF13, permissions: [...new Set([...meAdminF13.permissions, "esg.esg.read", "esg.esg.write", "hr.employees.read"])] };
 
 // --- Bloco 3: IA (sempre simulada; os pedidos reais gastam saldo).
 

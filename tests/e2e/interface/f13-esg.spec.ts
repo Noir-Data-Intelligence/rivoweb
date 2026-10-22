@@ -3,19 +3,19 @@
  * pilar com a pontuação; indicadores (definir validado com o factor e a
  * fonte, corrigir e desactivar), medições do mês (lista com o convertido,
  * registar); iniciativas (planear, corrigir o progresso, concluir, cancelar;
- * o responsável só para quem lê os RH, B41). Texto de fora nunca vira HTML.
+ * o responsável pelo nome na vista e pelos colaboradores de `/esg/lookups`, B41). Texto de fora nunca vira HTML.
  */
 import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF1 } from "../apoio-f1";
-import { ID } from "../../fixtures/f1";
-import { IDF13, indicadoresEsg, iniciativasEsg, meAdminEsg, meManagerF13, medicoesEsg, relatorioEsg } from "../../fixtures/f13";
+import { escolhasEsg, IDF13, indicadoresEsg, iniciativasEsg, meManagerF13, medicoesEsg, relatorioEsg } from "../../fixtures/f13";
 
 function comEsg(api: ApiSimulada, me = meManagerF13): ApiSimulada {
   return comF1(api, me)
     .em("GET", "/esg/indicators", { status: 200, corpo: indicadoresEsg() })
     .em("GET", "/esg/measurements", { status: 200, corpo: medicoesEsg() })
     .em("GET", "/esg/initiatives", { status: 200, corpo: iniciativasEsg() })
+    .em("GET", "/esg/lookups", { status: 200, corpo: escolhasEsg() })
     .em("GET", "/esg/report", (route) => ({ status: 200, corpo: relatorioEsg(Number(new URL(route.request().url()).searchParams.get("year"))) }));
 }
 
@@ -106,7 +106,7 @@ test.describe("esg", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("Manager: iniciativas planeadas, corrigidas, concluídas e canceladas; sem o responsável (B41)", async ({ page, api, violacoes }) => {
+  test("Manager: iniciativas planeadas, corrigidas, concluídas e canceladas; o responsável sem os RH (B41)", async ({ page, api, violacoes }) => {
     await comEsg(api)
       .em("POST", "/esg/initiatives", { status: 201, corpo: { id: "n9" } })
       .em("PUT", `/esg/initiatives/${IDF13.solar}`, { status: 204 })
@@ -115,17 +115,20 @@ test.describe("esg", () => {
       .ligar();
     await entrar(page, meManagerF13.email);
     await page.goto("/esg?vista=iniciativas");
-    await expect(page.getByText("(B41)", { exact: false })).toBeVisible();
     const tabela = page.getByRole("table", { name: "Iniciativas" });
     await expect(tabela.getByRole("row").filter({ hasText: "Painéis solares" })).toContainText("ENV-01 · Gasóleo da frota");
+    await expect(tabela.getByRole("row").filter({ hasText: "Painéis solares" })).toContainText("Joana <b>Antiga</b>");
     await expect(tabela.getByRole("row").filter({ hasText: "Código de conduta" })).toContainText("Concluída");
+    await expect(tabela.getByRole("row").filter({ hasText: "Código de conduta" })).toContainText("Ninguém");
+    expect(api.pedidos.some((p) => p.caminho === "/esg/lookups")).toBe(false);
     await expect(page.getByRole("button", { name: "Corrigir a iniciativa Código de conduta" })).toHaveCount(0);
     expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
     await verificar(page);
 
     await page.getByRole("button", { name: "Nova iniciativa" }).click();
     const d = page.getByRole("dialog");
-    await expect(d.getByLabel("Responsável (opcional)")).toHaveCount(0);
+    await expect(d.getByLabel("Responsável (opcional)").locator("option", { hasText: "Joana" })).toHaveCount(0);
+    await d.getByLabel("Responsável (opcional)").selectOption({ label: "Ana Sustentável" });
     await d.getByLabel("Título").fill("Reciclagem");
     await d.getByLabel("Pilar").selectOption("Social");
     await d.getByLabel("Indicador (opcional)").selectOption({ label: "SOC-01 · Horas de formação <b>por pessoa</b>" });
@@ -138,14 +141,15 @@ test.describe("esg", () => {
     await d.getByLabel("Orçamento (opcional)").fill("150 000,5");
     await d.getByRole("button", { name: "Planear" }).click();
     await expect(d).toHaveCount(0);
-    expect(api.escritas("POST", "/esg/initiatives")[0]?.corpo).toEqual({ title: "Reciclagem", pillar: "Social", description: null, indicatorId: IDF13.formacao, ownerEmployeeId: null, startsOn: "2026-06-01", endsOn: "2026-12-31", budget: "150000.50", currency: "AOA", progress: 0 });
+    expect(api.escritas("POST", "/esg/initiatives")[0]?.corpo).toEqual({ title: "Reciclagem", pillar: "Social", description: null, indicatorId: IDF13.formacao, ownerEmployeeId: IDF13.ana, startsOn: "2026-06-01", endsOn: "2026-12-31", budget: "150000.50", currency: "AOA", progress: 0 });
 
     await page.getByRole("button", { name: "Corrigir a iniciativa Painéis solares" }).click();
     await expect(d.getByLabel("Progresso (%)")).toHaveValue("20");
+    await expect(d.getByLabel("Responsável (opcional)")).toHaveValue(IDF13.antiga);
     await d.getByLabel("Progresso (%)").fill("60");
     await d.getByRole("button", { name: "Guardar" }).click();
     await expect(d).toHaveCount(0);
-    expect(api.escritas("PUT", `/esg/initiatives/${IDF13.solar}`)[0]?.corpo).toMatchObject({ title: "Painéis solares", progress: 60, budget: "2500000.00", indicatorId: IDF13.gasoleo });
+    expect(api.escritas("PUT", `/esg/initiatives/${IDF13.solar}`)[0]?.corpo).toMatchObject({ title: "Painéis solares", progress: 60, budget: "2500000.00", indicatorId: IDF13.gasoleo, ownerEmployeeId: IDF13.antiga });
 
     await page.getByRole("button", { name: "Concluir a iniciativa Painéis solares" }).click();
     await d.getByRole("button", { name: "Concluir" }).click();
@@ -156,20 +160,5 @@ test.describe("esg", () => {
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/esg/initiatives/${IDF13.solar}/cancellation`)).toHaveLength(1);
     expect(await violacoes()).toEqual([]);
-  });
-
-  test("Admin, que lê os RH: escolhe e vê o responsável", async ({ page, api }) => {
-    await comEsg(api, meAdminEsg).em("POST", "/esg/initiatives", { status: 201, corpo: { id: "n9" } }).ligar();
-    await entrar(page, meAdminEsg.email);
-    await page.goto("/esg?vista=iniciativas");
-    await expect(page.getByText("(B41)", { exact: false })).toHaveCount(0);
-    await expect(page.getByRole("table", { name: "Iniciativas" }).getByRole("row").filter({ hasText: "Painéis solares" })).toContainText("Ninguém");
-    await page.getByRole("button", { name: "Nova iniciativa" }).click();
-    const d = page.getByRole("dialog");
-    await d.getByLabel("Título").fill("Voluntariado");
-    await d.getByLabel("Responsável (opcional)").selectOption(ID.emp1);
-    await d.getByRole("button", { name: "Planear" }).click();
-    await expect(d).toHaveCount(0);
-    expect(api.escritas("POST", "/esg/initiatives")[0]?.corpo).toMatchObject({ title: "Voluntariado", ownerEmployeeId: ID.emp1 });
   });
 });

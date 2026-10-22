@@ -72,7 +72,7 @@ AM = AssetManager.
 | Indicadores: ver, definir, corrigir e desactivar (meta, factor de conversão com a fonte) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Medições: ver as do ano (valor e convertido) e registar ou corrigir o valor de um mês | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Iniciativas: ver, planear, corrigir (progresso), concluir e cancelar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Iniciativas: ver e escolher o responsável ²⁰ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Iniciativas: ver e escolher o responsável ²⁰ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Inteligência artificial** (sempre por botão; cada pedido é pago) | | | | | | | | | | |
 | Assistente: leitura dos indicadores do período, previsão de receita e despesa, rascunhos de texto ²¹ | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
 | Ler uma factura de fornecedor (PDF ou imagem) para pré-preencher o registo | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -329,7 +329,7 @@ Recursos Humanos.»
 ¹⁷ Os ficheiros trazem o nome e abrem-se pelo projecto, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B39).
 ¹⁸ Os nomes de quem tem a viatura e de quem conduziu vêm na ficha; os colaboradores activos escolhem-se pela lista da frota, sem ler os Recursos Humanos (B40).
 ¹⁹ Os documentos abrem-se pela viatura, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B40).
-²⁰ A iniciativa só traz o id do responsável (B41): o nome e a escolha vêm dos Recursos Humanos, que o Manager não lê.
+²⁰ O nome do responsável vem na iniciativa; os colaboradores activos escolhem-se pela lista do ESG, sem ler os Recursos Humanos (B41).
 ²¹ A leitura usa só as áreas que a conta lê (finanças, RH, vendas); a previsão exige ler receita e despesa (o Sales não a obtém: 403).
 
 ---
@@ -1375,8 +1375,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Como no Admin.
 
 **ESG**
-- Tudo o que o Admin faz, salvo ver e escolher o responsável das iniciativas
-  (não lê os Recursos Humanos, B41).
+- Tudo o que o Admin faz, incluindo ver e escolher o responsável das
+  iniciativas (sem ler os Recursos Humanos, B41).
 
 **Assistente de IA**
 - Como no Admin: leitura do período, previsão e rascunhos. Lê a factura de

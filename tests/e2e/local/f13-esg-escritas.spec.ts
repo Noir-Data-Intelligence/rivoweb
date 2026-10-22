@@ -3,16 +3,16 @@
  * SuperAdmin local: uma conta Manager e uma colaboradora. Pela interface,
  * como Manager: indicador com factor de conversão e meta, duas medições (uma
  * corrigida ao repetir o mês), o relatório do ano com o valor convertido;
- * iniciativa planeada, corrigida e concluída, outra cancelada; indicador
- * desactivado. Como Admin local: iniciativa com a colaboradora responsável.
- * Confere tudo no servidor.
+ * iniciativa planeada com a colaboradora responsável (sem ler os RH, B41),
+ * corrigida e concluída, outra cancelada; indicador desactivado. Confere
+ * tudo no servidor.
  */
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
 const API_LOCAL = "http://localhost:5080";
 const FRONT_LOCAL = "http://localhost:5173";
 
-test.skip(process.env.RIVO_ESCRITAS_LOCAL !== "1" || !process.env.RIVO_LOCAL_EMAIL || !process.env.RIVO_LOCAL_ADMIN_EMAIL, "Só com a API local e as contas SuperAdmin e Admin locais.");
+test.skip(process.env.RIVO_ESCRITAS_LOCAL !== "1" || !process.env.RIVO_LOCAL_EMAIL, "Só com a API local e a conta SuperAdmin local.");
 
 const sufixo = Date.now().toString(36).toUpperCase();
 const marca = `[TESTE] ${sufixo}`;
@@ -46,12 +46,6 @@ async function entrar(page: Page, email: string, password: string) {
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
   await page.waitForURL((u) => !u.pathname.startsWith("/entrar"));
-}
-
-async function sair(page: Page) {
-  await page.getByRole("button", { name: /Conta de/ }).click();
-  await page.getByRole("menuitem", { name: "Sair" }).click();
-  await expect(page).toHaveURL(/\/entrar$/);
 }
 
 const dialogo = (page: Page) => page.getByRole("dialog");
@@ -110,9 +104,11 @@ test("F13: ESG — indicador, medições, relatório, iniciativas", async ({ pag
     await dialogo(page).getByLabel("Título").fill(titulo);
     await dialogo(page).getByLabel("Indicador (opcional)").selectOption({ label: `${codigo} · ${marca} Gasóleo` });
     await dialogo(page).getByLabel("Orçamento (opcional)").fill("2 500 000");
+    if (titulo.endsWith("Painéis")) await dialogo(page).getByLabel("Responsável (opcional)").selectOption({ label: `${marca} Sustentabilidade` });
     await dialogo(page).getByRole("button", { name: "Planear" }).click();
     await expect(dialogo(page)).toHaveCount(0);
   }
+  await expect(page.getByRole("table", { name: "Iniciativas" }).getByRole("row").filter({ hasText: `${marca} Painéis` })).toContainText(`${marca} Sustentabilidade`);
   await page.getByRole("button", { name: `Corrigir a iniciativa ${marca} Painéis` }).click();
   await dialogo(page).getByLabel("Progresso (%)").fill("40");
   await dialogo(page).getByRole("button", { name: "Guardar" }).click();
@@ -132,19 +128,6 @@ test("F13: ESG — indicador, medições, relatório, iniciativas", async ({ pag
   await expect(dialogo(page)).toHaveCount(0);
   await expect(page.getByRole("table", { name: "Indicadores" }).getByRole("row").filter({ hasText: codigo })).toContainText("Desactivado");
 
-  await sair(page);
-
-  // --- Admin: responsável ---
-  await entrar(page, process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "", process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "");
-  await page.goto("/esg?vista=iniciativas");
-  await page.getByRole("button", { name: "Nova iniciativa" }).click();
-  await dialogo(page).getByLabel("Título").fill(`${marca} Voluntariado`);
-  await dialogo(page).getByLabel("Pilar").selectOption("Social");
-  await dialogo(page).getByLabel("Responsável (opcional)").selectOption({ label: `${marca} Sustentabilidade` });
-  await dialogo(page).getByRole("button", { name: "Planear" }).click();
-  await expect(dialogo(page)).toHaveCount(0);
-  await expect(page.getByRole("table", { name: "Iniciativas" }).getByRole("row").filter({ hasText: `${marca} Voluntariado` })).toContainText(`${marca} Sustentabilidade`);
-
   // --- No servidor ---
   const inds = await sa<{ indicatorId: string; code: string; annualTarget: number; conversionFactor: number; convertedUnit: string; factorSource: string; isActive: boolean }[]>("GET", "/esg/indicators?includeInactive=true");
   const ind = inds.corpo.find((i) => i.code === codigo);
@@ -154,11 +137,10 @@ test("F13: ESG — indicador, medições, relatório, iniciativas", async ({ pag
     [`${ano}-01-01`, 100, 268],
     [`${ano}-02-01`, 150.5, 403.34],
   ]);
-  const inis = await sa<{ title: string; status: string; progress: number; budget: number; indicatorId: string | null; ownerEmployeeId: string | null }[]>("GET", "/esg/initiatives");
-  const por = Object.fromEntries(inis.corpo.filter((x) => x.title.startsWith(marca)).map((x) => [x.title, [x.status, Number(x.progress), x.budget === null ? null : Number(x.budget), x.indicatorId === ind?.indicatorId, x.ownerEmployeeId]]));
+  const inis = await sa<{ title: string; status: string; progress: number; budget: number; indicatorId: string | null; ownerEmployeeId: string | null; ownerName: string | null }[]>("GET", "/esg/initiatives");
+  const por = Object.fromEntries(inis.corpo.filter((x) => x.title.startsWith(marca)).map((x) => [x.title, [x.status, Number(x.progress), x.budget === null ? null : Number(x.budget), x.indicatorId === ind?.indicatorId, x.ownerEmployeeId, x.ownerName]]));
   expect(por).toEqual({
-    [`${marca} Painéis`]: ["Completed", 100, 2500000, true, null],
-    [`${marca} Cancelar`]: ["Cancelled", 0, 2500000, true, null],
-    [`${marca} Voluntariado`]: ["Planned", 0, null, false, pessoa.corpo.employeeId],
+    [`${marca} Painéis`]: ["Completed", 100, 2500000, true, pessoa.corpo.employeeId, `${marca} Sustentabilidade`],
+    [`${marca} Cancelar`]: ["Cancelled", 0, 2500000, true, null, null],
   });
 });

@@ -2,9 +2,7 @@
 import { useId, useState } from "react";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { SelectColaborador, useTodosColaboradores } from "@/features/rh";
 import { formatarData } from "@/lib/format/data";
-import { Alert } from "@/ui/Alert";
 import { BarraProgresso } from "@/ui/BarraProgresso";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
@@ -12,7 +10,7 @@ import { Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useAcaoEsg, useIndicadores, useIniciativas, type Iniciativa } from "./api";
+import { useAcaoEsg, useEscolhasEsg, useIndicadores, useIniciativas, type Iniciativa } from "./api";
 import { EstadoIniciativa, iniciativaEncerrada, pilarDe, PILARES } from "./comum";
 import { nomeIndicador } from "./Indicadores";
 import { errosIniciativa, iniciativaParaApi, temErros, type CamposIniciativa, type Pilar } from "./regras";
@@ -30,13 +28,8 @@ const camposDe = (x?: Iniciativa): CamposIniciativa => ({
   progresso: String(x?.progress ?? 0),
 });
 
-/** Quem lê os RH vê e escolhe o responsável (B41). */
-function usePessoas() {
-  const { pode } = useUtilizador();
-  const le = pode("hr.employees.read");
-  const lista = useTodosColaboradores(le);
-  return { le, nome: (id: string | null) => (id ? (lista.data?.items.find((c) => c.employeeId === id)?.fullName ?? "—") : "Ninguém") };
-}
+/** O nome vem na vista (B41); sem nome, o colaborador já não existe. */
+const nomeResponsavel = (x: Iniciativa) => (x.ownerEmployeeId ? (x.ownerName ?? "—") : "Ninguém");
 
 /** Planear (sem `x`) ou corrigir (com `x`) uma iniciativa. */
 function EditarIniciativa({ x }: { x?: Iniciativa }) {
@@ -45,7 +38,9 @@ function EditarIniciativa({ x }: { x?: Iniciativa }) {
   const [tentou, setTentou] = useState(false);
   const accao = useAcaoEsg();
   const indicadores = useIndicadores(true);
-  const pessoas = usePessoas();
+  const escolhas = useEscolhasEsg(aberto).data?.employees ?? [];
+  // Um responsável que já não está activo continua escolhido até se mudar.
+  const pessoas = x?.ownerEmployeeId && !escolhas.some((c) => c.id === x.ownerEmployeeId) ? [{ id: x.ownerEmployeeId, name: nomeResponsavel(x) }, ...escolhas] : escolhas;
   const idForm = useId();
   const erros = errosIniciativa(v);
   const campo = <K extends keyof CamposIniciativa>(k: K, y: CamposIniciativa[K]) => setV((z) => ({ ...z, [k]: y }));
@@ -120,11 +115,18 @@ function EditarIniciativa({ x }: { x?: Iniciativa }) {
               </Select>
             )}
           </Field>
-          {pessoas.le ? (
-            <Field rotulo="Responsável (opcional)">
-              {({ id, descricao }) => <SelectColaborador id={id} aria-describedby={descricao} valor={v.responsavel} aoMudar={(r) => campo("responsavel", r)} vazio="Ninguém" />}
-            </Field>
-          ) : null}
+          <Field rotulo="Responsável (opcional)">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.responsavel} onChange={(e) => campo("responsavel", e.target.value)}>
+                <option value="">Ninguém</option>
+                {pessoas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
           <Field rotulo="Progresso (%)" erro={tentou ? erros.progresso : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} inputMode="numeric" maxLength={3} autoComplete="off" className="text-right tabular-nums" aria-describedby={descricao} invalido={invalido} value={v.progresso} onChange={(e) => campo("progresso", e.target.value)} />}
           </Field>
@@ -181,7 +183,6 @@ export function IniciativasEsg() {
   const escreve = pode("esg.esg.write");
   const lista = useIniciativas();
   const indicadores = useIndicadores(true);
-  const pessoas = usePessoas();
   const colunas: Coluna<Iniciativa>[] = [
     {
       id: "titulo",
@@ -196,7 +197,7 @@ export function IniciativasEsg() {
     },
     { id: "pilar", cabecalho: "Pilar", esconderAte: "sm", celula: (x) => pilarDe(x.pillar) },
     { id: "indicador", cabecalho: "Indicador", esconderAte: "lg", className: "max-w-[12rem] truncate", celula: (x) => nomeIndicador(indicadores.data, x.indicatorId) },
-    ...(pessoas.le ? [{ id: "quem", cabecalho: "Responsável", esconderAte: "lg" as const, className: "max-w-[12rem] truncate", celula: (x: Iniciativa) => pessoas.nome(x.ownerEmployeeId) }] : []),
+    { id: "quem", cabecalho: "Responsável", esconderAte: "lg", className: "max-w-[12rem] truncate", celula: nomeResponsavel },
     { id: "periodo", cabecalho: "Período", esconderAte: "md", celula: (x) => (x.startsOn || x.endsOn ? `${x.startsOn ? formatarData(x.startsOn) : "…"} → ${x.endsOn ? formatarData(x.endsOn) : "…"}` : "—") },
     { id: "orc", cabecalho: "Orçamento", alinhar: "direita", esconderAte: "lg", celula: (x) => (x.budget === null ? "—" : moeda(x.budget, x.currency)) },
     { id: "prog", cabecalho: "Progresso", className: "min-w-[7rem]", celula: (x) => <BarraProgresso valor={Number(x.progress)} rotulo={`${x.title}: ${String(x.progress)}%`} /> },
@@ -226,7 +227,6 @@ export function IniciativasEsg() {
           <EditarIniciativa />
         </div>
       ) : null}
-      {escreve && !pessoas.le ? <Alert tom="info" titulo="Ver e escolher o responsável pede a leitura dos Recursos Humanos, que este perfil não tem (B41)." /> : null}
       <Tabela rotulo="Iniciativas" colunas={colunas} linhas={lista.data} chave={(x) => x.initiativeId} aCarregar={lista.isPending} erro={lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : undefined} vazio="Ainda não há iniciativas." />
     </div>
   );
