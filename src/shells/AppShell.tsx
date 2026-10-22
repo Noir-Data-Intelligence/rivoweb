@@ -6,9 +6,9 @@
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as D from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { ArrowLeft, ChevronsLeft, ChevronsRight, LogOut, Menu, Monitor, Moon, Sun, UserCog, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ChevronDown, LogOut, Menu, Monitor, Moon, PanelLeft, Sun, UserCog, X, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, matchPath, NavLink, Outlet, useLocation } from "react-router";
 import { useTema } from "@/app/theme";
 import { temGestao, type Shell } from "@/lib/auth/permissions";
 import { gravarPrefs, lerPrefs, type Tema } from "@/lib/prefs";
@@ -21,6 +21,7 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { cn } from "@/ui/cn";
 import { Logo } from "@/ui/Layout";
+import { ProcurarPagina } from "./ProcurarPagina";
 import { CONTA, MENU, NOTIFICACOES, type EntradaMenu } from "./rotas";
 
 /** No portal do colaborador, quem também gere volta ao backoffice pela barra lateral (§3.3). */
@@ -62,8 +63,8 @@ function ItemMenu({ e, compacto, aoNavegar }: { e: EntradaMenu; compacto: boolea
       onClick={aoNavegar}
       className={({ isActive }) =>
         cn(
-          "flex h-9 items-center gap-3 rounded-md px-3 text-base text-sidebar-foreground hover:bg-secondary pointer-coarse:h-11",
-          isActive && "bg-sidebar-active font-medium text-sidebar-active-foreground hover:bg-sidebar-active",
+          "flex h-8 items-center gap-3 rounded-lg border border-transparent px-3 text-[0.8125rem] text-sidebar-foreground hover:bg-secondary pointer-coarse:h-11",
+          isActive && "border-[var(--marca-destaque)] bg-[var(--marca-destaque-suave)] font-medium text-[var(--marca-destaque)] hover:bg-[var(--marca-destaque-suave)]",
           compacto && "justify-center px-0",
         )
       }
@@ -85,8 +86,42 @@ function ItemMenu({ e, compacto, aoNavegar }: { e: EntradaMenu; compacto: boolea
   );
 }
 
+/** Grupos fechados guardados nas preferências; o grupo da página aberta mostra-se sempre. */
+function useGruposFechados() {
+  const [fechados, setFechados] = useState<readonly string[]>(() => lerPrefs().gruposFechados);
+  const alternar = (g: string) => {
+    const novos = fechados.includes(g) ? fechados.filter((x) => x !== g) : [...fechados, g];
+    gravarPrefs({ gruposFechados: novos });
+    setFechados(novos);
+  };
+  return { fechados, alternar };
+}
+
+function GrupoMenu({ g, aberto, alternar, children }: { g: string; aberto: boolean; alternar: () => void; children: ReactNode }) {
+  const id = `grupo-${g.replace(/\W+/g, "-")}`;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <button
+        type="button"
+        aria-expanded={aberto}
+        aria-controls={id}
+        onClick={alternar}
+        className="flex h-7 items-center justify-between rounded-md px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {g}
+        <ChevronDown className={cn("size-3.5 transition-transform", !aberto && "-rotate-90")} strokeWidth={1.75} aria-hidden />
+      </button>
+      <div id={id} hidden={!aberto} className="flex flex-col gap-0.5">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function Navegacao({ shell, compacto, aoNavegar }: { shell: Shell; compacto: boolean; aoNavegar?: () => void }) {
   const { pode, utilizador } = useUtilizador();
+  const { pathname } = useLocation();
+  const { fechados, alternar } = useGruposFechados();
   const itens = MENU[shell].filter((e) => pode(e.requer));
   const voltar = shell === "colaborador" && temGestao(utilizador.permissions);
   const grupos = new Map<string, EntradaMenu[]>();
@@ -96,14 +131,22 @@ function Navegacao({ shell, compacto, aoNavegar }: { shell: Shell; compacto: boo
   }
   return (
     <nav aria-label="Principal" className="flex flex-col gap-4">
-      {[...grupos.entries()].map(([g, lista]) => (
-        <div key={g || "_"} className="flex flex-col gap-0.5">
-          {g && !compacto ? <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g}</p> : null}
-          {lista.map((e) => (
-            <ItemMenu key={e.caminho} e={e} compacto={compacto} {...(aoNavegar ? { aoNavegar } : {})} />
-          ))}
-        </div>
-      ))}
+      {[...grupos.entries()].map(([g, lista]) => {
+        const ligacoes = lista.map((e) => <ItemMenu key={e.caminho} e={e} compacto={compacto} {...(aoNavegar ? { aoNavegar } : {})} />);
+        if (!g || compacto) {
+          return (
+            <div key={g || "_"} className="flex flex-col gap-0.5">
+              {ligacoes}
+            </div>
+          );
+        }
+        const temActiva = lista.some((e) => matchPath({ path: e.caminho, end: e.exacto ?? false }, pathname) !== null);
+        return (
+          <GrupoMenu key={g} g={g} aberto={temActiva || !fechados.includes(g)} alternar={() => alternar(g)}>
+            {ligacoes}
+          </GrupoMenu>
+        );
+      })}
       {voltar ? (
         <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-4">
           <ItemMenu e={VOLTAR_GESTAO} compacto={compacto} {...(aoNavegar ? { aoNavegar } : {})} />
@@ -167,10 +210,11 @@ function MenuUtilizador({ shell }: { shell: Shell }) {
       <Dropdown.Trigger asChild>
         <button
           type="button"
-          className="flex size-9 items-center justify-center rounded-full bg-accent text-sm font-medium text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-coarse:size-11"
+          className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`Conta de ${nome}`}
         >
-          {iniciais || "?"}
+          <span className="flex size-8 items-center justify-center rounded-full bg-[image:var(--marca-gradiente-rivo)] text-xs font-semibold text-white pointer-coarse:size-11">{iniciais || "?"}</span>
+          <span className="hidden max-w-[14rem] truncate pr-1 text-sm font-medium text-foreground xl:inline">{utilizador.email}</span>
         </button>
       </Dropdown.Trigger>
       <Dropdown.Portal>
@@ -262,7 +306,10 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
         >
           <div className={cn("flex items-center", colapsada ? "justify-center" : "justify-center lg:justify-start lg:px-2")}>
             <LogoInicio shell={shell} comNome={false} className={colapsada ? "" : "lg:hidden"} />
-            <LogoInicio shell={shell} className={colapsada ? "hidden" : "hidden lg:inline-flex"} />
+            <div className={colapsada ? "hidden" : "hidden lg:flex lg:flex-col lg:gap-0.5"}>
+              <LogoInicio shell={shell} />
+              <span className="pl-9 text-[0.625rem] font-medium tracking-wide text-muted-foreground">Your Business. Under Control.</span>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto">
             <div className={colapsada ? "" : "lg:hidden"}>
@@ -272,15 +319,7 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
               <Navegacao shell={shell} compacto={false} />
             </div>
           </div>
-          <Button
-            variante="ghost"
-            tamanho="icone"
-            className="mx-auto hidden lg:inline-flex"
-            onClick={alternar}
-            aria-label={colapsada ? "Expandir barra lateral" : "Colapsar barra lateral"}
-          >
-            {colapsada ? <ChevronsRight strokeWidth={1.75} aria-hidden /> : <ChevronsLeft strokeWidth={1.75} aria-hidden />}
-          </Button>
+          <p className={cn("border-t border-sidebar-border px-2 pt-3 text-[0.6875rem] text-muted-foreground", colapsada ? "hidden" : "hidden lg:block")}>© {new Date().getFullYear()} Rivo</p>
         </aside>
         <Gaveta shell={shell} aberta={gaveta} setAberta={setGaveta} />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -288,8 +327,21 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
             <Button variante="ghost" tamanho="icone" className="md:hidden" onClick={() => setGaveta(true)} aria-label="Abrir menu">
               <Menu strokeWidth={1.75} aria-hidden />
             </Button>
+            <Button
+              variante="ghost"
+              tamanho="icone"
+              className="hidden lg:inline-flex"
+              onClick={alternar}
+              aria-label={colapsada ? "Expandir barra lateral" : "Colapsar barra lateral"}
+              aria-pressed={!colapsada}
+            >
+              <PanelLeft strokeWidth={1.75} aria-hidden />
+            </Button>
             <LogoInicio shell={shell} comNome={false} className="md:hidden" />
-            <div className="min-w-0 flex-1">{nomeShell ? <p className="truncate text-sm font-medium text-muted-foreground">{nomeShell}</p> : null}</div>
+            {nomeShell ? <p className="min-w-0 max-w-[11rem] truncate text-sm font-medium text-muted-foreground">{nomeShell}</p> : null}
+            <div className="flex min-w-0 flex-1 justify-center px-2">
+              <ProcurarPagina shell={shell} />
+            </div>
             <Sino caminhoPagina={NOTIFICACOES[shell]} />
             <MenuTema />
             <MenuUtilizador shell={shell} />

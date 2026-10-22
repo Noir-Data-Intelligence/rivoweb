@@ -12,6 +12,7 @@ import { Card } from "@/ui/Card";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { useKpis, useMeuPainel } from "../api";
+import { ActividadeRecente, AtalhosPainel, EcossistemaRivo, InsightsIa, TopClientesCartao } from "../blocosPainel";
 import { Anuncios, SeccaoFinancas, SeccaoPessoas, SeccaoVendas, SeletorPeriodo, SemSeccoes, usePeriodo } from "../componentes";
 
 export function saudacao(nome: string | null | undefined, email: string): string {
@@ -65,6 +66,21 @@ export function ResumoPessoal({ prefixo }: { prefixo: string }) {
   );
 }
 
+/** Actividade recente e IA à esquerda; os clientes que mais facturaram à direita. */
+function Complementos() {
+  const { janela } = usePeriodo();
+  const kpis = useKpis(janela);
+  return (
+    <div className="grid gap-4 lg:grid-cols-3">
+      <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+        <ActividadeRecente />
+        <InsightsIa />
+      </div>
+      <TopClientesCartao f={kpis.data?.finance} moedaKpis={kpis.data?.currency ?? "AOA"} aCarregar={kpis.isPending} />
+    </div>
+  );
+}
+
 function Indicadores() {
   const { periodo, janela, mudar } = usePeriodo();
   const kpis = useKpis(janela);
@@ -95,10 +111,12 @@ export default function Painel() {
   const { utilizador } = useUtilizador();
   return (
     <>
-      <PageHeader titulo={saudacao(utilizador.displayName, utilizador.email)} />
+      <PageHeader titulo={saudacao(utilizador.displayName, utilizador.email)} descricao="Aqui está a visão geral do seu negócio." accao={<AtalhosPainel />} />
       <div className="flex flex-col gap-8">
         <ResumoPessoal prefixo="/" />
+        <EcossistemaRivo />
         <Indicadores />
+        <Complementos />
       </div>
     </>
   );

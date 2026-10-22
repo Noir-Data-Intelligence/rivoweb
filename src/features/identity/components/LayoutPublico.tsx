@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Lock, ShieldCheck } from "lucide-react";
 import { API_DISPONIVEL } from "@/lib/env";
 import { Alert } from "@/ui/Alert";
-import "@/styles/tema-entrada.css";
 
 /** Texto em gradiente da marca (tema da entrada). */
 const GRADIENTE_TEXTO = "bg-[image:var(--entrada-gradiente)] bg-clip-text text-transparent";

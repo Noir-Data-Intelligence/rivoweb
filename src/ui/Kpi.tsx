@@ -7,9 +7,9 @@ import { cn } from "./cn";
  */
 export function Kpi({ rotulo, valor, detalhe, className }: { rotulo: string; valor: ReactNode; detalhe?: ReactNode; className?: string }) {
   return (
-    <div className={cn("min-w-0 rounded-card border border-border bg-card p-4", className)}>
-      <p className="truncate text-sm text-muted-foreground">{rotulo}</p>
-      <p className="mt-1 truncate text-lg font-semibold tabular-nums text-foreground">{valor}</p>
+    <div className={cn("min-w-0 rounded-card border border-l-2 border-border border-l-[var(--marca-destaque)] bg-card p-4", className)}>
+      <p className="truncate text-[0.6875rem] font-medium uppercase tracking-[0.08em] text-muted-foreground">{rotulo}</p>
+      <p className="mt-1.5 truncate text-xl font-bold tabular-nums text-foreground">{valor}</p>
       {detalhe ? <p className="mt-1 truncate text-xs text-muted-foreground">{detalhe}</p> : null}
     </div>
   );

@@ -256,7 +256,7 @@ test.describe("portal do cliente", () => {
       .em("POST", `/customer-portal/me/projects/${IDF12.projecto}/milestones/${IDF12.marco2}/comments`, { status: 201, corpo: { commentId: "pc1" } })
       .ligar();
     await entrar(page, meCliente.email);
-    await page.getByRole("link", { name: "Projectos" }).click();
+    await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Projectos" }).click();
     await expect(page.getByRole("list", { name: "Projectos" })).toContainText("Próximo marco: Go-live, a 30/06/2026");
     await verificar(page);
     await page.getByRole("link", { name: "Implementação ERP" }).click();

@@ -34,7 +34,7 @@ test.describe("esg", () => {
       .em("POST", `/esg/indicators/${IDF13.gasoleo}/measurements`, { status: 201, corpo: { id: "m9" } })
       .ligar();
     await entrar(page, meManagerF13.email);
-    await page.getByRole("link", { name: "ESG" }).click();
+    await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "ESG" }).click();
     await expect(page.getByText("Pontuação global").locator("..")).toContainText("50,0");
     const amb = page.getByRole("table", { name: "Indicadores Ambiental" });
     await expect(amb.getByRole("row").filter({ hasText: "ENV-01" })).toContainText("Sim");

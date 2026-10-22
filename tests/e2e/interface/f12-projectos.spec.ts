@@ -42,7 +42,7 @@ test.describe("projectos", () => {
       .em("POST", `/projects/${IDF12.projecto}/milestones/${IDF12.marco2}/comments`, { status: 201, corpo: { id: "c9" } })
       .ligar();
     await entrar(page, meGestorProjectos.email);
-    await page.getByRole("link", { name: "Projectos" }).click();
+    await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Projectos" }).click();
     const tabela = page.getByRole("table", { name: "Projectos" });
     await expect(tabela).toContainText("Implementação ERP");
     await expect(tabela).not.toContainText("Auditoria 2025");

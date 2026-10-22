@@ -67,7 +67,7 @@ test("F12: projectos — orçamento, marcos, tarefas, quadro, dependências, Gan
   await page.waitForURL((u) => !u.pathname.startsWith("/entrar"));
 
   // --- Projecto e orçamento ---
-  await page.getByRole("link", { name: "Projectos" }).click();
+  await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Projectos" }).click();
   await page.getByRole("button", { name: "Novo projecto" }).click();
   await dialogo(page).getByLabel("Nome").fill(`${marca} Implementação`);
   await dialogo(page).getByLabel("Início").fill("2026-02-01");

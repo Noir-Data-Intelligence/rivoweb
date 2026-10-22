@@ -131,11 +131,11 @@ describe("descargas (§2.5, S17)", () => {
 });
 
 describe("preferências (§1.4)", () => {
-  it("só tema e barra, com valores inválidos a cair na omissão", () => {
-    localStorage.setItem("rivo.prefs", JSON.stringify({ tema: "roxo", barraColapsada: "sim", token: "x" }));
-    expect(lerPrefs()).toEqual({ tema: "sistema", barraColapsada: false });
+  it("só tema, barra e grupos fechados, com valores inválidos a cair na omissão", () => {
+    localStorage.setItem("rivo.prefs", JSON.stringify({ tema: "roxo", barraColapsada: "sim", gruposFechados: ["Vendas", 3], token: "x" }));
+    expect(lerPrefs()).toEqual({ tema: "sistema", barraColapsada: false, gruposFechados: ["Vendas"] });
     gravarPrefs({ tema: "escuro" });
-    expect(JSON.parse(localStorage.getItem("rivo.prefs") ?? "{}")).toEqual({ tema: "escuro", barraColapsada: false });
+    expect(JSON.parse(localStorage.getItem("rivo.prefs") ?? "{}")).toEqual({ tema: "escuro", barraColapsada: false, gruposFechados: ["Vendas"] });
     localStorage.setItem("rivo.prefs", "{corrompido");
     expect(lerPrefs().tema).toBe("sistema");
   });

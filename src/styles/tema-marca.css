@@ -1,0 +1,27 @@
+/*
+ * Tema da marca pedido pelo utilizador a 2026-10-22 a partir de
+ * https://rivo.noirdataintelligence.com: ecrãs públicos (entrar, convite,
+ * recuperação), barra lateral, cabeçalho, indicadores e painel. Fica fora de
+ * `tokens.css` (cópia byte a byte da IV).
+ */
+:root {
+  --entrada-painel: #07090E;
+  --entrada-painel-texto: #FFFFFF;
+  --entrada-painel-suave: #9CA3AF;
+  --entrada-brilho-1: rgb(25 148 210 / 0.1);
+  --entrada-brilho-2: rgb(132 52 223 / 0.1);
+  --entrada-gradiente: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
+  --entrada-destaque: #494BDF;
+  --entrada-fundo: #F9F9FB;
+  /* Destaque e gradiente usados também dentro da aplicação. */
+  --marca-destaque: #494BDF;
+  --marca-destaque-suave: rgb(73 75 223 / 0.08);
+  --marca-gradiente-rivo: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
+}
+
+.dark {
+  --entrada-destaque: #9496F2;
+  --marca-destaque: #9496F2;
+  --marca-destaque-suave: rgb(148 150 242 / 0.12);
+  --entrada-fundo: hsl(var(--background));
+}

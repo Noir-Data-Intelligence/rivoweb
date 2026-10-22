@@ -36,6 +36,11 @@ conta; no portal, «Voltar à gestão» fica no fundo da barra lateral (e no men
 da conta), e o logotipo leva de volta ao ecrã principal com os menus
 completos. Em qualquer ambiente, o logotipo leva ao início desse ambiente.
 
+Navegação comum: os grupos do menu lateral abrem e fecham (lembrado no
+browser; o grupo da página aberta mostra-se sempre); o botão no topo colapsa a
+barra; **«Ir para…»** (Ctrl/⌘ K) procura entre as páginas do menu que a conta
+pode abrir (não procura dados).
+
 ---
 
 ## 2. Matriz de funcionalidades
@@ -399,7 +404,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 ### Admin
 **Início**
+- Atalhos para as páginas que o perfil abre: nova factura, recibos, despesas,
+  colaboradores, salários.
 - Resumo pessoal: notificações por ler, aprovações à espera, anúncios em vigor.
+- **O seu ecossistema Rivo:** os sete módulos (Finanças, RH, Comercial,
+  Projectos, Inventário, Frota, ESG), com ligação nos que o perfil abre e
+  cadeado nos outros.
 - Indicadores do período (este mês, últimos 3 meses, este ano, ano anterior):
   - **Finanças:** receita, despesa, resultado, a receber e a pagar; gráfico de
     receita e despesa por mês.
@@ -411,6 +421,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     por etapa e das oportunidades ganhas por mês.
 - Cada gráfico tem como título uma conclusão calculada dos dados e «Ver como
   tabela» com os mesmos números, exportável em CSV.
+- **Actividade recente** (as 5 facturas mais recentes, para quem lê a
+  facturação), **Insights IA** (leva ao assistente; nenhum pedido pago sai do
+  painel) e **Top 5 clientes** do período (para quem lê as finanças).
+- Os outros perfis de gestão vêem o mesmo painel, só com os atalhos, módulos,
+  secções e cartões que as suas permissões abrem.
 
 **Dashboard executivo**
 - Receita, despesa, resultado, a receber e a pagar do período; evolução mensal;

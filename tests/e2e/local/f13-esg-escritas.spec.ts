@@ -66,7 +66,7 @@ test("F13: ESG — indicador, medições, relatório, iniciativas", async ({ pag
 
   // --- Manager: indicador e medições ---
   await entrar(page, email, PASSWORD_LOCAL);
-  await page.getByRole("link", { name: "ESG" }).click();
+  await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "ESG" }).click();
   await page.getByRole("link", { name: "Indicadores" }).click();
   await page.getByRole("button", { name: "Novo indicador" }).click();
   await dialogo(page).getByLabel("Código").fill(codigo.toLowerCase());
