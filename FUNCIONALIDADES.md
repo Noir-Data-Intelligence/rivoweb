@@ -339,6 +339,10 @@ Recursos Humanos.»
 ### Acesso
 - **Entrar** com e-mail e password. Credenciais erradas mostram «E-mail ou
   password incorrectos.», sem dizer qual dos dois falhou.
+  A password pode mostrar-se e esconder-se. Não há registo nem conta de
+  demonstração: o acesso é dado por convite. Os ecrãs públicos (entrar,
+  convite, recuperação) têm o tema da marca: painel escuro com «Your
+  Business. Under Control.» em ecrãs largos e o formulário ao lado.
 - **Aceitar convite** pela ligação do e-mail (`/convite`): define a password e
   entra. A ligação é lida e retirada do endereço logo ao abrir.
 - **Recuperar password** (`/recuperar-password`): a resposta é sempre a mesma,

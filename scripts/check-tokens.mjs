@@ -1,4 +1,5 @@
 // A IV é vinculativa (§4.1): tokens e preset copiados byte a byte, nenhum hex nos componentes.
+// Excepção: `tema-entrada.css`, o tema dos ecrãs públicos pedido pelo utilizador (2026-10-22).
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -24,7 +25,7 @@ function ficheiros(dir) {
 }
 
 for (const f of ficheiros("src")) {
-  if (!/\.(tsx?|css)$/.test(f) || f.endsWith("tokens.css") || f.endsWith("schema.d.ts")) continue;
+  if (!/\.(tsx?|css)$/.test(f) || f.endsWith("tokens.css") || f.endsWith("tema-entrada.css") || f.endsWith("schema.d.ts")) continue;
   const linhas = readFileSync(f, "utf8").split("\n");
   linhas.forEach((l, i) => {
     if (/#[0-9a-fA-F]{3,8}\b/.test(l) && !/^\s*(\/\/|\*|\/\*)/.test(l)) falhas.push(`${f}:${i + 1}: cor literal`);

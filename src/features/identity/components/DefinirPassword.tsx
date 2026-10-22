@@ -17,6 +17,7 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
+import { BOTAO_ENTRADA, CAMPO_ENTRADA, ROTULOS_ENTRADA } from "./LayoutPublico";
 
 type Testemunho = { readonly userId: string; readonly token: string } | null;
 
@@ -102,7 +103,7 @@ export function DefinirPassword({
     return (
       <div className="flex flex-col gap-4">
         <Alert tom="sucesso" titulo={sucesso} />
-        <Button asChild tamanho="lg">
+        <Button asChild tamanho="lg" className={BOTAO_ENTRADA}>
           <Link to="/entrar">Entrar</Link>
         </Button>
       </div>
@@ -122,7 +123,7 @@ export function DefinirPassword({
   const ligacaoExpirada = erroApi !== null && erroApi.status === 400 && Object.keys(erroApi.errors).length === 0;
 
   return (
-    <form onSubmit={submeter} noValidate className="flex flex-col gap-4">
+    <form onSubmit={submeter} noValidate className={`flex flex-col gap-5 ${ROTULOS_ENTRADA}`}>
       {ligacaoExpirada ? (
         <Alert tom="erro" titulo={erroApi?.detail ?? "A ligação já não é válida."}>
           {ligacaoInvalida}
@@ -132,15 +133,15 @@ export function DefinirPassword({
       ) : null}
       <Field rotulo="Nova password" erro={form.formState.errors.password?.message} ajuda={<RegrasPassword valor={password} />}>
         {({ id, descricao, invalido }) => (
-          <Input id={id} type="password" autoComplete="new-password" maxLength={128} aria-describedby={descricao} invalido={invalido} {...form.register("password")} />
+          <Input id={id} type="password" autoComplete="new-password" className={CAMPO_ENTRADA} maxLength={128} aria-describedby={descricao} invalido={invalido} {...form.register("password")} />
         )}
       </Field>
       <Field rotulo="Repita a password" erro={form.formState.errors.confirmacao?.message}>
         {({ id, descricao, invalido }) => (
-          <Input id={id} type="password" autoComplete="new-password" maxLength={128} aria-describedby={descricao} invalido={invalido} {...form.register("confirmacao")} />
+          <Input id={id} type="password" autoComplete="new-password" className={CAMPO_ENTRADA} maxLength={128} aria-describedby={descricao} invalido={invalido} {...form.register("confirmacao")} />
         )}
       </Field>
-      <Button type="submit" tamanho="lg" aCarregar={mutacao.isPending} disabled={!API_DISPONIVEL}>
+      <Button type="submit" tamanho="lg" className={BOTAO_ENTRADA} aCarregar={mutacao.isPending} disabled={!API_DISPONIVEL}>
         {textoBotao}
       </Button>
     </form>

@@ -10,7 +10,7 @@ import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { usePedirRecuperacao } from "../api";
-import { LayoutPublico } from "../components/LayoutPublico";
+import { BOTAO_ENTRADA, CAMPO_ENTRADA, LayoutPublico, LIGACAO_ENTRADA, ROTULOS_ENTRADA } from "../components/LayoutPublico";
 
 const esquema = z.object({ email });
 type Dados = z.infer<typeof esquema>;
@@ -37,12 +37,12 @@ export default function RecuperarPassword() {
           <Alert tom="sucesso" titulo="Se existir uma conta com esse endereço, a mensagem já saiu.">
             Abra a ligação do e-mail neste dispositivo. A ligação é de uso único e tem prazo.
           </Alert>
-          <Link to="/entrar" className="text-sm text-primary underline-offset-4 hover:underline">
+          <Link to="/entrar" className={`text-sm ${LIGACAO_ENTRADA}`}>
             Voltar a entrar
           </Link>
         </div>
       ) : (
-        <form onSubmit={submeter} noValidate className="flex flex-col gap-4">
+        <form onSubmit={submeter} noValidate className={`flex flex-col gap-5 ${ROTULOS_ENTRADA}`}>
           <p className="text-base text-muted-foreground">Indique o e-mail da sua conta. Enviamos uma ligação para definir uma password nova.</p>
           {indisponivel ? (
             <Alert tom="aviso" titulo="A recuperação por e-mail não está disponível.">
@@ -53,13 +53,13 @@ export default function RecuperarPassword() {
           ) : null}
           <Field rotulo="E-mail" erro={form.formState.errors.email?.message}>
             {({ id, descricao, invalido }) => (
-              <Input id={id} type="email" autoComplete="username" inputMode="email" maxLength={256} aria-describedby={descricao} invalido={invalido} {...form.register("email")} />
+              <Input id={id} type="email" autoComplete="username" className={CAMPO_ENTRADA} inputMode="email" maxLength={256} aria-describedby={descricao} invalido={invalido} {...form.register("email")} />
             )}
           </Field>
-          <Button type="submit" tamanho="lg" aCarregar={pedir.isPending} disabled={!API_DISPONIVEL}>
+          <Button type="submit" tamanho="lg" className={BOTAO_ENTRADA} aCarregar={pedir.isPending} disabled={!API_DISPONIVEL}>
             Enviar ligação
           </Button>
-          <Link to="/entrar" className="text-sm text-primary underline-offset-4 hover:underline">
+          <Link to="/entrar" className={`text-sm ${LIGACAO_ENTRADA}`}>
             Voltar a entrar
           </Link>
         </form>
