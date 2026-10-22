@@ -4,7 +4,7 @@ import { meAdminF12 } from "./f12";
 
 type S = components["schemas"];
 
-export const meAdminF13: S["CurrentUserResponse"] = { ...meAdminF12, permissions: [...new Set([...meAdminF12.permissions, "analytics.overview.read", "audit.trail.read", "identity.users.read"])] };
+export const meAdminF13: S["CurrentUserResponse"] = { ...meAdminF12, permissions: [...new Set([...meAdminF12.permissions, "analytics.overview.read", "audit.trail.read", "identity.users.read", "ai.assistant.use", "ai.provider.manage"])] };
 
 /** O Manager de produção lê o analytics, não a auditoria. */
 export const meManagerF13: S["CurrentUserResponse"] = {
@@ -124,3 +124,57 @@ export const relatorioEsg = (ano = 2026): S["EsgReport"] => ({
 });
 
 export const meAdminEsg: S["CurrentUserResponse"] = { ...meAdminF13, permissions: [...new Set([...meAdminF13.permissions, "esg.esg.read", "esg.esg.write", "hr.employees.read"])] };
+
+// --- Bloco 3: IA (sempre simulada; os pedidos reais gastam saldo).
+
+export const estadoIa = (ligada = true): S["AiStatusResponse"] => ({ enabled: ligada, model: ligada ? "claude-opus-5" : null, provider: ligada ? "anthropic" : null, fallbackEnabled: true });
+
+export const fornecedorIa = (): S["AiProviderSettingsView"] => ({
+  activeProvider: "anthropic",
+  fallbackEnabled: true,
+  updatedAt: null,
+  providers: [
+    { name: "anthropic", configured: true, model: "claude-opus-5" },
+    { name: "openai", configured: true, model: "gpt-5" },
+    { name: "outro", configured: false, model: "x-1" },
+  ],
+});
+
+export const leituraIa = (): S["InsightsView"] => ({
+  from: "2026-01-01",
+  to: "2026-10-22",
+  sections: ["finance", "sales"],
+  summary: "A receita cresceu 12% face ao trimestre anterior.\n<script>x</script>",
+  insights: [
+    { area: "finance", severity: "attention", title: "Clientes a pagar mais tarde", detail: "O prazo médio subiu para 48 dias." },
+    { area: "sales", severity: "critical", title: "Pipeline concentrado", detail: "Duas oportunidades valem 70% do pipeline." },
+  ],
+  model: "claude-opus-5",
+});
+
+export const previsaoIa = (): S["RevenueForecastView"] => ({
+  currency: "AOA",
+  history: [{ month: "2026-09", revenue: 1500000, expenses: 900000 }],
+  forecast: [
+    { month: "2026-11", revenue: 1600000, expenses: 950000 },
+    { month: "2026-12", revenue: 1700000.5, expenses: 980000 },
+  ],
+  method: "Média móvel com sazonalidade",
+  assumptions: "Sem novos contratos grandes.",
+  confidence: "Média",
+  model: "claude-opus-5",
+});
+
+export const facturaLida = (): S["ExtractedInvoice"] => ({
+  supplierName: "Kwanza Serviços, Lda",
+  supplierTaxId: "5417 000001",
+  invoiceNumber: "FT 2026/777",
+  issuedOn: "2026-10-01",
+  dueOn: "2026-10-31",
+  currency: "AOA",
+  netTotal: 100000,
+  taxTotal: 14000,
+  grossTotal: 114000,
+  lines: [{ description: "Manutenção do gerador", quantity: 1, unitPrice: 100000, taxRate: 14, total: 114000 }],
+  warnings: ["A data de vencimento estava pouco legível."],
+});

@@ -42,6 +42,8 @@ export function mensagemErro(e: unknown): MensagemErro {
       };
     case 501:
       return { titulo: "Esta funcionalidade não está configurada.", detalhe: e.detail, codigoSuporte: null };
+    case 502:
+      return { titulo: "O serviço externo não respondeu.", detalhe: e.detail ?? "Tente de novo dentro de momentos.", codigoSuporte: codigo };
     case 503:
       return { titulo: "Sem ligação ao servidor.", detalhe: "O serviço está indisponível. Tente dentro de momentos.", codigoSuporte: codigo };
     default:

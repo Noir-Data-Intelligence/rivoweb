@@ -6,6 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { z } from "zod/mini";
 import { moeda } from "@/features/facturacao";
+import { LerFacturaComIa, type FacturaLida } from "@/features/ia";
 import { Can, useUtilizador } from "@/features/identity";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
 import { eApiError } from "@/lib/api/problem";
@@ -76,6 +77,26 @@ function NovaFactura() {
     }
   };
   const e = form.formState.errors;
+  // O que a IA leu entra nos campos; quem regista confirma. O fornecedor registado com o mesmo NIF é escolhido.
+  const preencher = (f: FacturaLida) => {
+    const pt = (x: number | string | null) => (x === null ? null : String(x).replace(".", ","));
+    const nif = (f.supplierTaxId ?? "").replace(/\s/g, "");
+    const registado = nif ? fornecedores.data?.items.find((x) => x.taxId.replace(/\s/g, "") === nif) : undefined;
+    const por = (k: (typeof CAMPOS)[number], x: string | null | undefined) => {
+      if (x !== null && x !== undefined && x !== "") form.setValue(k, x, { shouldDirty: true });
+    };
+    por("supplierId", registado?.supplierId ?? "");
+    if (!registado) {
+      por("supplierName", f.supplierName);
+      por("supplierTaxId", f.supplierTaxId);
+    }
+    por("supplierInvoiceNumber", f.invoiceNumber);
+    if (f.issuedOn && IsoDate.safeParse(f.issuedOn).success) por("issuedOn", f.issuedOn);
+    if (f.dueOn && IsoDate.safeParse(f.dueOn).success) por("dueOn", f.dueOn);
+    if (MOEDAS.some((m) => m === f.currency)) por("currency", f.currency);
+    por("netTotal", pt(f.netTotal));
+    por("taxTotal", pt(f.taxTotal));
+  };
   return (
     <>
       <Button onClick={() => setAberto(true)}>
@@ -126,6 +147,7 @@ function NovaFactura() {
             );
           })}
         >
+          <LerFacturaComIa aoLer={preencher} />
           {pode("procurement.suppliers.read") ? (
             <Field rotulo="Fornecedor" erro={e.supplierId?.message} className="sm:col-span-2" ajuda={fornecedores.data && fornecedores.data.total > fornecedores.data.items.length ? `Só aparecem os primeiros ${String(fornecedores.data.items.length)} de ${String(fornecedores.data.total)}.` : undefined}>
               {({ id, descricao, invalido }) => (

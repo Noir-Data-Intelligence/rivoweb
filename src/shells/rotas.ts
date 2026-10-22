@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { Archive, AreaChart, History, Leaf, Car, ShieldCheck, Wrench, FolderKanban, Timer, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { Archive, AreaChart, Bot, BrainCircuit, History, Leaf, Car, ShieldCheck, Wrench, FolderKanban, Timer, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -24,6 +24,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/dashboard", titulo: "Dashboard executivo", icone: Gauge, requer: R["/dashboard"] },
     { caminho: "/analytics", titulo: "Analytics", icone: AreaChart, requer: R["/analytics"] },
     { caminho: "/esg", titulo: "ESG", icone: Leaf, requer: R["/esg"] },
+    { caminho: "/assistente", titulo: "Assistente de IA", icone: Bot, requer: R["/assistente"] },
     { caminho: "/aprovacoes", titulo: "Aprovações", icone: CheckSquare, requer: R["/aprovacoes"] },
     { caminho: "/alertas", titulo: "Alertas", icone: BellRing, requer: R["/alertas"] },
     { caminho: "/clientes", titulo: "Clientes", icone: Handshake, requer: R["/clientes"], grupo: "Vendas" },
@@ -107,6 +108,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/fiscal", titulo: "Fiscal", icone: Scale, requer: R["/fiscal"], grupo: "Administração" },
     { caminho: "/politicas-aprovacao", titulo: "Políticas de aprovação", icone: ListChecks, requer: R["/politicas-aprovacao"], grupo: "Administração" },
     { caminho: "/auditoria", titulo: "Auditoria", icone: History, requer: R["/auditoria"], grupo: "Administração" },
+    { caminho: "/ia", titulo: "Inteligência artificial", icone: BrainCircuit, requer: R["/ia"], grupo: "Administração" },
   ],
   colaborador: [
     { caminho: "/eu", titulo: "Início", icone: Home, requer: "autenticado", exacto: true },
@@ -131,6 +133,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/cliente/mensagens", titulo: "Mensagens", icone: MessageSquare, requer: "autenticado", grupo: "Apoio" },
     { caminho: "/cliente/suporte", titulo: "Suporte", icone: LifeBuoy, requer: "autenticado", grupo: "Apoio" },
     { caminho: "/cliente/ajuda", titulo: "Ajuda", icone: BookOpen, requer: "autenticado", grupo: "Apoio" },
+    { caminho: "/cliente/assistente", titulo: "Assistente", icone: Bot, requer: "autenticado", grupo: "Apoio" },
   ],
 };
 

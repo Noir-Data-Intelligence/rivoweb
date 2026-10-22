@@ -84,6 +84,7 @@ export const rotas: RouteObject[] = [
               { path: "suporte/:conversationId", element: preguicoso(pagina("pedidoSuporteCliente")) },
               { path: "ajuda", element: preguicoso(pagina("ajudaCliente")) },
               { path: "ajuda/:slug", element: preguicoso(pagina("artigoAjudaCliente")) },
+              { path: "assistente", element: preguicoso(pagina("assistenteCliente")) },
               { path: "projectos", element: preguicoso(pagina("projectosCliente")) },
               { path: "projectos/:projectId", element: preguicoso(pagina("projectoCliente")) },
               { path: "conta", element: preguicoso(pagina("minhaConta")) },
@@ -156,6 +157,8 @@ export const rotas: RouteObject[] = [
               { path: "analytics", element: protegido(R["/analytics"], pagina("analytics")) },
               { path: "auditoria", element: protegido(R["/auditoria"], pagina("auditoria")) },
               { path: "esg", element: protegido(R["/esg"], pagina("esg")) },
+              { path: "assistente", element: protegido(R["/assistente"], pagina("assistente")) },
+              { path: "ia", element: protegido(R["/ia"], pagina("configuracaoIa")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).

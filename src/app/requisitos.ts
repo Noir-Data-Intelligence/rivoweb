@@ -106,6 +106,8 @@ export const REQUISITO_PAGINA = {
   "/analytics": "analytics.overview.read",
   "/auditoria": "audit.trail.read",
   "/esg": "esg.esg.read",
+  "/assistente": "ai.assistant.use",
+  "/ia": "ai.provider.manage",
 } as const satisfies Record<string, Requisito>;
 
 /** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */

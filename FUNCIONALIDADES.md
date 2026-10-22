@@ -17,7 +17,7 @@
 > manutenção, atribuições, viagens, despesas, documentos, seguros e
 > sinistros) publicadas. Por publicar: ficheiros dos projectos abertos pelo
 > projecto (B39), nomes, escolhas e documentos da frota pela viatura (B40) e
-> os blocos 1 e 2 da **F13** (analytics, auditoria e ESG) ·
+> a **F13** completa (analytics, auditoria, ESG e IA) ·
 > actualizado a 2026-10-22.
 
 ---
@@ -26,16 +26,16 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Inteligência artificial |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Inteligência artificial |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
-| **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
+| **Finance** (Finanças) | Gestão (`/`) | Início, Assistente de IA, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
-| **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
+| **Sales** (Vendas) | Gestão (`/`) | Início, Assistente de IA, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
-| **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Projectos, Mensagens, Suporte, Ajuda |
+| **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Projectos, Mensagens, Suporte, Ajuda, Assistente |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
 perfil de gestão e ficha de colaborador vê também «O meu portal» no menu da
@@ -80,6 +80,11 @@ AM = AssetManager.
 | Medições: ver as do ano (valor e convertido) e registar ou corrigir o valor de um mês | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Iniciativas: ver, planear, corrigir (progresso), concluir e cancelar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Iniciativas: ver e escolher o responsável ²⁰ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Inteligência artificial** (sempre por botão; cada pedido é pago) | | | | | | | | | | |
+| Assistente: leitura dos indicadores do período, previsão de receita e despesa, rascunhos de texto ²¹ | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
+| Ler uma factura de fornecedor (PDF ou imagem) para pré-preencher o registo | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Configuração: ver o estado e os fornecedores; trocar o activo e o recurso ao outro | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Portal: perguntar ao assistente sobre as próprias facturas e saldo | — | — | — | — | — | — | — | — | — | ✓ |
 | **Aprovações** | | | | | | | | | | |
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -332,6 +337,7 @@ Recursos Humanos.»
 ¹⁸ Os nomes de quem tem a viatura e de quem conduziu vêm na ficha; os colaboradores activos escolhem-se pela lista da frota, sem ler os Recursos Humanos (B40).
 ¹⁹ Os documentos abrem-se pela viatura, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B40).
 ²⁰ A iniciativa só traz o id do responsável (B41): o nome e a escolha vêm dos Recursos Humanos, que o Manager não lê.
+²¹ A leitura usa só as áreas que a conta lê (finanças, RH, vendas); a previsão exige ler receita e despesa (o Sales não a obtém: 403).
 
 ---
 
@@ -450,6 +456,20 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     cancelada); **planear** e **corrigir** (com progresso acima de 0 passa a
     em curso), **concluir** (100 %) e **cancelar**; encerrada não se altera.
 
+**Assistente de IA**
+- Com a IA ligada (o fornecedor e o modelo à vista); desligada, um aviso e
+  nenhum botão. Nada se pede ao abrir nem ao mudar um campo: só ao carregar
+  no botão, com o aviso de que cada pedido é pago e conta para o limite de 20
+  por hora (acima, «Limite de pedidos atingido»). Três vistas:
+  - **Leitura do período:** datas e moeda; resumo e observações (área e
+    gravidade — informação, atenção, crítico), com as áreas lidas.
+  - **Previsão de receita:** 1 a 12 meses e moeda; os meses reais e os
+    previstos (receita e despesa), o método, os pressupostos e a confiança.
+    É uma estimativa: não entra em cálculos.
+  - **Rascunhos:** tipo (proposta, modelo de proposta, modelo de
+    declaração, anúncio, e-mail, mensagem de cobrança), o que se pretende e
+    o contexto; o texto para rever e **copiar**.
+
 **Aprovações**
 - Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
   **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
@@ -468,6 +488,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   orçamento, passos por cargo).
 - **Criar** (passos por ordem, cada um com cargo com autoridade, modo e prazo
   em horas) e **desactivar**.
+
+**Inteligência artificial** (configuração)
+- O estado (ligadas ou não, quem responde), os fornecedores com o modelo e se
+  têm chave no servidor; **trocar o fornecedor activo** (só os com chave) e
+  **ligar ou desligar o recurso ao outro** quando o activo falha. Não gasta
+  saldo.
 
 **Auditoria**
 - Os registos mais recentes da trilha (50, 100 ou 200), primeiro os novos:
@@ -856,7 +882,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   filtro «vencem até».
 - **Registar** (fornecedor da lista ou não registado com nome e NIF, número da
   factura do fornecedor, moeda, emissão, vencimento, valor sem IVA, IVA,
-  descrição), com o total à vista.
+  descrição), com o total à vista. Com a IA ligada, **ler a factura com IA**
+  (PDF ou imagem até 10 MB, por botão): preenche os campos — e escolhe o
+  fornecedor registado com o mesmo NIF —, mostra os avisos e as linhas
+  lidas; nada se grava até carregar em registar.
 - Ficha: dados e totais, confronto com a encomenda quando a tem, os pedidos de
   pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
   **anular** com motivo.
@@ -1264,6 +1293,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Início**
 - Resumo pessoal e indicadores de **Finanças**.
 
+**Assistente de IA**
+- Como no Admin; a leitura usa só as finanças.
+
 **Aprovações**
 - Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
   com o resumo do pedido e os nomes.
@@ -1353,6 +1385,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz, salvo ver e escolher o responsável das iniciativas
   (não lê os Recursos Humanos, B41).
 
+**Assistente de IA**
+- Como no Admin: leitura do período, previsão e rascunhos. Lê a factura de
+  compra com IA ao registá-la.
+
 **Aprovações**
 - Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
   com o resumo do pedido e os nomes.
@@ -1428,6 +1464,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 ### Sales (Vendas)
 **Início**
 - Resumo pessoal e indicadores de **Finanças** e de **Vendas**.
+
+**Assistente de IA**
+- Leitura do período (as áreas que lê) e rascunhos; a previsão de receita e
+  despesa pede ler a despesa, que não tem (403).
 
 **Clientes**
 - Tudo o que o Admin faz em Clientes (ver, registar, importar, corrigir,
@@ -1559,6 +1599,9 @@ conta; nenhum pedido diz de que cliente é.
 - **Ajuda:** artigos publicados para clientes, com pesquisa e categoria;
   ler um artigo (texto simples) e dizer se foi útil (um voto por conta, que
   se pode mudar).
+- **Assistente:** com a IA ligada, perguntar (até 2000 caracteres) sobre as
+  próprias facturas e o saldo; a resposta usa só os dados do cliente, em
+  texto; as perguntas e respostas da visita ficam no ecrã.
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem associação a um cliente, o portal explica-o e pede para falar com a
   empresa.
@@ -1573,6 +1616,5 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F13 | Complementar (ESG, IA) |
 
 O login com Google (D4) entra quando o backend o tiver.

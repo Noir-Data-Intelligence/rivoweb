@@ -72,6 +72,9 @@ export const PAGINAS = {
   analytics: () => import("@/features/analytics/pages/Analytics"),
   auditoria: () => import("@/features/auditoria/pages/Auditoria"),
   esg: () => import("@/features/esg/pages/Esg"),
+  assistente: () => import("@/features/ia/pages/Assistente"),
+  configuracaoIa: () => import("@/features/ia/pages/Configuracao"),
+  assistenteCliente: () => import("@/features/ia/pages/AssistenteCliente"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

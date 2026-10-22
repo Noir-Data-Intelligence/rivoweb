@@ -1965,6 +1965,29 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
   **Nenhuma escrita em produção.**
 - **Testes:** 239 unitários; interface 3 cenários × 3 motores; suite inteira 618, sem falhas nem instáveis (24 saltados).
 
+**Bloco 3 — IA** (2026-10-22, por publicar).
+- **Inventário** (produção, só leituras gratuitas): `/ai/status` 200 (ligada,
+  Anthropic com recurso ao OpenAI) e `/ai/provider` 200 (Admin, os dois com
+  chave). Nenhum `POST /ai/*` em produção nem na base local (que não tem
+  chaves: desligada).
+- **Ecrãs:** `/assistente` («Assistente de IA», a seguir ao ESG; Admin,
+  Manager, Finance, Sales) com as vistas leitura do período, previsão de
+  receita e rascunhos; `/ia` («Inteligência artificial», em Administração;
+  Admin); «Ler com IA» no registo de factura de compra; `/cliente/assistente`
+  («Assistente» no portal do cliente).
+- **Regras:** só por botão, sem novas tentativas (`retry: false`) e com o
+  trinco da escrita (um clique duplo não paga duas vezes); aviso do custo e
+  do limite de 20 por hora (429 com mensagem própria); desligada (`enabled`
+  falso), aviso e nenhum botão; 502 com mensagem própria; o texto da IA é
+  sempre texto; a factura lida só preenche o formulário (o fornecedor pelo
+  NIF), nada se grava sem confirmar; fornecedor sem chave não se escolhe.
+- **Verificado na base local** (`f13-ia-escritas.spec.ts`, IA desligada): a
+  configuração mostra os fornecedores sem chave, guardar é recusado pelo
+  servidor e a configuração fica igual; o assistente e o registo de factura
+  não oferecem a IA; nenhum `POST /ai/*` saiu. Os pedidos pagos só se
+  verificam em produção com autorização para cada um.
+- **Testes:** 239 unitários; interface 5 cenários × 3 motores; suite inteira 633, sem falhas nem instáveis (24 saltados).
+
 ### F12 — Projectos e frota
 
 **Inventário** (2026-10-18, contra `a281377` e produção, só códigos e
