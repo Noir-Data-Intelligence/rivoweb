@@ -155,6 +155,7 @@ export const rotas: RouteObject[] = [
               // F13 — complementar (§5.14).
               { path: "analytics", element: protegido(R["/analytics"], pagina("analytics")) },
               { path: "auditoria", element: protegido(R["/auditoria"], pagina("auditoria")) },
+              { path: "esg", element: protegido(R["/esg"], pagina("esg")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).

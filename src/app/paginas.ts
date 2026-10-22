@@ -71,6 +71,7 @@ export const PAGINAS = {
   segurosFrota: () => import("@/features/frota/pages/Seguros"),
   analytics: () => import("@/features/analytics/pages/Analytics"),
   auditoria: () => import("@/features/auditoria/pages/Auditoria"),
+  esg: () => import("@/features/esg/pages/Esg"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

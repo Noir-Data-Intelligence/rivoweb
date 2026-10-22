@@ -1942,6 +1942,29 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
   «Sistema» sem conta; nenhuma escrita (não existe).
 - **Testes:** 233 unitários; interface 2 cenários × 3 motores; suite inteira 609, sem falhas nem instáveis (24 saltados).
 
+**Bloco 2 — ESG** (2026-10-22, por publicar).
+- **Inventário** (produção, só códigos e contagens): Manager 200 em
+  `/esg/indicators` (10), `/esg/measurements` (120 desde 2025),
+  `/esg/initiatives` (6) e `/esg/report`; 403 nos RH. A iniciativa só traz o
+  id do responsável: **B41**.
+- **Ecrãs:** `/esg` («ESG», a seguir ao Analytics; Admin, Manager) com as
+  vistas relatório (ano no URL), indicadores (medições num diálogo) e
+  iniciativas.
+- **Regras:** um só `useAcaoEsg` por acto; código em maiúsculas que não muda;
+  factor positivo só com a unidade convertida e a fonte (sem factor, não
+  seguem); metas e medições até 4 casas, factor até 6, em texto; período da
+  medição é o 1.º dia do mês (repetir corrige); desactivado sem medições nem
+  escolha em iniciativas novas; iniciativa com datas por ordem, orçamento
+  ≥ 0, moeda ISO, progresso 0–100; encerrada sem acções; responsável só para
+  quem lê os RH (B41).
+- **Escritas:** verificadas **na base local** (`f13-esg-escritas.spec.ts`):
+  como Manager, indicador com meta 5 000 e factor 2,68, medições de janeiro
+  (100) e fevereiro (999 corrigido para 150,5), relatório com 671,34 kgCO2e,
+  iniciativa a 40 % e concluída (100 %), outra cancelada, indicador
+  desactivado; como Admin, iniciativa com a colaboradora responsável.
+  **Nenhuma escrita em produção.**
+- **Testes:** 239 unitários; interface 3 cenários × 3 motores; suite inteira 618, sem falhas nem instáveis (24 saltados).
+
 ### F12 — Projectos e frota
 
 **Inventário** (2026-10-18, contra `a281377` e produção, só códigos e

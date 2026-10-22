@@ -17,7 +17,7 @@
 > manutenção, atribuições, viagens, despesas, documentos, seguros e
 > sinistros) publicadas. Por publicar: ficheiros dos projectos abertos pelo
 > projecto (B39), nomes, escolhas e documentos da frota pela viatura (B40) e
-> o 1.º bloco da **F13** (analytics e auditoria) ·
+> os blocos 1 e 2 da **F13** (analytics, auditoria e ESG) ·
 > actualizado a 2026-10-22.
 
 ---
@@ -26,11 +26,11 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
@@ -74,6 +74,12 @@ AM = AssetManager.
 | Cargo actual (da ficha ligada) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Dashboard executivo** | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Analytics**: tendências (receita e despesa por mês, frota, inventário), recursos humanos e vendas de um período, numa moeda | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| **ESG** | | | | | | | | | | |
+| Relatório do ano por pilar: pontuação, cada indicador contra a meta e o ano anterior, iniciativas activas | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Indicadores: ver, definir, corrigir e desactivar (meta, factor de conversão com a fonte) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Medições: ver as do ano (valor e convertido) e registar ou corrigir o valor de um mês | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Iniciativas: ver, planear, corrigir (progresso), concluir e cancelar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Iniciativas: ver e escolher o responsável ²⁰ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Aprovações** | | | | | | | | | | |
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -325,6 +331,7 @@ Recursos Humanos.»
 ¹⁷ Os ficheiros trazem o nome e abrem-se pelo projecto, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B39).
 ¹⁸ Os nomes de quem tem a viatura e de quem conduziu vêm na ficha; os colaboradores activos escolhem-se pela lista da frota, sem ler os Recursos Humanos (B40).
 ¹⁹ Os documentos abrem-se pela viatura, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B40).
+²⁰ A iniciativa só traz o id do responsável (B41): o nome e a escolha vêm dos Recursos Humanos, que o Manager não lê.
 
 ---
 
@@ -422,6 +429,26 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     taxa de sucesso, valor ganho e contratos a terminar em 30 dias; pipeline
     por etapa e ganhas por mês; conversão de leads, actividades em atraso e
     leads por estado.
+
+**ESG**
+- Três vistas (no URL):
+  - **Relatório:** o ano (este e os quatro anteriores, no URL); pontuação
+    global (a % dos indicadores com meta que a cumprem) e por pilar
+    (ambiental, social, governação), com as metas cumpridas e as iniciativas
+    activas; em cada pilar, cada indicador com o valor do ano (agregado e
+    convertido), o do ano anterior, a meta e se a cumpre.
+  - **Indicadores:** o catálogo (código, nome, categoria, pilar, unidade e a
+    convertida, meta e direcção, activo ou desactivado); **definir** (código
+    único em maiúsculas, nome, pilar, categoria, unidade, como conta no ano —
+    soma, média ou último mês —, se menos ou mais é melhor, meta anual,
+    factor de conversão com a unidade convertida e a fonte) e **corrigir**
+    (o código não muda; **desactivar** ou reactivar). **Medições** de cada
+    indicador num ano (mês, valor, convertido, fonte, notas) e **registar** o
+    valor de um mês (repetir o mês corrige-o); desactivado não recebe.
+  - **Iniciativas:** título e descrição, pilar, indicador, responsável ²⁰,
+    período, orçamento, progresso e estado (planeada, em curso, concluída,
+    cancelada); **planear** e **corrigir** (com progresso acima de 0 passa a
+    em curso), **concluir** (100 %) e **cancelar**; encerrada não se altera.
 
 **Aprovações**
 - Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
@@ -1321,6 +1348,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Dashboard executivo** e **Analytics**
 - Como no Admin.
+
+**ESG**
+- Tudo o que o Admin faz, salvo ver e escolher o responsável das iniciativas
+  (não lê os Recursos Humanos, B41).
 
 **Aprovações**
 - Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,

@@ -73,3 +73,54 @@ export const registosAuditoria = (): S["AuditEntryView"][] => [
 ];
 
 export const contasAuditoria = (): S["UserSummary"][] => [{ userId: ACTOR, email: "financas@teste.local", isActive: true, roles: ["Finance"] }];
+
+// --- Bloco 2: ESG.
+
+export const IDF13 = {
+  gasoleo: "00000000-0000-4000-8000-000000001301",
+  formacao: "00000000-0000-4000-8000-000000001302",
+  inactivo: "00000000-0000-4000-8000-000000001303",
+  solar: "00000000-0000-4000-8000-000000001311",
+  fechada: "00000000-0000-4000-8000-000000001312",
+};
+
+export const indicadoresEsg = (): S["IndicatorView"][] => [
+  { indicatorId: IDF13.gasoleo, code: "ENV-01", name: "Gasóleo da frota", pillar: "Environmental", category: "Energia", unit: "litros", aggregation: "Sum", direction: "LowerIsBetter", annualTarget: 30000, conversionFactor: 2.68, convertedUnit: "kgCO2e", factorSource: "Inventário interno 2026", isActive: true },
+  { indicatorId: IDF13.formacao, code: "SOC-01", name: "Horas de formação <b>por pessoa</b>", pillar: "Social", category: null, unit: "horas", aggregation: "Average", direction: "HigherIsBetter", annualTarget: null, conversionFactor: null, convertedUnit: null, factorSource: null, isActive: true },
+  { indicatorId: IDF13.inactivo, code: "GOV-09", name: "Antigo", pillar: "Governance", category: null, unit: "n.º", aggregation: "Last", direction: "HigherIsBetter", annualTarget: null, conversionFactor: null, convertedUnit: null, factorSource: null, isActive: false },
+];
+
+export const medicoesEsg = (): S["MeasurementView"][] => [{ measurementId: "m1", indicatorId: IDF13.gasoleo, period: "2026-02-01", value: 1200, reportedValue: 3216, source: "Facturas de combustível", notes: "<script>x</script>" }];
+
+export const iniciativasEsg = (): S["InitiativeView"][] => [
+  { initiativeId: IDF13.solar, title: "Painéis solares", pillar: "Environmental", description: "Armazém central.", indicatorId: IDF13.gasoleo, ownerEmployeeId: null, startsOn: "2026-03-01", endsOn: "2026-09-30", budget: 2500000, currency: "AOA", progress: 20, status: "InProgress" },
+  { initiativeId: IDF13.fechada, title: "Código de conduta", pillar: "Governance", description: null, indicatorId: null, ownerEmployeeId: null, startsOn: null, endsOn: null, budget: null, currency: "AOA", progress: 100, status: "Completed" },
+];
+
+export const relatorioEsg = (ano = 2026): S["EsgReport"] => ({
+  year: ano,
+  overallScore: 50,
+  pillars: [
+    {
+      pillar: "Environmental",
+      indicators: 1,
+      onTarget: 1,
+      withTarget: 1,
+      score: 100,
+      activeInitiatives: 1,
+      results: [{ indicatorId: IDF13.gasoleo, code: "ENV-01", name: "Gasóleo da frota", unit: "kgCO2e", actual: 3216, previousYear: 4000.5, target: 30000, meetsTarget: true, monthly: [{ month: "2026-02", value: 3216 }] }],
+    },
+    {
+      pillar: "Social",
+      indicators: 1,
+      onTarget: 0,
+      withTarget: 0,
+      score: null,
+      activeInitiatives: 0,
+      results: [{ indicatorId: IDF13.formacao, code: "SOC-01", name: "Horas de formação", unit: "horas", actual: 12.5, previousYear: null, target: null, meetsTarget: null, monthly: [] }],
+    },
+    { pillar: "Governance", indicators: 0, onTarget: 0, withTarget: 0, score: null, activeInitiatives: 0, results: [] },
+  ],
+});
+
+export const meAdminEsg: S["CurrentUserResponse"] = { ...meAdminF13, permissions: [...new Set([...meAdminF13.permissions, "esg.esg.read", "esg.esg.write", "hr.employees.read"])] };

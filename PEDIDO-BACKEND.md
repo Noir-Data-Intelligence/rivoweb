@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `57c6d14`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `57c6d14`. Em aberto: **B24** (configuração) e
+> **B41** (responsável das iniciativas ESG, F13).
 > **B40** está resolvido (PR #115) e o front já o usa: nomes de quem tem a
 > viatura e de quem conduziu, colaboradores em `/fleet/lookups`, documentos
 > abertos pela viatura; o AssetManager junta os seus (um documento alheio dá
@@ -534,3 +535,20 @@ mas não os junta nem abre; o Admin junta e abre pelo arquivo.
 3. `GET /fleet/vehicles/{vehicleId}/documents/{documentId}/content` com
    `fleet.vehicles.read` (em anexo), anexar só documentos carregados por quem
    anexa (salvo `documents.read`) e `documents.write` para o AssetManager.
+
+## B41 — As iniciativas ESG só trazem o id do responsável e o Manager não o escolhe
+
+**Facto:** `InitiativeView` traz `ownerEmployeeId`, sem o nome; planear ou
+corrigir pede o id e o servidor confirma-o contra os RH (ADR-084). O Manager
+tem `esg.esg.read/.write` mas não `hr.employees.read` (catálogo de produção;
+403 em `/hr/employees`, 2026-10-22).
+
+**Consequência:** o Manager gere as iniciativas sem ver nem escolher o
+responsável; o front esconde a coluna e o campo e diz porquê. Ao corrigir uma
+iniciativa com responsável, o front reenvia o id que veio, por isso não o
+apaga.
+
+**Pedido** (como o B38 e o B40):
+1. `ownerName` em `InitiativeView`.
+2. `GET /esg/lookups` para quem tem `esg.esg.write`: colaboradores activos
+   (id e nome).
