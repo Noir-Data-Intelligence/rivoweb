@@ -42,9 +42,14 @@ jobs:
       - run: npm audit --audit-level=critical
       - run: npm run licenses
 
+  # Um job por motor, em paralelo: os três seguidos já passavam dos 25 minutos.
   interface:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        motor: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -58,11 +63,11 @@ jobs:
         run: npx vite build
         env:
           VITE_API_URL: http://localhost:5080
-      - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm run e2e
+      - run: npx playwright install --with-deps ${{ matrix.motor }}
+      - run: npx playwright test --project=${{ matrix.motor }}
       - if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.motor }}
           path: playwright-report
           retention-days: 7

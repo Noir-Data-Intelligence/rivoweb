@@ -1284,7 +1284,7 @@ deploy de produção: `curl -I` aos cabeçalhos (S14, S28) e o smoke de leitura
 
 > **Respostas (2026-10-12):** D1 base local · D2 conta SuperAdmin de arranque
 > (credenciais só em `.env.local`) · D3 memória + `sessionStorage` · D4 sem
-> Google por agora, «mas terá» · D5 `git@github.com:y-jr/rivoweb.git`, Vercel
+> Google por agora, «mas terá» · D5 `git@github.com:y-jr/rivoweb.git` (desde 2026-10-22 `Noir-Data-Intelligence/rivoweb`), Vercel
 > quando houver estrutura · D6 o front antigo continua até o novo estar 100 %
 > (`FRONTEND_BASE_URL` não muda até lá) · D9 aprovado; o backend resolveu B8,
 > B12, B13 e a exportação SAF-T de B5 (PRs #94 → #97, ADR-080/081); as

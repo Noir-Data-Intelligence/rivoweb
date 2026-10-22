@@ -1,6 +1,6 @@
 # Contrato da API
 
-`v1.json` é o OpenAPI do backend (`y-jr/rivo-api`). `src/lib/api/schema.d.ts`
+`v1.json` é o OpenAPI do backend (`Noir-Data-Intelligence/rivo-api`). `src/lib/api/schema.d.ts`
 gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 `npm run api:check`).
 

@@ -1,6 +1,6 @@
 # Pedidos ao backend
 
-> 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
+> 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
 > Revisto contra `main` @ `7c9b867`. Em aberto: **B24** (configuração).
 > **B41** está resolvido (PR #116) e o front já o usa: o nome do responsável
 > nas iniciativas ESG e os colaboradores em `/esg/lookups`; o Manager vê-o e
