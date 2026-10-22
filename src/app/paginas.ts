@@ -65,6 +65,10 @@ export const PAGINAS = {
   projectos: () => import("@/features/projectos/pages/Projectos"),
   projecto: () => import("@/features/projectos/pages/Projecto"),
   tempoProjectos: () => import("@/features/projectos/pages/Tempo"),
+  viaturas: () => import("@/features/frota/pages/Viaturas"),
+  viatura: () => import("@/features/frota/pages/Viatura"),
+  manutencaoFrota: () => import("@/features/frota/pages/Manutencao"),
+  segurosFrota: () => import("@/features/frota/pages/Seguros"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

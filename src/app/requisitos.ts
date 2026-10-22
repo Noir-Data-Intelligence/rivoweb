@@ -99,6 +99,9 @@ export const REQUISITO_PAGINA = {
   // F12 — projectos e frota (§5.13).
   "/projectos": "projects.projects.read",
   "/projectos/tempo": "projects.projects.read",
+  "/frota": "fleet.vehicles.read",
+  "/frota/manutencao": "fleet.vehicles.read",
+  "/frota/seguros": "fleet.vehicles.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */

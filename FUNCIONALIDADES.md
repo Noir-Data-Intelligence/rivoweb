@@ -10,11 +10,13 @@
 > F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
 > de conhecimento, portal na ficha do cliente e arquivo de documentos).
 > **F11** (comercial avançado: CRM, propostas, contratos de clientes e
-> cobranças) concluída e verificada na base local. Projectos da **F12**
-> (marcos, tarefas, quadro, Gantt, dependências — publicados; comentários,
+> cobranças) concluída e verificada na base local. **F12**: projectos
+> publicados (marcos, tarefas, quadro, Gantt, dependências, comentários,
 > checklist, tempo, orçamento por linhas, ficheiros, recursos, visibilidade
-> ao cliente e projectos no portal do cliente — verificados na base local,
-> por publicar) · actualizado a 2026-10-22.
+> ao cliente e projectos no portal do cliente); nomes e escolhas pela lista
+> dos projectos (B38) e **frota** (viaturas, manutenção, atribuições,
+> viagens, despesas, documentos, seguros e sinistros) verificados na base
+> local, por publicar · actualizado a 2026-10-22.
 
 ---
 
@@ -22,12 +24,12 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
 | **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
-| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Fornecedores |
+| **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
 | **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
@@ -180,6 +182,14 @@ AM = AssetManager.
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| **Frota** | | | | | | | | | | |
+| Ver as viaturas (activas e inactivas), o estado, quem tem cada uma e a próxima manutenção; a ficha com quilómetros e custos | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Registar e desactivar viaturas | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Manutenção: abrir e fechar (com custo); planos preventivos — agendar, concluir um ciclo, cancelar; manutenção prevista em toda a frota | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Atribuições: atribuir a um colaborador e terminar; ver quem teve a viatura ¹⁸ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Viagens (motorista ¹⁸, odómetro, motivo) e despesas (combustível, portagens, estacionamento): registar e ver os totais | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Documentos da viatura: ver e retirar; juntar e abrir ¹⁹ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Seguros de frota: contratar, corrigir, anular; a caducar em 30, 60 ou 90 dias; sinistros — abrir, pagar, recusar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -309,6 +319,8 @@ Recursos Humanos.»
 ¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
 ¹⁶ Os nomes (de quem tem a tarefa, de quem registou o tempo, do recurso alocado e de quem comentou) vêm nas vistas dos projectos; colaboradores, viaturas e clientes activos escolhem-se pela lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes (B38).
 ¹⁷ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os ficheiros do projecto não trazem o nome nem se descarregam pelo projecto (B39). O ProjectManager vê a lista.
+¹⁸ As vistas da frota só trazem o id de quem tem a viatura e de quem conduziu (B40): os nomes e a escolha vêm da lista própria dos activos fixos (colaboradores activos), que o Admin e o AssetManager têm; quem já não está activo aparece como «—».
+¹⁹ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os documentos da viatura não se descarregam pela viatura (B40). O AssetManager vê a lista e retira.
 
 ---
 
@@ -729,6 +741,49 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Seguros:** apólices de cada activo e as que caducam em 30, 60 ou 90 dias;
   **registar** e **corrigir** (seguradora, número, cobertura, vigência,
   prémio, capital seguro), **cancelar**.
+
+**Viaturas**
+- Lista paginada por matrícula, com ou sem as inactivas (no URL): modelo,
+  estado (activa, em manutenção, inactiva), a quem está atribuída e a
+  próxima manutenção prevista (com aviso de atraso); **registar** (matrícula,
+  em maiúsculas e única, e modelo).
+- **Ficha:** estado, a quem está atribuída, quilómetros e viagens, custos
+  (despesas e manutenções) e a próxima manutenção; **desactivar** (não se
+  desfaz; deixa de receber manutenção, atribuições, planos, viagens e
+  despesas, os registos ficam). Vistas no URL:
+  - **Manutenção:** registos (tipo, descrição, período, custo); **enviar
+    para manutenção** (preventiva ou correctiva, início, descrição; uma de
+    cada vez, a viatura fica «em manutenção») e **fechar** (fim não antes do
+    início, custo opcional; volta a activa). Planos preventivos (descrição,
+    intervalo, próxima data, em atraso, cancelados): **agendar** (descrição,
+    intervalo em dias, primeira data), **concluir um ciclo** (reagenda para a
+    data mais o intervalo) e **cancelar**.
+  - **Atribuições:** quem teve a viatura e quando; **atribuir** a um
+    colaborador activo (da lista própria dos activos, sem precisar dos
+    Recursos Humanos; uma de cada vez) e **terminar** (não antes do início).
+  - **Viagens:** total de viagens e de quilómetros; cada viagem (período,
+    motorista, odómetro, distância, motivo); **registar** uma viagem feita
+    (motorista opcional, datas, odómetro à partida — proposto a partir da
+    última chegada — e à chegada, motivo).
+  - **Custos:** totais de combustível, portagens, estacionamento e
+    manutenções; as despesas (data, categoria, descrição, valor);
+    **registar** uma despesa (categoria, valor em AOA, data, descrição).
+  - **Documentos:** paginados (categoria, ficheiro, tamanho, data);
+    **juntar** um ficheiro carregado na hora com a categoria, **descarregar**
+    (sempre em anexo) e **retirar** com o motivo (fica no registo).
+  - **Seguros:** as apólices da viatura (seguradora, número, cobertura,
+    vigência, prémio, capital, estado — por começar, em vigor com os dias que
+    faltam, caducada, anulada); **contratar** e **corrigir** (seguradora,
+    número, cobertura — vazia, responsabilidade civil —, vigência, prémio,
+    moeda, capital seguro, notas), **anular** com a data; **sinistros** de
+    cada apólice (data, referência, descrição, reclamado, pago, estado):
+    **abrir** (dentro da vigência; descrição, valor reclamado, referência),
+    **pagar** (valor pago, proposto o reclamado) e **recusar**.
+- **Manutenção prevista:** os planos activos de toda a frota a vencer em 7,
+  30, 60 ou 90 dias (no URL), os em atraso incluídos, com ligação à viatura.
+- **Seguros de frota:** as apólices de todas as viaturas, ou só as em vigor a
+  caducar em 30, 60 ou 90 dias (no URL), com ligação à viatura; corrigir,
+  anular e gerir os sinistros como na ficha.
 
 **Fornecedores**
 - Lista paginada (nome, NIF, cidade, contacto, estado), com ou sem inactivos.
@@ -1303,6 +1358,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Activos fixos**
 - Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
 
+**Viaturas**, **Manutenção prevista** e **Seguros de frota**
+- Tudo o que o Admin faz na frota, incluindo atribuir viaturas e indicar o
+  motorista (pela lista dos activos), salvo juntar e abrir documentos (B40):
+  vê a lista e retira.
+
 **Fornecedores**
 - Ver a lista e a ficha.
 
@@ -1454,7 +1514,6 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| F12 | Frota |
 | F13 | Complementar (ESG, IA) |
 
 O login com Google (D4) entra quando o backend o tiver.

@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { Archive, FolderKanban, Timer, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
+import { Archive, Car, ShieldCheck, Wrench, FolderKanban, Timer, FileBadge, PhoneCall, FileSpreadsheet, FileType, CalendarCheck, ChartPie, KanbanSquare, Tags, UserPlus, ArrowLeftRight, BadgeCheck, Library, MessagesSquare, LifeBuoy, Banknote, ClipboardCheck, ClipboardList, Package, Warehouse, DoorOpen, PackageCheck, ShoppingCart, Trophy, UserSearch, FileSignature, Gift, Network, Stamp, CalendarDays, Clock, FolderOpen, GraduationCap, Laptop, Megaphone, MessageSquare, Plane, BellRing, BookOpen, CalendarClock, CalendarRange, ChartColumn, ListTree, Percent, Scale, Target, Wallet, Workflow, CheckSquare, Coins, FileInput, HandCoins, Landmark, ReceiptText, ScrollText, TrendingUp, Truck, ListChecks, BriefcaseBusiness, Building2, FileClock, FileMinus, FileText, Gauge, Handshake, Home, Hourglass, KeyRound, Receipt, Settings, SlidersHorizontal, UserCog, Users } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -52,6 +52,9 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/contagens", titulo: "Contagens", icone: ClipboardCheck, requer: R["/contagens"], grupo: "Inventário" },
     { caminho: "/valorizacao", titulo: "Valorização do stock", icone: TrendingUp, requer: R["/valorizacao"], grupo: "Inventário" },
     { caminho: "/activos", titulo: "Activos fixos", icone: Laptop, requer: R["/activos"], grupo: "Activos" },
+    { caminho: "/frota", titulo: "Viaturas", icone: Car, requer: R["/frota"], grupo: "Frota" },
+    { caminho: "/frota/manutencao", titulo: "Manutenção prevista", icone: Wrench, requer: R["/frota/manutencao"], grupo: "Frota" },
+    { caminho: "/frota/seguros", titulo: "Seguros de frota", icone: ShieldCheck, requer: R["/frota/seguros"], grupo: "Frota" },
     { caminho: "/fornecedores", titulo: "Fornecedores", icone: Truck, requer: R["/fornecedores"], grupo: "Pagamentos" },
     { caminho: "/facturas-compra", titulo: "Facturas de compra", icone: FileInput, requer: R["/facturas-compra"], grupo: "Pagamentos" },
     { caminho: "/pedidos-pagamento", titulo: "Pedidos de pagamento", icone: HandCoins, requer: R["/pedidos-pagamento"], grupo: "Pagamentos" },

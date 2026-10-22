@@ -1,8 +1,9 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `cdd7b10`. Em aberto: **B24** (configuração) e
-> **B39** (ficheiros dos projectos, F12).
+> Revisto contra `main` @ `cdd7b10`. Em aberto: **B24** (configuração),
+> **B39** (ficheiros dos projectos, F12) e **B40** (nomes, escolhas e
+> documentos da frota, F12).
 > **B38** está resolvido (PR #113) e o front já o usa: nomes de quem tem a
 > tarefa, de quem registou o tempo, do recurso alocado e de quem comentou;
 > o ProjectManager escolhe colaboradores, viaturas e clientes em
@@ -495,3 +496,34 @@ o Admin junta e abre pelo arquivo.
    `projects.projects.read` (em anexo), anexar só documentos carregados por
    quem anexa (salvo `documents.read`) e `documents.write` para o
    ProjectManager — como o B33 e o B37.
+
+## B40 — A frota só traz ids de pessoas e os documentos não se abrem pela viatura
+
+**Facto 1 (nomes e escolhas):** `VehicleAssignmentView` traz `employeeId` e
+`VehicleTripView` traz `driverId`, sem nomes; atribuir e indicar o motorista
+pedem o id e o servidor confirma-o contra os RH. O AssetManager tem
+`fleet.vehicles.*` mas não `hr.employees.read` (catálogo de produção; 403 em
+`/hr/employees`, 2026-10-22).
+
+**Consequência:** o front tira os nomes e a escolha de
+`/finance/assets/lookups` (B31), o que só funciona porque o Admin e o
+AssetManager também gerem activos fixos; quem só tiver a frota não atribui
+nem vê nomes, e quem saiu da empresa aparece como «—».
+
+**Facto 2 (documentos):** `GET /fleet/vehicles/{id}/documents` traz
+`fileName`, mas não há rota para descarregar pela viatura (só
+`GET /documents/{id}`, com `documents.read`); `AttachVehicleDocumentAsync`
+só confirma que o documento existe, como os contratos antes do B37; e o
+AssetManager não tem `documents.write`, por isso nem carrega o livrete.
+
+**Consequência:** o AssetManager vê os documentos da viatura e retira-os,
+mas não os junta nem abre; o Admin junta e abre pelo arquivo.
+
+**Pedido** (como o B31, o B37 e o B38):
+1. `employeeName` em `VehicleAssignmentView` e `driverName` em
+   `VehicleTripView`.
+2. `GET /fleet/lookups` para quem tem `fleet.vehicles.write`: colaboradores
+   activos (id e nome).
+3. `GET /fleet/vehicles/{vehicleId}/documents/{documentId}/content` com
+   `fleet.vehicles.read` (em anexo), anexar só documentos carregados por quem
+   anexa (salvo `documents.read`) e `documents.write` para o AssetManager.

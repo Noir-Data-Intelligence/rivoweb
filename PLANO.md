@@ -1988,6 +1988,34 @@ publicado em `7761bf6` e `6266f4f`: CI verde).
 - **Testes:** 223 unitários; interface 4 cenários × 3 motores; suite inteira
   588, sem falhas nem instáveis (24 saltados).
 
+**Bloco 3 — frota** (2026-10-22, por publicar).
+- **Inventário** (produção, só códigos e contagens): AssetManager 200 em
+  `/fleet/vehicles` (25), `/fleet/insurance` (25) e
+  `/fleet/maintenance-plans/due` (16 em 30 dias); 403 nos RH. As vistas só
+  trazem o id de quem tem a viatura e de quem conduziu, e os documentos não
+  se abrem pela viatura: **B40**.
+- **Ecrãs:** `/frota` («Viaturas», inactivas no URL), `/frota/:id` com as
+  vistas manutenção, atribuições, viagens, custos, documentos e seguros (no
+  URL), `/frota/manutencao` («Manutenção prevista», janela no URL) e
+  `/frota/seguros` («Seguros de frota», a caducar no URL); grupo «Frota» no
+  menu (Admin, AssetManager).
+- **Regras:** um só `useAcaoViatura` e um `useAcaoApolice` por acto;
+  matrícula em maiúsculas; uma manutenção e uma atribuição abertas de cada
+  vez; inactiva sem manutenção, atribuições, planos, viagens nem despesas;
+  fechos não antes do início; plano em dias inteiros; odómetro final não
+  inferior ao inicial (proposto da última chegada); despesas em AOA; apólice
+  com moeda ISO e sinistros dentro da vigência; dinheiro e quilómetros em
+  texto; colaboradores da lista dos activos (B31) até haver nomes e escolhas
+  da frota (B40); documentos juntos e abertos só com o arquivo (B40).
+- **Escritas:** verificadas **na base local** (`f12-frota-escritas.spec.ts`):
+  como AssetManager, viatura registada, manutenção aberta e fechada (85 000,50),
+  plano concluído (próximo a 01/07/2026) e outro cancelado, atribuição e fim,
+  viagem de 140,5 km, despesa de 45 000, apólice contratada e corrigida
+  (260 000,50 / 18 000 000), sinistro pago (75 000) e outro recusado, apólice
+  anulada; como Admin, documento junto, descarregado e retirado, viatura
+  desactivada. **Nenhuma escrita em produção.**
+- **Testes:** 233 unitários; interface 5 cenários × 3 motores; suite inteira 603, sem falhas nem instáveis (24 saltados).
+
 ### F11 — Comercial avançado
 
 **Inventário** (2026-10-18, contra `2b84331` e produção, só códigos e

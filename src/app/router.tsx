@@ -147,6 +147,11 @@ export const rotas: RouteObject[] = [
               { path: "projectos", element: protegido(R["/projectos"], pagina("projectos")) },
               { path: "projectos/tempo", element: protegido(R["/projectos/tempo"], pagina("tempoProjectos")) },
               { path: "projectos/:projectId", element: protegido(R["/projectos"], pagina("projecto")) },
+              // F12 — frota (§5.13).
+              { path: "frota", element: protegido(R["/frota"], pagina("viaturas")) },
+              { path: "frota/manutencao", element: protegido(R["/frota/manutencao"], pagina("manutencaoFrota")) },
+              { path: "frota/seguros", element: protegido(R["/frota/seguros"], pagina("segurosFrota")) },
+              { path: "frota/:vehicleId", element: protegido(R["/frota"], pagina("viatura")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).
