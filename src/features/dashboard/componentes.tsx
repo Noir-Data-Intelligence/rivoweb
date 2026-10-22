@@ -111,14 +111,6 @@ export function SeccaoFinancas({
   /** No dashboard executivo os números já estão no topo: só o gráfico. */
   comKpis?: boolean;
 }) {
-  const receita = serieMensal(f.monthlyRevenue, janela, moedaKpis);
-  const despesa = serieMensal(f.monthlyExpenses, janela, moedaKpis);
-  const categorias = receita.map((r) => mesCurto(r.ano, r.mes));
-  const series: Serie[] = [
-    { id: "receita", nome: "Receita", slot: SLOT.receita as Slot, pontos: receita.map((r) => pontoMoeda(r.valor, moedaKpis)) },
-    { id: "despesa", nome: "Despesa", slot: SLOT.despesa as Slot, pontos: despesa.map((d) => pontoMoeda(d.valor, moedaKpis)) },
-  ];
-  const conclusao = conclusaoReceitaDespesa(receita.map((r, i) => ({ ano: r.ano, mes: r.mes, receita: dinheiro(r.valor), despesa: dinheiro(despesa[i]?.valor ?? 0) })));
   return (
     <section aria-labelledby="sec-financas" className="flex flex-col gap-4">
       <h2 id="sec-financas" className="text-md font-semibold text-foreground">
@@ -132,9 +124,24 @@ export function SeccaoFinancas({
         <Kpi rotulo="A receber" valor={moeda(f.receivables, moedaKpis)} detalhe={`A pagar: ${moeda(f.payables, moedaKpis)}`} />
       </GrelhaKpis>
       ) : null}
-      <ChartCard titulo={conclusao} descricao="Receita e despesa por mês" tipo="barras" categorias={categorias} series={series} ficheiroCsv={`receita-despesa-${janela.from}-${janela.to}`} rotuloCategoria="Mês" />
+      <GraficoReceitaDespesa receitaMensal={f.monthlyRevenue} despesaMensal={f.monthlyExpenses} janela={janela} moedaKpis={moedaKpis} />
     </section>
   );
+}
+
+type Mensal = readonly { year: Valor; month: Valor; amount: Valor }[];
+
+/** Receita e despesa mês a mês na janela, com os meses sem movimento a zero. */
+export function GraficoReceitaDespesa({ receitaMensal, despesaMensal, janela, moedaKpis }: { receitaMensal: Mensal; despesaMensal: Mensal; janela: { from: string; to: string }; moedaKpis: string }) {
+  const receita = serieMensal(receitaMensal, janela, moedaKpis);
+  const despesa = serieMensal(despesaMensal, janela, moedaKpis);
+  const categorias = receita.map((r) => mesCurto(r.ano, r.mes));
+  const series: Serie[] = [
+    { id: "receita", nome: "Receita", slot: SLOT.receita as Slot, pontos: receita.map((r) => pontoMoeda(r.valor, moedaKpis)) },
+    { id: "despesa", nome: "Despesa", slot: SLOT.despesa as Slot, pontos: despesa.map((d) => pontoMoeda(d.valor, moedaKpis)) },
+  ];
+  const conclusao = conclusaoReceitaDespesa(receita.map((r, i) => ({ ano: r.ano, mes: r.mes, receita: dinheiro(r.valor), despesa: dinheiro(despesa[i]?.valor ?? 0) })));
+  return <ChartCard titulo={conclusao} descricao="Receita e despesa por mês" tipo="barras" categorias={categorias} series={series} ficheiroCsv={`receita-despesa-${janela.from}-${janela.to}`} rotuloCategoria="Mês" />;
 }
 
 export function TopClientes({ clientes, moedaKpis }: { clientes: VisaoExecutiva["topCustomers"]; moedaKpis: string }) {

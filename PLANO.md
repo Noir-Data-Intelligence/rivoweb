@@ -1925,6 +1925,23 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 - **Testes:** 180 unitários; interface 5 cenários × 3 motores; suite inteira
   471, sem instáveis.
 
+### F13 — Complementar
+
+**Bloco 1 — analytics e auditoria** (2026-10-22, por publicar).
+- **Inventário** (produção, só códigos e contagens): Admin e Manager 200 em
+  `/analytics/overview`, `/analytics/hr` e `/analytics/sales`; Admin 200 em
+  `/audit/entries` (200 registos no limite), Manager 403.
+- **Ecrãs:** `/analytics` («Analytics», a seguir ao dashboard executivo;
+  Admin, Manager) com os separadores tendências, recursos humanos e vendas
+  (no URL); `/auditoria` («Auditoria», em Administração; Admin).
+- **Regras:** período e moeda no URL, o fim não antes do início, só o
+  separador aberto se pede; as secções de pessoas e vendas e o gráfico de
+  receita e despesa são os do dashboard (mesmos esquemas, extraído
+  `GraficoReceitaDespesa`); a auditoria filtra por igualdade (tipo, id) e
+  limite de 50 a 200, mostra quem pelo e-mail para quem lê as contas e
+  «Sistema» sem conta; nenhuma escrita (não existe).
+- **Testes:** 233 unitários; interface 2 cenários × 3 motores; suite inteira 609, sem falhas nem instáveis (24 saltados).
+
 ### F12 — Projectos e frota
 
 **Inventário** (2026-10-18, contra `a281377` e produção, só códigos e

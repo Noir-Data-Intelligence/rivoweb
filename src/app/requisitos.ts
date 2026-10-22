@@ -102,6 +102,9 @@ export const REQUISITO_PAGINA = {
   "/frota": "fleet.vehicles.read",
   "/frota/manutencao": "fleet.vehicles.read",
   "/frota/seguros": "fleet.vehicles.read",
+  // F13 — complementar (§5.14).
+  "/analytics": "analytics.overview.read",
+  "/auditoria": "audit.trail.read",
 } as const satisfies Record<string, Requisito>;
 
 /** Escrever um artigo e voltar a ele (a ficha lê-se com a permissão das conversas). */

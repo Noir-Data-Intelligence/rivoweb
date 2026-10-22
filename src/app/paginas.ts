@@ -69,6 +69,8 @@ export const PAGINAS = {
   viatura: () => import("@/features/frota/pages/Viatura"),
   manutencaoFrota: () => import("@/features/frota/pages/Manutencao"),
   segurosFrota: () => import("@/features/frota/pages/Seguros"),
+  analytics: () => import("@/features/analytics/pages/Analytics"),
+  auditoria: () => import("@/features/auditoria/pages/Auditoria"),
   aReceber: () => import("@/features/facturacao/pages/AReceber"),
   configuracaoFacturacao: () => import("@/features/facturacao/pages/Configuracao"),
   // F4

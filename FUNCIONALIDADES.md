@@ -10,13 +10,14 @@
 > F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
 > de conhecimento, portal na ficha do cliente e arquivo de documentos).
 > **F11** (comercial avançado: CRM, propostas, contratos de clientes e
-> cobranças) concluída e verificada na base local. **F12**: projectos
-> publicados (marcos, tarefas, quadro, Gantt, dependências, comentários,
-> checklist, tempo, orçamento por linhas, ficheiros, recursos, visibilidade
-> ao cliente e projectos no portal do cliente); nomes e escolhas pela lista
-> dos projectos (B38) e **frota** (viaturas, manutenção, atribuições,
-> viagens, despesas, documentos, seguros e sinistros) verificados na base
-> local, por publicar · actualizado a 2026-10-22.
+> cobranças) e **F12** (projectos — marcos, tarefas, quadro, Gantt,
+> dependências, comentários, checklist, tempo, orçamento por linhas,
+> ficheiros, recursos, visibilidade ao cliente, projectos no portal do
+> cliente, nomes e escolhas pela lista dos projectos — e frota — viaturas,
+> manutenção, atribuições, viagens, despesas, documentos, seguros e
+> sinistros) publicadas. Por publicar: ficheiros dos projectos abertos pelo
+> projecto (B39) e o 1.º bloco da **F13** (analytics e auditoria) ·
+> actualizado a 2026-10-22.
 
 ---
 
@@ -24,11 +25,11 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
@@ -71,12 +72,14 @@ AM = AssetManager.
 | Ajuda: pesquisar e ler artigos; dizer se foi útil | — | — | — | — | — | — | — | — | — | ✓ |
 | Cargo actual (da ficha ligada) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Dashboard executivo** | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| **Analytics**: tendências (receita e despesa por mês, frota, inventário), recursos humanos e vendas de um período, numa moeda | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Aprovações** | | | | | | | | | | |
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Auditoria**: consultar a trilha (quem, o quê, quando), por entidade | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
 | Resolver alertas; criar, rever e desactivar regras; avaliar agora | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -402,6 +405,23 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Receita, despesa, resultado, a receber e a pagar do período; evolução mensal;
   os clientes que mais facturaram.
 
+**Analytics**
+- Período (por omissão, do início do ano a hoje) e moeda, no URL; o fim não
+  pode ser antes do início. Três separadores (no URL), cada um pedido só
+  quando se abre:
+  - **Tendências:** receita e despesa mês a mês (os meses sem movimento a
+    zero), com a conclusão no título e a tabela exportável; frota no período
+    (despesas, quilómetros, custo de manutenção); inventário (valor do stock
+    hoje e valorização no período).
+  - **Recursos humanos:** colaboradores activos e inactivos, admissões,
+    ausências (injustificadas), pedidos de férias por decidir e pedidos de RH
+    em aberto; admissões por mês e colaboradores por departamento; atrasos,
+    dias de férias aprovados, horas de formação e contratos em vigor.
+  - **Vendas:** oportunidades em aberto, valor em pipeline (e ponderado),
+    taxa de sucesso, valor ganho e contratos a terminar em 30 dias; pipeline
+    por etapa e ganhas por mês; conversão de leads, actividades em atraso e
+    leads por estado.
+
 **Aprovações**
 - Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
   **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
@@ -420,6 +440,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   orçamento, passos por cargo).
 - **Criar** (passos por ordem, cada um com cargo com autoridade, modo e prazo
   em horas) e **desactivar**.
+
+**Auditoria**
+- Os registos mais recentes da trilha (50, 100 ou 200), primeiro os novos:
+  quando, acção, entidade (tipo e id), quem (o e-mail da conta, ou «Sistema»),
+  IP e correlação. Só consulta.
+- Filtrar por tipo de entidade (com sugestões) e id, no URL; um clique no id
+  mostra só os registos dessa entidade; limpar os filtros.
 
 **Alertas**
 - Ver alertas (abertos ou todos) e **resolvê-los**.
@@ -1291,7 +1318,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Início**
 - Resumo pessoal e indicadores de **Finanças** e de **Vendas**.
 
-**Dashboard executivo**
+**Dashboard executivo** e **Analytics**
 - Como no Admin.
 
 **Aprovações**
