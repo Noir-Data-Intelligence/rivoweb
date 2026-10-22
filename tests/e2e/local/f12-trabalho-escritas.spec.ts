@@ -121,7 +121,11 @@ test("F12: trabalho do projecto — comentários, checklist, tempo, orçamento, 
   await dialogo(page).getByLabel("Categoria (opcional)").fill("Acta de arranque");
   await dialogo(page).getByRole("button", { name: "Juntar" }).click();
   await expect(dialogo(page)).toHaveCount(0);
-  await page.getByRole("button", { name: "Retirar Acta de arranque" }).click();
+  await expect(page.getByRole("table", { name: "Ficheiros do projecto" })).toContainText("acta.pdf");
+  const descarga = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Descarregar acta.pdf" }).click();
+  expect((await descarga).suggestedFilename()).toBe("acta.pdf");
+  await page.getByRole("button", { name: "Retirar acta.pdf" }).click();
   await dialogo(page).getByLabel("Motivo").fill("Versão errada.");
   await dialogo(page).getByRole("button", { name: "Retirar" }).click();
   await expect(dialogo(page)).toHaveCount(0);

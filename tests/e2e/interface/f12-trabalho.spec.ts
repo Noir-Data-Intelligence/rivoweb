@@ -3,7 +3,7 @@
  * simulada: comentários e checklist de tarefa; tempo, recursos e cliente com
  * os nomes e as escolhas dos projectos (o ProjectManager regista, aloca e
  * liga sem ler os RH, a frota ou os clientes, B38); orçamento por linhas;
- * ficheiros (juntar e abrir só com os documentos, B39); visibilidade no portal; registo de tempo global; o cliente vê e comenta os
+ * ficheiros com o nome, abertos pelo projecto e juntos por quem carrega (B39); visibilidade no portal; registo de tempo global; o cliente vê e comenta os
  * marcos. Texto de fora nunca vira HTML.
  */
 import type { Page } from "@playwright/test";
@@ -70,6 +70,9 @@ test.describe("trabalho do projecto", () => {
       .em("POST", `/projects/${IDF12.projecto}/time-entries`, { status: 201, corpo: { id: "e9" } })
       .em("POST", `/projects/${IDF12.projecto}/allocations`, { status: 201, corpo: { id: "a9" } })
       .em("PUT", `/projects/${IDF12.projecto}/customer-visibility`, { status: 204 })
+      .em("GET", `/projects/${IDF12.projecto}/files/f1/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .em("POST", "/documents", { status: 201, corpo: { documentId: "00000000-0000-4000-8000-000000000e43", fileName: "plano.pdf", contentType: "application/pdf", sizeInBytes: 100, category: "Projecto", contentHash: "x", uploadedBy: null, uploadedAt: "2026-10-22T10:00:00Z" } })
+      .em("POST", `/projects/${IDF12.projecto}/files`, { status: 201, corpo: { id: "f8" } })
       .ligar();
     await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=tarefas`);
@@ -141,8 +144,17 @@ test.describe("trabalho do projecto", () => {
     expect(api.escritas("DELETE", `/projects/${IDF12.projecto}/budget/lines/l1`)).toHaveLength(1);
 
     await page.getByRole("link", { name: "Ficheiros", exact: true }).click();
-    await expect(page.getByText("Juntar e abrir ficheiros pede acesso aos documentos", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Descarregar/ })).toHaveCount(0);
+    await expect(page.getByRole("table", { name: "Ficheiros do projecto" })).toContainText("caderno.pdf");
+    const descargaPm = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar caderno.pdf" }).click();
+    expect((await descargaPm).suggestedFilename()).toBe("caderno.pdf");
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/documents/"))).toBe(false);
+    await page.getByRole("button", { name: "Juntar ficheiro" }).click();
+    await d.getByLabel("Ficheiro").setInputFiles({ name: "plano.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF") });
+    await expect(d.getByText("plano.pdf")).toBeVisible();
+    await d.getByRole("button", { name: "Juntar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/projects/${IDF12.projecto}/files`)[0]?.corpo).toEqual({ documentId: "00000000-0000-4000-8000-000000000e43", taskId: null, category: null });
     await page.getByRole("link", { name: "Cliente", exact: true }).click();
     await page.getByLabel("Ligar a um cliente").selectOption({ label: "Cliente Teste, Lda" });
     await page.getByRole("button", { name: "Guardar cliente" }).click();
@@ -158,7 +170,7 @@ test.describe("trabalho do projecto", () => {
       .em("POST", "/documents", { status: 201, corpo: { documentId: "00000000-0000-4000-8000-000000000e42", fileName: "acta.pdf", contentType: "application/pdf", sizeInBytes: 100, category: "Projecto", contentHash: "x", uploadedBy: null, uploadedAt: "2026-10-22T10:00:00Z" } })
       .em("POST", `/projects/${IDF12.projecto}/files`, { status: 201, corpo: { id: "f9" } })
       .em("POST", `/projects/${IDF12.projecto}/files/f1/removal`, { status: 204 })
-      .em("GET", "/documents/00000000-0000-4000-8000-000000000e41", { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .em("GET", `/projects/${IDF12.projecto}/files/f1/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .em("POST", `/projects/${IDF12.projecto}/allocations/a1/end`, { status: 204 })
       .em("PUT", `/projects/${IDF12.projecto}/customer-visibility`, { status: 204 })
       .ligar();
@@ -185,9 +197,8 @@ test.describe("trabalho do projecto", () => {
 
     await page.getByRole("link", { name: "Ficheiros", exact: true }).click();
     const descarga = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Descarregar Caderno de encargos" }).click();
-    // Sem nome do ficheiro na vista (B39), o browser completa o nome à sua maneira (espaços ou «_», com a extensão).
-    expect((await descarga).suggestedFilename()).toMatch(/^Caderno[ _]de[ _]encargos/);
+    await page.getByRole("button", { name: "Descarregar caderno.pdf" }).click();
+    expect((await descarga).suggestedFilename()).toBe("caderno.pdf");
     await page.getByRole("button", { name: "Juntar ficheiro" }).click();
     await d.getByLabel("Ficheiro").setInputFiles({ name: "acta.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF") });
     await expect(d.getByText("acta.pdf")).toBeVisible();
@@ -195,7 +206,7 @@ test.describe("trabalho do projecto", () => {
     await d.getByRole("button", { name: "Juntar" }).click();
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/projects/${IDF12.projecto}/files`)[0]?.corpo).toEqual({ documentId: "00000000-0000-4000-8000-000000000e42", taskId: null, category: "Acta de arranque" });
-    await page.getByRole("button", { name: "Retirar Caderno de encargos" }).click();
+    await page.getByRole("button", { name: "Retirar caderno.pdf" }).click();
     await d.getByRole("button", { name: "Retirar" }).click();
     await expect(d.getByText("Diga porque retira o ficheiro do projecto.")).toBeVisible();
     await d.getByLabel("Motivo").fill("Versão errada.");

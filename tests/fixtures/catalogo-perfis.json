@@ -252,6 +252,7 @@
  {
   "name": "ProjectManager",
   "permissions": [
+   "documents.write",
    "projects.projects.read",
    "projects.projects.write"
   ]

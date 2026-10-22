@@ -1,9 +1,11 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `cdd7b10`. Em aberto: **B24** (configuração),
-> **B39** (ficheiros dos projectos, F12) e **B40** (nomes, escolhas e
-> documentos da frota, F12).
+> Revisto contra `main` @ `42eabd0`. Em aberto: **B24** (configuração) e
+> **B40** (nomes, escolhas e documentos da frota, F12).
+> **B39** está resolvido (PR #114) e o front já o usa: os ficheiros do
+> projecto trazem o nome e descarregam-se pelo projecto; o ProjectManager
+> junta os seus (um documento alheio dá 404, verificado na base local).
 > **B38** está resolvido (PR #113) e o front já o usa: nomes de quem tem a
 > tarefa, de quem registou o tempo, do recurso alocado e de quem comentou;
 > o ProjectManager escolhe colaboradores, viaturas e clientes em
@@ -478,7 +480,7 @@ explica porquê.
 
 ## B39 — Os ficheiros de um projecto não se abrem pelo projecto e aceitam qualquer documento
 
-> Pedido a 2026-10-18 como ponto 3 do B38; o PR #113 não o trouxe (revisto em `cdd7b10`).
+> **Resolvido** (PR #114, 2026-10-22); o front usa-o e foi verificado na base local (`42eabd0`). Pedido a 2026-10-18 como ponto 3 do B38.
 
 **Facto:** `GET /projects/{id}/files` traz `documentId`,
 `category` e `attachedAt`, sem o nome do ficheiro, e não há rota para o

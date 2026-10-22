@@ -32,10 +32,11 @@
  * - orçamento por linhas: categoria (100), descrição (500), previsto e gasto
  *   ≥ 0; num projecto fechado não; desvio por linha e total, e se o previsto
  *   passa o aprovado;
- * - ficheiros: um documento carregado (o servidor só confirma que existe),
- *   tarefa opcional, categoria (100); retirar pede o motivo (500) e deixa a
- *   ligação e o documento (eliminação lógica); a lista não traz o nome nem há
- *   descarga pelo projecto (B39): só quem lê o arquivo os abre;
+ * - ficheiros: um documento carregado por quem o junta (ou qualquer um, com
+ *   `documents.read`; outro dá 404), tarefa opcional, categoria (100);
+ *   retirar pede o motivo (500) e deixa a ligação e o documento (eliminação
+ *   lógica); a lista traz o nome e descarrega-se pelo projecto, com a leitura
+ *   dos projectos (B39);
  * - recursos: colaborador ou viatura (o servidor confirma), início não antes
  *   do projecto, o mesmo recurso uma vez em aberto; terminar com a data (não
  *   antes do início);

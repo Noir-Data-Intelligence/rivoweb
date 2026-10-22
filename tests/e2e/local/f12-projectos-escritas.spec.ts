@@ -5,7 +5,9 @@
  * marcos (novo, alcançado, comentário), tarefas (nova atribuída pelas
  * escolhas dos projectos, B38; planear, dependência, mover no quadro,
  * concluir, cancelar), ver o Gantt, registar tempo e alocar a colaboradora
- * (sem ler os RH) e fechar o projecto. Confere tudo no servidor.
+ * (sem ler os RH), juntar e descarregar um ficheiro pelo projecto (B39) e
+ * fechar o projecto. Confere tudo no servidor, e que ligar um documento
+ * carregado por outra conta dá 404.
  */
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
@@ -27,10 +29,14 @@ async function soLocal(page: Page) {
 
 type Chamar = <T = unknown>(metodo: string, caminho: string, corpo?: unknown) => Promise<{ status: number; corpo: T }>;
 
-async function sessaoApi(request: APIRequestContext, email: string, password: string): Promise<Chamar> {
+async function token(request: APIRequestContext, email: string, password: string): Promise<string> {
   const r = await request.post(`${API_LOCAL}/identity/login`, { data: { email, password } });
   expect(r.status(), `login ${email}`).toBe(200);
-  const { accessToken } = (await r.json()) as { accessToken: string };
+  return ((await r.json()) as { accessToken: string }).accessToken;
+}
+
+async function sessaoApi(request: APIRequestContext, email: string, password: string): Promise<Chamar> {
+  const accessToken = await token(request, email, password);
   return async (metodo, caminho, corpo) => {
     const x = await request.fetch(`${API_LOCAL}${caminho}`, { method: metodo, headers: { Authorization: `Bearer ${accessToken}` }, ...(corpo === undefined ? {} : { data: corpo }) });
     const texto = await x.text();
@@ -147,6 +153,29 @@ test("F12: projectos — orçamento, marcos, tarefas, quadro, dependências, Gan
   await dialogo(page).getByRole("button", { name: "Alocar" }).click();
   await expect(dialogo(page)).toHaveCount(0);
   await expect(page.getByRole("table", { name: "Recursos alocados" })).toContainText(`${marca} Consultora`);
+
+  // --- Ficheiros pelo projecto (B39): juntar e descarregar ---
+  await page.getByRole("link", { name: "Ficheiros", exact: true }).click();
+  await page.getByRole("button", { name: "Juntar ficheiro" }).click();
+  await dialogo(page).getByLabel("Ficheiro").setInputFiles({ name: "plano.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\n%%EOF\n") });
+  await expect(dialogo(page).getByText("plano.pdf")).toBeVisible();
+  await dialogo(page).getByLabel("Categoria (opcional)").fill("Plano de trabalho");
+  await dialogo(page).getByRole("button", { name: "Juntar" }).click();
+  await expect(dialogo(page)).toHaveCount(0);
+  const descarga = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Descarregar plano.pdf" }).click();
+  expect((await descarga).suggestedFilename()).toBe("plano.pdf");
+  // Um documento carregado por outra conta não se liga (404), sem `documents.read`.
+  const alheio = await request.post(`${API_LOCAL}/documents`, {
+    headers: { Authorization: `Bearer ${await token(request, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "")}` },
+    multipart: { file: { name: "alheio.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF\n") }, category: "Projecto" },
+  });
+  expect(alheio.status()).toBe(201);
+  const idAlheio = ((await alheio.json()) as { documentId: string }).documentId;
+  const pm = await sessaoApi(request, email, PASSWORD_LOCAL);
+  expect((await pm("POST", `/projects/${pid}/files`, { documentId: idAlheio, taskId: null, category: null })).status).toBe(404);
+  const ficheiros = await pm<{ fileName: string; category: string }[]>("GET", `/projects/${pid}/files`);
+  expect(ficheiros.corpo.map((f) => [f.fileName, f.category])).toEqual([["plano.pdf", "Plano de trabalho"]]);
 
   const p = await sa<{ status: string; budget: { amount: number; currency: string }; completionPercent: number; milestones: { name: string; status: string; reachedOn: string }[]; tasks: { title: string; status: string; stage: string; priority: string; estimatedHours: number; progress: number; startDate: string; assignedEmployeeId: string | null; assignedEmployeeName: string | null }[]; allocations: { resourceId: string; resourceName: string | null }[] }>("GET", `/projects/${pid}`);
   expect([Number(p.corpo.budget.amount), p.corpo.budget.currency]).toEqual([5000000.5, "AOA"]);

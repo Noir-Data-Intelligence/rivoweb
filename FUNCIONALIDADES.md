@@ -122,7 +122,7 @@ AM = AssetManager.
 | Tempo: ver os registos e os totais (por projecto e no registo de tempo global) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tempo: registar e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Orçamento por linhas: ver, juntar, corrigir e apagar linhas (previsto, gasto, desvio) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
-| Ficheiros do projecto: ver; juntar, abrir e retirar ¹⁷ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Ficheiros do projecto: ver, juntar, abrir e retirar ¹⁷ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Recursos (colaboradores e viaturas): ver; alocar e terminar ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Ligar o projecto a um cliente ¹⁶ e mostrá-lo ou escondê-lo no portal | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Portal: ver os projectos que a empresa mostra, o progresso e os marcos; comentar um marco | — | — | — | — | — | — | — | — | — | ✓ |
@@ -318,7 +318,7 @@ Recursos Humanos.»
 ¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
 ¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
 ¹⁶ Os nomes (de quem tem a tarefa, de quem registou o tempo, do recurso alocado e de quem comentou) vêm nas vistas dos projectos; colaboradores, viaturas e clientes activos escolhem-se pela lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes (B38).
-¹⁷ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os ficheiros do projecto não trazem o nome nem se descarregam pelo projecto (B39). O ProjectManager vê a lista.
+¹⁷ Os ficheiros trazem o nome e abrem-se pelo projecto, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B39).
 ¹⁸ As vistas da frota só trazem o id de quem tem a viatura e de quem conduziu (B40): os nomes e a escolha vêm da lista própria dos activos fixos (colaboradores activos), que o Admin e o AssetManager têm; quem já não está activo aparece como «—».
 ¹⁹ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os documentos da viatura não se descarregam pela viatura (B40). O AssetManager vê a lista e retira.
 
@@ -587,9 +587,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   - **Orçamento:** aprovado, previsto nas linhas, gasto e desvio, com aviso
     quando o previsto passa o aprovado; **linhas** (categoria, descrição,
     previsto, gasto) — juntar, corrigir, apagar.
-  - **Ficheiros:** os ficheiros juntos (categoria, tarefa, data); **juntar**
-    um ficheiro carregado na hora (categoria, tarefa), **abrir** (sempre em
-    anexo) e **retirar** com o motivo (fica no registo).
+  - **Ficheiros:** os ficheiros juntos (categoria, nome, tarefa, data);
+    **juntar** um ficheiro carregado na hora (categoria, tarefa), **abrir**
+    pelo projecto (sempre em anexo) e **retirar** com o motivo (fica no
+    registo).
   - **Recursos:** colaboradores e viaturas alocados (desde, até); **alocar**
     (não antes do início do projecto; o mesmo recurso uma vez em aberto) e
     **terminar** com a data.
@@ -1418,7 +1419,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz nos projectos — incluindo atribuir tarefas,
   registar tempo, alocar colaboradores e viaturas e ligar o cliente, pela
   lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes
-  (B38) — salvo juntar ou abrir ficheiros (B39): vê a lista e retira.
+  (B38) — e juntar, abrir e retirar ficheiros pelo projecto (B39).
 
 ### Colaborador
 Entra no **portal do colaborador** (`/eu`). Tudo é do próprio: o servidor

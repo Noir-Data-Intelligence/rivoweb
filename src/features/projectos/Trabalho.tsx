@@ -426,6 +426,8 @@ function Anexar({ p }: { p: Projecto }) {
   );
 }
 
+const nomeFicheiro = (f: FicheiroProjecto) => f.fileName ?? f.category;
+
 function Retirar({ p, f }: { p: Projecto; f: FicheiroProjecto }) {
   const [aberto, setAberto] = useState(false);
   const [motivo, setMotivo] = useState("");
@@ -434,7 +436,7 @@ function Retirar({ p, f }: { p: Projecto; f: FicheiroProjecto }) {
   const erro = erroMotivoFicheiro(motivo);
   return (
     <>
-      <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Retirar ${f.category}`}>
+      <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Retirar ${nomeFicheiro(f)}`}>
         Retirar
       </Button>
       <Confirmar
@@ -447,7 +449,7 @@ function Retirar({ p, f }: { p: Projecto; f: FicheiroProjecto }) {
             setTentou(false);
           }
         }}
-        titulo={`Retirar «${f.category}» do projecto?`}
+        titulo={`Retirar «${nomeFicheiro(f)}» do projecto?`}
         descricao="A ligação e o documento ficam no registo."
         rotuloConfirmar="Retirar"
         variante="destructive"
@@ -467,11 +469,11 @@ function Retirar({ p, f }: { p: Projecto; f: FicheiroProjecto }) {
   );
 }
 
-function Abrir({ f }: { f: FicheiroProjecto }) {
-  const d = useEscrita({ mutationFn: () => descarregar(`/documents/${encodeURIComponent(f.documentId)}`, `${f.category}`) });
+function Abrir({ p, f }: { p: Projecto; f: FicheiroProjecto }) {
+  const d = useEscrita({ mutationFn: () => descarregar(`/projects/${encodeURIComponent(p.projectId)}/files/${encodeURIComponent(f.linkId)}/content`, nomeFicheiro(f)) });
   return (
     <span className="inline-flex flex-col items-end">
-      <Button variante="ghost" tamanho="sm" aCarregar={d.isPending} onClick={() => d.mutate()} aria-label={`Descarregar ${f.category}`}>
+      <Button variante="ghost" tamanho="sm" aCarregar={d.isPending} onClick={() => d.mutate()} aria-label={`Descarregar ${nomeFicheiro(f)}`}>
         <Download strokeWidth={1.75} aria-hidden />
         Descarregar
       </Button>
@@ -486,7 +488,17 @@ export function FicheirosDoProjecto({ p }: { p: Projecto }) {
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
   const tarefa = (id: string | null) => (id ? (p.tasks.find((t) => t.taskId === id)?.title ?? "Tarefa") : "—");
   const colunas: Coluna<FicheiroProjecto>[] = [
-    { id: "cat", cabecalho: "Ficheiro", celula: (f) => <span className="font-medium">{f.category}</span> },
+    {
+      id: "cat",
+      cabecalho: "Ficheiro",
+      className: "max-w-[18rem]",
+      celula: (f) => (
+        <span className="flex min-w-0 flex-col">
+          <span className="break-words font-medium">{f.category}</span>
+          {f.fileName ? <span className="truncate text-xs text-muted-foreground">{f.fileName}</span> : null}
+        </span>
+      ),
+    },
     { id: "tarefa", cabecalho: "Tarefa", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (f) => tarefa(f.taskId) },
     { id: "quando", cabecalho: "Junto a", esconderAte: "sm", celula: (f) => formatarDataHora(f.attachedAt) },
     {
@@ -495,7 +507,7 @@ export function FicheirosDoProjecto({ p }: { p: Projecto }) {
       alinhar: "direita",
       celula: (f) => (
         <span className="inline-flex gap-1">
-          {pode("documents.read") ? <Abrir f={f} /> : null}
+          <Abrir p={p} f={f} />
           {escreve ? <Retirar p={p} f={f} /> : null}
         </span>
       ),
@@ -507,7 +519,6 @@ export function FicheirosDoProjecto({ p }: { p: Projecto }) {
         <CardTitle>Ficheiros</CardTitle>
         {escreve && pode("documents.write") ? <Anexar p={p} /> : null}
       </div>
-      {escreve && !pode("documents.write") ? <Alert tom="info" className="mb-3" titulo="Juntar e abrir ficheiros pede acesso aos documentos, que este perfil não tem (B39)." /> : null}
       <Tabela
         rotulo="Ficheiros do projecto"
         colunas={colunas}

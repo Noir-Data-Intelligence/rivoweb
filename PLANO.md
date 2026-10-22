@@ -1958,7 +1958,8 @@ o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
   576, sem falhas nem instáveis (24 saltados).
 
 **Bloco 2 — trabalho do projecto e portal do cliente** (2026-10-22,
-publicado em `7761bf6` e `6266f4f`: CI verde).
+publicado em `7761bf6` e `6266f4f`: CI verde; com o B38 e a frota em
+`09ff269`, smoke de produção 10/10).
 - **Ecrãs:** vistas tempo, orçamento, ficheiros, recursos e cliente na ficha
   do projecto; comentários e checklist em cada tarefa (diálogos);
   `/projectos/tempo` («Registo de tempo»); no portal do cliente,
@@ -1979,6 +1980,12 @@ publicado em `7761bf6` e `6266f4f`: CI verde).
   (`f12-projectos-escritas.spec.ts`: como ProjectManager, tarefa atribuída,
   3 h registadas e colaboradora alocada, com os nomes no servidor) e, em
   produção, `GET /projects/lookups` dá 200 ao ProjectManager (só o código).
+- **B39 aplicado** (2026-10-22, contra `42eabd0`): os ficheiros trazem o
+  nome e descarregam-se por `/projects/{id}/files/{linkId}/content`; o
+  ProjectManager (com `documents.write`) junta, abre e retira. Verificado na
+  base local (`f12-projectos-escritas.spec.ts`: como ProjectManager, ficheiro
+  junto e descarregado com o nome; um documento carregado por outra conta dá
+  404 ao ligar).
 - **Escritas:** verificadas **na base local** (`f12-trabalho-escritas.spec.ts`):
   como Admin, comentário e checklist (um passo marcado), tempo de 6,5 h e
   outro registo apagado, linha de orçamento (1 200 000 / 300 000,50), ficheiro
@@ -1988,7 +1995,8 @@ publicado em `7761bf6` e `6266f4f`: CI verde).
 - **Testes:** 223 unitários; interface 4 cenários × 3 motores; suite inteira
   588, sem falhas nem instáveis (24 saltados).
 
-**Bloco 3 — frota** (2026-10-22, por publicar).
+**Bloco 3 — frota** (2026-10-22, publicado em `09ff269`: CI verde, smoke de
+produção 10/10).
 - **Inventário** (produção, só códigos e contagens): AssetManager 200 em
   `/fleet/vehicles` (25), `/fleet/insurance` (25) e
   `/fleet/maintenance-plans/due` (16 em 30 dias); 403 nos RH. As vistas só

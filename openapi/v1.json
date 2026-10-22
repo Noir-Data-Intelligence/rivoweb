@@ -28533,7 +28533,7 @@
         "tags": [
           "ProjectWorkEndpoints"
         ],
-        "summary": "Liga um documento já carregado em POST /documents ao projecto (e opcionalmente a uma tarefa).",
+        "summary": "Liga ao projecto (e opcionalmente a uma tarefa) um documento carregado por quem o liga, ou qualquer um com `documents.read`; outro dá 404 (B39).",
         "parameters": [
           {
             "name": "projectId",
@@ -28578,6 +28578,67 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/projects/{projectId}/files/{linkId}/content": {
+      "get": {
+        "tags": [
+          "ProjectWorkEndpoints"
+        ],
+        "summary": "Descarrega um ficheiro do projecto (anexo, nosniff), pelo `linkId` da lista, sem `documents.read` (B39).",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -55617,6 +55678,12 @@
           "attachedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "fileName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

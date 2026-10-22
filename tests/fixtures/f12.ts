@@ -17,13 +17,13 @@ export const IDF12 = {
   viatura: "00000000-0000-4000-8000-000000000e51",
 };
 
-/** Como em produção: só `projects.projects.read/.write`. */
+/** Como no catálogo: `projects.projects.read/.write` e, desde o B39, `documents.write`. */
 export const meGestorProjectos: S["CurrentUserResponse"] = {
   userId: "00000000-0000-4000-8000-000000000010",
   email: "projectos@teste.local",
   displayName: "Paula Projectos",
   roles: ["ProjectManager"],
-  permissions: ["projects.projects.read", "projects.projects.write"],
+  permissions: ["documents.write", "projects.projects.read", "projects.projects.write"],
 };
 
 export const meAdminF12: S["CurrentUserResponse"] = { ...meAdminF10, permissions: [...new Set([...meAdminF10.permissions, "projects.projects.read", "projects.projects.write", "hr.employees.read"])] };
@@ -143,7 +143,7 @@ export const orcamentoLinhas = (): S["BudgetBreakdown"] => ({
   lines: [{ lineId: "l1", category: "Mão-de-obra", description: "Consultores", plannedAmount: 5500000, actualAmount: 1200000, variance: 4300000 }],
 });
 
-export const ficheirosProjecto = (): S["ProjectFileView"][] => [{ linkId: "f1", documentId: "00000000-0000-4000-8000-000000000e41", taskId: IDF12.t1, category: "Caderno de encargos", attachedAt: "2026-02-02T10:00:00Z" }];
+export const ficheirosProjecto = (): S["ProjectFileView"][] => [{ linkId: "f1", documentId: "00000000-0000-4000-8000-000000000e41", taskId: IDF12.t1, category: "Caderno de encargos", fileName: "caderno.pdf", attachedAt: "2026-02-02T10:00:00Z" }];
 
 export const visibilidade = (comCliente = false): S["CustomerVisibilityView"] => ({ projectId: IDF12.projecto, customerId: comCliente ? "00000000-0000-4000-8000-000000000701" : null, customerName: comCliente ? "Cliente Teste, Lda" : null, visibleToCustomer: false });
 
