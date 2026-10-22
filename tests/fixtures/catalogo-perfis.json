@@ -115,6 +115,7 @@
  {
   "name": "AssetManager",
   "permissions": [
+   "documents.write",
    "procurement.suppliers.read",
    "procurement.orders.read",
    "procurement.receipts.read",

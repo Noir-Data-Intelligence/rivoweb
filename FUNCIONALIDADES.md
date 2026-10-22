@@ -16,7 +16,8 @@
 > cliente, nomes e escolhas pela lista dos projectos — e frota — viaturas,
 > manutenção, atribuições, viagens, despesas, documentos, seguros e
 > sinistros) publicadas. Por publicar: ficheiros dos projectos abertos pelo
-> projecto (B39) e o 1.º bloco da **F13** (analytics e auditoria) ·
+> projecto (B39), nomes, escolhas e documentos da frota pela viatura (B40) e
+> o 1.º bloco da **F13** (analytics e auditoria) ·
 > actualizado a 2026-10-22.
 
 ---
@@ -191,7 +192,7 @@ AM = AssetManager.
 | Manutenção: abrir e fechar (com custo); planos preventivos — agendar, concluir um ciclo, cancelar; manutenção prevista em toda a frota | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Atribuições: atribuir a um colaborador e terminar; ver quem teve a viatura ¹⁸ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Viagens (motorista ¹⁸, odómetro, motivo) e despesas (combustível, portagens, estacionamento): registar e ver os totais | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
-| Documentos da viatura: ver e retirar; juntar e abrir ¹⁹ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Documentos da viatura: ver, juntar, abrir e retirar ¹⁹ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Seguros de frota: contratar, corrigir, anular; a caducar em 30, 60 ou 90 dias; sinistros — abrir, pagar, recusar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -322,8 +323,8 @@ Recursos Humanos.»
 ¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
 ¹⁶ Os nomes (de quem tem a tarefa, de quem registou o tempo, do recurso alocado e de quem comentou) vêm nas vistas dos projectos; colaboradores, viaturas e clientes activos escolhem-se pela lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes (B38).
 ¹⁷ Os ficheiros trazem o nome e abrem-se pelo projecto, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B39).
-¹⁸ As vistas da frota só trazem o id de quem tem a viatura e de quem conduziu (B40): os nomes e a escolha vêm da lista própria dos activos fixos (colaboradores activos), que o Admin e o AssetManager têm; quem já não está activo aparece como «—».
-¹⁹ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os documentos da viatura não se descarregam pela viatura (B40). O AssetManager vê a lista e retira.
+¹⁸ Os nomes de quem tem a viatura e de quem conduziu vêm na ficha; os colaboradores activos escolhem-se pela lista da frota, sem ler os Recursos Humanos (B40).
+¹⁹ Os documentos abrem-se pela viatura, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B40).
 
 ---
 
@@ -787,8 +788,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     intervalo em dias, primeira data), **concluir um ciclo** (reagenda para a
     data mais o intervalo) e **cancelar**.
   - **Atribuições:** quem teve a viatura e quando; **atribuir** a um
-    colaborador activo (da lista própria dos activos, sem precisar dos
-    Recursos Humanos; uma de cada vez) e **terminar** (não antes do início).
+    colaborador activo (da lista própria da frota, sem precisar dos Recursos
+    Humanos; uma de cada vez) e **terminar** (não antes do início).
   - **Viagens:** total de viagens e de quilómetros; cada viagem (período,
     motorista, odómetro, distância, motivo); **registar** uma viagem feita
     (motorista opcional, datas, odómetro à partida — proposto a partir da
@@ -798,7 +799,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     **registar** uma despesa (categoria, valor em AOA, data, descrição).
   - **Documentos:** paginados (categoria, ficheiro, tamanho, data);
     **juntar** um ficheiro carregado na hora com a categoria, **descarregar**
-    (sempre em anexo) e **retirar** com o motivo (fica no registo).
+    pela viatura (sempre em anexo) e **retirar** com o motivo (fica no registo).
   - **Seguros:** as apólices da viatura (seguradora, número, cobertura,
     vigência, prémio, capital, estado — por começar, em vigor com os dias que
     faltam, caducada, anulada); **contratar** e **corrigir** (seguradora,
@@ -1387,9 +1388,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
 
 **Viaturas**, **Manutenção prevista** e **Seguros de frota**
-- Tudo o que o Admin faz na frota, incluindo atribuir viaturas e indicar o
-  motorista (pela lista dos activos), salvo juntar e abrir documentos (B40):
-  vê a lista e retira.
+- Tudo o que o Admin faz na frota, incluindo atribuir viaturas, indicar o
+  motorista (pela lista da frota) e juntar, abrir e retirar documentos (B40).
 
 **Fornecedores**
 - Ver a lista e a ficha.

@@ -1,9 +1,8 @@
 /** Peças comuns da frota: estados, tipos, categorias e nomes de colaboradores. */
-import { useEscolhasActivos } from "@/features/activos";
 import { useUtilizador } from "@/features/identity";
 import { formatarData } from "@/lib/format/data";
 import { Badge, type TomBadge } from "@/ui/Badge";
-import type { Plano } from "./api";
+import { useEscolhasFrota, type Plano } from "./api";
 import type { CategoriaDespesa } from "./regras";
 
 function estado(mapa: Record<string, { texto: string; tom: TomBadge }>) {
@@ -41,15 +40,8 @@ export function ProximaManutencao({ planos }: { planos: readonly Plano[] }) {
   );
 }
 
-/**
- * Colaboradores activos para atribuir e conduzir, e os seus nomes: as vistas
- * da frota só trazem ids (B40), por isso vêm de `/finance/assets/lookups`
- * (B31), para quem gere activos. Sem isso, «—» e não se escolhe.
- */
+/** Colaboradores activos para atribuir e indicar o motorista, para quem escreve na frota (B40). */
 export function useMotoristas() {
   const { pode } = useUtilizador();
-  const le = pode("finance.assets.write");
-  const q = useEscolhasActivos(le);
-  const activos = q.data?.employees ?? [];
-  return { le, activos, nome: (id: string | null | undefined) => (id ? (activos.find((c) => c.id === id)?.name ?? null) : null) };
+  return useEscolhasFrota(pode("fleet.vehicles.write")).data?.employees ?? [];
 }

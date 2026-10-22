@@ -18,7 +18,7 @@ import { GrelhaKpis, Kpi } from "@/ui/Kpi";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import { useAcaoViatura, useApolices, useViatura, type Viatura as TipoViatura } from "../api";
-import { EstadoViatura, ProximaManutencao, useMotoristas } from "../comum";
+import { EstadoViatura, ProximaManutencao } from "../comum";
 import { AtribuicoesDaViatura, CustosDaViatura, DocumentosDaViatura, ManutencaoDaViatura, ViagensDaViatura } from "../Operacao";
 import { EditarApolice, TabelaApolices } from "../Seguros";
 
@@ -77,7 +77,6 @@ export default function Viatura() {
   const { pode } = useUtilizador();
   const q = useViatura(vehicleId);
   const vista = useVista(VISTAS);
-  const motoristas = useMotoristas();
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/frota">
@@ -116,7 +115,7 @@ export default function Viatura() {
       {x.status === "InMaintenance" ? <Alert tom="aviso" className="mb-4" titulo="Em manutenção: feche o registo aberto para a viatura voltar a activa." /> : null}
       <div className="mb-6">
         <GrelhaKpis>
-          <Kpi rotulo="Atribuída a" valor={atribuicao ? (motoristas.nome(atribuicao.employeeId) ?? "—") : "Ninguém"} />
+          <Kpi rotulo="Atribuída a" valor={atribuicao ? (atribuicao.employeeName ?? "—") : "Ninguém"} />
           <Kpi rotulo="Quilómetros" valor={`${formatarNumeroDecimal(quilometros.toString(), 0)} km`} detalhe={`${String(x.trips.length)} viagens`} />
           <Kpi rotulo="Custos" valor={moeda(custos.toFixed(2))} detalhe="Despesas e manutenções." />
           <Kpi rotulo="Próxima manutenção" valor={<ProximaManutencao planos={x.plans} />} />

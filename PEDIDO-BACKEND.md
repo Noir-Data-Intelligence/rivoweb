@@ -1,8 +1,11 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `42eabd0`. Em aberto: **B24** (configuração) e
-> **B40** (nomes, escolhas e documentos da frota, F12).
+> Revisto contra `main` @ `57c6d14`. Em aberto: **B24** (configuração).
+> **B40** está resolvido (PR #115) e o front já o usa: nomes de quem tem a
+> viatura e de quem conduziu, colaboradores em `/fleet/lookups`, documentos
+> abertos pela viatura; o AssetManager junta os seus (um documento alheio dá
+> 404, verificado na base local).
 > **B39** está resolvido (PR #114) e o front já o usa: os ficheiros do
 > projecto trazem o nome e descarregam-se pelo projecto; o ProjectManager
 > junta os seus (um documento alheio dá 404, verificado na base local).
@@ -500,6 +503,8 @@ o Admin junta e abre pelo arquivo.
    ProjectManager — como o B33 e o B37.
 
 ## B40 — A frota só traz ids de pessoas e os documentos não se abrem pela viatura
+
+> **Resolvido** (PR #115, 2026-10-22); o front usa-o e foi verificado na base local (`57c6d14`).
 
 **Facto 1 (nomes e escolhas):** `VehicleAssignmentView` traz `employeeId` e
 `VehicleTripView` traz `driverId`, sem nomes; atribuir e indicar o motorista

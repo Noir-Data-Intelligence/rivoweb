@@ -16,7 +16,7 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useRegistarViatura, useViaturas, type Viatura } from "../api";
-import { EstadoViatura, ProximaManutencao, useMotoristas } from "../comum";
+import { EstadoViatura, ProximaManutencao } from "../comum";
 import { errosViatura, temErros, viaturaParaApi, type CamposViatura } from "../regras";
 
 function NovaViatura() {
@@ -70,7 +70,6 @@ export default function Viaturas() {
   const [params, setParams] = useSearchParams();
   const inactivas = params.get("inactivas") === "sim";
   const lista = useViaturas({ inactivas, pagina, tamanho });
-  const motoristas = useMotoristas();
   const alternar = (sim: boolean) => {
     const n = new URLSearchParams(window.location.search);
     if (sim) n.set("inactivas", "sim");
@@ -97,7 +96,7 @@ export default function Viaturas() {
       className: "max-w-[12rem] truncate",
       celula: (x) => {
         const a = x.assignments.find((y) => !y.endedOn);
-        return a ? (motoristas.nome(a.employeeId) ?? "—") : "Ninguém";
+        return a ? (a.employeeName ?? "—") : "Ninguém";
       },
     },
     { id: "plano", cabecalho: "Próxima manutenção", esconderAte: "sm", celula: (x) => <ProximaManutencao planos={x.plans} /> },

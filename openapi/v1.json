@@ -31406,6 +31406,37 @@
         ]
       }
     },
+    "/fleet/lookups": {
+      "get": {
+        "tags": [
+          "FleetModuleEndpoints"
+        ],
+        "summary": "Colaboradores activos (id e nome), para atribuir a viatura e indicar o motorista, sem `hr.employees.read`.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetLookups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/fleet/vehicles/{vehicleId}": {
       "get": {
         "tags": [
@@ -32360,6 +32391,7 @@
         "tags": [
           "FleetModuleEndpoints"
         ],
+        "summary": "Anexa um documento carregado por quem anexa (ou qualquer um, com `documents.read`); outro dá 404 (B40).",
         "parameters": [
           {
             "name": "vehicleId",
@@ -32398,6 +32430,67 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/fleet/vehicles/{vehicleId}/documents/{documentId}/content": {
+      "get": {
+        "tags": [
+          "FleetModuleEndpoints"
+        ],
+        "summary": "Descarrega um documento da viatura (anexo, nosniff), sem `documents.read` (B40). Retirado ou de outra viatura: 404.",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
                 }
               }
             }
@@ -46378,6 +46471,36 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "FleetLookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "FleetLookups": {
+        "required": [
+          "employees"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FleetLookupEntry"
+            }
           }
         }
       },
@@ -62056,6 +62179,12 @@
               "string"
             ],
             "format": "date"
+          },
+          "employeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -62178,6 +62307,12 @@
             "format": "double"
           },
           "purpose": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "driverName": {
             "type": [
               "null",
               "string"

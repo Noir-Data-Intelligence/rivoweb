@@ -14,7 +14,6 @@ import { useEscrita } from "@/lib/api/escrita";
 import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { formatarNumeroDecimal, formatarTamanho } from "@/lib/format/numero";
 import { normalizarTexto } from "@/lib/validation/normalizar";
-import { Alert } from "@/ui/Alert";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Card, CardTitle } from "@/ui/Card";
@@ -385,7 +384,7 @@ function Atribuir({ x }: { x: Viatura }) {
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.pessoa} onChange={(e) => setV((y) => ({ ...y, pessoa: e.target.value }))}>
                 <option value="">Escolha…</option>
-                {motoristas.activos.map((c) => (
+                {motoristas.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
@@ -442,22 +441,20 @@ function TerminarAtribuicao({ x, a, nome }: { x: Viatura; a: Atribuicao; nome: s
 
 export function AtribuicoesDaViatura({ x }: { x: Viatura }) {
   const { escreve, activa } = useEscreve(x);
-  const motoristas = useMotoristas();
-  const nome = (id: string) => motoristas.nome(id) ?? "—";
+  const nome = (a: Atribuicao) => a.employeeName ?? "—";
   const aberta = x.assignments.some((a) => !a.endedOn);
   const colunas: Coluna<Atribuicao>[] = [
-    { id: "quem", cabecalho: "Colaborador", className: "max-w-[14rem] truncate", celula: (a) => nome(a.employeeId) },
+    { id: "quem", cabecalho: "Colaborador", className: "max-w-[14rem] truncate", celula: (a) => nome(a) },
     { id: "desde", cabecalho: "Desde", celula: (a) => formatarData(a.startedOn) },
     { id: "ate", cabecalho: "Até", celula: (a) => (a.endedOn ? formatarData(a.endedOn) : <Badge tom="info">Em curso</Badge>) },
-    ...(escreve ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (a: Atribuicao) => (a.endedOn ? null : <TerminarAtribuicao x={x} a={a} nome={nome(a.employeeId)} />) }] : []),
+    ...(escreve ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (a: Atribuicao) => (a.endedOn ? null : <TerminarAtribuicao x={x} a={a} nome={nome(a)} />) }] : []),
   ];
   return (
     <Card>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <CardTitle>Atribuições</CardTitle>
-        {activa && motoristas.le && !aberta ? <Atribuir x={x} /> : null}
+        {activa && !aberta ? <Atribuir x={x} /> : null}
       </div>
-      {activa && !motoristas.le ? <Alert tom="info" className="mb-3" titulo="Atribuir exige escolher o colaborador, o que pede a lista dos activos fixos, que este perfil não tem (B40)." /> : null}
       <Tabela rotulo="Atribuições" colunas={colunas} linhas={[...x.assignments].sort((a, b) => b.startedOn.localeCompare(a.startedOn))} chave={(a) => a.assignmentId} aCarregar={false} vazio="Nunca foi atribuída." />
     </Card>
   );
@@ -501,20 +498,18 @@ function RegistarViagem({ x }: { x: Viatura }) {
             accao.mutate({ acto: "viagem", corpo: viagemParaApi(v) }, { onSuccess: () => fechar(false) });
           }}
         >
-          {motoristas.le ? (
-            <Field rotulo="Motorista (opcional)" className="sm:col-span-2">
-              {({ id, descricao }) => (
-                <Select id={id} aria-describedby={descricao} value={v.motorista} onChange={campo("motorista")}>
-                  <option value="">Sem motorista indicado</option>
-                  {motoristas.activos.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-          ) : null}
+          <Field rotulo="Motorista (opcional)" className="sm:col-span-2">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.motorista} onChange={campo("motorista")}>
+                <option value="">Sem motorista indicado</option>
+                {motoristas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
           <Field rotulo="Início" erro={tentou ? erros.inicio : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} type="date" aria-describedby={descricao} invalido={invalido} value={v.inicio} onChange={campo("inicio")} />}
           </Field>
@@ -538,10 +533,9 @@ function RegistarViagem({ x }: { x: Viatura }) {
 
 export function ViagensDaViatura({ x }: { x: Viatura }) {
   const { activa } = useEscreve(x);
-  const motoristas = useMotoristas();
   const colunas: Coluna<Viagem>[] = [
     { id: "periodo", cabecalho: "Período", celula: (t) => (t.startedOn === t.endedOn ? formatarData(t.startedOn) : `${formatarData(t.startedOn)} → ${formatarData(t.endedOn)}`) },
-    { id: "quem", cabecalho: "Motorista", esconderAte: "sm", className: "max-w-[12rem] truncate", celula: (t) => (t.driverId ? (motoristas.nome(t.driverId) ?? "—") : "Não indicado") },
+    { id: "quem", cabecalho: "Motorista", esconderAte: "sm", className: "max-w-[12rem] truncate", celula: (t) => (t.driverId ? (t.driverName ?? "—") : "Não indicado") },
     { id: "odometro", cabecalho: "Odómetro", esconderAte: "lg", celula: (t) => `${km(t.startOdometer)} → ${km(t.endOdometer)}` },
     { id: "dist", cabecalho: "Distância", alinhar: "direita", celula: (t) => km(t.distance) },
     { id: "motivo", cabecalho: "Motivo", esconderAte: "md", className: "max-w-[16rem] truncate", celula: (t) => t.purpose ?? "—" },
@@ -746,8 +740,8 @@ function RetirarDocumento({ x, d }: { x: Viatura; d: DocumentoViatura }) {
   );
 }
 
-function AbrirDocumento({ d }: { d: DocumentoViatura }) {
-  const q = useEscrita({ mutationFn: () => descarregar(`/documents/${encodeURIComponent(d.documentId)}`, d.fileName) });
+function AbrirDocumento({ x, d }: { x: Viatura; d: DocumentoViatura }) {
+  const q = useEscrita({ mutationFn: () => descarregar(`/fleet/vehicles/${encodeURIComponent(x.vehicleId)}/documents/${encodeURIComponent(d.documentId)}/content`, d.fileName) });
   return (
     <span className="inline-flex flex-col items-end">
       <Button variante="ghost" tamanho="sm" aCarregar={q.isPending} onClick={() => q.mutate()} aria-label={`Descarregar ${d.fileName}`}>
@@ -784,7 +778,7 @@ export function DocumentosDaViatura({ x }: { x: Viatura }) {
       alinhar: "direita",
       celula: (d) => (
         <span className="inline-flex gap-1">
-          {pode("documents.read") ? <AbrirDocumento d={d} /> : null}
+          <AbrirDocumento x={x} d={d} />
           {escreve ? <RetirarDocumento x={x} d={d} /> : null}
         </span>
       ),
@@ -796,7 +790,6 @@ export function DocumentosDaViatura({ x }: { x: Viatura }) {
         <CardTitle>Documentos</CardTitle>
         {escreve && pode("documents.write") ? <JuntarDocumento x={x} /> : null}
       </div>
-      {escreve && !pode("documents.write") ? <Alert tom="info" className="mb-3" titulo="Juntar e abrir documentos pede acesso ao arquivo, que este perfil não tem (B40)." /> : null}
       <Tabela
         rotulo="Documentos da viatura"
         colunas={colunas}

@@ -1,12 +1,13 @@
 /**
  * F12 (frota) contra a API LOCAL (D1, §8.3). Preparação pela API com a conta
  * SuperAdmin local: uma colaboradora e uma conta AssetManager. Pela
- * interface, como AssetManager (sem RH nem arquivo): viatura registada,
- * manutenção aberta e fechada com custo, plano agendado e concluído, outro
- * cancelado, atribuição à colaboradora (pela lista dos activos, B31) e
- * terminada, viagem, despesa, apólice contratada e corrigida, sinistro pago,
- * outro recusado, apólice anulada. Como Admin local: documento junto,
- * descarregado e retirado; viatura desactivada. Confere tudo no servidor.
+ * interface, como AssetManager (sem RH nem leitura do arquivo): viatura
+ * registada, manutenção aberta e fechada com custo, plano agendado e
+ * concluído, outro cancelado, atribuição à colaboradora (pela lista da frota,
+ * B40) e terminada, viagem, despesa, documento junto, descarregado pela
+ * viatura e retirado (um documento alheio dá 404), apólice contratada e
+ * corrigida, sinistro pago, outro recusado, apólice anulada. Como Admin
+ * local: viatura desactivada. Confere tudo no servidor.
  */
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
@@ -29,10 +30,14 @@ async function soLocal(page: Page) {
 
 type Chamar = <T = unknown>(metodo: string, caminho: string, corpo?: unknown) => Promise<{ status: number; corpo: T }>;
 
-async function sessaoApi(request: APIRequestContext, email: string, password: string): Promise<Chamar> {
+async function token(request: APIRequestContext, email: string, password: string): Promise<string> {
   const r = await request.post(`${API_LOCAL}/identity/login`, { data: { email, password } });
   expect(r.status(), `login ${email}`).toBe(200);
-  const { accessToken } = (await r.json()) as { accessToken: string };
+  return ((await r.json()) as { accessToken: string }).accessToken;
+}
+
+async function sessaoApi(request: APIRequestContext, email: string, password: string): Promise<Chamar> {
+  const accessToken = await token(request, email, password);
   return async (metodo, caminho, corpo) => {
     const x = await request.fetch(`${API_LOCAL}${caminho}`, { method: metodo, headers: { Authorization: `Bearer ${accessToken}` }, ...(corpo === undefined ? {} : { data: corpo }) });
     const texto = await x.text();
@@ -61,9 +66,9 @@ type FichaViatura = {
   model: string;
   status: string;
   maintenances: { type: string; description: string; startedOn: string; endedOn: string | null; cost: number | null }[];
-  assignments: { employeeId: string; startedOn: string; endedOn: string | null }[];
+  assignments: { employeeId: string; employeeName: string | null; startedOn: string; endedOn: string | null }[];
   plans: { description: string; intervalDays: number; nextDueOn: string; isActive: boolean }[];
-  trips: { driverId: string | null; startOdometer: number; endOdometer: number; distance: number; purpose: string | null }[];
+  trips: { driverId: string | null; driverName: string | null; startOdometer: number; endOdometer: number; distance: number; purpose: string | null }[];
   expenses: { category: string; amount: number; occurredOn: string; description: string | null }[];
 };
 
@@ -157,9 +162,30 @@ test("F12: frota — viatura, manutenção, planos, atribuição, viagem, despes
   await dialogo(page).getByRole("button", { name: "Registar" }).click();
   await expect(dialogo(page)).toHaveCount(0);
 
-  // Documentos: o AssetManager não junta nem abre (B40).
+  // Documentos pela viatura (B40): junto, descarregado e retirado; um documento alheio dá 404.
   await page.getByRole("link", { name: "Documentos", exact: true }).click();
-  await expect(page.getByText("(B40)", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "Juntar documento" }).click();
+  await dialogo(page).getByLabel("Ficheiro").setInputFiles({ name: "livrete.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\n%%EOF\n") });
+  await expect(dialogo(page).getByText("livrete.pdf")).toBeVisible();
+  await dialogo(page).getByLabel("Categoria").fill("Livrete");
+  await dialogo(page).getByRole("button", { name: "Juntar" }).click();
+  await expect(dialogo(page)).toHaveCount(0);
+  await expect(page.getByRole("table", { name: "Documentos da viatura" })).toContainText("livrete.pdf");
+  const descarga = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Descarregar livrete.pdf" }).click();
+  expect((await descarga).suggestedFilename()).toBe("livrete.pdf");
+  await page.getByRole("button", { name: "Retirar livrete.pdf" }).click();
+  await dialogo(page).getByLabel("Motivo").fill("Livrete substituído.");
+  await dialogo(page).getByRole("button", { name: "Retirar" }).click();
+  await expect(dialogo(page)).toHaveCount(0);
+  await expect(page.getByRole("table", { name: "Documentos da viatura" })).not.toContainText("livrete.pdf");
+  const alheio = await request.post(`${API_LOCAL}/documents`, {
+    headers: { Authorization: `Bearer ${await token(request, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "")}` },
+    multipart: { file: { name: "alheio.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF\n") }, category: "Frota" },
+  });
+  expect(alheio.status()).toBe(201);
+  const am = await sessaoApi(request, email, PASSWORD_LOCAL);
+  expect((await am("POST", `/fleet/vehicles/${vid}/documents`, { documentId: ((await alheio.json()) as { documentId: string }).documentId, category: "Alheio" })).status).toBe(404);
 
   // Seguros: apólice contratada e corrigida; um sinistro pago, outro recusado; anulada.
   await page.getByRole("link", { name: "Seguros", exact: true }).click();
@@ -202,24 +228,9 @@ test("F12: frota — viatura, manutenção, planos, atribuição, viagem, despes
   await expect(page.getByRole("table", { name: "Apólices" }).getByRole("row").filter({ hasText: numero })).toContainText("Anulada");
   await sair(page);
 
-  // --- Admin, pela interface: documento junto, descarregado e retirado; desactivar ---
+  // --- Admin, pela interface: desactivar ---
   await entrar(page, process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "", process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "");
-  await page.goto(`/frota/${vid}?vista=documentos`);
-  await page.getByRole("button", { name: "Juntar documento" }).click();
-  await dialogo(page).getByLabel("Ficheiro").setInputFiles({ name: "livrete.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\n%%EOF\n") });
-  await expect(dialogo(page).getByText("livrete.pdf")).toBeVisible();
-  await dialogo(page).getByLabel("Categoria").fill("Livrete");
-  await dialogo(page).getByRole("button", { name: "Juntar" }).click();
-  await expect(dialogo(page)).toHaveCount(0);
-  await expect(page.getByRole("table", { name: "Documentos da viatura" })).toContainText("livrete.pdf");
-  const descarga = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Descarregar livrete.pdf" }).click();
-  expect((await descarga).suggestedFilename()).toBe("livrete.pdf");
-  await page.getByRole("button", { name: "Retirar livrete.pdf" }).click();
-  await dialogo(page).getByLabel("Motivo").fill("Livrete substituído.");
-  await dialogo(page).getByRole("button", { name: "Retirar" }).click();
-  await expect(dialogo(page)).toHaveCount(0);
-  await expect(page.getByRole("table", { name: "Documentos da viatura" })).not.toContainText("livrete.pdf");
+  await page.goto(`/frota/${vid}`);
   await page.getByRole("button", { name: "Desactivar" }).click();
   await dialogo(page).getByRole("button", { name: "Desactivar" }).click();
   await expect(dialogo(page)).toHaveCount(0);
@@ -231,8 +242,8 @@ test("F12: frota — viatura, manutenção, planos, atribuição, viagem, despes
   expect(v.corpo.maintenances.map((m) => [m.type, m.description, m.startedOn, m.endedOn, Number(m.cost)])).toEqual([["Corrective", "Travões", "2026-03-01", "2026-03-03", 85000.5]]);
   const planos = Object.fromEntries(v.corpo.plans.map((p) => [p.description, [p.isActive, p.nextDueOn, Number(p.intervalDays)]]));
   expect(planos).toEqual({ "Mudança de óleo": [true, "2026-07-01", 90], Pneus: [false, "2026-05-01", 365] });
-  expect(v.corpo.assignments.map((a) => [a.employeeId, a.startedOn, a.endedOn])).toEqual([[pessoa.corpo.employeeId, "2026-03-01", "2026-03-31"]]);
-  expect(v.corpo.trips.map((t) => [t.driverId, Number(t.startOdometer), Number(t.endOdometer), Number(t.distance), t.purpose])).toEqual([[pessoa.corpo.employeeId, 12000, 12140.5, 140.5, "Visita ao cliente"]]);
+  expect(v.corpo.assignments.map((a) => [a.employeeId, a.employeeName, a.startedOn, a.endedOn])).toEqual([[pessoa.corpo.employeeId, `${marca} Motorista`, "2026-03-01", "2026-03-31"]]);
+  expect(v.corpo.trips.map((t) => [t.driverId, t.driverName, Number(t.startOdometer), Number(t.endOdometer), Number(t.distance), t.purpose])).toEqual([[pessoa.corpo.employeeId, `${marca} Motorista`, 12000, 12140.5, 140.5, "Visita ao cliente"]]);
   expect(v.corpo.expenses.map((d) => [d.category, Number(d.amount), d.occurredOn, d.description])).toEqual([["Fuel", 45000, "2026-03-04", "Gasóleo"]]);
   const ap = await sa<{ policyId: string; policyNumber: string; premium: number; insuredValue: number; currency: string; coverage: string; status: string }[]>("GET", `/fleet/insurance?vehicleId=${vid}`);
   expect(ap.corpo.map((p) => [p.policyNumber, Number(p.premium), Number(p.insuredValue), p.currency, p.coverage, p.status])).toEqual([[numero, 260000.5, 18000000, "AOA", "Responsabilidade civil", "Cancelled"]]);

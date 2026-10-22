@@ -32071,6 +32071,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/fleet/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores activos (id e nome), para atribuir a viatura e indicar o motorista, sem `hr.employees.read`. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FleetLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/fleet/vehicles/{vehicleId}": {
         parameters: {
             query?: never;
@@ -33010,6 +33060,7 @@ export interface paths {
             };
         };
         put?: never;
+        /** Anexa um documento carregado por quem anexa (ou qualquer um, com `documents.read`); outro dá 404 (B40). */
         post: {
             parameters: {
                 query?: never;
@@ -33068,6 +33119,68 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/vehicles/{vehicleId}/documents/{documentId}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descarrega um documento da viatura (anexo, nosniff), sem `documents.read` (B40). Retirado ou de outra viatura: 404. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    vehicleId: string;
+                    documentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -40306,6 +40419,14 @@ export interface components {
             occurredOn: string;
             description: null | string;
         };
+        FleetLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        FleetLookups: {
+            employees: components["schemas"]["FleetLookupEntry"][];
+        };
         ForecastEntry: {
             /** Format: date */
             on: string;
@@ -44219,6 +44340,7 @@ export interface components {
             startedOn: string;
             /** Format: date */
             endedOn: null | string;
+            employeeName?: null | string;
         };
         VehicleDocumentAttachedResponse: {
             /** Format: uuid */
@@ -44255,6 +44377,7 @@ export interface components {
             /** Format: double */
             distance: number | string;
             purpose: null | string;
+            driverName?: null | string;
         };
         VehicleView: {
             /** Format: uuid */

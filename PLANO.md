@@ -2032,6 +2032,12 @@ produção 10/10).
   com moeda ISO e sinistros dentro da vigência; dinheiro e quilómetros em
   texto; colaboradores da lista dos activos (B31) até haver nomes e escolhas
   da frota (B40); documentos juntos e abertos só com o arquivo (B40).
+- **B40 aplicado** (2026-10-22, contra `57c6d14`): nomes nas atribuições e
+  viagens, colaboradores em `/fleet/lookups` e documentos descarregados por
+  `/fleet/vehicles/{id}/documents/{documentId}/content`; o AssetManager
+  (com `documents.write`) junta, abre e retira. Verificado na base local
+  (`f12-frota-escritas.spec.ts`: como AssetManager, documento junto,
+  descarregado e retirado, um documento alheio dá 404, nomes no servidor).
 - **Escritas:** verificadas **na base local** (`f12-frota-escritas.spec.ts`):
   como AssetManager, viatura registada, manutenção aberta e fechada (85 000,50),
   plano concluído (próximo a 01/07/2026) e outro cancelado, atribuição e fim,

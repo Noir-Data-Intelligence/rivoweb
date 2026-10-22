@@ -1,8 +1,8 @@
 /**
  * F12 (3.º bloco) — frota, com a API simulada: viaturas (inactivas no URL,
  * registar validado), ficha com manutenção (abrir, planos: agendar, concluir,
- * cancelar), atribuições (terminar; atribuir pela lista dos activos, B31),
- * viagens, despesas, documentos (o AssetManager não junta nem abre, B40),
+ * cancelar), atribuições (terminar; atribuir pela lista da frota, B40),
+ * viagens, despesas, documentos (abertos pela viatura, B40),
  * seguros e sinistros; manutenção prevista e seguros a caducar (no URL);
  * viatura inactiva sem acções. Texto de fora nunca vira HTML.
  */
@@ -25,7 +25,7 @@ function comFrota(api: ApiSimulada, me = meFrota, ficha = viatura()): ApiSimulad
     .em("GET", "/fleet/maintenance-plans/due", pag(planosPrevistos()))
     .em("GET", "/fleet/insurance", { status: 200, corpo: apolices() })
     .em("GET", `${A}/claims`, { status: 200, corpo: sinistros() })
-    .em("GET", "/finance/assets/lookups", { status: 200, corpo: { employees: [{ id: ID.emp1, name: "Ana Teste" }] } });
+    .em("GET", "/fleet/lookups", { status: 200, corpo: { employees: [{ id: ID.emp1, name: "Ana Teste" }] } });
 }
 
 async function verificar(page: Page) {
@@ -156,9 +156,10 @@ test.describe("frota", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("documentos (B40) e seguros: apólice nova, corrigida e anulada; sinistro aberto, pago e recusado", async ({ page, api, violacoes }) => {
+  test("documentos pela viatura (B40) e seguros: apólice nova, corrigida e anulada; sinistro aberto, pago e recusado", async ({ page, api, violacoes }) => {
     await comFrota(api)
       .em("POST", `${V}/documents/${IDF12F.documento}/removal`, { status: 204 })
+      .em("GET", `${V}/documents/${IDF12F.documento}/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .em("POST", `${V}/insurance`, { status: 201, corpo: { id: "ap9" } })
       .em("PUT", A, { status: 204 })
       .em("POST", `${A}/cancellation`, { status: 204 })
@@ -169,8 +170,11 @@ test.describe("frota", () => {
     await entrar(page, meFrota.email);
     await page.goto(`/frota/${IDF12F.viatura}?vista=documentos`);
     await expect(page.getByRole("table", { name: "Documentos da viatura" })).toContainText("livrete.pdf");
-    await expect(page.getByText("(B40)", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Descarregar/ })).toHaveCount(0);
+    const descargaAm = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Descarregar livrete.pdf" }).click();
+    expect((await descargaAm).suggestedFilename()).toBe("livrete.pdf");
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/documents/") || p.caminho.startsWith("/finance/") || p.caminho.startsWith("/hr/"))).toBe(false);
+    await expect(page.getByRole("button", { name: "Juntar documento" })).toBeVisible();
     await page.getByRole("button", { name: "Retirar livrete.pdf" }).click();
     const d = page.getByRole("dialog");
     await d.getByRole("button", { name: "Retirar" }).click();
@@ -230,12 +234,12 @@ test.describe("frota", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("Admin: atribui, junta e abre documentos, desactiva", async ({ page, api }) => {
+  test("Admin: atribui, junta e abre documentos pela viatura, desactiva", async ({ page, api }) => {
     await comFrota(api, meAdminFrota, { ...viatura(), assignments: [] })
       .em("POST", `${V}/assignments`, { status: 201, corpo: { assignmentId: "a9" } })
       .em("POST", "/documents", { status: 201, corpo: { documentId: "00000000-0000-4000-8000-000000000f42", fileName: "inspeccao.pdf", contentType: "application/pdf", sizeInBytes: 100, category: "Frota", contentHash: "x", uploadedBy: null, uploadedAt: "2026-10-22T10:00:00Z" } })
       .em("POST", `${V}/documents`, { status: 201, corpo: { linkId: "l9" } })
-      .em("GET", `/documents/${IDF12F.documento}`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
+      .em("GET", `${V}/documents/${IDF12F.documento}/content`, { status: 200, bruto: { conteudo: "%PDF-1.4", tipo: "application/pdf" } })
       .em("POST", `${V}/deactivation`, { status: 204 })
       .ligar();
     await entrar(page, meAdminFrota.email);
@@ -251,7 +255,6 @@ test.describe("frota", () => {
     expect(api.escritas("POST", `${V}/assignments`)[0]?.corpo).toEqual({ employeeId: ID.emp1, startedOn: "2026-04-01" });
 
     await page.getByRole("link", { name: "Documentos", exact: true }).click();
-    await expect(page.getByText("(B40)", { exact: false })).toHaveCount(0);
     const descarga = page.waitForEvent("download");
     await page.getByRole("button", { name: "Descarregar livrete.pdf" }).click();
     expect((await descarga).suggestedFilename()).toBe("livrete.pdf");

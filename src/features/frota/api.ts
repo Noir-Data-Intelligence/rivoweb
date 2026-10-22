@@ -20,10 +20,10 @@
  *   inicial ≥ 0 e final ≥ inicial, motivo (500);
  * - despesa: combustível, portagem ou estacionamento, valor > 0, sempre em AOA,
  *   descrição (500);
- * - documento: um documento carregado (o servidor só confirma que existe),
- *   categoria (100); retirar pede o motivo (500), pelo id do documento; abrir
- *   só pelo arquivo (`documents.read`); juntar pede carregar
- *   (`documents.write`) (B40);
+ * - documento: carregado por quem o junta (ou qualquer um, com
+ *   `documents.read`; outro dá 404), categoria (100); retirar pede o motivo
+ *   (500), pelo id do documento; abre-se pela viatura, com a leitura da frota
+ *   (B40);
  * - apólice: seguradora (200) e número (60, únicos juntos: 409), cobertura
  *   (200; vazia, «Responsabilidade civil»), fim não antes do início, prémio e
  *   capital ≥ 0, moeda ISO (vazia, AOA), notas (1000); anulada não se altera;
@@ -31,9 +31,9 @@
  * - sinistro: dentro da vigência (e antes da anulação), descrição (1000),
  *   valor reclamado ≥ 0, referência (60); aberto paga-se (valor ≥ 0) ou
  *   recusa-se;
- * - as vistas só trazem o id de quem tem a viatura e de quem conduziu (B40):
- *   os nomes e a escolha vêm dos colaboradores activos de
- *   `/finance/assets/lookups` (B31), para quem gere activos.
+ * - as vistas trazem o nome de quem tem a viatura e de quem conduziu; os
+ *   colaboradores activos escolhem-se em `/fleet/lookups`, para quem escreve
+ *   na frota, sem os RH (B40).
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
@@ -61,6 +61,11 @@ export function useViaturas(f: { inactivas: boolean; pagina: number; tamanho: nu
     queryFn: ({ signal }) => lerPagina(api.GET("/fleet/vehicles", { params: { query: { includeInactive: f.inactivas, page: f.pagina, pageSize: f.tamanho } }, signal })),
     placeholderData: keepPreviousData,
   });
+}
+
+/** Colaboradores activos para atribuir e indicar o motorista (B40). */
+export function useEscolhasFrota(activo: boolean) {
+  return useQuery({ queryKey: [...CHAVE, "lookups"], queryFn: ({ signal }) => ler(api.GET("/fleet/lookups", { signal })), enabled: activo, staleTime: 60_000 });
 }
 
 export function useViatura(id: string) {
