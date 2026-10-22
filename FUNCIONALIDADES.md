@@ -1,6 +1,6 @@
 # Rivo — funcionalidades do front por perfil
 
-> **Estado:** fases **F0 a F10** publicadas em
+> **Estado:** fases **F0 a F13** publicadas em
 > `https://rivoweb-coral.vercel.app` (F6: fiscal, contabilidade e
 > planeamento; F7: recursos humanos completos — portal do colaborador, RH do
 > dia-a-dia, recrutamento, entradas e saídas, anúncios, pedidos internos,
@@ -8,17 +8,10 @@
 > colaboradores; F8: salários — folhas de pagamento; F9: compras —
 > requisições, ordens de compra, recepções —, inventário e activos fixos;
 > F10: portal do cliente e o lado da equipa — comprovativos, conversas, base
-> de conhecimento, portal na ficha do cliente e arquivo de documentos).
-> **F11** (comercial avançado: CRM, propostas, contratos de clientes e
-> cobranças) e **F12** (projectos — marcos, tarefas, quadro, Gantt,
-> dependências, comentários, checklist, tempo, orçamento por linhas,
-> ficheiros, recursos, visibilidade ao cliente, projectos no portal do
-> cliente, nomes e escolhas pela lista dos projectos — e frota — viaturas,
-> manutenção, atribuições, viagens, despesas, documentos, seguros e
-> sinistros) publicadas. Por publicar: ficheiros dos projectos abertos pelo
-> projecto (B39), nomes, escolhas e documentos da frota pela viatura (B40) e
-> a **F13** completa (analytics, auditoria, ESG e IA) ·
-> actualizado a 2026-10-22.
+> de conhecimento, portal na ficha do cliente e arquivo de documentos; F11:
+> comercial avançado — CRM, propostas, contratos de clientes e cobranças;
+> F12: projectos e frota; F13: analytics, auditoria, ESG e IA). Smoke de
+> leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-22.
 
 ---
 

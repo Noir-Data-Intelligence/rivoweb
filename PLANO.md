@@ -1927,7 +1927,7 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 
 ### F13 — Complementar
 
-**Bloco 1 — analytics e auditoria** (2026-10-22, por publicar).
+**Bloco 1 — analytics e auditoria** (2026-10-22, publicado em `5752547`: CI verde).
 - **Inventário** (produção, só códigos e contagens): Admin e Manager 200 em
   `/analytics/overview`, `/analytics/hr` e `/analytics/sales`; Admin 200 em
   `/audit/entries` (200 registos no limite), Manager 403.
@@ -1942,7 +1942,7 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
   «Sistema» sem conta; nenhuma escrita (não existe).
 - **Testes:** 233 unitários; interface 2 cenários × 3 motores; suite inteira 609, sem falhas nem instáveis (24 saltados).
 
-**Bloco 2 — ESG** (2026-10-22, por publicar).
+**Bloco 2 — ESG** (2026-10-22, publicado em `0529672`: CI verde).
 - **Inventário** (produção, só códigos e contagens): Manager 200 em
   `/esg/indicators` (10), `/esg/measurements` (120 desde 2025),
   `/esg/initiatives` (6) e `/esg/report`; 403 nos RH. A iniciativa só traz o
@@ -1965,7 +1965,8 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
   **Nenhuma escrita em produção.**
 - **Testes:** 239 unitários; interface 3 cenários × 3 motores; suite inteira 618, sem falhas nem instáveis (24 saltados).
 
-**Bloco 3 — IA** (2026-10-22, por publicar).
+**Bloco 3 — IA** (2026-10-22, publicado em `104ac2c`: CI verde; smoke de
+produção 10/10 com todos os menus, sem nenhum pedido pago).
 - **Inventário** (produção, só leituras gratuitas): `/ai/status` 200 (ligada,
   Anthropic com recurso ao OpenAI) e `/ai/provider` 200 (Admin, os dois com
   chave). Nenhum `POST /ai/*` em produção nem na base local (que não tem
@@ -2167,7 +2168,7 @@ acrescentadas: responsável escolhido e gravado com o nome; posições
 distintas depois de tirar uma linha; anexo descarregado pelo contrato e
 anexar um ficheiro alheio dá 404. Testes: suite inteira 564, sem falhas nem instáveis (24 saltados).
 
-**Bloco 3 — contratos de clientes e cobranças** (2026-10-18, por publicar).
+**Bloco 3 — contratos de clientes e cobranças** (2026-10-18, publicado).
 **F11 fechada no código.**
 - **Ecrãs** (grupo «Vendas»): `/contratos-clientes` (estado, tipo e «acabam
   em» no URL) e `/contratos-clientes/:id`, `/cobrancas` (vistas vencidas e
