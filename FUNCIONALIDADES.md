@@ -1594,7 +1594,9 @@ conta; nenhum pedido diz de que cliente é.
   se pode mudar).
 - **Assistente:** com a IA ligada, perguntar (até 2000 caracteres) sobre as
   próprias facturas e o saldo; a resposta usa só os dados do cliente, em
-  texto; as perguntas e respostas da visita ficam no ecrã.
+  texto; as perguntas e respostas da visita ficam no ecrã. Cada resposta diz
+  que é automática e sem valor contratual (descontos, prazos ou condições só
+  valem confirmados por escrito pela empresa).
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem associação a um cliente, o portal explica-o e pede para falar com a
   empresa.

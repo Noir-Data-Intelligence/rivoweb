@@ -149,6 +149,8 @@ test.describe("IA noutros ecrãs", () => {
     const conversa = page.getByRole("list", { name: "Conversa com o assistente" });
     await expect(conversa).toContainText("Quanto devo?");
     await expect(conversa).toContainText("<img src=x onerror=alert(1)>");
+    await expect(conversa).toContainText("Resposta automática, sem valor contratual.");
+    await expect(page.getByText("só valem se a empresa os confirmar por escrito", { exact: false })).toBeVisible();
     expect(await page.locator("main img").count()).toBe(0);
     await expect(page.getByLabel("A sua pergunta")).toHaveValue("");
     expect(api.escritas("POST", "/ai/customer-assistant")[0]?.corpo).toEqual({ question: "Quanto devo?" });

@@ -1,7 +1,9 @@
 /**
  * Assistente do portal do cliente (§5.14, F13): perguntas sobre a própria
  * conta (facturas, saldo), respondidas com os dados do cliente. Por botão;
- * as perguntas e respostas desta visita ficam só no ecrã.
+ * as perguntas e respostas desta visita ficam só no ecrã. A pergunta pode
+ * desviar o texto da resposta (por exemplo, «prometer» um desconto): cada
+ * resposta diz que é automática e sem valor contratual.
  */
 import { useState } from "react";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -36,7 +38,10 @@ export default function AssistenteCliente() {
               {conversa.map((c, k) => (
                 <li key={k} className="flex flex-col gap-2">
                   <p className="self-end whitespace-pre-line break-words rounded-md bg-muted px-3 py-2 text-sm text-foreground">{c.pergunta}</p>
-                  <Card className="whitespace-pre-line break-words text-sm text-foreground">{c.resposta}</Card>
+                  <Card className="flex flex-col gap-2 text-sm text-foreground">
+                    <p className="whitespace-pre-line break-words">{c.resposta}</p>
+                    <p className="text-xs text-muted-foreground">Resposta automática, sem valor contratual.</p>
+                  </Card>
                 </li>
               ))}
             </ol>
@@ -69,7 +74,7 @@ export default function AssistenteCliente() {
                 Perguntar
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">As respostas são automáticas e podem ter erros: para pagamentos e documentos, confirme no extracto.</p>
+            <p className="text-xs text-muted-foreground">As respostas são automáticas, sem valor contratual, e podem ter erros: descontos, prazos ou condições só valem se a empresa os confirmar por escrito. Para pagamentos e documentos, confirme no extracto.</p>
           </form>
         </div>
       )}
