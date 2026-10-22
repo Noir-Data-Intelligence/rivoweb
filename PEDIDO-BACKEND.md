@@ -1,8 +1,13 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`y-jr/rivoweb`) para a API.
-> Revisto contra `main` @ `a281377`. Em aberto: **B24** (configuração) e
-> **B38** (nomes e escolhas nos projectos, F12).
+> Revisto contra `main` @ `cdd7b10`. Em aberto: **B24** (configuração) e
+> **B39** (ficheiros dos projectos, F12).
+> **B38** está resolvido (PR #113) e o front já o usa: nomes de quem tem a
+> tarefa, de quem registou o tempo, do recurso alocado e de quem comentou;
+> o ProjectManager escolhe colaboradores, viaturas e clientes em
+> `/projects/lookups` (verificado na base local). Os ficheiros do pedido
+> (ponto 3) não vieram e passaram ao **B39**.
 > **B35** a **B37** estão resolvidos (PR #111 e #112) e o front já os usa:
 > nomes de clientes, leads, responsáveis e facturas nas vistas do comercial;
 > responsável e cliente escolhidos em `/commercial/lookups`; listas
@@ -439,6 +444,8 @@ ficheiro de outra área.
 
 ## B38 — Os projectos só trazem ids de pessoas, recursos e autores, e o ProjectManager não os escolhe
 
+> **Resolvido** (PR #113, 2026-10-22) nos pontos 1 e 2; o front usa-o e foi verificado na base local (`cdd7b10`). O ponto 3 (ficheiros) passou ao **B39**.
+
 **Facto 1 (nomes):** `ProjectTaskView`, `BoardCard` e `TaskPlanView` trazem
 `assignedEmployeeId`; `TimeEntryView` e `TimeByEmployee`, `employeeId`;
 `ResourceAllocationView`, `resourceId` (colaborador ou viatura); `CommentView`,
@@ -466,7 +473,13 @@ explica porquê.
 2. `GET /projects/lookups` para quem tem `projects.projects.write`:
    colaboradores activos, viaturas activas e clientes activos (id e nome).
 
-**Facto 3 (ficheiros):** `GET /projects/{id}/files` traz `documentId`,
+**Facto 3 (ficheiros):** ver o **B39**.
+
+## B39 — Os ficheiros de um projecto não se abrem pelo projecto e aceitam qualquer documento
+
+> Pedido a 2026-10-18 como ponto 3 do B38; o PR #113 não o trouxe (revisto em `cdd7b10`).
+
+**Facto:** `GET /projects/{id}/files` traz `documentId`,
 `category` e `attachedAt`, sem o nome do ficheiro, e não há rota para o
 descarregar pelo projecto (só `GET /documents/{id}`, com `documents.read`).
 `AttachFileAsync` só confirma que o documento existe, como os contratos antes
@@ -476,8 +489,8 @@ carrega ficheiros.
 **Consequência:** o ProjectManager não junta nem abre ficheiros do projecto;
 o Admin junta e abre pelo arquivo.
 
-**Pedido (cont.):**
-3. `fileName` em `ProjectFileView`,
+**Pedido** (como o B33 e o B37):
+1. `fileName` em `ProjectFileView`,
    `GET /projects/{projectId}/files/{linkId}/content` com
    `projects.projects.read` (em anexo), anexar só documentos carregados por
    quem anexa (salvo `documents.read`) e `documents.write` para o

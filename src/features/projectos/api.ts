@@ -35,15 +35,16 @@
  * - ficheiros: um documento carregado (o servidor só confirma que existe),
  *   tarefa opcional, categoria (100); retirar pede o motivo (500) e deixa a
  *   ligação e o documento (eliminação lógica); a lista não traz o nome nem há
- *   descarga pelo projecto (B38): só quem lê o arquivo os abre;
+ *   descarga pelo projecto (B39): só quem lê o arquivo os abre;
  * - recursos: colaborador ou viatura (o servidor confirma), início não antes
  *   do projecto, o mesmo recurso uma vez em aberto; terminar com a data (não
  *   antes do início);
  * - visibilidade ao cliente: ligar a um cliente e mostrar no portal (só com
  *   cliente);
- * - as vistas só trazem ids de pessoas, recursos e autores (B38): os nomes
- *   vêm dos RH, da frota e das contas para quem os lê; sem isso, «—», e a
- *   escolha não se oferece.
+ * - as vistas trazem os nomes de quem tem a tarefa, do recurso alocado, de
+ *   quem registou o tempo e de quem comentou; as escolhas (colaboradores,
+ *   viaturas e clientes activos) vêm de `/projects/lookups`, para quem
+ *   escreve nos projectos, sem pedir os RH, a frota ou os clientes (B38).
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, enviar, ler, lerPagina } from "@/lib/api/client";
@@ -246,11 +247,11 @@ export function useAcaoProjecto(id: string) {
   });
 }
 
-/** Viaturas para alocar e dar nome às alocações, para quem lê a frota (B38). */
-export function useViaturas(activo: boolean) {
+/** Colaboradores, viaturas e clientes activos para escolher (B38). */
+export function useEscolhasProjecto(activo: boolean) {
   return useQuery({
-    queryKey: ["fleet", "vehicles", "all"],
-    queryFn: ({ signal }) => lerPagina(api.GET("/fleet/vehicles", { params: { query: { includeInactive: true, page: 1, pageSize: 200 } }, signal })),
+    queryKey: ["projects", "lookups"],
+    queryFn: ({ signal }) => ler(api.GET("/projects/lookups", { signal })),
     enabled: activo,
     staleTime: 60_000,
   });

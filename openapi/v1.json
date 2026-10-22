@@ -27241,6 +27241,37 @@
         ]
       }
     },
+    "/projects/lookups": {
+      "get": {
+        "tags": [
+          "ProjectsModuleEndpoints"
+        ],
+        "summary": "Colaboradores, viaturas e clientes activos (id e nome), para atribuir, registar tempo, alocar e ligar a um cliente.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectLookups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/projects/{projectId}": {
       "get": {
         "tags": [
@@ -40325,6 +40356,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "assignedEmployeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -41443,6 +41480,12 @@
           "postedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "authorName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -55577,6 +55620,50 @@
           }
         }
       },
+      "ProjectLookupEntry": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProjectLookups": {
+        "required": [
+          "employees",
+          "vehicles",
+          "customers"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectLookupEntry"
+            }
+          },
+          "vehicles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectLookupEntry"
+            }
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectLookupEntry"
+            }
+          }
+        }
+      },
       "ProjectOpenedResponse": {
         "required": [
           "projectId"
@@ -55682,6 +55769,12 @@
             ],
             "format": "int32",
             "default": 0
+          },
+          "assignedEmployeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -58005,6 +58098,12 @@
               "string"
             ],
             "format": "date"
+          },
+          "resourceName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -60263,6 +60362,12 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "assignedEmployeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -60962,6 +61067,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "employeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -61068,6 +61179,12 @@
           },
           "billable": {
             "type": "boolean"
+          },
+          "employeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

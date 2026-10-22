@@ -1931,7 +1931,8 @@ Vercel, smoke de produção 10/10 com um trabalhador). Fecha a F9 no front.
 contagens): 25 projectos (ProjectManager 200 em tudo), registo de tempo 200,
 o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
 (atribuições, tempo, autores) e recursos, e o ProjectManager só tem
-`projects.*`: **B38** (nomes e `GET /projects/lookups`).
+`projects.*`: **B38** (nomes e `GET /projects/lookups`; resolvido no PR
+#113 e aplicado a 2026-10-22). Os ficheiros ficaram no **B39**.
 
 **Bloco 1 — projectos** (2026-10-18, publicado em `83456c7`: CI verde, smoke de produção 10/10).
 - **Ecrãs:** `/projectos` (fechados no URL) e `/projectos/:id` com as vistas
@@ -1942,8 +1943,8 @@ o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
   moeda do orçamento não muda numa revisão; mover para «Feita» conclui;
   dependências informativas, ciclos recusados pelo servidor; os comentários
   de marco assinam com o nome da conta (editável; vazio, «Equipa») porque o
-  cliente os vê; atribuir só a quem lê os RH (B38), e o porquê para os
-  outros; o Gantt é uma tabela com o texto completo e a barra como reforço,
+  cliente os vê; atribuir pela lista dos projectos (B38, antes só a quem
+  lia os RH); o Gantt é uma tabela com o texto completo e a barra como reforço,
   com scroll próprio (focável) e `relative` para o `sr-only` não alargar a
   página.
 - **Escritas:** verificadas **na base local** (`f12-projectos-escritas.spec.ts`,
@@ -1956,21 +1957,28 @@ o cliente vê 2 projectos no portal. As vistas só trazem ids de pessoas
 - **Testes:** 219 unitários; interface 4 cenários × 3 motores; suite inteira
   576, sem falhas nem instáveis (24 saltados).
 
-**Bloco 2 — trabalho do projecto e portal do cliente** (2026-10-22, por
-publicar).
+**Bloco 2 — trabalho do projecto e portal do cliente** (2026-10-22,
+publicado em `7761bf6` e `6266f4f`: CI verde).
 - **Ecrãs:** vistas tempo, orçamento, ficheiros, recursos e cliente na ficha
   do projecto; comentários e checklist em cada tarefa (diálogos);
   `/projectos/tempo` («Registo de tempo»); no portal do cliente,
   `/cliente/projectos` e `/cliente/projectos/:id` (menu «Projectos»).
-- **Regras:** tempo só com colaborador escolhido (RH), dia não futuro, até
+- **Regras:** tempo só com colaborador escolhido, dia não futuro, até
   24 h por dia (o servidor soma o dia); linhas de orçamento com valores em
   texto; ficheiros carregados na hora e retirados com motivo (eliminação
-  lógica), abertos pelo arquivo; alocação de colaborador (RH) ou viatura
-  (frota); ligar o cliente (clientes) e mostrar no portal só com cliente;
-  cada escolha só para quem lê essa área, e o porquê para os outros (**B38**,
-  alargado aos ficheiros: nome, descarga pelo projecto, anexar só os
-  próprios, `documents.write` ao ProjectManager); o cliente comenta os
-  marcos dos projectos visíveis (texto simples).
+  lógica), abertos pelo arquivo (**B39**: nome, descarga pelo projecto,
+  anexar só os próprios, `documents.write` ao ProjectManager); alocação de
+  colaborador ou viatura; ligar o cliente e mostrar no portal só com
+  cliente; o cliente comenta os marcos dos projectos visíveis (texto
+  simples).
+- **B38 aplicado** (2026-10-22, contra `cdd7b10`): os nomes vêm nas vistas
+  (tarefas, quadro, Gantt, tempo, alocações, comentários) e colaboradores,
+  viaturas e clientes activos escolhem-se em `GET /projects/lookups`; o
+  ProjectManager passa a atribuir, registar tempo, alocar e ligar o cliente
+  sem ler os RH, a frota ou os clientes. Verificado na base local
+  (`f12-projectos-escritas.spec.ts`: como ProjectManager, tarefa atribuída,
+  3 h registadas e colaboradora alocada, com os nomes no servidor) e, em
+  produção, `GET /projects/lookups` dá 200 ao ProjectManager (só o código).
 - **Escritas:** verificadas **na base local** (`f12-trabalho-escritas.spec.ts`):
   como Admin, comentário e checklist (um passo marcado), tempo de 6,5 h e
   outro registo apagado, linha de orçamento (1 200 000 / 300 000,50), ficheiro

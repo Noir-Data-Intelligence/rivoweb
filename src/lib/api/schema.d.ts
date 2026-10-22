@@ -27888,6 +27888,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores, viaturas e clientes activos (id e nome), para atribuir, registar tempo, alocar e ligar a um cliente. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjectLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}": {
         parameters: {
             query?: never;
@@ -38714,6 +38764,7 @@ export interface components {
             comments: number | string;
             /** Format: double */
             loggedHours: number | string;
+            assignedEmployeeName?: null | string;
         };
         BoardColumn: {
             stage: string;
@@ -39002,6 +39053,7 @@ export interface components {
             body: string;
             /** Format: date-time */
             postedAt: string;
+            authorName?: null | string;
         };
         CommercialLookupEntry: {
             /** Format: uuid */
@@ -42490,6 +42542,16 @@ export interface components {
             /** Format: date-time */
             attachedAt: string;
         };
+        ProjectLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        ProjectLookups: {
+            employees: components["schemas"]["ProjectLookupEntry"][];
+            vehicles: components["schemas"]["ProjectLookupEntry"][];
+            customers: components["schemas"]["ProjectLookupEntry"][];
+        };
         ProjectOpenedResponse: {
             /** Format: uuid */
             projectId: string;
@@ -42526,6 +42588,7 @@ export interface components {
              * @default 0
              */
             progress: number | string;
+            assignedEmployeeName?: null | string;
         };
         ProjectView: {
             /** Format: uuid */
@@ -43107,6 +43170,7 @@ export interface components {
             startsOn: string;
             /** Format: date */
             endsOn: null | string;
+            resourceName?: null | string;
         };
         /** @description 0 = Employee, 1 = Vehicle */
         ResourceKind: number;
@@ -43695,6 +43759,7 @@ export interface components {
             progress: number | string;
             /** Format: uuid */
             assignedEmployeeId: null | string;
+            assignedEmployeeName?: null | string;
         };
         TaxDetermination: {
             taxCode: string;
@@ -43869,6 +43934,7 @@ export interface components {
             employeeId: string;
             /** Format: double */
             hours: number | string;
+            employeeName?: null | string;
         };
         TimeEntryRequest: {
             /** Format: uuid */
@@ -43897,6 +43963,7 @@ export interface components {
             hours: number | string;
             description: null | string;
             billable: boolean;
+            employeeName?: null | string;
         };
         TimeSummary: {
             /** Format: double */

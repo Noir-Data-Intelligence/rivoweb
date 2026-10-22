@@ -1,9 +1,9 @@
 /**
  * F12 (2.º bloco) — trabalho do projecto e portal do cliente, com a API
- * simulada: comentários e checklist de tarefa; tempo (o ProjectManager não
- * escolhe o colaborador, B38; o Admin regista e apaga); orçamento por linhas;
- * ficheiros (juntar e abrir só com os documentos); recursos; cliente e
- * visibilidade no portal; registo de tempo global; o cliente vê e comenta os
+ * simulada: comentários e checklist de tarefa; tempo, recursos e cliente com
+ * os nomes e as escolhas dos projectos (o ProjectManager regista, aloca e
+ * liga sem ler os RH, a frota ou os clientes, B38); orçamento por linhas;
+ * ficheiros (juntar e abrir só com os documentos, B39); visibilidade no portal; registo de tempo global; o cliente vê e comenta os
  * marcos. Texto de fora nunca vira HTML.
  */
 import type { Page } from "@playwright/test";
@@ -11,12 +11,12 @@ import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSim
 import { comF1 } from "../apoio-f1";
 import { ID } from "../../fixtures/f1";
 import { meCliente } from "../../fixtures/f10";
-import { clientes } from "../../fixtures/f3";
 import {
   checklist,
   comentariosMarcos,
   comentariosTarefa,
   dependencias,
+  escolhasProjecto,
   ficheirosProjecto,
   gantt,
   IDF12,
@@ -36,7 +36,7 @@ const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-P
 function comTrabalho(api: ApiSimulada, me = meGestorProjectos, comCliente = false): ApiSimulada {
   return comF1(api, me)
     .em("GET", "/projects", pag(projectos()))
-    .em("GET", `/projects/${IDF12.projecto}`, { status: 200, corpo: { ...projecto(), allocations: [{ allocationId: "a1", kind: "Employee", resourceId: ID.emp1, startsOn: "2026-02-01", endsOn: null }] } })
+    .em("GET", `/projects/${IDF12.projecto}`, { status: 200, corpo: { ...projecto(), allocations: [{ allocationId: "a1", kind: "Employee", resourceId: ID.emp1, resourceName: "Ana Teste", startsOn: "2026-02-01", endsOn: null }] } })
     .em("GET", `/projects/${IDF12.projecto}/board`, { status: 200, corpo: quadroProjecto() })
     .em("GET", `/projects/${IDF12.projecto}/gantt`, { status: 200, corpo: gantt() })
     .em("GET", `/projects/${IDF12.projecto}/dependencies`, { status: 200, corpo: dependencias() })
@@ -47,8 +47,7 @@ function comTrabalho(api: ApiSimulada, me = meGestorProjectos, comCliente = fals
     .em("GET", `/projects/${IDF12.projecto}/budget/lines`, { status: 200, corpo: orcamentoLinhas() })
     .em("GET", `/projects/${IDF12.projecto}/files`, { status: 200, corpo: ficheirosProjecto() })
     .em("GET", `/projects/${IDF12.projecto}/customer-visibility`, { status: 200, corpo: visibilidade(comCliente) })
-    .em("GET", "/commercial/customers", pag(clientes()))
-    .em("GET", "/fleet/vehicles", pag([]));
+    .em("GET", "/projects/lookups", { status: 200, corpo: escolhasProjecto() });
 }
 
 async function verificar(page: Page) {
@@ -59,7 +58,7 @@ async function verificar(page: Page) {
 }
 
 test.describe("trabalho do projecto", () => {
-  test("ProjectManager: comentários e checklist de tarefa; tempo e recursos explicam o B38; orçamento por linhas", async ({ page, api, violacoes }) => {
+  test("ProjectManager: comentários e checklist de tarefa; regista tempo, aloca e liga o cliente sem ler os RH, a frota ou os clientes (B38); orçamento por linhas", async ({ page, api, violacoes }) => {
     await comTrabalho(api)
       .em("POST", `/projects/${IDF12.projecto}/tasks/${IDF12.t2}/comments`, { status: 201, corpo: { id: "c9" } })
       .em("POST", `/projects/${IDF12.projecto}/checklist/i2/toggle`, { status: 204 })
@@ -68,12 +67,16 @@ test.describe("trabalho do projecto", () => {
       .em("POST", `/projects/${IDF12.projecto}/budget/lines`, { status: 201, corpo: { id: "l9" } })
       .em("PUT", `/projects/${IDF12.projecto}/budget/lines/l1`, { status: 204 })
       .em("DELETE", `/projects/${IDF12.projecto}/budget/lines/l1`, { status: 204 })
+      .em("POST", `/projects/${IDF12.projecto}/time-entries`, { status: 201, corpo: { id: "e9" } })
+      .em("POST", `/projects/${IDF12.projecto}/allocations`, { status: 201, corpo: { id: "a9" } })
+      .em("PUT", `/projects/${IDF12.projecto}/customer-visibility`, { status: 204 })
       .ligar();
     await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=tarefas`);
     await page.getByRole("button", { name: "Comentários de Configuração" }).click();
     const d = page.getByRole("dialog");
     await expect(d.getByRole("list", { name: "Comentários da tarefa" })).toContainText("<script>x</script>");
+    await expect(d.getByRole("list", { name: "Comentários da tarefa" })).toContainText("Paula Projectos ·");
     expect(await page.locator("[role=dialog] script").count()).toBe(0);
     await d.getByRole("button", { name: "Comentar" }).click();
     await expect(d.getByText("Escreva o comentário.")).toBeVisible();
@@ -95,14 +98,26 @@ test.describe("trabalho do projecto", () => {
 
     await page.getByRole("link", { name: "Tempo", exact: true }).click();
     await expect(page.getByText("22,50 h").first()).toBeVisible();
-    await expect(page.getByText("Registar tempo exige escolher o colaborador", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Registar tempo" })).toHaveCount(0);
-    await expect(page.getByRole("table", { name: "Registos de tempo" }).getByRole("row").filter({ hasText: "Configuração inicial" })).toContainText("—");
+    await expect(page.getByRole("table", { name: "Registos de tempo" }).getByRole("row").filter({ hasText: "Configuração inicial" })).toContainText("Ana Teste");
+    await expect(page.getByRole("list", { name: "Horas por colaborador" })).toContainText("Ana Teste");
     await verificar(page);
+    await page.getByRole("button", { name: "Registar tempo" }).click();
+    await d.getByLabel("Colaborador").selectOption({ label: "Ana Teste" });
+    await d.getByLabel("Dia").fill("2026-10-20");
+    await d.getByLabel("Horas").fill("2");
+    await d.getByRole("button", { name: "Registar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/projects/${IDF12.projecto}/time-entries`)[0]?.corpo).toEqual({ employeeId: ID.emp1, taskId: null, day: "2026-10-20", hours: "2", description: null, billable: true });
 
     await page.getByRole("link", { name: "Recursos", exact: true }).click();
-    await expect(page.getByText("Alocar exige escolher", { exact: false })).toBeVisible();
-    await expect(page.getByRole("table", { name: "Recursos alocados" })).toContainText("Em curso");
+    await expect(page.getByRole("table", { name: "Recursos alocados" }).getByRole("row").filter({ hasText: "Ana Teste" })).toContainText("Em curso");
+    await page.getByRole("button", { name: "Alocar recurso" }).click();
+    await d.getByLabel("Tipo").selectOption({ label: "Viatura" });
+    await d.getByLabel("Viatura").selectOption({ label: "LD-12-34-AB · Toyota Hilux" });
+    await d.getByLabel("Início").fill("2026-03-01");
+    await d.getByRole("button", { name: "Alocar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/projects/${IDF12.projecto}/allocations`)[0]?.corpo).toEqual({ kind: 1, resourceId: IDF12.viatura, startsOn: "2026-03-01" });
 
     await page.getByRole("link", { name: "Orçamento", exact: true }).click();
     await expect(page.getByText("O previsto nas linhas passa o orçamento aprovado.")).toBeVisible();
@@ -129,8 +144,10 @@ test.describe("trabalho do projecto", () => {
     await expect(page.getByText("Juntar e abrir ficheiros pede acesso aos documentos", { exact: false })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Descarregar/ })).toHaveCount(0);
     await page.getByRole("link", { name: "Cliente", exact: true }).click();
-    await expect(page.getByText("o que pede a leitura dos clientes (B38)", { exact: false })).toBeVisible();
-    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/") || p.caminho === "/commercial/customers" || p.caminho === "/fleet/vehicles")).toBe(false);
+    await page.getByLabel("Ligar a um cliente").selectOption({ label: "Cliente Teste, Lda" });
+    await page.getByRole("button", { name: "Guardar cliente" }).click();
+    await expect.poll(() => api.escritas("PUT", `/projects/${IDF12.projecto}/customer-visibility`)[0]?.corpo).toEqual({ customerId: "00000000-0000-4000-8000-000000000701", visible: false });
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/") || p.caminho.startsWith("/commercial/customers") || p.caminho.startsWith("/fleet/"))).toBe(false);
     expect(await violacoes()).toEqual([]);
   });
 
@@ -169,7 +186,7 @@ test.describe("trabalho do projecto", () => {
     await page.getByRole("link", { name: "Ficheiros", exact: true }).click();
     const descarga = page.waitForEvent("download");
     await page.getByRole("button", { name: "Descarregar Caderno de encargos" }).click();
-    // Sem nome do ficheiro na vista (B38), o browser completa o nome à sua maneira (espaços ou «_», com a extensão).
+    // Sem nome do ficheiro na vista (B39), o browser completa o nome à sua maneira (espaços ou «_», com a extensão).
     expect((await descarga).suggestedFilename()).toMatch(/^Caderno[ _]de[ _]encargos/);
     await page.getByRole("button", { name: "Juntar ficheiro" }).click();
     await d.getByLabel("Ficheiro").setInputFiles({ name: "acta.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF") });
@@ -205,7 +222,7 @@ test.describe("trabalho do projecto", () => {
     await comTrabalho(api, meGestorProjectos, true).em("PUT", `/projects/${IDF12.projecto}/customer-visibility`, { status: 204 }).ligar();
     await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=cliente`);
-    await expect(page.getByText("Cliente Teste, Lda")).toBeVisible();
+    await expect(page.getByRole("definition").filter({ hasText: "Cliente Teste, Lda" })).toBeVisible();
     await page.getByRole("button", { name: "Mostrar no portal do cliente" }).click();
     await expect.poll(() => api.escritas("PUT", `/projects/${IDF12.projecto}/customer-visibility`)[0]?.corpo).toEqual({ customerId: "00000000-0000-4000-8000-000000000701", visible: true });
 

@@ -1,11 +1,10 @@
 /**
  * O trabalho de um projecto: tempo registado, orçamento por linhas,
- * ficheiros, recursos alocados e visibilidade ao cliente. Cada escolha de
- * pessoa, viatura ou cliente só para quem lê essa área (B38).
+ * ficheiros, recursos alocados e visibilidade ao cliente. As escolhas de
+ * pessoa, viatura e cliente vêm de `/projects/lookups` (B38).
  */
 import { Download, Plus } from "lucide-react";
 import { useId, useState } from "react";
-import { useTodosClientes } from "@/features/clientes";
 import { CarregarFicheiro, type Documento } from "@/features/documentos";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
@@ -30,7 +29,6 @@ import {
   useFicheirosProjecto,
   useOrcamentoLinhas,
   useTempo,
-  useViaturas,
   useVisibilidade,
   type Alocacao,
   type FicheiroProjecto,
@@ -38,7 +36,7 @@ import {
   type Projecto,
   type RegistoTempo,
 } from "./api";
-import { usePessoas } from "./comum";
+import { useEscolhas } from "./comum";
 import {
   erroFimAlocacao,
   erroMotivoFicheiro,
@@ -62,7 +60,7 @@ function RegistarTempo({ p }: { p: Projecto }) {
   const [v, setV] = useState(vazio);
   const [tentou, setTentou] = useState(false);
   const accao = useAcaoProjecto(p.projectId);
-  const pessoas = usePessoas();
+  const { pessoas } = useEscolhas();
   const idForm = useId();
   const erros = errosTempo(v, hojeIso());
   const campo = (k: keyof CamposTempo) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
@@ -96,9 +94,9 @@ function RegistarTempo({ p }: { p: Projecto }) {
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.pessoa} onChange={campo("pessoa")}>
                 <option value="">Escolha…</option>
-                {pessoas.activos.map((c) => (
-                  <option key={c.employeeId} value={c.employeeId}>
-                    {c.fullName}
+                {pessoas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
               </Select>
@@ -164,19 +162,17 @@ function ApagarTempo({ p, r, quem }: { p: Projecto; r: RegistoTempo; quem: strin
 
 export function TempoDoProjecto({ p }: { p: Projecto }) {
   const tempo = useTempo({ projecto: p.projectId });
-  const pessoas = usePessoas();
   const { pode } = useUtilizador();
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
-  const nome = (id: string) => pessoas.nome(id) ?? "—";
   const tarefa = (id: string | null) => (id ? (p.tasks.find((t) => t.taskId === id)?.title ?? "Tarefa") : "—");
   const colunas: Coluna<RegistoTempo>[] = [
     { id: "dia", cabecalho: "Dia", celula: (r) => formatarData(r.day) },
-    { id: "quem", cabecalho: "Colaborador", esconderAte: "sm", className: "max-w-[12rem] truncate", celula: (r) => nome(r.employeeId) },
+    { id: "quem", cabecalho: "Colaborador", esconderAte: "sm", className: "max-w-[12rem] truncate", celula: (r) => r.employeeName ?? "—" },
     { id: "tarefa", cabecalho: "Tarefa", esconderAte: "md", className: "max-w-[14rem] truncate", celula: (r) => tarefa(r.taskId) },
     { id: "desc", cabecalho: "Descrição", esconderAte: "lg", className: "max-w-[16rem] truncate", celula: (r) => r.description ?? "—" },
     { id: "horas", cabecalho: "Horas", alinhar: "direita", celula: (r) => horas(r.hours) },
     { id: "fact", cabecalho: "Facturável", esconderAte: "sm", celula: (r) => (r.billable ? <Badge tom="sucesso">Sim</Badge> : <Badge tom="neutro">Não</Badge>) },
-    ...(escreve ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (r: RegistoTempo) => <ApagarTempo p={p} r={r} quem={nome(r.employeeId)} /> }] : []),
+    ...(escreve ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (r: RegistoTempo) => <ApagarTempo p={p} r={r} quem={r.employeeName ?? "—"} /> }] : []),
   ];
   if (tempo.isPending) return <Skeleton className="h-48" />;
   if (tempo.error) return <ErrorPanel erro={tempo.error} tentarDeNovo={() => void tempo.refetch()} />;
@@ -188,13 +184,13 @@ export function TempoDoProjecto({ p }: { p: Projecto }) {
         <Kpi rotulo="Facturáveis" valor={horas(t.billableHours)} />
         <Kpi rotulo="Colaboradores" valor={String(t.byEmployee.length)} />
       </GrelhaKpis>
-      {pessoas.le && t.byEmployee.length > 0 ? (
+      {t.byEmployee.length > 0 ? (
         <Card>
           <CardTitle className="mb-2">Por colaborador</CardTitle>
           <ul className="divide-y divide-border text-sm" aria-label="Horas por colaborador">
             {t.byEmployee.map((b) => (
               <li key={b.employeeId} className="flex justify-between gap-2 py-2">
-                <span>{nome(b.employeeId)}</span>
+                <span>{b.employeeName ?? "—"}</span>
                 <span className="tabular-nums">{horas(b.hours)}</span>
               </li>
             ))}
@@ -204,9 +200,8 @@ export function TempoDoProjecto({ p }: { p: Projecto }) {
       <Card>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <CardTitle>Registos</CardTitle>
-          {escreve && pessoas.le ? <RegistarTempo p={p} /> : null}
+          {escreve ? <RegistarTempo p={p} /> : null}
         </div>
-        {escreve && !pessoas.le ? <Alert tom="info" className="mb-3" titulo="Registar tempo exige escolher o colaborador, o que pede a leitura dos Recursos Humanos (B38)." /> : null}
         <Tabela rotulo="Registos de tempo" colunas={colunas} linhas={t.entries} chave={(r) => r.entryId} aCarregar={false} vazio="Ainda não há tempo registado." />
       </Card>
     </div>
@@ -512,7 +507,7 @@ export function FicheirosDoProjecto({ p }: { p: Projecto }) {
         <CardTitle>Ficheiros</CardTitle>
         {escreve && pode("documents.write") ? <Anexar p={p} /> : null}
       </div>
-      {escreve && !pode("documents.write") ? <Alert tom="info" className="mb-3" titulo="Juntar e abrir ficheiros pede acesso aos documentos, que este perfil não tem (B38)." /> : null}
+      {escreve && !pode("documents.write") ? <Alert tom="info" className="mb-3" titulo="Juntar e abrir ficheiros pede acesso aos documentos, que este perfil não tem (B39)." /> : null}
       <Tabela
         rotulo="Ficheiros do projecto"
         colunas={colunas}
@@ -529,12 +524,9 @@ export function FicheirosDoProjecto({ p }: { p: Projecto }) {
 // --- Recursos
 
 function Alocar({ p }: { p: Projecto }) {
-  const pessoas = usePessoas();
-  const { pode } = useUtilizador();
-  const leFrota = pode("fleet.vehicles.read");
-  const viaturas = useViaturas(leFrota);
+  const { pessoas, viaturas } = useEscolhas();
   const [aberto, setAberto] = useState(false);
-  const [v, setV] = useState({ tipo: pessoas.le ? "0" : "1", recurso: "", inicio: hojeIso() });
+  const [v, setV] = useState({ tipo: "0", recurso: "", inicio: hojeIso() });
   const [tentou, setTentou] = useState(false);
   const accao = useAcaoProjecto(p.projectId);
   const idForm = useId();
@@ -542,7 +534,7 @@ function Alocar({ p }: { p: Projecto }) {
   const fechar = (a: boolean) => {
     setAberto(a);
     if (!a) {
-      setV({ tipo: pessoas.le ? "0" : "1", recurso: "", inicio: hojeIso() });
+      setV({ tipo: "0", recurso: "", inicio: hojeIso() });
       setTentou(false);
       accao.reset();
     }
@@ -567,8 +559,8 @@ function Alocar({ p }: { p: Projecto }) {
           <Field rotulo="Tipo">
             {({ id, descricao }) => (
               <Select id={id} aria-describedby={descricao} value={v.tipo} onChange={(e) => setV((x) => ({ ...x, tipo: e.target.value, recurso: "" }))}>
-                {pessoas.le ? <option value="0">Colaborador</option> : null}
-                {leFrota ? <option value="1">Viatura</option> : null}
+                <option value="0">Colaborador</option>
+                <option value="1">Viatura</option>
               </Select>
             )}
           </Field>
@@ -579,19 +571,11 @@ function Alocar({ p }: { p: Projecto }) {
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} value={v.recurso} onChange={(e) => setV((x) => ({ ...x, recurso: e.target.value }))}>
                 <option value="">Escolha…</option>
-                {v.tipo === "0"
-                  ? pessoas.activos.map((c) => (
-                      <option key={c.employeeId} value={c.employeeId}>
-                        {c.fullName}
-                      </option>
-                    ))
-                  : (viaturas.data?.items ?? [])
-                      .filter((x) => x.status === "Active")
-                      .map((x) => (
-                        <option key={x.vehicleId} value={x.vehicleId}>
-                          {x.plateNumber} · {x.model}
-                        </option>
-                      ))}
+                {(v.tipo === "0" ? pessoas : viaturas).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </Select>
             )}
           </Field>
@@ -640,16 +624,9 @@ function TerminarAlocacao({ p, a, nome }: { p: Projecto; a: Alocacao; nome: stri
 }
 
 export function RecursosDoProjecto({ p }: { p: Projecto }) {
-  const pessoas = usePessoas();
   const { pode } = useUtilizador();
-  const leFrota = pode("fleet.vehicles.read");
-  const viaturas = useViaturas(leFrota);
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
-  const nome = (a: Alocacao) =>
-    a.kind === "Employee" ? (pessoas.nome(a.resourceId) ?? "—") : (() => {
-      const x = viaturas.data?.items.find((y) => y.vehicleId === a.resourceId);
-      return x ? `${x.plateNumber} · ${x.model}` : "—";
-    })();
+  const nome = (a: Alocacao) => a.resourceName ?? "—";
   const colunas: Coluna<Alocacao>[] = [
     { id: "tipo", cabecalho: "Tipo", celula: (a) => (a.kind === "Employee" ? "Colaborador" : "Viatura") },
     { id: "nome", cabecalho: "Recurso", className: "max-w-[14rem] truncate", celula: (a) => nome(a) },
@@ -661,9 +638,8 @@ export function RecursosDoProjecto({ p }: { p: Projecto }) {
     <Card>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <CardTitle>Recursos</CardTitle>
-        {escreve && (pessoas.le || leFrota) ? <Alocar p={p} /> : null}
+        {escreve ? <Alocar p={p} /> : null}
       </div>
-      {escreve && !pessoas.le && !leFrota ? <Alert tom="info" className="mb-3" titulo="Alocar exige escolher o colaborador ou a viatura, o que pede a leitura dos Recursos Humanos ou da frota (B38)." /> : null}
       <Tabela rotulo="Recursos alocados" colunas={colunas} linhas={p.allocations} chave={(a) => a.allocationId} aCarregar={false} vazio="Sem recursos alocados." />
     </Card>
   );
@@ -674,8 +650,7 @@ export function RecursosDoProjecto({ p }: { p: Projecto }) {
 export function ClienteDoProjecto({ p }: { p: Projecto }) {
   const vis = useVisibilidade(p.projectId);
   const { pode } = useUtilizador();
-  const leClientes = pode("commercial.customers.read");
-  const clientes = useTodosClientes(leClientes);
+  const { clientes } = useEscolhas();
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
   const accao = useAcaoProjecto(p.projectId);
   const [cliente, setCliente] = useState<string | null>(null);
@@ -702,30 +677,25 @@ export function ClienteDoProjecto({ p }: { p: Projecto }) {
       {accao.error ? <ErrorPanel erro={accao.error} className="mt-3" /> : null}
       {escreve ? (
         <div className="mt-4 flex flex-col gap-3">
-          {leClientes ? (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-              <div className="flex flex-1 flex-col gap-1.5">
-                <label htmlFor={id} className="text-sm font-medium text-foreground">
-                  Ligar a um cliente
-                </label>
-                <Select id={id} value={escolhido} onChange={(e) => setCliente(e.target.value)}>
-                  <option value="">Nenhum</option>
-                  {(clientes.data?.items ?? [])
-                    .filter((c) => c.status === "Active" || c.customerId === v.customerId)
-                    .map((c) => (
-                      <option key={c.customerId} value={c.customerId}>
-                        {c.name}
-                      </option>
-                    ))}
-                </Select>
-              </div>
-              <Button variante="secondary" aCarregar={accao.isPending} disabled={escolhido === (v.customerId ?? "")} onClick={() => accao.mutate({ acto: "visibilidade", corpo: { customerId: escolhido === "" ? null : escolhido, visible: escolhido === "" ? false : v.visibleToCustomer } }, depois)}>
-                Guardar cliente
-              </Button>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label htmlFor={id} className="text-sm font-medium text-foreground">
+                Ligar a um cliente
+              </label>
+              <Select id={id} value={escolhido} onChange={(e) => setCliente(e.target.value)}>
+                <option value="">Nenhum</option>
+                {v.customerId && !clientes.some((c) => c.id === v.customerId) ? <option value={v.customerId}>{v.customerName ?? "Cliente inactivo"}</option> : null}
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
             </div>
-          ) : (
-            <Alert tom="info" titulo="Ligar o projecto a um cliente exige escolher o cliente, o que pede a leitura dos clientes (B38)." />
-          )}
+            <Button variante="secondary" aCarregar={accao.isPending} disabled={escolhido === (v.customerId ?? "")} onClick={() => accao.mutate({ acto: "visibilidade", corpo: { customerId: escolhido === "" ? null : escolhido, visible: escolhido === "" ? false : v.visibleToCustomer } }, depois)}>
+              Guardar cliente
+            </Button>
+          </div>
           {v.customerId ? (
             <div>
               <Button aCarregar={accao.isPending} onClick={() => accao.mutate({ acto: "visibilidade", corpo: { customerId: v.customerId, visible: !v.visibleToCustomer } }, depois)}>

@@ -8,7 +8,7 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Skeleton } from "@/ui/Layout";
 import { useAcaoProjecto, useQuadroProjecto, type Cartao, type Etapa, type Projecto } from "./api";
-import { ETAPAS, PrioridadeBadge, usePessoas } from "./comum";
+import { ETAPAS, PrioridadeBadge } from "./comum";
 
 const ORDEM: readonly Etapa[] = ["Backlog", "ToDo", "InProgress", "Review", "Done"];
 
@@ -35,7 +35,6 @@ function Mover({ p, c, etapa }: { p: Projecto; c: Cartao; etapa: Etapa }) {
 
 export function QuadroDoProjecto({ p }: { p: Projecto }) {
   const quadro = useQuadroProjecto(p.projectId);
-  const pessoas = usePessoas();
   const { pode } = useUtilizador();
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
   if (quadro.isPending) return <Skeleton className="h-64" />;
@@ -62,7 +61,7 @@ export function QuadroDoProjecto({ p }: { p: Projecto }) {
                     <p className="mt-1 text-xs text-muted-foreground">
                       {String(c.progress)}% · {formatarNumeroDecimal(String(c.loggedHours), 1)} h registadas · {String(c.comments)} comentários
                     </p>
-                    {c.assignedEmployeeId && pessoas.nome(c.assignedEmployeeId) ? <p className="mt-1 text-xs text-foreground">{pessoas.nome(c.assignedEmployeeId)}</p> : null}
+                    {c.assignedEmployeeName ? <p className="mt-1 text-xs text-foreground">{c.assignedEmployeeName}</p> : null}
                     {escreve && etapa !== "Done" ? <Mover p={p} c={c} etapa={etapa} /> : null}
                   </Card>
                 </li>

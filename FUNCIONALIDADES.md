@@ -115,13 +115,13 @@ AM = AssetManager.
 | Abrir e fechar projectos; definir e rever o orçamento | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Marcos: criar, marcar alcançado, comentar (o cliente vê, se o projecto lhe for visível) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tarefas: criar, planear (datas, horas, prioridade, progresso), mover no quadro, concluir, cancelar, dependências | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
-| Atribuir tarefas e ver a quem estão atribuídas ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Atribuir tarefas e ver a quem estão atribuídas ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tarefas: comentários e checklist (juntar, marcar, tirar passos) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tempo: ver os registos e os totais (por projecto e no registo de tempo global) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
-| Tempo: registar e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Tempo: registar e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Orçamento por linhas: ver, juntar, corrigir e apagar linhas (previsto, gasto, desvio) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Ficheiros do projecto: ver; juntar, abrir e retirar ¹⁷ | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Recursos (colaboradores e viaturas): ver; alocar e terminar ¹⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Recursos (colaboradores e viaturas): ver; alocar e terminar ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Ligar o projecto a um cliente ¹⁶ e mostrá-lo ou escondê-lo no portal | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Portal: ver os projectos que a empresa mostra, o progresso e os marcos; comentar um marco | — | — | — | — | — | — | — | — | — | ✓ |
 | **Comprovativos de pagamento** (enviados no portal) | | | | | | | | | | |
@@ -307,8 +307,8 @@ Recursos Humanos.»
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
 ¹⁴ Os comprovativos só para quem lê os recibos (Admin, Finance, Sales); decidir só para quem os regista (Admin, Finance).
 ¹⁵ Cada bloco para quem o lê; o Finance e o Manager não abrem fichas de clientes.
-¹⁶ Escolher e ver colaboradores exige ler os Recursos Humanos; viaturas, a frota; clientes, os clientes; nomes de quem comentou, as contas. As vistas dos projectos só trazem ids (B38). O ProjectManager não lê nenhum: mostrar no portal só depois de alguém ligar o cliente.
-¹⁷ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os ficheiros do projecto não trazem o nome nem se descarregam pelo projecto (B38). O ProjectManager vê a lista.
+¹⁶ Os nomes (de quem tem a tarefa, de quem registou o tempo, do recurso alocado e de quem comentou) vêm nas vistas dos projectos; colaboradores, viaturas e clientes activos escolhem-se pela lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes (B38).
+¹⁷ Juntar pede `documents.write` e abrir `documents.read` (só o Admin): os ficheiros do projecto não trazem o nome nem se descarregam pelo projecto (B39). O ProjectManager vê a lista.
 
 ---
 
@@ -1355,11 +1355,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Resumo pessoal.
 
 **Projectos**
-- Tudo o que o Admin faz nos projectos, salvo o que pede escolher ou ver
-  pessoas, viaturas e clientes — atribuir tarefas, registar tempo, alocar
-  recursos, ligar o cliente — e juntar ou abrir ficheiros (B38). Comenta,
-  gere a checklist, o orçamento por linhas e mostra no portal um projecto já
-  ligado a um cliente.
+- Tudo o que o Admin faz nos projectos — incluindo atribuir tarefas,
+  registar tempo, alocar colaboradores e viaturas e ligar o cliente, pela
+  lista dos projectos, sem ler os Recursos Humanos, a frota ou os clientes
+  (B38) — salvo juntar ou abrir ficheiros (B39): vê a lista e retira.
 
 ### Colaborador
 Entra no **portal do colaborador** (`/eu`). Tudo é do próprio: o servidor

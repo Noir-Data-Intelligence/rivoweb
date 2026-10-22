@@ -14,7 +14,6 @@ import { GrelhaKpis, Kpi } from "@/ui/Kpi";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useProjectos, useTempo, type RegistoTempo } from "../api";
-import { usePessoas } from "../comum";
 
 const horas = (h: number | string) => `${formatarNumeroDecimal(String(h), 2)} h`;
 
@@ -24,7 +23,6 @@ export default function Tempo() {
   const erroJanela = de > ate ? "O fim não pode ser antes do início." : undefined;
   const tempo = useTempo({ de, ate });
   const projectos = useProjectos({ fechados: true, pagina: 1, tamanho: 200 });
-  const pessoas = usePessoas();
   const nomeProjecto = (id: string) => projectos.data?.items.find((p) => p.projectId === id)?.name ?? "Projecto";
   const t = tempo.data;
   const porProjecto = t
@@ -42,7 +40,7 @@ export default function Tempo() {
         </Link>
       ),
     },
-    { id: "quem", cabecalho: "Colaborador", esconderAte: "md", className: "max-w-[12rem] truncate", celula: (r) => pessoas.nome(r.employeeId) ?? "—" },
+    { id: "quem", cabecalho: "Colaborador", esconderAte: "md", className: "max-w-[12rem] truncate", celula: (r) => r.employeeName ?? "—" },
     { id: "desc", cabecalho: "Descrição", esconderAte: "lg", className: "max-w-[16rem] truncate", celula: (r) => r.description ?? "—" },
     { id: "horas", cabecalho: "Horas", alinhar: "direita", celula: (r) => horas(r.hours) },
     { id: "fact", cabecalho: "Facturável", esconderAte: "sm", celula: (r) => (r.billable ? <Badge tom="sucesso">Sim</Badge> : <Badge tom="neutro">Não</Badge>) },
@@ -74,19 +72,17 @@ export default function Tempo() {
                 ))}
               </ul>
             </Card>
-            {pessoas.le ? (
-              <Card>
-                <CardTitle className="mb-2">Por colaborador</CardTitle>
-                <ul className="divide-y divide-border text-sm" aria-label="Horas por colaborador">
-                  {t.byEmployee.map((b) => (
-                    <li key={b.employeeId} className="flex justify-between gap-2 py-2">
-                      <span className="truncate">{pessoas.nome(b.employeeId) ?? "—"}</span>
-                      <span className="tabular-nums">{horas(b.hours)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ) : null}
+            <Card>
+              <CardTitle className="mb-2">Por colaborador</CardTitle>
+              <ul className="divide-y divide-border text-sm" aria-label="Horas por colaborador">
+                {t.byEmployee.map((b) => (
+                  <li key={b.employeeId} className="flex justify-between gap-2 py-2">
+                    <span className="truncate">{b.employeeName ?? "—"}</span>
+                    <span className="tabular-nums">{horas(b.hours)}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
           </div>
           <Tabela rotulo="Registos de tempo" colunas={colunas} linhas={t.entries} chave={(r) => r.entryId} aCarregar={false} vazio="Sem horas no período." />
         </div>

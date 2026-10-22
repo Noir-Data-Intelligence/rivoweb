@@ -5,7 +5,6 @@ import { useUtilizador } from "@/features/identity";
 import { formatarData } from "@/lib/format/data";
 import { formatarNumeroDecimal } from "@/lib/format/numero";
 import { normalizarTexto } from "@/lib/validation/normalizar";
-import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Card, CardTitle } from "@/ui/Card";
 import { Confirmar } from "@/ui/Confirmar";
@@ -14,7 +13,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAcaoProjecto, useDependencias, type Prioridade, type Projecto, type Tarefa } from "./api";
-import { EstadoTarefa, ETAPAS, PRIORIDADES, PrioridadeBadge, usePessoas } from "./comum";
+import { EstadoTarefa, ETAPAS, PRIORIDADES, PrioridadeBadge, useEscolhas } from "./comum";
 import { ChecklistDaTarefa, ComentariosDaTarefa } from "./TarefaDetalhe";
 import { errosNovaTarefa, errosPlano, planoParaApi, temErros, type CamposPlano } from "./regras";
 
@@ -23,7 +22,7 @@ function NovaTarefa({ p }: { p: Projecto }) {
   const [v, setV] = useState({ titulo: "", prazo: "", pessoa: "" });
   const [tentou, setTentou] = useState(false);
   const accao = useAcaoProjecto(p.projectId);
-  const pessoas = usePessoas();
+  const { pessoas } = useEscolhas();
   const idForm = useId();
   const erros = errosNovaTarefa(v, p.startDate);
   const fechar = (a: boolean) => {
@@ -58,20 +57,18 @@ function NovaTarefa({ p }: { p: Projecto }) {
           <Field rotulo="Prazo (opcional)" erro={tentou ? erros.prazo : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} type="date" min={p.startDate} aria-describedby={descricao} invalido={invalido} value={v.prazo} onChange={(e) => setV((x) => ({ ...x, prazo: e.target.value }))} />}
           </Field>
-          {pessoas.le ? (
-            <Field rotulo="Atribuir a (opcional)">
-              {({ id, descricao }) => (
-                <Select id={id} aria-describedby={descricao} value={v.pessoa} onChange={(e) => setV((x) => ({ ...x, pessoa: e.target.value }))}>
-                  <option value="">Ninguém</option>
-                  {pessoas.activos.map((c) => (
-                    <option key={c.employeeId} value={c.employeeId}>
-                      {c.fullName}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-          ) : null}
+          <Field rotulo="Atribuir a (opcional)">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.pessoa} onChange={(e) => setV((x) => ({ ...x, pessoa: e.target.value }))}>
+                <option value="">Ninguém</option>
+                {pessoas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
         </form>
       </Confirmar>
     </>
@@ -160,7 +157,7 @@ function Atribuir({ p, t }: { p: Projecto; t: Tarefa }) {
   const [aberto, setAberto] = useState(false);
   const [pessoa, setPessoa] = useState(t.assignedEmployeeId ?? "");
   const accao = useAcaoProjecto(p.projectId);
-  const pessoas = usePessoas();
+  const { pessoas } = useEscolhas();
   const id = useId();
   return (
     <>
@@ -186,9 +183,10 @@ function Atribuir({ p, t }: { p: Projecto; t: Tarefa }) {
           </label>
           <Select id={id} value={pessoa} onChange={(e) => setPessoa(e.target.value)}>
             <option value="">Ninguém (tirar a atribuição)</option>
-            {pessoas.activos.map((c) => (
-              <option key={c.employeeId} value={c.employeeId}>
-                {c.fullName}
+            {t.assignedEmployeeId && !pessoas.some((c) => c.id === t.assignedEmployeeId) ? <option value={t.assignedEmployeeId}>{t.assignedEmployeeName ?? "Colaborador inactivo"}</option> : null}
+            {pessoas.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </Select>
@@ -295,7 +293,6 @@ function Dependencias({ p, t }: { p: Projecto; t: Tarefa }) {
 
 export function TarefasDoProjecto({ p }: { p: Projecto }) {
   const { pode } = useUtilizador();
-  const pessoas = usePessoas();
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
   const colunas: Coluna<Tarefa>[] = [
     {
@@ -311,7 +308,7 @@ export function TarefasDoProjecto({ p }: { p: Projecto }) {
     },
     { id: "etapa", cabecalho: "Etapa", esconderAte: "md", celula: (t) => (t.status === "Pending" ? (ETAPAS[t.stage as keyof typeof ETAPAS] ?? t.stage ?? "—") : <EstadoTarefa estado={t.status} />) },
     { id: "prio", cabecalho: "Prioridade", esconderAte: "lg", celula: (t) => (t.priority ? <PrioridadeBadge p={t.priority} /> : "—") },
-    { id: "quem", cabecalho: "Atribuída a", esconderAte: "md", className: "max-w-[12rem] truncate", celula: (t) => (t.assignedEmployeeId ? (pessoas.nome(t.assignedEmployeeId) ?? "—") : "Ninguém") },
+    { id: "quem", cabecalho: "Atribuída a", esconderAte: "md", className: "max-w-[12rem] truncate", celula: (t) => (t.assignedEmployeeId ? (t.assignedEmployeeName ?? "—") : "Ninguém") },
     { id: "prazo", cabecalho: "Prazo", esconderAte: "sm", celula: (t) => (t.dueDate ? formatarData(t.dueDate) : "—") },
     { id: "prog", cabecalho: "Progresso", alinhar: "direita", esconderAte: "lg", celula: (t) => `${String(t.progress ?? 0)}%${t.estimatedHours ? ` · ${formatarNumeroDecimal(String(t.estimatedHours), 1)} h` : ""}` },
     {
@@ -326,7 +323,7 @@ export function TarefasDoProjecto({ p }: { p: Projecto }) {
           {escreve && t.status === "Pending" ? (
             <>
               <Planear p={p} t={t} />
-              {pessoas.le ? <Atribuir p={p} t={t} /> : null}
+              <Atribuir p={p} t={t} />
               <Fechar p={p} t={t} concluir />
               <Fechar p={p} t={t} concluir={false} />
             </>
@@ -341,7 +338,6 @@ export function TarefasDoProjecto({ p }: { p: Projecto }) {
         <CardTitle>Tarefas</CardTitle>
         {escreve ? <NovaTarefa p={p} /> : null}
       </div>
-      {escreve && !pessoas.le ? <Alert tom="info" className="mb-3" titulo="Atribuir tarefas exige escolher o colaborador, o que pede a leitura dos Recursos Humanos (B38)." /> : null}
       <Tabela rotulo="Tarefas" colunas={colunas} linhas={p.tasks} chave={(t) => t.taskId} aCarregar={false} vazio="Ainda não há tarefas." />
     </Card>
   );

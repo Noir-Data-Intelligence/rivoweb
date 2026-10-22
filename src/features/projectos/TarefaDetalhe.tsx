@@ -1,7 +1,5 @@
 /** Comentários e checklist de uma tarefa, em diálogos a partir da lista. */
 import { useId, useState } from "react";
-import { useUtilizadores } from "@/features/administracao";
-import { useUtilizador } from "@/features/identity";
 import { formatarDataHora } from "@/lib/format/data";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import { Button } from "@/ui/Button";
@@ -19,10 +17,6 @@ export function ComentariosDaTarefa({ p, t, escreve }: { p: Projecto; t: Tarefa;
   const [tentou, setTentou] = useState(false);
   const lista = useComentariosTarefa(p.projectId, t.taskId, aberto);
   const accao = useAcaoProjecto(p.projectId);
-  const { pode } = useUtilizador();
-  // Quem escreveu, para quem lê as contas (B38); senão, só a data.
-  const contas = useUtilizadores(aberto && pode("identity.users.read"));
-  const autor = (id: string | null) => (id ? (contas.data?.find((u) => u.userId === id)?.email ?? null) : null);
   const erro = erroComentario(texto);
   return (
     <>
@@ -54,7 +48,7 @@ export function ComentariosDaTarefa({ p, t, escreve }: { p: Projecto; t: Tarefa;
               .map((c) => (
                 <li key={c.commentId} className="rounded-md border border-border p-2 text-sm">
                   <p className="mb-1 text-xs text-muted-foreground">
-                    {autor(c.authorUserId) ? `${autor(c.authorUserId) ?? ""} · ` : ""}
+                    {c.authorName ? `${c.authorName} · ` : ""}
                     {formatarDataHora(c.postedAt)}
                   </p>
                   <p className="whitespace-pre-line break-words text-foreground">{c.body}</p>

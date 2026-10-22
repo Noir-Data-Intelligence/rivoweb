@@ -3,14 +3,14 @@
  * abrir validado; resumo com orçamento, marcos (novo, alcançado, comentário
  * com o nome que o cliente vê), fechar; tarefas (nova, planear, concluir,
  * dependências); quadro com «Mover para» (Feita conclui); Gantt em texto.
- * O ProjectManager não atribui (B38); o Admin, que lê os RH, atribui e vê os
- * nomes. Texto de fora nunca vira HTML.
+ * O ProjectManager vê a quem estão atribuídas e atribui pelas escolhas dos
+ * projectos, sem ler os RH (B38). Texto de fora nunca vira HTML.
  */
 import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF1 } from "../apoio-f1";
 import { ID } from "../../fixtures/f1";
-import { comentariosMarcos, dependencias, gantt, IDF12, meAdminF12, meGestorProjectos, projecto, projectos, quadroProjecto } from "../../fixtures/f12";
+import { comentariosMarcos, dependencias, escolhasProjecto, gantt, IDF12, meGestorProjectos, projecto, projectos, quadroProjecto } from "../../fixtures/f12";
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 
@@ -21,7 +21,8 @@ function comProjectos(api: ApiSimulada, me = meGestorProjectos): ApiSimulada {
     .em("GET", `/projects/${IDF12.projecto}/board`, { status: 200, corpo: quadroProjecto() })
     .em("GET", `/projects/${IDF12.projecto}/gantt`, { status: 200, corpo: gantt() })
     .em("GET", `/projects/${IDF12.projecto}/dependencies`, { status: 200, corpo: dependencias() })
-    .em("GET", `/projects/${IDF12.projecto}/milestones/comments`, { status: 200, corpo: comentariosMarcos() });
+    .em("GET", `/projects/${IDF12.projecto}/milestones/comments`, { status: 200, corpo: comentariosMarcos() })
+    .em("GET", "/projects/lookups", { status: 200, corpo: escolhasProjecto() });
 }
 
 async function verificar(page: Page) {
@@ -100,7 +101,7 @@ test.describe("projectos", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("tarefas: sem os RH não se atribui (B38); nova, planear, concluir e dependências", async ({ page, api, violacoes }) => {
+  test("tarefas: nomes e escolhas sem os RH (B38); nova atribuída, planear, concluir e dependências", async ({ page, api, violacoes }) => {
     await comProjectos(api)
       .em("POST", `/projects/${IDF12.projecto}/tasks`, { status: 201, corpo: { taskId: "t9" } })
       .em("PUT", `/projects/${IDF12.projecto}/tasks/${IDF12.t3}`, { status: 204 })
@@ -110,10 +111,10 @@ test.describe("projectos", () => {
       .ligar();
     await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=tarefas`);
-    await expect(page.getByText("(B38)", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Atribuir / })).toHaveCount(0);
+    await expect(page.getByText("(B38)", { exact: false })).toHaveCount(0);
     const linhas = page.getByRole("table", { name: "Tarefas" });
-    await expect(linhas.getByRole("row").filter({ hasText: "Configuração" })).toContainText("—");
+    await expect(linhas.getByRole("row").filter({ hasText: "Configuração" })).toContainText("Ana Teste");
+    await expect(linhas.getByRole("row").filter({ hasText: "Formação" })).toContainText("Ninguém");
     await expect(linhas).toContainText("<script>x</script>");
     expect(await page.locator("main script").count()).toBe(0);
     expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
@@ -121,12 +122,12 @@ test.describe("projectos", () => {
 
     await page.getByRole("button", { name: "Nova tarefa" }).click();
     const d = page.getByRole("dialog");
-    await expect(d.getByLabel("Atribuir a (opcional)")).toHaveCount(0);
     await d.getByLabel("Título").fill("Migração de dados");
     await d.getByLabel("Prazo (opcional)").fill("2026-04-30");
+    await d.getByLabel("Atribuir a (opcional)").selectOption({ label: "Ana Teste" });
     await d.getByRole("button", { name: "Criar" }).click();
     await expect(d).toHaveCount(0);
-    expect(api.escritas("POST", `/projects/${IDF12.projecto}/tasks`)[0]?.corpo).toEqual({ title: "Migração de dados", dueDate: "2026-04-30", assignedEmployeeId: null });
+    expect(api.escritas("POST", `/projects/${IDF12.projecto}/tasks`)[0]?.corpo).toEqual({ title: "Migração de dados", dueDate: "2026-04-30", assignedEmployeeId: ID.emp1 });
 
     await page.getByRole("button", { name: "Planear Formação" }).click();
     await d.getByLabel("Início (opcional)").fill("2026-05-01");
@@ -163,6 +164,7 @@ test.describe("projectos", () => {
     await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=quadro`);
     await expect(page.getByRole("region", { name: "Em curso (1)" })).toContainText("6,5 h registadas · 2 comentários");
+    await expect(page.getByRole("region", { name: "Em curso (1)" })).toContainText("Ana Teste");
     await expect(page.getByRole("region", { name: "Feita (1)" })).toContainText("Levantamento");
     await verificar(page);
     await page.getByLabel("Mover Formação para").selectOption("Done");
@@ -178,17 +180,16 @@ test.describe("projectos", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("Admin, que lê os RH: vê a quem está atribuída e atribui", async ({ page, api }) => {
-    await comProjectos(api, meAdminF12).em("POST", `/projects/${IDF12.projecto}/tasks/${IDF12.t3}/assignment`, { status: 204 }).ligar();
-    await entrar(page, meAdminF12.email);
+  test("atribuir pelas escolhas dos projectos, sem os RH (B38)", async ({ page, api }) => {
+    await comProjectos(api).em("POST", `/projects/${IDF12.projecto}/tasks/${IDF12.t3}/assignment`, { status: 204 }).ligar();
+    await entrar(page, meGestorProjectos.email);
     await page.goto(`/projectos/${IDF12.projecto}?vista=tarefas`);
-    await expect(page.getByText("(B38)", { exact: false })).toHaveCount(0);
-    await expect(page.getByRole("table", { name: "Tarefas" }).getByRole("row").filter({ hasText: "Configuração" })).toContainText("Ana Teste");
     await page.getByRole("button", { name: "Atribuir Formação" }).click();
     const d = page.getByRole("dialog");
     await d.getByLabel("Colaborador").selectOption(ID.emp1);
     await d.getByRole("button", { name: "Guardar" }).click();
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/projects/${IDF12.projecto}/tasks/${IDF12.t3}/assignment`)[0]?.corpo).toEqual({ employeeId: ID.emp1 });
+    expect(api.pedidos.some((p) => p.caminho.startsWith("/hr/"))).toBe(false);
   });
 });

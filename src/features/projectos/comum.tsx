@@ -1,8 +1,7 @@
 /** Peças comuns dos projectos: estados, etapas, prioridades e nomes. */
 import { useUtilizador } from "@/features/identity";
-import { useTodosColaboradores } from "@/features/rh";
 import { Badge, type TomBadge } from "@/ui/Badge";
-import type { Etapa, Prioridade } from "./api";
+import { useEscolhasProjecto, type Etapa, type Prioridade } from "./api";
 
 export const ETAPAS: Readonly<Record<Etapa, string>> = { Backlog: "Por planear", ToDo: "A fazer", InProgress: "Em curso", Review: "Em revisão", Done: "Feita" };
 export const ETAPAS_ABERTAS: readonly Etapa[] = ["Backlog", "ToDo", "InProgress", "Review"];
@@ -16,18 +15,9 @@ export const EstadoMarco = ({ estado }: { estado: string }) => (estado === "Reac
 const TOM_PRIORIDADE: Record<string, TomBadge> = { Low: "neutro", Normal: "info", High: "aviso", Urgent: "erro" };
 export const PrioridadeBadge = ({ p }: { p: string }) => <Badge tom={TOM_PRIORIDADE[p] ?? "neutro"}>{PRIORIDADES[p as Prioridade] ?? p}</Badge>;
 
-/**
- * Colaboradores para quem lê os RH (B38): dão nome às atribuições e deixam
- * atribuir. Sem eles, «—» e não se atribui.
- */
-export function usePessoas() {
+/** Colaboradores, viaturas e clientes activos (id e nome), para quem escreve nos projectos (B38). */
+export function useEscolhas() {
   const { pode } = useUtilizador();
-  const le = pode("hr.employees.read");
-  const lista = useTodosColaboradores(le);
-  const activos = (lista.data?.items ?? []).filter((c) => c.status === "Active");
-  return {
-    le,
-    activos,
-    nome: (id: string | null | undefined) => (id ? (lista.data?.items.find((c) => c.employeeId === id)?.fullName ?? null) : null),
-  };
+  const q = useEscolhasProjecto(pode("projects.projects.write"));
+  return { pessoas: q.data?.employees ?? [], viaturas: q.data?.vehicles ?? [], clientes: q.data?.customers ?? [] };
 }

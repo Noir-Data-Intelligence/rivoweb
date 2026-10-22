@@ -14,6 +14,7 @@ export const IDF12 = {
   t2: "00000000-0000-4000-8000-000000000e22",
   t3: "00000000-0000-4000-8000-000000000e23",
   dep: "00000000-0000-4000-8000-000000000e31",
+  viatura: "00000000-0000-4000-8000-000000000e51",
 };
 
 /** Como em produção: só `projects.projects.read/.write`. */
@@ -54,8 +55,8 @@ export const projecto = (): S["ProjectView"] => ({
     { milestoneId: IDF12.marco2, name: "Go-live", status: "Pending", targetDate: "2026-06-30", reachedOn: null },
   ],
   tasks: [
-    tarefa(IDF12.t1, "Levantamento", { status: "Done", stage: "Done", progress: 100, assignedEmployeeId: ID.emp1, description: "Entrevistas.\n<script>x</script>" }),
-    tarefa(IDF12.t2, "Configuração", { stage: "InProgress", priority: "High", progress: 40, assignedEmployeeId: ID.emp1 }),
+    tarefa(IDF12.t1, "Levantamento", { status: "Done", stage: "Done", progress: 100, assignedEmployeeId: ID.emp1, assignedEmployeeName: "Ana Teste", description: "Entrevistas.\n<script>x</script>" }),
+    tarefa(IDF12.t2, "Configuração", { stage: "InProgress", priority: "High", progress: 40, assignedEmployeeId: ID.emp1, assignedEmployeeName: "Ana Teste" }),
     tarefa(IDF12.t3, "Formação", { stage: "Backlog", dueDate: null, startDate: null, estimatedHours: null }),
   ],
   budget: { amount: 5000000, currency: "AOA", setAt: "2026-02-01T10:00:00Z" },
@@ -65,14 +66,21 @@ export const projecto = (): S["ProjectView"] => ({
   completionPercent: 33,
 });
 
+/** As escolhas dos projectos (B38): para quem escreve, sem os RH, a frota ou os clientes. */
+export const escolhasProjecto = (): S["ProjectLookups"] => ({
+  employees: [{ id: ID.emp1, name: "Ana Teste" }],
+  vehicles: [{ id: IDF12.viatura, name: "LD-12-34-AB · Toyota Hilux" }],
+  customers: [{ id: "00000000-0000-4000-8000-000000000701", name: "Cliente Teste, Lda" }],
+});
+
 export const projectos = (): S["ProjectView"][] => [projecto(), { ...projecto(), projectId: IDF12.fechado, name: "Auditoria 2025", status: "Closed", endDate: "2025-12-31", completionPercent: 100, budget: null }];
 
 export const quadroProjecto = (): S["BoardColumn"][] => [
   { stage: "Backlog", cards: [{ taskId: IDF12.t3, title: "Formação", priority: "Normal", dueDate: null, assignedEmployeeId: null, boardOrder: 0, progress: 0, comments: 0, loggedHours: 0 }] },
   { stage: "ToDo", cards: [] },
-  { stage: "InProgress", cards: [{ taskId: IDF12.t2, title: "Configuração", priority: "High", dueDate: "2026-03-15", assignedEmployeeId: ID.emp1, boardOrder: 0, progress: 40, comments: 2, loggedHours: 6.5 }] },
+  { stage: "InProgress", cards: [{ taskId: IDF12.t2, title: "Configuração", priority: "High", dueDate: "2026-03-15", assignedEmployeeId: ID.emp1, assignedEmployeeName: "Ana Teste", boardOrder: 0, progress: 40, comments: 2, loggedHours: 6.5 }] },
   { stage: "Review", cards: [] },
-  { stage: "Done", cards: [{ taskId: IDF12.t1, title: "Levantamento", priority: "Normal", dueDate: "2026-03-15", assignedEmployeeId: ID.emp1, boardOrder: 0, progress: 100, comments: 0, loggedHours: 16 }] },
+  { stage: "Done", cards: [{ taskId: IDF12.t1, title: "Levantamento", priority: "Normal", dueDate: "2026-03-15", assignedEmployeeId: ID.emp1, assignedEmployeeName: "Ana Teste", boardOrder: 0, progress: 100, comments: 0, loggedHours: 16 }] },
 ];
 
 export const gantt = (): S["GanttView"] => ({
@@ -93,6 +101,7 @@ export const gantt = (): S["GanttView"] => ({
     loggedHours: t.taskId === IDF12.t2 ? 6.5 : 0,
     progress: t.progress ?? 0,
     assignedEmployeeId: t.assignedEmployeeId,
+    assignedEmployeeName: t.assignedEmployeeName ?? null,
   })),
   milestones: projecto().milestones.map((m) => ({ milestoneId: m.milestoneId, name: m.name, targetDate: m.targetDate, status: m.status })),
 });
@@ -106,7 +115,7 @@ export const comentariosMarcos = (): S["MilestoneCommentView"][] => [
 // --- Bloco 2: trabalho do projecto e portal do cliente.
 
 export const comentariosTarefa = (): S["CommentView"][] => [
-  { commentId: "c1", taskId: IDF12.t2, authorUserId: null, body: "Falta a tabela de IVA.\n<script>x</script>", postedAt: "2026-03-05T10:00:00Z" },
+  { commentId: "c1", taskId: IDF12.t2, authorUserId: null, authorName: "Paula Projectos", body: "Falta a tabela de IVA.\n<script>x</script>", postedAt: "2026-03-05T10:00:00Z" },
 ];
 
 export const checklist = (): S["ChecklistItemView"][] => [
@@ -117,10 +126,10 @@ export const checklist = (): S["ChecklistItemView"][] => [
 export const tempo = (): S["TimeSummary"] => ({
   totalHours: 22.5,
   billableHours: 16,
-  byEmployee: [{ employeeId: ID.emp1, hours: 22.5 }],
+  byEmployee: [{ employeeId: ID.emp1, employeeName: "Ana Teste", hours: 22.5 }],
   entries: [
-    { entryId: "e1", projectId: IDF12.projecto, taskId: IDF12.t2, employeeId: ID.emp1, day: "2026-03-05", hours: 6.5, description: "Configuração inicial", billable: true },
-    { entryId: "e2", projectId: IDF12.projecto, taskId: null, employeeId: ID.emp1, day: "2026-03-04", hours: 16, description: null, billable: false },
+    { entryId: "e1", projectId: IDF12.projecto, taskId: IDF12.t2, employeeId: ID.emp1, employeeName: "Ana Teste", day: "2026-03-05", hours: 6.5, description: "Configuração inicial", billable: true },
+    { entryId: "e2", projectId: IDF12.projecto, taskId: null, employeeId: ID.emp1, employeeName: "Ana Teste", day: "2026-03-04", hours: 16, description: null, billable: false },
   ],
 });
 
