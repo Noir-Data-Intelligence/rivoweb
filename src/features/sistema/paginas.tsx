@@ -1,6 +1,6 @@
 import { ArrowLeft, Home } from "lucide-react";
 import { isRouteErrorResponse, Link, useLocation, useNavigate, useRouteError } from "react-router";
-import { LayoutPublico } from "@/features/identity";
+import { LayoutPublico } from "@/features/identity/components/LayoutPublico";
 import { APP_VERSION } from "@/lib/env";
 import { Button } from "@/ui/Button";
 import { EmptyState, PageHeader } from "@/ui/Layout";
