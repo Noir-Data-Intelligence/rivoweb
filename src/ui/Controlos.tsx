@@ -6,12 +6,12 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cn } from "./cn";
 
 const CAMPO =
-  "w-full rounded-md border border-input bg-card px-3 text-base text-foreground placeholder:text-muted-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger";
+  "w-full rounded-lg border border-input bg-background px-3 text-base text-foreground placeholder:text-muted-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger";
 
 /** Lista nativa: teclado, leitores de ecrã e telemóvel sem trabalho extra. */
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement> & { invalido?: boolean }>(
   function Select({ className, invalido, ...props }, ref) {
-    return <select ref={ref} aria-invalid={invalido || undefined} className={cn(CAMPO, "h-9 pointer-coarse:h-11", className)} {...props} />;
+    return <select ref={ref} aria-invalid={invalido || undefined} className={cn(CAMPO, "h-10 pointer-coarse:h-11", className)} {...props} />;
   },
 );
 

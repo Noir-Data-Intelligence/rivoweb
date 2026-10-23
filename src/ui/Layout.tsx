@@ -5,8 +5,8 @@ export function PageHeader({ titulo, descricao, accao }: { titulo: string; descr
   return (
     <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-lg font-semibold text-foreground">{titulo}</h1>
-        {descricao ? <p className="mt-1 text-base text-muted-foreground">{descricao}</p> : null}
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{titulo}</h1>
+        {descricao ? <p className="mt-1 text-sm text-muted-foreground">{descricao}</p> : null}
       </div>
       {accao ? <div className="shrink-0">{accao}</div> : null}
     </header>

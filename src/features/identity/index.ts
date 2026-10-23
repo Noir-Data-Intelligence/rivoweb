@@ -2,3 +2,4 @@
 export { Can, useUtilizador } from "./utilizador";
 export { RegrasPassword } from "./components/DefinirPassword";
 export { usePortalColaborador, type Utilizador } from "./api";
+export { LayoutPublico } from "./components/LayoutPublico";

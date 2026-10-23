@@ -4,24 +4,34 @@
  * recuperação), barra lateral, cabeçalho, indicadores e painel. Fica fora de
  * `tokens.css` (cópia byte a byte da IV).
  */
-:root {
-  --entrada-painel: #07090E;
-  --entrada-painel-texto: #FFFFFF;
-  --entrada-painel-suave: #9CA3AF;
-  --entrada-brilho-1: rgb(25 148 210 / 0.1);
-  --entrada-brilho-2: rgb(132 52 223 / 0.1);
-  --entrada-gradiente: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
-  --entrada-destaque: #494BDF;
-  --entrada-fundo: #F9F9FB;
-  /* Destaque e gradiente usados também dentro da aplicação. */
-  --marca-destaque: #494BDF;
-  --marca-destaque-suave: rgb(73 75 223 / 0.08);
-  --marca-gradiente-rivo: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
-}
+/* Na mesma camada que os tokens da IV e depois deles: estes valores ganham. */
+@layer base {
+  :root {
+    --entrada-painel: #07090E;
+    --entrada-painel-texto: #FFFFFF;
+    --entrada-painel-suave: #9CA3AF;
+    --entrada-brilho-1: rgb(25 148 210 / 0.1);
+    --entrada-brilho-2: rgb(132 52 223 / 0.1);
+    --entrada-gradiente: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
+    --entrada-destaque: #494BDF;
+    --entrada-fundo: #F9F9FB;
+    /* Destaque e gradiente usados também dentro da aplicação. */
+    --marca-destaque: #494BDF;
+    --marca-destaque-suave: rgb(73 75 223 / 0.08);
+    --marca-gradiente-rivo: linear-gradient(135deg, #1994D2, #494BDF 55%, #8434DF);
+    /* Cor principal da referência (índigo) por cima da da IV. */
+    --primary: 239 70% 58%; /* #494BDF */
+    --primary-hover: 239 62% 50%; /* #3537CF */
+    --ring: 239 70% 58%; /* #494BDF */
+  }
 
-.dark {
-  --entrada-destaque: #9496F2;
-  --marca-destaque: #9496F2;
-  --marca-destaque-suave: rgb(148 150 242 / 0.12);
-  --entrada-fundo: hsl(var(--background));
+  .dark {
+    --entrada-destaque: #9496F2;
+    --marca-destaque: #9496F2;
+    --marca-destaque-suave: rgb(148 150 242 / 0.12);
+    --primary: 239 79% 76%; /* #9496F2 */
+    --primary-hover: 239 82% 82%; /* #B0B1F6 */
+    --ring: 239 79% 76%; /* #9496F2 */
+    --entrada-fundo: hsl(var(--background));
+  }
 }

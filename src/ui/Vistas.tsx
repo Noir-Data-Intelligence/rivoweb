@@ -32,7 +32,7 @@ export function Vistas<V extends string>({ rotulo, vistas, actual }: { rotulo: s
   if (visiveis.length < 2) return null;
   const omissao = visiveis[0]?.valor;
   return (
-    <nav aria-label={rotulo} className="mb-4 flex gap-1 overflow-x-auto border-b border-border">
+    <nav aria-label={rotulo} className="mb-4 flex w-fit max-w-full gap-1 overflow-x-auto rounded-lg bg-muted p-1">
       {visiveis.map((v) => {
         const activa = v.valor === actual;
         return (
@@ -43,8 +43,8 @@ export function Vistas<V extends string>({ rotulo, vistas, actual }: { rotulo: s
             aria-current={activa ? "page" : undefined}
             className={() =>
               cn(
-                "inline-flex h-9 shrink-0 items-center border-b-2 px-3 text-base pointer-coarse:h-11",
-                activa ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+                "inline-flex h-8 shrink-0 items-center rounded-md px-3 text-sm pointer-coarse:h-11",
+                activa ? "bg-card font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
               )
             }
           >

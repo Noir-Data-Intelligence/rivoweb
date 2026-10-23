@@ -8,7 +8,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
         ref={ref}
         aria-invalid={invalido || undefined}
         className={cn(
-          "h-9 w-full rounded-md border border-input bg-card px-3 text-base text-foreground placeholder:text-muted-subtle",
+          "h-10 w-full rounded-lg border border-input bg-background px-3 text-base text-foreground placeholder:text-muted-subtle",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
           "disabled:cursor-not-allowed disabled:opacity-60 pointer-coarse:h-11",
           "aria-[invalid=true]:border-danger",

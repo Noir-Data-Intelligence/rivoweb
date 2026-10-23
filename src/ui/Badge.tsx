@@ -14,7 +14,8 @@ export type TomBadge = keyof typeof TONS;
 /** Estado curto. O texto diz o estado; a cor só reforça (WCAG 1.4.1). */
 export function Badge({ tom = "neutro", children, className }: { tom?: TomBadge; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium", TONS[tom], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.03em]", TONS[tom], className)}>
+      <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-current" />
       {children}
     </span>
   );

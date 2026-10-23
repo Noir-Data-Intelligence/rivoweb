@@ -95,7 +95,7 @@ export function Tabela<T>({
       >
         <table className="w-full border-collapse text-base" aria-label={rotulo} aria-busy={aCarregar || undefined}>
           <thead>
-            <tr className="border-b border-border bg-muted">
+            <tr className="border-b border-border">
               {colunas.map((c) => {
                 const activa = ordem?.id === c.id;
                 const podeOrdenar = ordenavel && c.ordenar !== undefined;
@@ -106,7 +106,7 @@ export function Tabela<T>({
                     scope="col"
                     aria-sort={activa ? (ordem.asc ? "ascending" : "descending") : undefined}
                     className={cn(
-                      "h-10 whitespace-nowrap px-3 text-left text-[13px] font-medium text-muted-foreground",
+                      "h-10 whitespace-nowrap px-3 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-muted-foreground",
                       c.alinhar === "direita" && "text-right",
                       c.esconderAte && ESCONDER[c.esconderAte],
                     )}
@@ -145,7 +145,7 @@ export function Tabela<T>({
                       <td
                         key={c.id}
                         className={cn(
-                          "h-11 px-3 py-2 align-middle text-foreground",
+                          "h-12 px-3 py-2 align-middle text-foreground",
                           c.alinhar === "direita" && "text-right tabular-nums",
                           c.esconderAte && ESCONDER[c.esconderAte],
                           c.className,

@@ -2,27 +2,29 @@ import type { ReactNode } from "react";
 import { Lock, ShieldCheck } from "lucide-react";
 import { API_DISPONIVEL } from "@/lib/env";
 import { Alert } from "@/ui/Alert";
+import { Logotipo } from "@/ui/Logotipo";
 
 /** Texto em gradiente da marca (tema da entrada). */
 const GRADIENTE_TEXTO = "bg-[image:var(--entrada-gradiente)] bg-clip-text text-transparent";
 
 /** Painel da marca, à esquerda em ecrãs largos; decorativo, sem acções. */
-function PainelMarca() {
+function PainelMarca({ destaque }: { destaque?: ReactNode }) {
   return (
     <aside className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-[var(--entrada-painel)] p-12 text-[var(--entrada-painel-texto)] lg:flex">
       <div aria-hidden className="pointer-events-none absolute left-1/4 top-1/4 size-96 rounded-full bg-[var(--entrada-brilho-1)] blur-[64px]" />
       <div aria-hidden className="pointer-events-none absolute left-[37.5%] top-[30%] size-72 rounded-full bg-[var(--entrada-brilho-2)] blur-[64px]" />
-      <span className="relative inline-flex items-center gap-2">
-        <img src="/logo/rivo-simbolo-mono-branco.svg" alt="" className="size-8" />
-        <span className="text-xl font-semibold tracking-tight">Rivo</span>
-      </span>
+      <Logotipo className="relative h-12 text-[var(--entrada-painel-texto)]" />
       <div className="relative">
-        <p className="text-5xl font-bold leading-none tracking-[-0.025em]">
-          Your Business.
-          <br />
-          <span className={GRADIENTE_TEXTO}>Under Control.</span>
-        </p>
-        <p className="mt-6 max-w-md text-lg text-[var(--entrada-painel-suave)]">Finanças, Recursos Humanos e Operações unificados num único sistema empresarial.</p>
+        {destaque ?? (
+          <>
+            <p className="text-5xl font-bold leading-none tracking-[-0.025em]">
+              Your Business.
+              <br />
+              <span className={GRADIENTE_TEXTO}>Under Control.</span>
+            </p>
+            <p className="mt-6 max-w-md text-lg text-[var(--entrada-painel-suave)]">Finanças, Recursos Humanos e Operações unificados num único sistema empresarial.</p>
+          </>
+        )}
       </div>
       <p className="relative inline-flex items-center gap-2 text-xs text-[var(--entrada-painel-suave)]">
         <Lock className="size-3.5" strokeWidth={1.75} aria-hidden />
@@ -33,10 +35,10 @@ function PainelMarca() {
 }
 
 /** Ecrãs públicos (entrar, convite, recuperação). A marca aparece aqui, não nos dados. */
-export function LayoutPublico({ titulo, descricao, children }: { titulo: string; descricao?: string; children: ReactNode }) {
+export function LayoutPublico({ titulo, descricao, children, destaque, comEscudo = true }: { titulo: string; descricao?: ReactNode; children: ReactNode; destaque?: ReactNode; comEscudo?: boolean }) {
   return (
     <div className="flex min-h-screen bg-[var(--entrada-fundo)]">
-      <PainelMarca />
+      <PainelMarca destaque={destaque} />
       <main id="conteudo" className="flex flex-1 flex-col items-center justify-start px-4 py-10 sm:justify-center">
         <div className="w-full max-w-md">
           <span className="mb-10 inline-flex items-center gap-2 lg:hidden">
@@ -46,7 +48,7 @@ export function LayoutPublico({ titulo, descricao, children }: { titulo: string;
           </span>
           <div className="mb-8">
             <h1 className="inline-flex items-center gap-2 text-xl font-semibold text-foreground">
-              <ShieldCheck className="size-5 text-[var(--entrada-destaque)]" strokeWidth={1.75} aria-hidden />
+              {comEscudo ? <ShieldCheck className="size-5 text-[var(--entrada-destaque)]" strokeWidth={1.75} aria-hidden /> : null}
               {titulo}
             </h1>
             <div aria-hidden className="mt-2 h-0.5 w-12 rounded-full bg-[image:var(--entrada-gradiente)]" />
