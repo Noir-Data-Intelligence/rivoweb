@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Lock, ShieldCheck } from "lucide-react";
 import { API_DISPONIVEL } from "@/lib/env";
 import { Alert } from "@/ui/Alert";
-import { Logotipo } from "@/ui/Logotipo";
 
 /** Texto em gradiente da marca (tema da entrada). */
 const GRADIENTE_TEXTO = "bg-[image:var(--entrada-gradiente)] bg-clip-text text-transparent";
@@ -13,7 +12,11 @@ function PainelMarca({ destaque }: { destaque?: ReactNode }) {
     <aside className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-[var(--entrada-painel)] p-12 text-[var(--entrada-painel-texto)] lg:flex">
       <div aria-hidden className="pointer-events-none absolute left-1/4 top-1/4 size-96 rounded-full bg-[var(--entrada-brilho-1)] blur-[64px]" />
       <div aria-hidden className="pointer-events-none absolute left-[37.5%] top-[30%] size-72 rounded-full bg-[var(--entrada-brilho-2)] blur-[64px]" />
-      <Logotipo className="relative h-12 text-[var(--entrada-painel-texto)]" />
+      {/* Painel sempre escuro: a versão colorida para fundo escuro. */}
+      <span className="relative inline-flex items-center gap-2">
+        <img src="/logo/rivo-simbolo-escuro.svg" alt="" className="size-8" />
+        <span className="text-xl font-semibold tracking-tight">Rivo</span>
+      </span>
       <div className="relative">
         {destaque ?? (
           <>

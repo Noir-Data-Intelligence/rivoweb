@@ -21,7 +21,6 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { cn } from "@/ui/cn";
 import { Logo } from "@/ui/Layout";
-import { Logotipo } from "@/ui/Logotipo";
 import { ProcurarPagina } from "./ProcurarPagina";
 import { CONTA, MENU, NOTIFICACOES, type EntradaMenu } from "./rotas";
 
@@ -35,7 +34,7 @@ function inicioDoLogo(shell: Shell, gere: boolean): string {
   return "/";
 }
 
-function LogoInicio({ shell, className, comNome, completo = false }: { shell: Shell; className?: string; comNome?: boolean; completo?: boolean }) {
+function LogoInicio({ shell, className, comNome }: { shell: Shell; className?: string; comNome?: boolean }) {
   const { utilizador } = useUtilizador();
   const gere = temGestao(utilizador.permissions);
   const destino = inicioDoLogo(shell, gere);
@@ -45,7 +44,7 @@ function LogoInicio({ shell, className, comNome, completo = false }: { shell: Sh
       aria-label={destino === "/" && shell === "colaborador" ? "Rivo, ir para a gestão" : "Rivo, página inicial"}
       className={cn("inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
     >
-      {completo ? <Logotipo decorativo className="h-10 text-foreground" /> : <Logo comNome={comNome ?? true} />}
+      <Logo comNome={comNome ?? true} />
     </Link>
   );
 }
@@ -307,7 +306,7 @@ export function AppShell({ shell, children }: { shell: Shell; children?: ReactNo
         >
           <div className={cn("flex items-center", colapsada ? "justify-center" : "justify-center lg:justify-start lg:px-2")}>
             <LogoInicio shell={shell} comNome={false} className={colapsada ? "" : "lg:hidden"} />
-            <LogoInicio shell={shell} completo className={colapsada ? "hidden" : "hidden lg:inline-flex"} />
+            <LogoInicio shell={shell} className={colapsada ? "hidden" : "hidden lg:inline-flex"} />
           </div>
           <div className="flex-1 overflow-y-auto">
             <div className={colapsada ? "" : "lg:hidden"}>

@@ -382,7 +382,8 @@ Recursos Humanos.»
 ### Aparência e acessibilidade
 - Tema claro, escuro ou o do sistema, lembrado no browser.
 - Desenho da marca (conciliado com rivo.noirdataintelligence.com): cor
-  principal índigo, logotipo com a frase «Your Business. Under Control.»,
+  principal índigo, logotipo colorido da marca (versão para fundo escuro no
+  tema escuro e no painel da entrada),
   títulos de página a negrito, tabelas com cabeçalhos em maiúsculas pequenas,
   estados com ponto, separadores em comprimidos, página 404 com o painel da
   marca (ir para o início ou voltar).
