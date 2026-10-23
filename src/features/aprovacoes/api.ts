@@ -13,6 +13,8 @@ export type Historico = S["ApprovalHistoryView"];
 export type Politica = S["PolicyView"];
 export type PedidoPolitica = S["CreatePolicyRequest"];
 export type Accao = "Approved" | "Rejected" | "ClarificationRequested";
+export type ItemChecklist = S["ApprovalChecklistItemView"];
+export type RespostaItem = { itemId: string; response: "Compliant" | "NonCompliant" | "NotApplicable" };
 
 export const chaves = {
   todos: ["approval"] as const,
@@ -53,8 +55,10 @@ export function useHistorico(id: string) {
 export function useDecidir(antecipar: boolean) {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: async ({ requestId, action, notes }: { requestId: string; action: Accao; notes: string | null }) => {
-      const r = await ler(api.POST("/approval/requests/{requestId}/decisions", { params: { path: { requestId } }, body: { action, notes } }));
+    mutationFn: async ({ requestId, action, notes, checklist }: { requestId: string; action: Accao; notes: string | null; checklist?: RespostaItem[] }) => {
+      // Num passo de aprovação o checklist não vai (o servidor recusa-o).
+      const corpo = checklist ? { action, notes, checklist } : { action, notes };
+      const r = await ler(api.POST("/approval/requests/{requestId}/decisions", { params: { path: { requestId } }, body: corpo }));
       const final = r.status === "Approved" || r.status === "Rejected";
       if (antecipar && final && r.processType === "hr.position_assignment") {
         // Melhor esforço: se falhar, o processo de fundo aplica na mesma.

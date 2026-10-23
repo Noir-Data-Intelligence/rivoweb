@@ -1,7 +1,7 @@
 /** Portal › Pedidos internos: abrir um pedido aos serviços (RH, informática, …) e acompanhar. */
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { CATEGORIA_PEDIDO, EstadoPedido, nome, PRIORIDADE_PEDIDO } from "@/features/rh";
 import { formatarDataHora } from "@/lib/format/data";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -15,11 +15,18 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAbrirPedido, useMeusPedidos, type CategoriaPedido, type PedidoInterno, type PrioridadePedido } from "../api";
 import { MAXIMO_ASSUNTO, MAXIMO_MENSAGEM } from "../regras";
 
+/** `?novo=<área>` abre o formulário já com a área (ex.: «Pedir correcção» nos dados pessoais). */
+function areaDoUrl(v: string | null): CategoriaPedido | "" {
+  return v !== null && Object.hasOwn(CATEGORIA_PEDIDO, v) ? (v as CategoriaPedido) : "";
+}
+
 function Abrir() {
   const navegar = useNavigate();
-  const [aberto, setAberto] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const areaInicial = areaDoUrl(params.get("novo"));
+  const [aberto, setAberto] = useState(areaInicial !== "");
   const [assunto, setAssunto] = useState("");
-  const [categoria, setCategoria] = useState<CategoriaPedido | "">("");
+  const [categoria, setCategoria] = useState<CategoriaPedido | "">(areaInicial);
   const [prioridade, setPrioridade] = useState<PrioridadePedido>("Normal");
   const [texto, setTexto] = useState("");
   const [tentou, setTentou] = useState(false);
@@ -35,6 +42,10 @@ function Abrir() {
   const mudar = (v: boolean) => {
     setAberto(v);
     if (!v) {
+      if (params.has("novo")) {
+        params.delete("novo");
+        setParams(params, { replace: true });
+      }
       abrir.reset();
       setTentou(false);
       setAssunto("");

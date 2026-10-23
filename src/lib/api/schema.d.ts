@@ -36108,6 +36108,162 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portal/me/benefits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Benefícios do próprio (activos primeiro), com o nome e o valor mensal, sem `hr.benefits.read`. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OwnBenefit"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/me/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contratos de trabalho do próprio, do mais recente ao mais antigo, com o salário e sem as notas internas de RH. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OwnEmploymentContract"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/me/personal-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dados pessoais e contactos do próprio, só leitura. Para os corrigir, pede-se a RH (ticket). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OwnPersonalData"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customer-portal/me": {
         parameters: {
             query?: never;
@@ -38515,6 +38671,21 @@ export interface components {
             slaHours: null | number | string;
             approverName?: null | string;
         };
+        ApprovalChecklistAnswerView: {
+            /** Format: uuid */
+            itemId: string;
+            response: string;
+        };
+        ApprovalChecklistItemView: {
+            /** Format: uuid */
+            itemId: string;
+            /** Format: int32 */
+            step: number | string;
+            /** Format: int32 */
+            order: number | string;
+            text: string;
+            mandatory: boolean;
+        };
         ApprovalDecisionView: {
             /** Format: uuid */
             decidedByEmployeeId: string;
@@ -38525,6 +38696,7 @@ export interface components {
             step: number | string;
             notes: null | string;
             decidedByName?: null | string;
+            checklist?: null | components["schemas"]["ApprovalChecklistAnswerView"][];
         };
         ApprovalHistoryView: {
             /** Format: uuid */
@@ -38552,6 +38724,7 @@ export interface components {
             decisions: components["schemas"]["ApprovalDecisionView"][];
             summary?: null | string;
             requestedByName?: null | string;
+            checklist?: null | components["schemas"]["ApprovalChecklistItemView"][];
         };
         ApprovalRuleGroup: {
             module: string;
@@ -38586,6 +38759,7 @@ export interface components {
             summary?: null | string;
             requestedByName?: null | string;
             pendingApproverNames?: null | components["schemas"]["EmployeeNameView"][];
+            currentChecklist?: null | components["schemas"]["ApprovalChecklistItemView"][];
         };
         ApproveBudgetRequest: {
             /** Format: uuid */
@@ -39164,8 +39338,14 @@ export interface components {
             /** Format: int32 */
             accountCount: number | string;
         };
+        ChecklistAnswerRequest: {
+            /** Format: uuid */
+            itemId: string;
+            response: null | string;
+        };
         ChecklistItemRequest: {
-            title: string;
+            text: null | string;
+            mandatory: null | boolean;
         };
         ChecklistItemView: {
             /** Format: uuid */
@@ -39932,6 +40112,7 @@ export interface components {
         DecideRequest: {
             action: string;
             notes: null | string;
+            checklist?: null | components["schemas"]["ChecklistAnswerRequest"][];
         };
         DeclarationTemplateCreatedResponse: {
             /** Format: uuid */
@@ -42010,6 +42191,23 @@ export interface components {
             /** Format: double */
             observedHours: null | number | string;
         };
+        OwnBenefit: {
+            /** Format: uuid */
+            enrolmentId: string;
+            /** Format: uuid */
+            benefitId: string;
+            name: string;
+            kind: string;
+            /** Format: double */
+            monthlyValue: number | string;
+            currency: string;
+            description: null | string;
+            /** Format: date */
+            startsOn: string;
+            /** Format: date */
+            cancelledOn: null | string;
+            status: string;
+        };
         OwnDeclarationTemplate: {
             /** Format: uuid */
             templateId: string;
@@ -42026,6 +42224,19 @@ export interface components {
             sizeInBytes: number | string;
             /** Format: date-time */
             attachedAt: string;
+        };
+        OwnEmploymentContract: {
+            /** Format: uuid */
+            contractId: string;
+            type: string;
+            /** Format: date */
+            startsOn: string;
+            /** Format: date */
+            endsOn: null | string;
+            /** Format: double */
+            monthlySalary: number | string;
+            currency: string;
+            status: string;
         };
         OwnerPerformance: {
             /** Format: uuid */
@@ -42146,6 +42357,31 @@ export interface components {
             socialSecurityContribution: null | number | string;
             /** Format: uuid */
             documentId: null | string;
+        };
+        OwnPersonalData: {
+            email: null | string;
+            phone: null | string;
+            gender: null | string;
+            /** Format: date */
+            birthDate: null | string;
+            nationality: null | string;
+            maritalStatus: null | string;
+            taxId: null | string;
+            identityDocumentNumber: null | string;
+            /** Format: date */
+            identityDocumentExpiresOn: null | string;
+            socialSecurityNumber: null | string;
+            addressDetail: null | string;
+            city: null | string;
+            country: null | string;
+            bankName: null | string;
+            bankAccountNumber: null | string;
+            iban: null | string;
+            emergencyContactName: null | string;
+            emergencyContactRelationship: null | string;
+            emergencyContactPhone: null | string;
+            /** Format: date-time */
+            updatedAt: null | string;
         };
         OwnShift: {
             /** Format: uuid */
@@ -42542,6 +42778,12 @@ export interface components {
             /** Format: int32 */
             progress: null | number | string;
         };
+        PolicyChecklistItemView: {
+            /** Format: int32 */
+            order: number | string;
+            text: string;
+            mandatory: boolean;
+        };
         PolicyCreatedResponse: {
             /** Format: uuid */
             policyId: string;
@@ -42567,6 +42809,8 @@ export interface components {
             mode: null | string;
             /** Format: int32 */
             slaHours: null | number | string;
+            kind?: null | string;
+            checklist?: null | components["schemas"]["ChecklistItemRequest"][];
         };
         PolicyStepView: {
             /** Format: int32 */
@@ -42576,6 +42820,9 @@ export interface components {
             mode: string;
             /** Format: int32 */
             slaHours: null | number | string;
+            /** @default Approval */
+            kind: string;
+            checklist?: null | components["schemas"]["PolicyChecklistItemView"][];
         };
         PolicyView: {
             /** Format: uuid */

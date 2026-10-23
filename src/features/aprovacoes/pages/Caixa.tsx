@@ -3,6 +3,7 @@ import { useId } from "react";
 import { Link, NavLink, useSearchParams } from "react-router";
 import { formatarDataHora } from "@/lib/format/data";
 import { Alert } from "@/ui/Alert";
+import { Badge } from "@/ui/Badge";
 import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
@@ -39,7 +40,17 @@ export default function Caixa() {
       ),
     },
     { id: "de", cabecalho: "De", esconderAte: "sm", celula: (p) => nome(p.requestedByEmployeeId, p.requestedByName) },
-    { id: "passo", cabecalho: "Passo", esconderAte: "md", celula: (p) => `${String(p.currentStep)} de ${String(p.totalSteps)}` },
+    {
+      id: "passo",
+      cabecalho: "Passo",
+      esconderAte: "md",
+      celula: (p) => (
+        <span className="inline-flex flex-wrap items-center gap-1.5">
+          {`${String(p.currentStep)} de ${String(p.totalSteps)}`}
+          {p.currentChecklist && p.currentChecklist.length > 0 ? <Badge tom="info">Validação</Badge> : null}
+        </span>
+      ),
+    },
     { id: "data", cabecalho: "Submetido", esconderAte: "lg", celula: (p) => formatarDataHora(p.submittedAt) },
     { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoPedido estado={p.status} /> },
   ];

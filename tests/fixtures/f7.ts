@@ -151,3 +151,37 @@ export const objectivos = (): S["OwnObjective"][] => [
 export const conquistas = (): S["OwnAchievement"][] => [{ achievementId: IDF7.conquista, code: "PONTUAL", name: "Pontualidade exemplar", icon: null, points: 50, awardedAt: "2026-09-30T10:00:00+00:00", note: "Três meses sem atrasos." }];
 
 export const bens = (): S["OwnAssetInCustody"][] => [{ custodyId: IDF7.custodia, assetId: IDF7.activo, assetCode: "AF-0018", assetName: "Portátil HP EliteBook", assignedOn: "2026-09-01", conditionOnAssign: "Novo" }];
+
+export const beneficios = (): S["OwnBenefit"][] => [
+  { enrolmentId: "00000000-0000-4000-8000-000000000741", benefitId: "00000000-0000-4000-8000-000000000742", name: "Seguro de saúde", kind: "Health", monthlyValue: 15000, currency: "AOA", description: "Cobertura do próprio e do agregado.", startsOn: "2026-01-01", cancelledOn: null, status: "Active" },
+  { enrolmentId: "00000000-0000-4000-8000-000000000743", benefitId: "00000000-0000-4000-8000-000000000744", name: "Subsídio de transporte", kind: "Transport", monthlyValue: "8000.00", currency: "AOA", description: null, startsOn: "2025-03-01", cancelledOn: "2025-12-31", status: "Cancelled" },
+];
+
+export const contratos = (): S["OwnEmploymentContract"][] => [
+  { contractId: "00000000-0000-4000-8000-000000000745", type: "Permanent", startsOn: "2026-01-01", endsOn: null, monthlySalary: 350000, currency: "AOA", status: "Active" },
+  { contractId: "00000000-0000-4000-8000-000000000746", type: "FixedTerm", startsOn: "2025-01-01", endsOn: "2025-12-31", monthlySalary: "280000.00", currency: "AOA", status: "Terminated" },
+];
+
+/** O BI caducou em 2025; morada e contacto de emergência por preencher. */
+export const dadosPessoais = (): S["OwnPersonalData"] => ({
+  email: "colaborador@teste.local",
+  phone: "+244 923 000 000",
+  gender: "Feminino",
+  birthDate: "1990-04-12",
+  nationality: "Angolana",
+  maritalStatus: null,
+  taxId: "000111222LA033",
+  identityDocumentNumber: "000111222LA033",
+  identityDocumentExpiresOn: "2025-06-30",
+  socialSecurityNumber: null,
+  addressDetail: null,
+  city: "Luanda",
+  country: "AO",
+  bankName: "Banco Teste",
+  bankAccountNumber: "123456789",
+  iban: "AO06004000000123456789012",
+  emergencyContactName: null,
+  emergencyContactRelationship: null,
+  emergencyContactPhone: null,
+  updatedAt: "2026-10-20T09:30:00Z",
+});

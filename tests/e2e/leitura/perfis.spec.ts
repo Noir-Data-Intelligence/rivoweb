@@ -32,7 +32,7 @@ const MENU_ESPERADO: Readonly<Record<string, readonly string[]>> = {
   Manager: ["Início", "Dashboard executivo", "Analytics", "ESG", "Assistente de IA", "Aprovações", "Alertas", "Contratos de clientes", "Leads", "Oportunidades", "Propostas", "Actividades", "Relatório comercial", "Tipos de serviço", "Modelos de proposta", "Requisições", "Ordens de compra", "Recepções", "Fornecedores", "Facturas de compra", "Pedidos de pagamento", "Despesas", "Contas bancárias", "Centros de custo", "Orçamentos", "Previsões de custos"],
   AssetManager: ["Início", "Alertas", "Ordens de compra", "Recepções", "Artigos", "Armazéns", "Contagens", "Valorização do stock", "Activos fixos", "Viaturas", "Manutenção prevista", "Seguros de frota", "Fornecedores"],
   ProjectManager: ["Início", "Projectos", "Registo de tempo"],
-  Colaborador: ["Início", "Anúncios", "Assiduidade", "Férias e ausências", "Turnos", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda"],
+  Colaborador: ["Início", "Anúncios", "Assiduidade", "Férias e ausências", "Turnos", "Dados pessoais", "O meu contrato", "Benefícios", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda"],
   Cliente: ["Início", "Extracto", "Pagamentos", "Documentos", "Projectos", "Mensagens", "Suporte", "Ajuda", "Assistente"],
 };
 

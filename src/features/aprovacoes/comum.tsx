@@ -37,6 +37,28 @@ export const NOME_ACCAO: Readonly<Record<string, string>> = {
   ClarificationRequested: "Pediu esclarecimento",
 };
 
+/** Limites do checklist de um passo de validação (K4, `ApprovalModuleEndpoints.cs`). */
+export const MAXIMO_ITENS_CHECKLIST = 30;
+export const MAXIMO_TEXTO_ITEM = 500;
+
+export const RESPOSTAS_CHECKLIST = [
+  { valor: "Compliant", texto: "Conforme", simbolo: "✓" },
+  { valor: "NonCompliant", texto: "Não conforme", simbolo: "✗" },
+  { valor: "NotApplicable", texto: "N/A", simbolo: "—" },
+] as const;
+export type RespostaChecklist = (typeof RESPOSTAS_CHECKLIST)[number]["valor"];
+
+/**
+ * Validar (`Approved`) só com todos os itens respondidos e nenhum «não
+ * conforme»; rejeitar e pedir esclarecimento aceitam respostas parciais. O
+ * servidor confirma na mesma.
+ */
+export function estadoChecklist(itens: readonly { itemId: string }[], respostas: Readonly<Record<string, RespostaChecklist>>) {
+  const naoConforme = itens.some((i) => respostas[i.itemId] === "NonCompliant");
+  const completo = itens.every((i) => respostas[i.itemId] !== undefined);
+  return { naoConforme, completo, podeValidar: completo && !naoConforme };
+}
+
 export const NOME_MODO: Readonly<Record<string, string>> = {
   AnyApprover: "Basta um ocupante do cargo",
   AllApprovers: "Todos os ocupantes do cargo",

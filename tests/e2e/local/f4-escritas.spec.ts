@@ -87,7 +87,13 @@ test("F4: aprovação com dois colaboradores, segregação e decisão simultâne
   const h = { Authorization: `Bearer ${token}` };
   const contas = (await (await page.request.get(`${API_LOCAL}/identity/users`, { headers: h })).json()) as { userId: string; email: string }[];
   const idAdmin = contas.find((c) => c.email === adminEmail)?.userId;
-  const fichas = (await (await page.request.get(`${API_LOCAL}/hr/employees?page=1&pageSize=200`, { headers: h })).json()) as { employeeId: string; userId: string | null }[];
+  // Todas as páginas: a base local passa das 200 fichas com as corridas anteriores.
+  const fichas: { employeeId: string; userId: string | null }[] = [];
+  for (let p = 1; ; p++) {
+    const r = await page.request.get(`${API_LOCAL}/hr/employees?page=${String(p)}&pageSize=200`, { headers: h });
+    fichas.push(...((await r.json()) as typeof fichas));
+    if (fichas.length >= Number(r.headers()["x-total-count"] ?? 0)) break;
+  }
   const ligada = fichas.find((f) => f.userId === idAdmin);
   if (ligada) {
     await page.goto(`/colaboradores/${ligada.employeeId}`);
@@ -100,6 +106,8 @@ test("F4: aprovação com dois colaboradores, segregação e decisão simultâne
   await page.getByRole("button", { name: "Desligar" }).isVisible();
   await page.getByRole("button", { name: "Ligar conta" }).click();
   const opcao = page.getByLabel("Conta", { exact: true }).locator("option", { hasText: adminEmail });
+  // As contas carregam depois de o diálogo abrir: espera pela lista antes de contar.
+  await expect(page.getByLabel("Conta", { exact: true }).locator("option").nth(1)).toBeAttached();
   test.skip((await opcao.count()) === 0, "A conta admin local já está ligada a outra ficha.");
   await page.getByLabel("Conta", { exact: true }).selectOption({ label: adminEmail });
   await page.getByRole("dialog").getByRole("button", { name: "Ligar" }).click();

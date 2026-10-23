@@ -33,6 +33,9 @@ export type Objectivo = S["OwnObjective"];
 export type ResultadoChave = S["OwnKeyResult"];
 export type Conquista = S["OwnAchievement"];
 export type BemAGuarda = S["OwnAssetInCustody"];
+export type MeuBeneficio = S["OwnBenefit"];
+export type MeuContrato = S["OwnEmploymentContract"];
+export type MeusDados = S["OwnPersonalData"];
 
 const base = ["portal", "me"] as const;
 export const chaves = {
@@ -50,6 +53,9 @@ export const chaves = {
   objectivos: [...base, "objectives"] as const,
   conquistas: [...base, "achievements"] as const,
   bens: [...base, "assets"] as const,
+  beneficios: [...base, "benefits"] as const,
+  contratos: [...base, "contracts"] as const,
+  dados: [...base, "personal-data"] as const,
 };
 
 /** `de`/`até` nulos: a janela por omissão do servidor (mês corrente até hoje). */
@@ -202,4 +208,19 @@ export function useMinhasConquistas() {
 
 export function useMeusBens() {
   return useQuery({ queryKey: chaves.bens, queryFn: ({ signal }) => ler(api.GET("/portal/me/assets", { signal })) });
+}
+
+/** Activos primeiro e, em cada grupo, os mais recentes primeiro (o servidor ordena). */
+export function useMeusBeneficios() {
+  return useQuery({ queryKey: chaves.beneficios, queryFn: ({ signal }) => ler(api.GET("/portal/me/benefits", { signal })) });
+}
+
+/** Do mais recente para o mais antigo; sem as notas internas dos RH. */
+export function useMeusContratos() {
+  return useQuery({ queryKey: chaves.contratos, queryFn: ({ signal }) => ler(api.GET("/portal/me/contracts", { signal })) });
+}
+
+/** Só leitura de propósito: corrigir (sobretudo o IBAN) passa sempre pelos RH. */
+export function useMeusDados() {
+  return useQuery({ queryKey: chaves.dados, queryFn: ({ signal }) => ler(api.GET("/portal/me/personal-data", { signal })) });
 }

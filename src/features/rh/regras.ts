@@ -23,7 +23,7 @@ export function errosDadosPessoais(v: Readonly<Record<string, string>>, ibanAnte
 
 export const TIPO_CONTRATO: Readonly<Record<string, string>> = {
   Permanent: "Sem termo",
-  FixedTerm: "A termo",
+  FixedTerm: "A termo certo",
   Freelance: "Prestação de serviços",
 };
 

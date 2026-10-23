@@ -103,6 +103,9 @@ export const PAGINAS = {
   meusObjectivos: () => import("@/features/portal/pages/Objectivos"),
   anuncios: () => import("@/features/portal/pages/Anuncios"),
   meusBens: () => import("@/features/portal/pages/Bens"),
+  meusBeneficios: () => import("@/features/portal/pages/Beneficios"),
+  meuContrato: () => import("@/features/portal/pages/Contrato"),
+  meusDados: () => import("@/features/portal/pages/DadosPessoais"),
   // F10 — portal do cliente
   extractoCliente: () => import("@/features/portalcliente/pages/Extracto"),
   pagamentosCliente: () => import("@/features/portalcliente/pages/Pagamentos"),

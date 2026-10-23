@@ -11,8 +11,11 @@ import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSim
 import { meColaborador } from "../../fixtures/identidade";
 import {
   anuncios,
+  beneficios,
   bens,
   conquistas,
+  contratos,
+  dadosPessoais,
   documentos,
   formacao,
   IDF7,
@@ -54,7 +57,10 @@ function comPortal(api: ApiSimulada): ApiSimulada {
     .em("GET", "/portal/me/declarations", { status: 200, corpo: modelos() })
     .em("GET", "/portal/me/objectives", { status: 200, corpo: objectivos() })
     .em("GET", "/portal/me/achievements", { status: 200, corpo: conquistas() })
-    .em("GET", "/portal/me/assets", { status: 200, corpo: bens() });
+    .em("GET", "/portal/me/assets", { status: 200, corpo: bens() })
+    .em("GET", "/portal/me/benefits", { status: 200, corpo: beneficios() })
+    .em("GET", "/portal/me/contracts", { status: 200, corpo: contratos() })
+    .em("GET", "/portal/me/personal-data", { status: 200, corpo: dadosPessoais() });
 }
 
 async function verificarPagina(page: Page) {
@@ -75,7 +81,7 @@ test.describe("portal do colaborador", () => {
     const titulos = page.getByRole("region", { name: "Anúncios recentes" }).getByRole("heading");
     await expect(titulos).toHaveText(["Jantar de fim de ano", "Manutenção dos servidores"]);
     const menu = page.getByRole("navigation", { name: "Principal" }).first();
-    for (const nome of ["Assiduidade", "Férias e ausências", "Turnos", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda", "Anúncios"]) {
+    for (const nome of ["Dados pessoais", "O meu contrato", "Benefícios", "Assiduidade", "Férias e ausências", "Turnos", "Recibos", "Documentos e declarações", "Pedidos internos", "Despesas", "Formação", "Objectivos e conquistas", "Bens à minha guarda", "Anúncios"]) {
       await expect(menu.getByRole("link", { name: nome })).toBeVisible();
     }
     await verificarPagina(page);
@@ -295,5 +301,68 @@ test.describe("portal do colaborador", () => {
     await page.goto("/eu/anuncios");
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Jantar de fim de ano", "Manutenção dos servidores"]);
     await verificarPagina(page);
+  });
+
+  test("benefícios: activos em cima e terminados em «Anteriores»; contrato mais recente em destaque", async ({ page, api }) => {
+    await comPortal(api).ligar();
+    await entrar(page, meColaborador.email);
+    await page.getByRole("navigation", { name: "Principal" }).first().getByRole("link", { name: "Benefícios" }).click();
+    const activos = page.getByRole("region", { name: "Activos" });
+    await expect(activos.getByRole("heading", { name: "Seguro de saúde" })).toBeVisible();
+    await expect(activos.getByText(/15\s000,00\sKz/)).toBeVisible();
+    await expect(activos.getByText("Desde 01/01/2026")).toBeVisible();
+    const anteriores = page.getByRole("region", { name: "Anteriores" });
+    await expect(anteriores.getByRole("heading", { name: "Subsídio de transporte" })).toBeVisible();
+    await expect(anteriores.getByText("Desde 01/03/2025 · terminado a 31/12/2025")).toBeVisible();
+    await verificarPagina(page);
+
+    await page.goto("/eu/contrato");
+    const destaque = page.getByLabel("Contrato mais recente");
+    await expect(destaque.getByText("Sem termo")).toBeVisible();
+    await expect(destaque.getByText("Sem data de fim")).toBeVisible();
+    await expect(destaque.getByText(/350\s000,00\sKz/)).toBeVisible();
+    await expect(destaque.getByText("Em vigor")).toBeVisible();
+    const linha = page.getByRole("table", { name: "Contratos anteriores" }).getByRole("row").filter({ hasText: "A termo certo" });
+    await expect(linha).toContainText("01/01/2025 – 31/12/2025");
+    await expect(linha).toContainText("Terminado");
+    await verificarPagina(page);
+  });
+
+  test("benefícios e contrato vazios mandam falar com os RH", async ({ page, api }) => {
+    await comPortal(api).em("GET", "/portal/me/benefits", { status: 200, corpo: [] }).em("GET", "/portal/me/contracts", { status: 200, corpo: [] }).ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/beneficios");
+    await expect(page.getByText("Ainda não tem benefícios atribuídos. Fale com os Recursos Humanos.")).toBeVisible();
+    await page.goto("/eu/contrato");
+    await expect(page.getByText("Não há contrato registado. Fale com os Recursos Humanos.")).toBeVisible();
+  });
+
+  test("dados pessoais: só leitura, «—» nos vazios, BI caducado assinalado; corrigir abre um pedido aos RH", async ({ page, api }) => {
+    await comPortal(api).ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/dados-pessoais");
+    await expect(page.getByText("Actualizado a 20/10/2026 10:30.")).toBeVisible();
+    const banco = page.getByRole("region", { name: "Dados bancários" });
+    await expect(banco.getByText("AO06004000000123456789012")).toBeVisible();
+    const identificacao = page.getByRole("region", { name: "Identificação" });
+    await expect(identificacao.getByText("Caducado")).toBeVisible();
+    await expect(identificacao.getByText("30/06/2025")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Contacto de emergência" }).getByText("—")).toHaveCount(3);
+    await expect(page.getByRole("textbox")).toHaveCount(0);
+    await verificarPagina(page);
+    await page.getByRole("link", { name: "Pedir correcção" }).click();
+    await expect(page).toHaveURL(/\/eu\/pedidos\?novo=HumanResources$/);
+    const d = page.getByRole("dialog", { name: "Novo pedido interno" });
+    await expect(d.getByLabel("Área")).toHaveValue("HumanResources");
+    await d.getByRole("button", { name: "Cancelar" }).click();
+    await expect(page).toHaveURL(/\/eu\/pedidos$/);
+  });
+
+  test("sem ficha de colaborador (403): as páginas novas mostram o aviso do portal", async ({ page, api }) => {
+    const semFicha = { status: 403, corpo: { title: "Forbidden", status: 403, detail: "Esta conta não está associada a um colaborador." }, cabecalhos: { "Content-Type": "application/problem+json" } };
+    await comPortal(api).em("GET", "/portal/me/personal-data", semFicha).ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/dados-pessoais");
+    await expect(page.getByText("Esta conta não está associada a um colaborador.", { exact: false }).first()).toBeVisible();
   });
 });

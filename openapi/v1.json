@@ -35206,6 +35206,126 @@
         ]
       }
     },
+    "/portal/me/benefits": {
+      "get": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Benefícios do próprio (activos primeiro), com o nome e o valor mensal, sem `hr.benefits.read`.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnBenefit"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/portal/me/contracts": {
+      "get": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Contratos de trabalho do próprio, do mais recente ao mais antigo, com o salário e sem as notas internas de RH.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnEmploymentContract"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/portal/me/personal-data": {
+      "get": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Dados pessoais e contactos do próprio, só leitura. Para os corrigir, pede-se a RH (ticket).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnPersonalData"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/customer-portal/me": {
       "get": {
         "tags": [
@@ -38654,6 +38774,60 @@
           }
         }
       },
+      "ApprovalChecklistAnswerView": {
+        "required": [
+          "itemId",
+          "response"
+        ],
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "response": {
+            "type": "string"
+          }
+        }
+      },
+      "ApprovalChecklistItemView": {
+        "required": [
+          "itemId",
+          "step",
+          "order",
+          "text",
+          "mandatory"
+        ],
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "step": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "order": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "text": {
+            "type": "string"
+          },
+          "mandatory": {
+            "type": "boolean"
+          }
+        }
+      },
       "ApprovalDecisionView": {
         "required": [
           "decidedByEmployeeId",
@@ -38694,6 +38868,15 @@
               "null",
               "string"
             ]
+          },
+          "checklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ApprovalChecklistAnswerView"
+            }
           }
         }
       },
@@ -38809,6 +38992,15 @@
               "null",
               "string"
             ]
+          },
+          "checklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ApprovalChecklistItemView"
+            }
           }
         }
       },
@@ -38951,6 +39143,15 @@
             ],
             "items": {
               "$ref": "#/components/schemas/EmployeeNameView"
+            }
+          },
+          "currentChecklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ApprovalChecklistItemView"
             }
           }
         }
@@ -41241,14 +41442,43 @@
           }
         }
       },
-      "ChecklistItemRequest": {
+      "ChecklistAnswerRequest": {
         "required": [
-          "title"
+          "itemId",
+          "response"
         ],
         "type": "object",
         "properties": {
-          "title": {
-            "type": "string"
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "response": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ChecklistItemRequest": {
+        "required": [
+          "text",
+          "mandatory"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mandatory": {
+            "type": [
+              "null",
+              "boolean"
+            ]
           }
         }
       },
@@ -44341,6 +44571,15 @@
               "null",
               "string"
             ]
+          },
+          "checklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ChecklistAnswerRequest"
+            }
           }
         }
       },
@@ -52719,6 +52958,68 @@
           }
         }
       },
+      "OwnBenefit": {
+        "required": [
+          "enrolmentId",
+          "benefitId",
+          "name",
+          "kind",
+          "monthlyValue",
+          "currency",
+          "description",
+          "startsOn",
+          "cancelledOn",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "enrolmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "benefitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "monthlyValue": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "cancelledOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "OwnDeclarationTemplate": {
         "required": [
           "templateId",
@@ -52774,6 +53075,52 @@
           "attachedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "OwnEmploymentContract": {
+        "required": [
+          "contractId",
+          "type",
+          "startsOn",
+          "endsOn",
+          "monthlySalary",
+          "currency",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "monthlySalary": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
           }
         }
       },
@@ -53262,6 +53609,156 @@
               "string"
             ],
             "format": "uuid"
+          }
+        }
+      },
+      "OwnPersonalData": {
+        "required": [
+          "email",
+          "phone",
+          "gender",
+          "birthDate",
+          "nationality",
+          "maritalStatus",
+          "taxId",
+          "identityDocumentNumber",
+          "identityDocumentExpiresOn",
+          "socialSecurityNumber",
+          "addressDetail",
+          "city",
+          "country",
+          "bankName",
+          "bankAccountNumber",
+          "iban",
+          "emergencyContactName",
+          "emergencyContactRelationship",
+          "emergencyContactPhone",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "birthDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "nationality": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "maritalStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "taxId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "identityDocumentNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "identityDocumentExpiresOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "socialSecurityNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "addressDetail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankAccountNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "iban": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emergencyContactName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emergencyContactRelationship": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emergencyContactPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -54902,6 +55399,30 @@
           }
         }
       },
+      "PolicyChecklistItemView": {
+        "required": [
+          "order",
+          "text",
+          "mandatory"
+        ],
+        "type": "object",
+        "properties": {
+          "order": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "text": {
+            "type": "string"
+          },
+          "mandatory": {
+            "type": "boolean"
+          }
+        }
+      },
       "PolicyCreatedResponse": {
         "required": [
           "policyId"
@@ -55005,6 +55526,21 @@
               "string"
             ],
             "format": "int32"
+          },
+          "kind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "checklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItemRequest"
+            }
           }
         }
       },
@@ -55040,6 +55576,19 @@
               "string"
             ],
             "format": "int32"
+          },
+          "kind": {
+            "type": "string",
+            "default": "Approval"
+          },
+          "checklist": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PolicyChecklistItemView"
+            }
           }
         }
       },

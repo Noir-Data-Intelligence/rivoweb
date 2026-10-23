@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `7c9b867`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `1dad7aa`. Em aberto: **B24** (configuração) e
+> **B42** (dois `ChecklistItemRequest` no OpenAPI).
 > **B41** está resolvido (PR #116) e o front já o usa: o nome do responsável
 > nas iniciativas ESG e os colaboradores em `/esg/lookups`; o Manager vê-o e
 > escolhe-o sem ler os RH (verificado na base local).
@@ -556,3 +557,24 @@ apaga.
 1. `ownerName` em `InitiativeView`.
 2. `GET /esg/lookups` para quem tem `esg.esg.write`: colaboradores activos
    (id e nome).
+
+## B42 — Dois `ChecklistItemRequest` no OpenAPI: o dos projectos ficou com o esquema das aprovações
+
+> Aberto a 2026-10-23, contra `main` @ `1dad7aa` (merge do #118).
+
+**Facto:** o K4 acrescentou `ChecklistItemRequest(string? Text, bool? Mandatory)`
+em `Rivo.Approval.Api/ApprovalModuleEndpoints.cs`. Já existia
+`ChecklistItemRequest(string Title)` em
+`Rivo.Projects.Api/ProjectSharingEndpoints.cs`. O gerador do OpenAPI usa só o
+nome curto do tipo, por isso há um único esquema `ChecklistItemRequest`, com
+`text` e `mandatory`, e é esse que `POST /projects/{projectId}/tasks/{taskId}/checklist`
+passa a anunciar. O servidor continua a ler `title` nessa rota.
+
+**Consequência:** os tipos gerados no front dizem que o passo de uma tarefa
+se cria com `{ text }`, o que o servidor recusa. O front mantém `{ title }`
+com um tipo local até à correcção (ver `features/projectos/api.ts`).
+
+**Pedido:** dar nomes distintos aos dois tipos (por exemplo
+`TaskChecklistItemRequest` e `PolicyChecklistItemRequest`), ou configurar o
+`CreateSchemaReferenceId` para incluir o módulo, e confirmar que não há outros
+nomes repetidos entre módulos.

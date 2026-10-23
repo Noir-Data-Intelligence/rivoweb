@@ -11,7 +11,9 @@
 > de conhecimento, portal na ficha do cliente e arquivo de documentos; F11:
 > comercial avançado — CRM, propostas, contratos de clientes e cobranças;
 > F12: projectos e frota; F13: analytics, auditoria, ESG e IA). Smoke de
-> leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-22.
+> leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-23 (portal:
+> benefícios, contrato e dados pessoais; aprovações: validação de conformidade
+> com checklist, K4).
 
 ---
 
@@ -27,7 +29,7 @@
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Assistente de IA, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
-| **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
+| **Colaborador** | Portal do colaborador (`/eu`) | Início, Anúncios, Assiduidade, Férias e ausências, Turnos, Dados pessoais, O meu contrato, Benefícios, Recibos, Documentos e declarações, Pedidos internos, Despesas, Formação, Objectivos e conquistas, Bens à minha guarda |
 | **Cliente** | Portal do cliente (`/cliente`) | Início, Extracto, Pagamentos, Documentos, Projectos, Mensagens, Suporte, Ajuda, Assistente |
 
 Uma conta pode ter vários perfis; vê a soma do que cada um permite. Quem tem
@@ -86,9 +88,11 @@ AM = AssetManager.
 | **Aprovações** | | | | | | | | | | |
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Validar a conformidade num passo de validação: checklist item a item (conforme, não conforme, N/A nos opcionais) ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Políticas de aprovação: passos de validação com checklist (itens obrigatórios e opcionais) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Auditoria**: consultar a trilha (quem, o quê, quando), por entidade | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
@@ -230,6 +234,9 @@ AM = AssetManager.
 | Objectivos: progresso e resultados-chave; registar o valor actual (ciclo aberto) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Conquistas recebidas e pontos | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Bens da empresa à guarda | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Benefícios: activos e anteriores, com o valor mensal e as datas | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| O meu contrato: o mais recente em destaque (tipo, datas, salário, estado) e os anteriores | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Dados pessoais: ver (só leitura); pedir a correcção aos RH por um pedido interno | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Tesouraria** | | | | | | | | | | |
 | Contas bancárias: ver saldos e extracto por período | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar, fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -493,11 +500,20 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
   pagamento, requisição de compra, folha de salários, contagem de inventário).
 - Ficha: estado, o resumo do pedido (o que se aprova), quem pediu, passos com o modo (basta um ou todos os ocupantes
-  do cargo) e o prazo, aprovadores e decisões com notas.
+  do cargo) e o prazo, aprovadores e decisões com notas e, nos passos de
+  validação, as respostas ao checklist (✓ conforme, ✗ não conforme, — não
+  aplicável).
 - **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
   motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
   mostra o estado actual. Numa atribuição de cargo aprovada, o cargo fica em
   vigor de imediato.
+- **Validar** num passo de validação (a caixa marca-o com «Validação»):
+  responder ao checklist item a item (conforme, não conforme ou não
+  aplicável, este só nos itens não obrigatórios, marcados com «*» os
+  obrigatórios). «Validar» só fica disponível com todos os itens respondidos
+  e nenhum não conforme; com um não conforme, rejeita-se ou pede-se
+  esclarecimento, com a justificação nas notas. Validado, o pedido passa a
+  quem aprova; quem validou não aprova o mesmo pedido.
 - **Cancelar** os próprios pedidos enquanto estão abertos.
 - O contador «Aprovações à sua espera» do Início abre a caixa.
 
@@ -506,6 +522,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   orçamento, passos por cargo).
 - **Criar** (passos por ordem, cada um com cargo com autoridade, modo e prazo
   em horas) e **desactivar**.
+- Cada passo é de **aprovação** ou de **validação** (checklist de
+  conformidade): na validação, escrever de 1 a 30 itens e marcar os
+  obrigatórios. Na lista, «Validação · N itens» e o checklist por extenso.
+- As políticas não se editam: para mudar uma (por exemplo, acrescentar uma
+  validação), cria-se uma nova e desactiva-se a antiga.
 
 **Inteligência artificial** (configuração)
 - O estado (ligadas ou não, quem responde), os fornecedores com o modelo e se
@@ -1579,6 +1600,18 @@ decide pela conta, nunca por um id escolhido no ecrã.
   valor actual** enquanto o ciclo está aberto; conquistas com os pontos e a
   nota.
 - **Bens à minha guarda:** equipamento da empresa entregue e não devolvido.
+- **Dados pessoais:** contactos, dados pessoais, identificação (NIF, BI e
+  validade, segurança social), morada, dados bancários (IBAN por extenso) e
+  contacto de emergência, com «—» no que os RH ainda não preencheram e a
+  data da última actualização; um BI caducado aparece assinalado. Só
+  leitura, de propósito: **pedir correcção** abre um pedido interno aos
+  Recursos Humanos, já com a área escolhida.
+- **O meu contrato:** o contrato mais recente em destaque (tipo, início,
+  fim ou «sem data de fim», salário mensal bruto, em vigor ou terminado) e
+  os anteriores numa lista; sem contrato, pede para falar com os RH.
+- **Benefícios:** os activos em cima e os terminados em «Anteriores», com o
+  tipo, o valor mensal, a descrição, «desde» e «terminado a»; sem
+  benefícios, pede para falar com os RH.
 - **Despesas:** submeter (data, categoria com sugestões, descrição, valor,
   moeda, comprovativo até 10 MB), acompanhar o estado, ler o motivo de uma
   rejeição, ver a data do reembolso e **retirar** as que ainda não foram

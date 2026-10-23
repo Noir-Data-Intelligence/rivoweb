@@ -4,7 +4,7 @@
  * entram.
  */
 import type { LucideIcon } from "lucide-react";
-import { BadgeCheck, Banknote, Bell, BookOpen, Bot, Brain, BriefcaseBusiness, Building2, CalendarClock, CalendarDays, CalendarRange, Car, ChartColumn, CircleDollarSign, ClipboardCheck, ClipboardList, Clock, Contact, CreditCard, FileChartColumnIncreasing, FileClock, FileMinus, FilePenLine, FileText, FileType, FolderKanban, FolderOpen, Gauge, Gift, Globe, GraduationCap, HandCoins, Home, Kanban, KeyRound, Laptop, LayoutDashboard, Library, LifeBuoy, ListChecks, ListTree, Megaphone, MessageSquare, Network, Package, PackageCheck, Plane, Receipt, ReceiptText, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingCart, SlidersHorizontal, Target, Ticket, Timer, TrendingUp, Trophy, UserCog, UserPlus, Users, Wallet, Warehouse, Workflow, Wrench } from "lucide-react";
+import { BadgeCheck, Banknote, Bell, BookOpen, Bot, Brain, BriefcaseBusiness, Building2, CalendarClock, CalendarDays, CalendarRange, Car, ChartColumn, CircleDollarSign, ClipboardCheck, ClipboardList, Clock, Contact, CreditCard, FileChartColumnIncreasing, FileClock, FileMinus, FilePenLine, FileSignature, FileText, FileType, FolderKanban, FolderOpen, Gauge, Gift, Globe, GraduationCap, HandCoins, Home, IdCard, Kanban, KeyRound, Laptop, LayoutDashboard, Library, LifeBuoy, ListChecks, ListTree, Megaphone, MessageSquare, Network, Package, PackageCheck, Plane, Receipt, ReceiptText, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingCart, SlidersHorizontal, Target, Ticket, Timer, TrendingUp, Trophy, UserCog, UserPlus, Users, Wallet, Warehouse, Workflow, Wrench } from "lucide-react";
 import { REQUISITO_PAGINA as R } from "@/app/requisitos";
 import type { Requisito, Shell } from "@/lib/auth/permissions";
 
@@ -116,6 +116,9 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/eu/assiduidade", titulo: "Assiduidade", icone: Clock, requer: "autenticado", grupo: "O meu tempo" },
     { caminho: "/eu/ferias", titulo: "Férias e ausências", icone: Plane, requer: "autenticado", grupo: "O meu tempo" },
     { caminho: "/eu/turnos", titulo: "Turnos", icone: CalendarDays, requer: "autenticado", grupo: "O meu tempo" },
+    { caminho: "/eu/dados-pessoais", titulo: "Dados pessoais", icone: IdCard, requer: "autenticado", grupo: "A minha ficha" },
+    { caminho: "/eu/contrato", titulo: "O meu contrato", icone: FileSignature, requer: "autenticado", grupo: "A minha ficha" },
+    { caminho: "/eu/beneficios", titulo: "Benefícios", icone: Gift, requer: "autenticado", grupo: "A minha ficha" },
     { caminho: "/eu/recibos", titulo: "Recibos", icone: Banknote, requer: "autenticado", grupo: "Documentos" },
     { caminho: "/eu/documentos", titulo: "Documentos e declarações", icone: FolderOpen, requer: "autenticado", grupo: "Documentos" },
     { caminho: "/eu/pedidos", titulo: "Pedidos internos", icone: MessageSquare, requer: "autenticado", grupo: "Pedidos" },

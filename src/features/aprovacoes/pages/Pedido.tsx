@@ -19,8 +19,9 @@ import { Confirmar } from "@/ui/Confirmar";
 import { Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
-import { useCancelar, useDecidir, useHistorico, usePedido, type Accao, type Pedido } from "../api";
-import { EstadoPedido, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, useEuColaborador, useNomeColaborador } from "../comum";
+import { cn } from "@/ui/cn";
+import { useCancelar, useDecidir, useHistorico, usePedido, type Accao, type ItemChecklist, type Pedido } from "../api";
+import { EstadoPedido, estadoChecklist, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, RESPOSTAS_CHECKLIST, useEuColaborador, useNomeColaborador, type RespostaChecklist } from "../comum";
 
 const ACCOES: readonly { accao: Accao; rotulo: string; titulo: string; icone: typeof Check; variante: "primary" | "destructive" | "secondary"; notasObrigatorias: boolean }[] = [
   { accao: "Approved", rotulo: "Aprovar", titulo: "Aprovar o pedido?", icone: Check, variante: "primary", notasObrigatorias: false },
@@ -28,14 +29,62 @@ const ACCOES: readonly { accao: Accao; rotulo: string; titulo: string; icone: ty
   { accao: "ClarificationRequested", rotulo: "Pedir esclarecimento", titulo: "Pedir esclarecimento?", icone: CircleQuestionMark, variante: "secondary", notasObrigatorias: true },
 ];
 
+/** Um item do checklist com as três respostas; N/A só nos não obrigatórios. */
+function ItemChecklistResposta({ item, resposta, mudar }: { item: ItemChecklist; resposta: RespostaChecklist | undefined; mudar: (r: RespostaChecklist) => void }) {
+  const nomeGrupo = `item-${item.itemId}`;
+  return (
+    <fieldset className="flex flex-col gap-2 border-b border-border py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+      <legend className="float-left text-sm text-foreground sm:max-w-[55%]">
+        {item.text}
+        {item.mandatory ? (
+          <span className="text-danger" title="Obrigatório">
+            {" "}
+            *<span className="sr-only">(obrigatório)</span>
+          </span>
+        ) : null}
+      </legend>
+      <div className="flex flex-wrap gap-1">
+        {RESPOSTAS_CHECKLIST.map((r) => {
+          const desactivado = r.valor === "NotApplicable" && item.mandatory;
+          return (
+            <label
+              key={r.valor}
+              className={cn(
+                "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-2.5 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring pointer-coarse:h-11",
+                resposta === r.valor
+                  ? r.valor === "NonCompliant"
+                    ? "border-danger bg-danger-soft text-danger"
+                    : r.valor === "Compliant"
+                      ? "border-success bg-success-soft text-success"
+                      : "border-foreground/40 bg-muted text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground",
+                desactivado && "cursor-not-allowed opacity-50",
+              )}
+            >
+              <input type="radio" className="sr-only" name={nomeGrupo} value={r.valor} checked={resposta === r.valor} disabled={desactivado} onChange={() => mudar(r.valor)} />
+              <span aria-hidden>{r.simbolo}</span>
+              {r.texto}
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => void; aoConflito: (detalhe: string | null) => void }) {
   const { pode } = useUtilizador();
   const decidir = useDecidir(pode("hr.positions.assign"));
   const [aberta, setAberta] = useState<(typeof ACCOES)[number] | null>(null);
   const [notas, setNotas] = useState("");
   const [tentou, setTentou] = useState(false);
+  const [respostas, setRespostas] = useState<Record<string, RespostaChecklist>>({});
   const id = useId();
   const outro = eApiError(decidir.error) && decidir.error.status === 409;
+  // Passo de validação (K4): só vem preenchido com o pedido aberto e o passo em curso a validar.
+  const itens = p.currentChecklist && p.currentChecklist.length > 0 ? [...p.currentChecklist].sort((a, b) => Number(a.order) - Number(b.order)) : null;
+  const estado = itens ? estadoChecklist(itens, respostas) : null;
+  const rotulo = (a: (typeof ACCOES)[number]) => (itens && a.accao === "Approved" ? "Validar" : a.rotulo);
   const fechar = () => {
     setAberta(null);
     setNotas("");
@@ -47,8 +96,10 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
     setTentou(true);
     const n = normalizarTexto(notas, true);
     if (aberta.notasObrigatorias && n === "") return;
+    if (itens && aberta.accao === "Approved" && !estado?.podeValidar) return;
+    const checklist = itens ? itens.flatMap((i) => (respostas[i.itemId] ? [{ itemId: i.itemId, response: respostas[i.itemId] as RespostaChecklist }] : [])) : undefined;
     decidir.mutate(
-      { requestId: p.requestId, action: aberta.accao, notes: n || null },
+      { requestId: p.requestId, action: aberta.accao, notes: n || null, ...(checklist ? { checklist } : {}) },
       {
         onSuccess: () => {
           fechar();
@@ -68,22 +119,40 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
   };
   return (
     <Card>
-      <CardTitle>A sua decisão</CardTitle>
-      <p className="mt-1 text-sm text-muted-foreground">Está atribuído ao passo em curso. A decisão fica na trilha e não se desfaz.</p>
+      <CardTitle>{itens ? "A sua validação" : "A sua decisão"}</CardTitle>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {itens
+          ? "Este passo é de validação: confirme a conformidade item a item. Validar não é aprovar; com tudo conforme, o pedido segue para quem aprova."
+          : "Está atribuído ao passo em curso. A decisão fica na trilha e não se desfaz."}
+      </p>
+      {itens ? (
+        <div className="mt-3" role="group" aria-label="Checklist de conformidade">
+          {itens.map((i) => (
+            <ItemChecklistResposta key={i.itemId} item={i} resposta={respostas[i.itemId]} mudar={(r) => setRespostas((x) => ({ ...x, [i.itemId]: r }))} />
+          ))}
+          <p className="mt-2 text-xs text-muted-foreground">* Obrigatório: não aceita «não aplicável».</p>
+          {estado?.naoConforme ? (
+            <Alert tom="aviso" className="mt-3" titulo="Há itens não conformes.">
+              Não pode validar. Rejeite ou peça esclarecimento e explique nas notas o que falhou.
+            </Alert>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         {ACCOES.map((a) => (
-          <Button key={a.accao} variante={a.variante} onClick={() => setAberta(a)}>
+          <Button key={a.accao} variante={a.variante} disabled={a.accao === "Approved" && estado !== null && !estado.podeValidar} onClick={() => setAberta(a)}>
             <a.icone strokeWidth={1.75} aria-hidden />
-            {a.rotulo}
+            {rotulo(a)}
           </Button>
         ))}
       </div>
+      {estado && !estado.completo && !estado.naoConforme ? <p className="mt-2 text-xs text-muted-foreground">«Validar» fica disponível quando responder a todos os itens.</p> : null}
       <Confirmar
         aberto={aberta !== null}
         aoMudar={(v) => (v ? undefined : fechar())}
-        titulo={aberta?.titulo ?? ""}
+        titulo={itens && aberta?.accao === "Approved" ? "Validar a conformidade?" : (aberta?.titulo ?? "")}
         descricao={`${nomeProcesso(p.processType)} · passo ${String(p.currentStep)} de ${String(p.totalSteps)}.`}
-        rotuloConfirmar={aberta?.rotulo ?? ""}
+        rotuloConfirmar={aberta ? rotulo(aberta) : ""}
         variante={aberta?.variante === "destructive" ? "destructive" : "primary"}
         aCarregar={decidir.isPending}
         erro={
@@ -110,6 +179,30 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
         </div>
       </Confirmar>
     </Card>
+  );
+}
+
+/** O que quem validou respondeu, item a item (cruzado com o checklist do histórico). */
+function RespostasDadas({ respostas, itens }: { respostas: readonly { itemId: string; response: string }[]; itens: readonly ItemChecklist[] }) {
+  const porId = new Map(itens.map((i) => [i.itemId, i]));
+  const ordenadas = [...respostas].sort((a, b) => Number(porId.get(a.itemId)?.order ?? 0) - Number(porId.get(b.itemId)?.order ?? 0));
+  return (
+    <ul className="mt-1 flex flex-col gap-0.5 border-l-2 border-border pl-3" aria-label="Respostas ao checklist">
+      {ordenadas.map((r) => {
+        const resposta = RESPOSTAS_CHECKLIST.find((x) => x.valor === r.response);
+        return (
+          <li key={r.itemId} className="flex gap-2 text-sm">
+            <span aria-hidden className={cn("w-4 shrink-0 text-center font-semibold", r.response === "Compliant" ? "text-success" : r.response === "NonCompliant" ? "text-danger" : "text-muted-foreground")}>
+              {resposta?.simbolo ?? "?"}
+            </span>
+            <span className="text-foreground">
+              {porId.get(r.itemId)?.text ?? "Item"}
+              <span className="sr-only">: {resposta?.texto ?? r.response}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -237,6 +330,7 @@ export default function PedidoPagina() {
                             <li key={`${d.decidedByEmployeeId}-${d.decidedAt}`}>
                               <span className="font-medium">{nome(d.decidedByEmployeeId, d.decidedByName)}</span> {(NOME_ACCAO[d.action] ?? d.action).toLowerCase()} · {formatarDataHora(d.decidedAt)}
                               {d.notes ? <span className="block whitespace-pre-line text-muted-foreground">«{d.notes}»</span> : null}
+                              {d.checklist && d.checklist.length > 0 ? <RespostasDadas respostas={d.checklist} itens={h?.checklist ?? []} /> : null}
                             </li>
                           ))}
                         </ul>

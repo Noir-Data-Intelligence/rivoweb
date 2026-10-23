@@ -30,6 +30,10 @@ export const IDF4 = {
   meu: "00000000-0000-4000-8000-000000000802",
   atribuicao: "00000000-0000-4000-8000-000000000803",
   politica: "00000000-0000-4000-8000-000000000804",
+  validacao: "00000000-0000-4000-8000-000000000806",
+  item1: "00000000-0000-4000-8000-000000000811",
+  item2: "00000000-0000-4000-8000-000000000812",
+  item3: "00000000-0000-4000-8000-000000000813",
 };
 
 export const painelComFicha = (): S["MyDashboardView"] => ({ employeeId: EU, displayName: "Ana Teste", unreadNotifications: 0, pendingApprovals: 1, announcements: [] });
@@ -85,8 +89,61 @@ export const politicas = (): S["PolicyView"][] => [
     requiresBudgetCheck: true,
     isActive: true,
     specificity: 1,
-    steps: [{ order: 1, approverPositionId: ID.cargoAprovador, mode: "AnyApprover", slaHours: 24 }],
+    steps: [
+      {
+        order: 1,
+        approverPositionId: ID.cargoAprovador,
+        mode: "AnyApprover",
+        slaHours: 24,
+        kind: "Validation",
+        checklist: [
+          { order: 1, text: "Factura original anexada", mandatory: true },
+          { order: 2, text: "Três cotações comparativas", mandatory: false },
+        ],
+      },
+      { order: 2, approverPositionId: ID.cargoAprovador, mode: "AnyApprover", slaHours: null, kind: "Approval", checklist: null },
+    ],
   },
 ];
+
+/** K4: o checklist do passo de validação em curso (DAF antes da Direcção). */
+export const checklistValidacao = (): S["ApprovalChecklistItemView"][] => [
+  { itemId: IDF4.item1, step: 1, order: 1, text: "Factura original anexada", mandatory: true },
+  { itemId: IDF4.item2, step: 1, order: 2, text: "NIF do fornecedor confere com a factura", mandatory: true },
+  { itemId: IDF4.item3, step: 1, order: 3, text: "Três cotações comparativas", mandatory: false },
+];
+
+export const pedidoValidacao = (): S["ApprovalStatusView"] => ({
+  ...pedido(),
+  requestId: IDF4.validacao,
+  processType: "finance.payment_request",
+  sourceModule: "finance",
+  summary: "Pagamento ao fornecedor Papelaria Central.",
+  currentChecklist: checklistValidacao(),
+});
+
+/** Histórico de um pedido cuja validação já foi feita (passo 1) e espera a aprovação (passo 2). */
+export const historicoValidado = (): S["ApprovalHistoryView"] => ({
+  ...historico(IDF4.validacao),
+  processType: "finance.payment_request",
+  sourceModule: "finance",
+  currentStep: 2,
+  checklist: checklistValidacao(),
+  decisions: [
+    {
+      decidedByEmployeeId: OUTRO,
+      decidedByName: "Carlos Teste",
+      action: "Approved",
+      decidedAt: "2026-10-12T10:00:00Z",
+      step: 1,
+      notes: "Conferido",
+      checklist: [
+        { itemId: IDF4.item1, response: "Compliant" },
+        { itemId: IDF4.item2, response: "Compliant" },
+        { itemId: IDF4.item3, response: "NotApplicable" },
+      ],
+    },
+  ],
+});
 
 export { cargos, colaboradores };
