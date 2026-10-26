@@ -7,6 +7,7 @@
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { colaboradores } from "../../fixtures/f1";
 import { meColaborador } from "../../fixtures/identidade";
+import { meFinancasF11 } from "../../fixtures/f11";
 import {
   aprovacaoPagamento,
   cambios,
@@ -521,6 +522,32 @@ test.describe("tesouraria", () => {
     await page.getByRole("dialog").getByRole("button", { name: "Descontar" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(api.escritas("POST", `/finance/bills/${IDF5T.letra}/discount`)[0]?.corpo).toEqual({ on: expect.any(String), fee: "125000.00", bank: "BAI", notes: null });
+  });
+
+  test("letras: Finance liga a letra a receber a um cliente pelos lookups comerciais, sem ler o cadastro", async ({ page, api, violacoes }) => {
+    await comTesouraria(api, meFinancasF11)
+      .em("GET", "/commercial/lookups", { status: 200, corpo: { employees: [], customers: [{ id: "00000000-0000-4000-8000-0000000005c1", name: "Cliente <b>Lda</b>" }] } })
+      .em("POST", "/finance/bills", { status: 201, corpo: { id: IDF5T.letra } })
+      .ligar();
+    await entrar(page, meFinancasF11.email);
+    await page.goto("/letras");
+    await page.getByRole("button", { name: "Registar letra" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Cliente (opcional)").selectOption({ label: "Cliente <b>Lda</b>" });
+    await expect(d.getByLabel("Sacado (quem paga)")).toHaveValue("Cliente <b>Lda</b>");
+    await semViolacoesAxe(page);
+    await d.getByLabel("Sentido").selectOption("Payable");
+    await expect(d.getByLabel("Cliente (opcional)")).toHaveCount(0);
+    await d.getByLabel("Sentido").selectOption("Receivable");
+    await d.getByLabel("Cliente (opcional)").selectOption({ label: "Cliente <b>Lda</b>" });
+    await d.getByLabel("Número").fill("L2026-010");
+    await d.getByLabel("Vencimento").fill("2026-12-31");
+    await d.getByLabel("Valor").fill("80 000");
+    await d.getByRole("button", { name: "Registar" }).click();
+    await expect(page).toHaveURL(new RegExp(`/letras/${IDF5T.letra}$`));
+    expect(api.escritas("POST", "/finance/bills")[0]?.corpo).toMatchObject({ direction: "Receivable", counterpartyName: "Cliente <b>Lda</b>", customerId: "00000000-0000-4000-8000-0000000005c1", amount: "80000.00" });
+    expect(api.pedidos.some((p) => p.caminho === "/commercial/customers")).toBe(false);
+    expect(await violacoes()).toEqual([]);
   });
 
   test("fluxo de caixa: previsto por mês e origem, realizado, previsões manuais; axe", async ({ page, api, violacoes }) => {

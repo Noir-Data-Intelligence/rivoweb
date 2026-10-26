@@ -252,6 +252,7 @@ AM = AssetManager.
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Letras e livranças: ver; registar; aceite, desconto, endosso, pagamento, protesto, anulação | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Letras a receber: ligar ao cliente, escolhido da lista de clientes activos (sem ler o cadastro) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fluxo de caixa: previsto e realizado; previsões manuais (criar, rever, apagar) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Relatórios financeiros** | | | | | | | | | | |
 | Balancete por ano e período, com o equilíbrio | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -1012,7 +1013,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Lista com filtros por sentido (a receber, a pagar) e estado; as vencidas
   ficam marcadas.
 - **Registar** (letra ou livrança, sentido, número, sacado ou tomador, emissão,
-  vencimento, valor, moeda, banco, notas).
+  vencimento, valor, moeda, banco, notas). A receber, pode **ligar ao cliente**
+  (opcional), escolhido da lista de clientes activos, que preenche o sacado.
 - Ficha: só as acções que o estado permite: **aceite**, **desconto** (com
   encargos e banco), **endosso**, **pagamento**, **protesto** e **anulação**;
   endossos registados.
@@ -1431,7 +1433,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   deposita ou levanta.
 
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
-- Tudo o que o Admin faz.
+- Tudo o que o Admin faz. Nas letras a receber escolhe o cliente da lista de
+  clientes activos, sem acesso ao cadastro de clientes.
 
 **Relatórios financeiros** e **Impostos**
 - Tudo o que o Admin faz.

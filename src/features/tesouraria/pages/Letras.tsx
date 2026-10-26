@@ -2,8 +2,9 @@
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { useEscolhasComerciais } from "@/features/crm";
 import { moeda } from "@/features/facturacao";
-import { Can } from "@/features/identity";
+import { Can, useUtilizador } from "@/features/identity";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
 import { formatarData, hojeIso } from "@/lib/format/data";
 import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
@@ -52,6 +53,7 @@ function Sacar() {
   const [sentido, setSentido] = useState<Sentido>("Receivable");
   const [numero, setNumero] = useState("");
   const [contraparte, setContraparte] = useState("");
+  const [cliente, setCliente] = useState("");
   const [emissao, setEmissao] = useState(hojeIso());
   const [vencimento, setVencimento] = useState("");
   const [valor, setValor] = useState("");
@@ -61,6 +63,10 @@ function Sacar() {
   const [tentou, setTentou] = useState(false);
   const [soltas, setSoltas] = useState<string[]>([]);
   const idForm = useId();
+  const { pode } = useUtilizador();
+  // A receber, o sacado pode ser um cliente do cadastro: escolhe-se em `/commercial/lookups`, sem ler o cadastro inteiro (Finance tem `commercial.collections.write`).
+  const escolheCliente = sentido === "Receivable" && ["commercial.crm.write", "commercial.collections.write", "commercial.contracts.write"].some((p) => pode(p));
+  const clientes = useEscolhasComerciais(aberto && escolheCliente);
   const v = lerDinheiroDigitado(valor, 2);
   const erros = {
     numero: normalizarTexto(numero) === "" ? "Indique o número." : undefined,
@@ -108,7 +114,7 @@ function Sacar() {
                 direction: sentido,
                 number: normalizarTexto(numero),
                 counterpartyName: normalizarTexto(contraparte),
-                customerId: null,
+                customerId: escolheCliente && cliente ? cliente : null,
                 supplierId: null,
                 salesInvoiceId: null,
                 purchaseInvoiceId: null,
@@ -154,6 +160,29 @@ function Sacar() {
           <Field rotulo="Número" erro={tentou ? erros.numero : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} maxLength={60} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={numero} onChange={(e) => setNumero(e.target.value)} />}
           </Field>
+          {escolheCliente ? (
+            <Field rotulo="Cliente (opcional)" ajuda="Liga a letra ao cliente e preenche o sacado." className="sm:col-span-2">
+              {({ id, descricao }) => (
+                <Select
+                  id={id}
+                  aria-describedby={descricao}
+                  value={cliente}
+                  onChange={(e) => {
+                    setCliente(e.target.value);
+                    const nome = clientes.data?.customers.find((c) => c.id === e.target.value)?.name;
+                    if (nome) setContraparte(nome);
+                  }}
+                >
+                  <option value="">{clientes.isPending ? "A carregar…" : "Nenhum (só o nome)"}</option>
+                  {(clientes.data?.customers ?? []).map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+          ) : null}
           <Field rotulo={sentido === "Receivable" ? "Sacado (quem paga)" : "Tomador (a quem se paga)"} erro={tentou ? erros.contraparte : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} maxLength={200} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={contraparte} onChange={(e) => setContraparte(e.target.value)} />}
           </Field>
