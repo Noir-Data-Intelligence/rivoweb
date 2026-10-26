@@ -106,6 +106,8 @@ export const REQUISITO_PAGINA = {
   "/analytics": "analytics.overview.read",
   "/auditoria": "audit.trail.read",
   "/esg": "esg.esg.read",
+  // Auditoria interna (ADR-089, backend #119): o Admin conduz, o Manager lê.
+  "/auditoria-interna": "internalaudit.audits.read",
   "/assistente": "ai.assistant.use",
   "/ia": "ai.provider.manage",
 } as const satisfies Record<string, Requisito>;

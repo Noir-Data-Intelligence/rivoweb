@@ -108,6 +108,7 @@ export const MENU: Readonly<Record<Shell, readonly EntradaMenu[]>> = {
     { caminho: "/fiscal", titulo: "Fiscal", icone: Scale, requer: R["/fiscal"], grupo: "Administração" },
     { caminho: "/politicas-aprovacao", titulo: "Políticas de aprovação", icone: ListChecks, requer: R["/politicas-aprovacao"], grupo: "Administração" },
     { caminho: "/auditoria", titulo: "Auditoria", icone: Shield, requer: R["/auditoria"], grupo: "Administração" },
+    { caminho: "/auditoria-interna", titulo: "Auditoria interna", icone: ClipboardCheck, requer: R["/auditoria-interna"], grupo: "Administração" },
     { caminho: "/ia", titulo: "Inteligência artificial", icone: Brain, requer: R["/ia"], grupo: "Administração" },
   ],
   colaborador: [

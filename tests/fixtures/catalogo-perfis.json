@@ -109,13 +109,18 @@
    "esg.esg.read",
    "esg.esg.write",
    "ai.assistant.use",
-   "ai.provider.manage"
+   "ai.provider.manage",
+   "internalaudit.audits.read",
+   "internalaudit.audits.write",
+   "internalaudit.findings.read",
+   "internalaudit.findings.write",
+   "internalaudit.actions.read",
+   "internalaudit.actions.write"
   ]
  },
  {
   "name": "AssetManager",
   "permissions": [
-   "documents.write",
    "procurement.suppliers.read",
    "procurement.orders.read",
    "procurement.receipts.read",
@@ -126,7 +131,8 @@
    "fleet.vehicles.write",
    "finance.assets.read",
    "finance.assets.write",
-   "alerts.alerts.read"
+   "alerts.alerts.read",
+   "documents.write"
   ]
  },
  {
@@ -247,15 +253,18 @@
    "esg.esg.read",
    "esg.esg.write",
    "ai.assistant.use",
+   "internalaudit.audits.read",
+   "internalaudit.findings.read",
+   "internalaudit.actions.read",
    "documents.write"
   ]
  },
  {
   "name": "ProjectManager",
   "permissions": [
-   "documents.write",
    "projects.projects.read",
-   "projects.projects.write"
+   "projects.projects.write",
+   "documents.write"
   ]
  },
  {

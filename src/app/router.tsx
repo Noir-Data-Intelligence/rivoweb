@@ -160,6 +160,9 @@ export const rotas: RouteObject[] = [
               { path: "analytics", element: protegido(R["/analytics"], pagina("analytics")) },
               { path: "auditoria", element: protegido(R["/auditoria"], pagina("auditoria")) },
               { path: "esg", element: protegido(R["/esg"], pagina("esg")) },
+              // Auditoria interna (backend #119).
+              { path: "auditoria-interna", element: protegido(R["/auditoria-interna"], pagina("auditoriaInterna")) },
+              { path: "auditoria-interna/:auditId", element: protegido(R["/auditoria-interna"], pagina("auditoriaInternaDetalhe")) },
               { path: "assistente", element: protegido(R["/assistente"], pagina("assistente")) },
               { path: "ia", element: protegido(R["/ia"], pagina("configuracaoIa")) },
               { path: "a-receber", element: protegido(R["/a-receber"], pagina("aReceber")) },

@@ -1089,12 +1089,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Trilha, da mais recente para a mais antiga. Filtros opcionais: `entityType`, `entityId`, `from`/`to` (dias UTC, inclusivos). Sem `page`/`pageSize`: as `limit` mais recentes (até 200). Com eles: a página, com `X-Page`, `X-Page-Size` e `X-Total-Count`. */
         get: {
             parameters: {
                 query?: {
                     entityType?: string;
                     entityId?: string;
+                    from?: string;
+                    to?: string;
                     limit?: number | string;
+                    page?: number | string;
+                    pageSize?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -1109,6 +1114,77 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["AuditEntryView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit/entries/daily-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Entradas da trilha por dia (UTC), de `from` a `to` inclusive (até 366 dias), com os dias sem entradas a zero. */
+        get: {
+            parameters: {
+                query: {
+                    from: string;
+                    to: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuditDailyCountView"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -26698,6 +26774,929 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/internal-audit/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Indicadores: auditorias activas, achados por resolver, planos atrasados e % de achados resolvidos (nulo sem achados). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalAuditOverview"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Departamentos e colaboradores activos (id e nome), para escolher a área auditada e os responsáveis sem permissões de `hr`. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalAuditLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/audits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Auditorias (filtros opcionais `status`, `departmentId`), com o nome do departamento e do responsável e a contagem de achados. */
+        get: {
+            parameters: {
+                query?: {
+                    status?: string;
+                    departmentId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuditView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** Planeia uma auditoria (nasce Planned, com número AUD-AAAA-NNN). `departmentId` e `ownerEmployeeId` obrigatórios; `riskRating`: Low, Medium, High ou Critical. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AuditRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalAuditCreatedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/audits/{auditId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A auditoria com os seus achados e planos de acção. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auditId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuditDetailView"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** Revê a auditoria e, com `status`, muda de fase: Planned → InProgress → Reporting → Closed (Reporting volta a InProgress). Closed exige os achados resolvidos; Cancelled exige `cancellationReason`. Encerrada → 409. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auditId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AuditRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/audits/{auditId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Histórico da auditoria, dos achados e dos planos, lido da trilha (mais recente primeiro). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auditId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HistoryEntryView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/audits/{auditId}/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auditId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FindingView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Regista um achado (nasce Open). Só numa auditoria InProgress ou Reporting (senão 409). `severity`: Low, Medium, High ou Critical. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auditId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["FindingRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalAuditCreatedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Achados de todas as auditorias (filtros opcionais `auditId`, `status`, `severity`). */
+        get: {
+            parameters: {
+                query?: {
+                    auditId?: string;
+                    status?: string;
+                    severity?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FindingView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/findings/{findingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Revê o achado e, com `status`, muda-o: Open, InRemediation, Closed (planos todos Done) ou AcceptedRisk (exige `resolutionNotes`). Quem é responsável por um plano do achado não o fecha (403). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    findingId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["FindingRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/findings/{findingId}/action-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    findingId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActionPlanView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Plano de acção correctiva (nasce Pending; o achado passa a InRemediation). `ownerEmployeeId` e `dueDate` obrigatórios. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    findingId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ActionPlanRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalAuditCreatedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/action-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Planos de todas as auditorias (filtros opcionais `findingId`, `status`, `overdue`, `ownerEmployeeId`). `isOverdue` é calculado: prazo passado e não Done. */
+        get: {
+            parameters: {
+                query?: {
+                    findingId?: string;
+                    status?: string;
+                    overdue?: boolean;
+                    ownerEmployeeId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActionPlanView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal-audit/action-plans/{actionPlanId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Revê o plano; `status`: Pending, InProgress ou Done. Com o achado ou a auditoria encerrados → 409. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    actionPlanId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ActionPlanRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/approval/policies": {
         parameters: {
             query?: never;
@@ -30255,7 +31254,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["ChecklistItemRequest"];
+                    "application/json": components["schemas"]["TaskChecklistItemRequest"];
                 };
             };
             responses: {
@@ -38412,6 +39411,36 @@ export interface components {
             /** Format: int32 */
             awarded: number | string;
         };
+        ActionPlanRequest: {
+            action: string;
+            /** Format: uuid */
+            ownerEmployeeId: string;
+            /** Format: date */
+            dueDate: string;
+            /** @enum {null|string} */
+            status: "Pending" | "InProgress" | "Done" | null;
+        };
+        ActionPlanView: {
+            /** Format: uuid */
+            actionPlanId: string;
+            /** Format: uuid */
+            findingId: string;
+            /** Format: uuid */
+            auditId: string;
+            auditNumber: string;
+            action: string;
+            /** Format: uuid */
+            ownerEmployeeId: string;
+            ownerName: null | string;
+            /** Format: date */
+            dueDate: string;
+            status: string;
+            isOverdue: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            completedAt: null | string;
+        };
         ActivityCreatedResponse: {
             /** Format: uuid */
             activityId: string;
@@ -38964,6 +39993,17 @@ export interface components {
             /** Format: double */
             observedHours: null | number | string;
         };
+        AuditDailyCountView: {
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            count: number | string;
+        };
+        AuditDetailView: {
+            audit: components["schemas"]["AuditView"];
+            findings: components["schemas"]["FindingView"][];
+            actionPlans: components["schemas"]["ActionPlanView"][];
+        };
         AuditEntryView: {
             /** Format: uuid */
             id: string;
@@ -38976,6 +40016,55 @@ export interface components {
             correlationId: null | string;
             /** Format: date-time */
             occurredAt: string;
+        };
+        AuditRequest: {
+            title: string;
+            objectives: null | string;
+            scope: null | string;
+            /** Format: uuid */
+            departmentId: string;
+            /** Format: uuid */
+            ownerEmployeeId: string;
+            /** Format: date */
+            plannedStart: string;
+            /** Format: date */
+            plannedEnd: string;
+            /** @enum {string} */
+            riskRating: "Low" | "Medium" | "High" | "Critical";
+            /** @enum {null|string} */
+            status: "Planned" | "InProgress" | "Reporting" | "Closed" | "Cancelled" | null;
+            cancellationReason: null | string;
+        };
+        AuditView: {
+            /** Format: uuid */
+            auditId: string;
+            auditNumber: string;
+            title: string;
+            objectives: null | string;
+            scope: null | string;
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: null | string;
+            /** Format: uuid */
+            ownerEmployeeId: string;
+            ownerName: null | string;
+            /** Format: date */
+            plannedStart: string;
+            /** Format: date */
+            plannedEnd: string;
+            riskRating: string;
+            status: string;
+            cancellationReason: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            createdByUserId: null | string;
+            /** Format: date-time */
+            closedAt: null | string;
+            /** Format: int32 */
+            findingsTotal: number | string;
+            /** Format: int32 */
+            findingsOpen: number | string;
         };
         AutoMatchResponse: {
             /** Format: int32 */
@@ -39342,10 +40431,6 @@ export interface components {
             /** Format: uuid */
             itemId: string;
             response: null | string;
-        };
-        ChecklistItemRequest: {
-            text: null | string;
-            mandatory: null | boolean;
         };
         ChecklistItemView: {
             /** Format: uuid */
@@ -40592,6 +41677,40 @@ export interface components {
             monthlyExpenses: components["schemas"]["MonthlyAmount"][];
             topCustomers: components["schemas"]["CustomerRevenueView"][];
         };
+        FindingRequest: {
+            description: string;
+            /** @enum {string} */
+            severity: "Low" | "Medium" | "High" | "Critical";
+            controlRef: null | string;
+            recommendation: null | string;
+            /** @enum {null|string} */
+            status: "Open" | "InRemediation" | "Closed" | "AcceptedRisk" | null;
+            resolutionNotes: null | string;
+        };
+        FindingView: {
+            /** Format: uuid */
+            findingId: string;
+            /** Format: uuid */
+            auditId: string;
+            auditNumber: string;
+            auditTitle: string;
+            description: string;
+            severity: string;
+            controlRef: null | string;
+            recommendation: null | string;
+            status: string;
+            resolutionNotes: null | string;
+            /** Format: date-time */
+            identifiedAt: string;
+            /** Format: uuid */
+            identifiedByUserId: null | string;
+            /** Format: date-time */
+            resolvedAt: null | string;
+            /** Format: int32 */
+            actionPlansTotal: number | string;
+            /** Format: int32 */
+            actionPlansDone: number | string;
+        };
         FiscalDocumentDeliveredResponse: {
             enviadoPara: string;
         };
@@ -40803,6 +41922,17 @@ export interface components {
             email?: null | string;
             phone?: null | string;
             employeeCode?: null | string;
+        };
+        HistoryEntryView: {
+            action: string;
+            entityType: string;
+            /** Format: uuid */
+            entityId: string;
+            /** Format: uuid */
+            actorUserId: null | string;
+            actorName: null | string;
+            /** Format: date-time */
+            occurredAt: string;
         };
         HrApprovalOutcomeResponse: {
             estado: string;
@@ -41077,6 +42207,29 @@ export interface components {
             daysToExpiry: number | string;
             /** Format: int32 */
             openClaims: number | string;
+        };
+        InternalAuditCreatedResponse: {
+            /** Format: uuid */
+            id: string;
+        };
+        InternalAuditLookupEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        InternalAuditLookups: {
+            departments: components["schemas"]["InternalAuditLookupEntry"][];
+            employees: components["schemas"]["InternalAuditLookupEntry"][];
+        };
+        InternalAuditOverview: {
+            /** Format: int32 */
+            activeAudits: number | string;
+            /** Format: int32 */
+            openFindings: number | string;
+            /** Format: int32 */
+            overdueActionPlans: number | string;
+            /** Format: double */
+            compliancePercent: null | number | string;
         };
         IntroduceIncomeTaxScheduleVersionRequest: {
             brackets: components["schemas"]["NewIncomeTaxBracket"][];
@@ -42778,6 +43931,10 @@ export interface components {
             /** Format: int32 */
             progress: null | number | string;
         };
+        PolicyChecklistItemRequest: {
+            text: null | string;
+            mandatory: null | boolean;
+        };
         PolicyChecklistItemView: {
             /** Format: int32 */
             order: number | string;
@@ -42810,7 +43967,7 @@ export interface components {
             /** Format: int32 */
             slaHours: null | number | string;
             kind?: null | string;
-            checklist?: null | components["schemas"]["ChecklistItemRequest"][];
+            checklist?: null | components["schemas"]["PolicyChecklistItemRequest"][];
         };
         PolicyStepView: {
             /** Format: int32 */
@@ -44229,6 +45386,9 @@ export interface components {
             city?: null | string;
             country?: null | string;
             contactPerson?: null | string;
+        };
+        TaskChecklistItemRequest: {
+            title: string;
         };
         TaskPlanView: {
             /** Format: uuid */

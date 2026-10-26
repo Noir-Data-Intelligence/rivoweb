@@ -11,9 +11,10 @@
 > de conhecimento, portal na ficha do cliente e arquivo de documentos; F11:
 > comercial avançado — CRM, propostas, contratos de clientes e cobranças;
 > F12: projectos e frota; F13: analytics, auditoria, ESG e IA). Smoke de
-> leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-23 (portal:
+> leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-26 (portal:
 > benefícios, contrato e dados pessoais; aprovações: validação de conformidade
-> com checklist, K4).
+> com checklist, K4; auditoria interna; trilha por período com os eventos por
+> dia).
 
 ---
 
@@ -21,11 +22,11 @@
 
 | Perfil | Entra em | Menu lateral |
 |---|---|---|
-| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Inteligência artificial |
-| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Inteligência artificial |
+| **SuperAdmin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Auditoria interna, Inteligência artificial |
+| **Admin** | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Projectos, Registo de tempo, Requisições, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos, Utilizadores, Configurações, Facturação, Fiscal, Políticas de aprovação, Auditoria, Auditoria interna, Inteligência artificial |
 | **HR** (Recursos Humanos) | Gestão (`/`) | Início, Alertas, Colaboradores, Departamentos, Cargos, Organograma, Contratos, Assiduidade, Turnos, Férias e ausências, Benefícios, Validades de imigração, Recrutamento, Entradas e saídas, Formação, Desempenho, Conquistas, Anúncios, Pedidos internos, Declarações, Folhas de pagamento, Arquivo de documentos |
 | **Finance** (Finanças) | Gestão (`/`) | Início, Assistente de IA, Aprovações, Alertas, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Ordens de compra, Recepções, Activos fixos, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Caixa pequena, Letras e livranças, Câmbios, Fluxo de caixa, Relatórios financeiros, Impostos, Lançamentos, Plano de contas, Períodos, Regras contabilísticas, Centros de custo, Orçamentos, Previsões de custos, Configurações, Facturação, Fiscal |
-| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos |
+| **Manager** (Gestão) | Gestão (`/`) | Início, Dashboard executivo, Analytics, ESG, Assistente de IA, Aprovações, Alertas, Contratos de clientes, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Requisições, Ordens de compra, Recepções, Fornecedores, Facturas de compra, Pedidos de pagamento, Despesas, Contas bancárias, Centros de custo, Orçamentos, Previsões de custos, Auditoria interna |
 | **AssetManager** (Gestão de activos) | Gestão (`/`) | Início, Alertas, Ordens de compra, Recepções, Artigos, Armazéns, Contagens, Valorização do stock, Activos fixos, Viaturas, Manutenção prevista, Seguros de frota, Fornecedores |
 | **Sales** (Vendas) | Gestão (`/`) | Início, Assistente de IA, Clientes, Facturas, Pró-formas, Notas de crédito, Recibos, Comprovativos, A receber, Contratos de clientes, Cobranças, Leads, Oportunidades, Propostas, Actividades, Relatório comercial, Tipos de serviço, Modelos de proposta, Conversas, Base de conhecimento, Facturação |
 | **ProjectManager** (Gestão de projectos) | Gestão (`/`) | Início, Projectos, Registo de tempo |
@@ -93,7 +94,14 @@ AM = AssetManager.
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: passos de validação com checklist (itens obrigatórios e opcionais) | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| **Auditoria**: consultar a trilha (quem, o quê, quando), por entidade | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Auditoria**: consultar a trilha (quem, o quê, quando) de um período até 366 dias, por entidade, por páginas | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Auditoria: gráfico dos eventos por dia do período | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Auditoria interna** | | | | | | | | | | |
+| Ver os cartões (auditorias activas, achados abertos, planos atrasados, conformidade), as auditorias, os achados e os planos de acção, com filtros | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Ver uma auditoria: dados, achados com os planos e o histórico | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Planear e corrigir auditorias; mudar de fase (iniciar, relatório, voltar ao campo, fechar); cancelar com motivo | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Registar e corrigir achados; fechar (planos concluídos) e aceitar o risco (com motivo) | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Criar e corrigir planos de acção (responsável, prazo, estado) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Alertas** | | | | | | | | | | |
 | Ver alertas e regras | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
 | Resolver alertas; criar, rever e desactivar regras; avaliar agora | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -535,11 +543,42 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   saldo.
 
 **Auditoria**
-- Os registos mais recentes da trilha (50, 100 ou 200), primeiro os novos:
-  quando, acção, entidade (tipo e id), quem (o e-mail da conta, ou «Sistema»),
-  IP e correlação. Só consulta.
+- Os registos da trilha de um período (no URL; os últimos 7 dias por
+  omissão, até 366 dias, dias UTC), primeiro os novos, por páginas (25, 50
+  ou 100): quando, acção, entidade (tipo e id), quem (o e-mail da conta, ou
+  «Sistema»), IP e correlação. Só consulta.
+- **Eventos por dia:** gráfico do mesmo período, com o total e o dia com
+  mais no título, os dias sem eventos a zero; ver como tabela e exportar em
+  CSV.
 - Filtrar por tipo de entidade (com sugestões) e id, no URL; um clique no id
   mostra só os registos dessa entidade; limpar os filtros.
+
+**Auditoria interna** (não é a trilha: auditorias planeadas aos departamentos)
+- **Cartões:** auditorias activas (planeadas, em curso ou em relatório),
+  achados abertos, planos atrasados e conformidade (% dos achados fechados
+  ou com o risco aceite; «—» sem achados, nunca 100 %).
+- **Auditorias:** número (AUD-AAAA-NNN), título, departamento, responsável,
+  período previsto, risco, achados por resolver e fase; filtrar por fase e
+  departamento. **Planear** (título, departamento auditado, responsável,
+  início e fim previstos, risco, objectivos e âmbito): nasce planeada e abre
+  o detalhe.
+- **Achados** e **Planos de acção:** as listas de todas as auditorias, com
+  a auditoria, a gravidade, os planos concluídos, o prazo e «atrasado»;
+  filtrar por estado e gravidade, ou só os planos atrasados.
+- **Uma auditoria:** dados, achados com os planos, e o histórico (quem e
+  quando, ou «Sistema»; a que achado ou plano se refere).
+  - Fases uma de cada vez: **iniciar**, **passar a relatório**, **voltar a
+    em curso**, **fechar** (só com todos os achados fechados ou com o risco
+    aceite; senão o botão fica parado e diz quantos faltam); **corrigir** os
+    dados e **cancelar** com motivo. Fechada ou cancelada, não se altera.
+  - Achados (só em curso ou em relatório): **registar** (descrição,
+    gravidade, controlo, recomendação), **corrigir**, **fechar** (só com os
+    planos concluídos) e **aceitar o risco** (com motivo). Quem é
+    responsável por um plano do achado não o fecha nem aceita o risco: a
+    recusa diz «Quem executa um plano não pode fechar o achado».
+  - Planos de acção: **criar** (acção, responsável, prazo; o primeiro passa
+    o achado a «em correcção») e **corrigir** (estado incluído: pendente, em
+    curso, concluído).
 
 **Alertas**
 - Ver alertas (abertos ou todos) e **resolvê-los**.
@@ -1423,6 +1462,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **ESG**
 - Tudo o que o Admin faz, incluindo ver e escolher o responsável das
   iniciativas (sem ler os Recursos Humanos, B41).
+
+**Auditoria interna**
+- Só leitura: os cartões, as auditorias, os achados, os planos de acção e o
+  detalhe com o histórico, como o Admin vê. Sem botões de planear, mudar de
+  fase, registar achados ou planos.
 
 **Assistente de IA**
 - Como no Admin: leitura do período, previsão e rascunhos. Lê a factura de

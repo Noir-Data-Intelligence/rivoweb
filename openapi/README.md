@@ -8,9 +8,9 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-10-23 |
-| Commit do backend | `1dad7aa` (`main`, merge do PR #118: K4, validação com checklist; inclui o #117, portal do colaborador) |
-| Operações | 493 caminhos |
+| Data | 2026-10-26 |
+| Commit do backend | `e8d4a19` (`main`, merge do PR #122: trilha por período e contagem por dia; inclui o #119, auditoria interna, e o #121, B42) |
+| Operações | 505 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 
 O OpenAPI está desligado em produção (`GET https://syyt.tech/openapi/v1.json` →
@@ -18,11 +18,6 @@ O OpenAPI está desligado em produção (`GET https://syyt.tech/openapi/v1.json`
 deploy publicou.
 
 O deploy de produção é publicado a partir do `main` do backend.
-
-**Nome repetido (B42):** a partir do `1dad7aa`, o esquema
-`ChecklistItemRequest` é o das aprovações (`text`, `mandatory`); o passo de
-uma tarefa de projecto continua a ler `title` no servidor. O front usa um
-tipo local nesse pedido até à correcção (`features/projectos/api.ts`).
 
 ## Actualizar
 

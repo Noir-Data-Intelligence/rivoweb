@@ -54,8 +54,6 @@ import type { components } from "@/lib/api/schema";
 
 type S = components["schemas"];
 
-/** Corpo real de um passo de tarefa (`ProjectSharingEndpoints.cs`); o OpenAPI troca-o pelo das aprovações (B42). */
-type PassoTarefa = { title: string };
 export type Projecto = S["ProjectView"];
 export type Marco = S["MilestoneView"];
 export type Tarefa = S["ProjectTaskView"];
@@ -177,7 +175,7 @@ export function useAcaoProjecto(id: string) {
         | { acto: "depender"; tarefa: string; corpo: S["DependencyRequest"] }
         | { acto: "tirarDependencia"; dependencia: string }
         | { acto: "comentar"; tarefa: string; corpo: S["CommentRequest"] }
-        | { acto: "passo"; tarefa: string; corpo: PassoTarefa }
+        | { acto: "passo"; tarefa: string; corpo: S["TaskChecklistItemRequest"] }
         | { acto: "marcarPasso"; passo: string; corpo: S["ChecklistToggleRequest"] }
         | { acto: "tirarPasso"; passo: string }
         | { acto: "tempo"; corpo: S["TimeEntryRequest"] }
@@ -220,8 +218,7 @@ export function useAcaoProjecto(id: string) {
         case "comentar":
           return ler(api.POST("/projects/{projectId}/tasks/{taskId}/comments", { params: { path: { ...path, taskId: a.tarefa } }, body: a.corpo }));
         case "passo":
-          // B42: o OpenAPI anuncia o esquema das aprovações; o servidor lê `title`.
-          return ler(api.POST("/projects/{projectId}/tasks/{taskId}/checklist", { params: { path: { ...path, taskId: a.tarefa } }, body: a.corpo as unknown as S["ChecklistItemRequest"] }));
+          return ler(api.POST("/projects/{projectId}/tasks/{taskId}/checklist", { params: { path: { ...path, taskId: a.tarefa } }, body: a.corpo }));
         case "marcarPasso":
           return enviar(api.POST("/projects/{projectId}/checklist/{itemId}/toggle", { params: { path: { ...path, itemId: a.passo } }, body: a.corpo }));
         case "tirarPasso":

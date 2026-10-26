@@ -1,8 +1,10 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `1dad7aa`. Em aberto: **B24** (configuração) e
-> **B42** (dois `ChecklistItemRequest` no OpenAPI).
+> Revisto contra `main` @ `e8d4a19`. Em aberto: **B24** (configuração).
+> **B42** está resolvido (PR #121) e o front já o usa: o passo de uma tarefa
+> é `TaskChecklistItemRequest` e as políticas usam `PolicyChecklistItemRequest`;
+> saiu o tipo local dos projectos.
 > **B41** está resolvido (PR #116) e o front já o usa: o nome do responsável
 > nas iniciativas ESG e os colaboradores em `/esg/lookups`; o Manager vê-o e
 > escolhe-o sem ler os RH (verificado na base local).
@@ -561,6 +563,7 @@ apaga.
 ## B42 — Dois `ChecklistItemRequest` no OpenAPI: o dos projectos ficou com o esquema das aprovações
 
 > Aberto a 2026-10-23, contra `main` @ `1dad7aa` (merge do #118).
+> **Resolvido** no PR #121 (`main` @ `e8d4a19`).
 
 **Facto:** o K4 acrescentou `ChecklistItemRequest(string? Text, bool? Mandatory)`
 em `Rivo.Approval.Api/ApprovalModuleEndpoints.cs`. Já existia
