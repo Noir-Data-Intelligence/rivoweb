@@ -1,6 +1,6 @@
 /**
  * Relatórios financeiros (§5.7): balancete, balanço, demonstração de
- * resultados e antiguidade de saldos. Os números vêm do servidor; o front não
+ * resultados (também nos modelos oficiais do PGC) e antiguidade de saldos. Os números vêm do servidor; o front não
  * soma nada. Balanço e resultados mostram as contas sem classe de reporte e a
  * diferença, até o plano estar mapeado.
  */
@@ -23,6 +23,7 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useVista, Vistas } from "@/ui/Vistas";
 import { useAntiguidade, useBalancete, useBalanco, useResultados, type Antiguidade, type ContaDemonstracao, type SeccaoDemonstracao } from "../api";
 import { EscolhaAnoPeriodo, useAnoPeriodo } from "../comum";
+import { DemonstracaoOficial } from "../Oficial";
 
 const kz = (v: number | string) => formatarMoeda(dinheiro(v));
 const quando = (ano: number, periodo: number | null) => (periodo === null ? `ano de ${ano}` : `${nomeMes(periodo)} de ${ano}`);
@@ -326,6 +327,8 @@ export default function Relatorios() {
     { valor: "balancete", texto: "Balancete", visivel: razao },
     { valor: "balanco", texto: "Balanço", visivel: relatorios },
     { valor: "resultados", texto: "Resultados", visivel: relatorios },
+    { valor: "balanco-pgc", texto: "Balanço (PGC)", visivel: relatorios },
+    { valor: "resultados-pgc", texto: "DR (PGC)", visivel: relatorios },
     { valor: "antiguidade", texto: "Antiguidade de saldos", visivel: relatorios },
   ] as const;
   const vista = useVista(vistas);
@@ -333,11 +336,13 @@ export default function Relatorios() {
     balancete: <Balancete />,
     balanco: <Balanco />,
     resultados: <Resultados />,
+    "balanco-pgc": <DemonstracaoOficial tipo="balanco" />,
+    "resultados-pgc": <DemonstracaoOficial tipo="resultados" />,
     antiguidade: <AntiguidadeSaldos />,
   };
   return (
     <>
-      <PageHeader titulo="Relatórios financeiros" descricao="Balancete, balanço, demonstração de resultados e antiguidade dos saldos." />
+      <PageHeader titulo="Relatórios financeiros" descricao="Balancete, balanço, demonstração de resultados (também nos modelos do PGC) e antiguidade dos saldos." />
       <Vistas rotulo="Relatórios" vistas={vistas} actual={vista} />
       {vista ? conteudo[vista] : <Alert tom="info" titulo="Este perfil não lê relatórios financeiros." />}
     </>

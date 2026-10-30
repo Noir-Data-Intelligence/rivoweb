@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { erroDevolucao, errosAbate, errosActivo, errosApolice, errosManutencao, type CamposActivo } from "@/features/activos/regras";
 
-const base: CamposActivo = { codigo: "", nome: "Portátil", categoria: "", localizacao: "", serie: "", aquisicao: "2026-03-10", inicio: "", custo: "850 000", residual: "", metodo: "StraightLine", vida: "36", taxa: "", unidades: "" };
+const base: CamposActivo = { codigo: "", conta: "", nome: "Portátil", categoria: "", localizacao: "", serie: "", aquisicao: "2026-03-10", inicio: "", custo: "850 000", residual: "", metodo: "StraightLine", vida: "36", taxa: "", unidades: "" };
 
 describe("activo", () => {
   it("nome, custo positivo, residual entre zero e o custo, vida de 1 a 1200 meses", () => {

@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { z } from "zod/mini";
+import { useContasRazao } from "@/features/contabilidade";
 import { moeda } from "@/features/facturacao";
 import { LerFacturaComIa, type FacturaLida } from "@/features/ia";
 import { Can, useUtilizador } from "@/features/identity";
@@ -43,6 +44,7 @@ const esquema = z
     netTotal: valor("Valor sem IVA inválido."),
     taxTotal: valor("IVA inválido (escreva 0 se não tiver)."),
     description: texto({ max: 500 }),
+    expenseAccountCode: z.string().check(z.refine((v) => v.trim() === "" || /^\d+(\.\d+)*$/.test(v.trim()), "Código de conta do PGC, por exemplo 75.2.12.")),
   })
   .check(
     z.refine((d) => d.supplierId !== "" || d.supplierName.trim() !== "", { message: "Escolha o fornecedor ou escreva o nome.", path: ["supplierName"] }),
@@ -50,7 +52,7 @@ const esquema = z
     z.refine((d) => d.dueOn === "" || d.issuedOn === "" || d.dueOn >= d.issuedOn, { message: "O vencimento não pode ser antes da emissão.", path: ["dueOn"] }),
   );
 type Dados = z.infer<typeof esquema>;
-const CAMPOS = ["supplierId", "supplierName", "supplierTaxId", "supplierInvoiceNumber", "issuedOn", "dueOn", "currency", "netTotal", "taxTotal", "description"] as const;
+const CAMPOS = ["supplierId", "supplierName", "supplierTaxId", "supplierInvoiceNumber", "issuedOn", "dueOn", "currency", "netTotal", "taxTotal", "description", "expenseAccountCode"] as const;
 
 function NovaFactura() {
   const navegar = useNavigate();
@@ -58,10 +60,14 @@ function NovaFactura() {
   const [aberto, setAberto] = useState(false);
   const fornecedores = useFornecedoresActivos(aberto && pode("procurement.suppliers.read"));
   const registar = useRegistarFacturaCompra();
+  // Sugestões de contas de custos (classe 7) a quem lê o plano; os outros escrevem o código.
+  const contas = useContasRazao(false, aberto && pode("finance.ledger.read"));
+  const contasCusto = (contas.data ?? []).filter((c) => c.isActive && c.acceptsPostings && !c.isAnalytic && c.code.startsWith("7"));
+  const idContas = useId();
   const idForm = useId();
   const [soltas, setSoltas] = useState<string[]>([]);
   const hoje = hojeIso();
-  const inicial: Dados = { supplierId: "", supplierName: "", supplierTaxId: "", supplierInvoiceNumber: "", issuedOn: hoje, dueOn: hoje, currency: "AOA", netTotal: "", taxTotal: "0", description: "" };
+  const inicial: Dados = { supplierId: "", supplierName: "", supplierTaxId: "", supplierInvoiceNumber: "", issuedOn: hoje, dueOn: hoje, currency: "AOA", netTotal: "", taxTotal: "0", description: "", expenseAccountCode: "" };
   const form = useForm<Dados>({ resolver: zodResolver(esquema), defaultValues: inicial });
   const v = useWatch({ control: form.control });
   const escolhido = v.supplierId ?? "";
@@ -142,6 +148,7 @@ function NovaFactura() {
                 netTotal: paraApi(lerDinheiroDigitado(d.netTotal, 2) as Dinheiro),
                 taxTotal: paraApi(lerDinheiroDigitado(d.taxTotal, 2) as Dinheiro),
                 description: d.description === "" ? null : d.description,
+                expenseAccountCode: d.expenseAccountCode.trim() === "" ? null : d.expenseAccountCode.trim(),
               },
               { onSuccess: (r) => void navegar(`/facturas-compra/${r.purchaseInvoiceId}`), onError: (er) => setSoltas(aplicarErrosDoServidor(er, form.setError, CAMPOS)) },
             );
@@ -203,6 +210,22 @@ function NovaFactura() {
           </p>
           <Field rotulo="Descrição" erro={e.description?.message} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={500} autoComplete="off" aria-describedby={descricao} invalido={invalido} {...form.register("description")} />}
+          </Field>
+          <Field rotulo="Conta da despesa (opcional)" erro={e.expenseAccountCode?.message} className="sm:col-span-2" ajuda="Conta de movimento do PGC onde a despesa lança, por exemplo 75.2.12 Electricidade. Vazio: 75.2.39 Outros serviços.">
+            {({ id, descricao, invalido }) => (
+              <>
+                <Input id={id} maxLength={30} autoComplete="off" inputMode="decimal" list={contasCusto.length > 0 ? idContas : undefined} aria-describedby={descricao} invalido={invalido} {...form.register("expenseAccountCode")} />
+                {contasCusto.length > 0 ? (
+                  <datalist id={idContas}>
+                    {contasCusto.map((c) => (
+                      <option key={c.accountId} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </datalist>
+                ) : null}
+              </>
+            )}
           </Field>
         </form>
       </Confirmar>

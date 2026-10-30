@@ -5,8 +5,29 @@ import { normalizarTexto } from "@/lib/validation/normalizar";
 export type MetodoAmortizacao = "StraightLine" | "DecliningBalance" | "UnitsOfProduction";
 export const METODOS: Record<MetodoAmortizacao, string> = { StraightLine: "Linear (quotas constantes)", DecliningBalance: "Quotas decrescentes", UnitsOfProduction: "Unidades de produção" };
 
+/**
+ * Contas do PGC aceites no activo (`PgcStatements.DepreciationAccountsFor`): 11.2 a 11.6 e 11.9
+ * (amortização em 73.1/18.1) e 12.1 a 12.4 e 12.9 (73.2/18.2). Os terrenos (11.1) não se amortizam.
+ */
+export const CONTAS_PGC_ACTIVO = [
+  { valor: "11.2", texto: "11.2 Edifícios e outras construções" },
+  { valor: "11.3", texto: "11.3 Equipamento básico" },
+  { valor: "11.4", texto: "11.4 Equipamento de carga e transporte" },
+  { valor: "11.5", texto: "11.5 Equipamento administrativo" },
+  { valor: "11.6", texto: "11.6 Taras e vasilhame" },
+  { valor: "11.9", texto: "11.9 Outras imobilizações corpóreas" },
+  { valor: "12.1", texto: "12.1 Trespasses" },
+  { valor: "12.2", texto: "12.2 Despesas de investigação e desenvolvimento" },
+  { valor: "12.3", texto: "12.3 Propriedade industrial e outros direitos e contratos" },
+  { valor: "12.4", texto: "12.4 Despesas de constituição" },
+  { valor: "12.9", texto: "12.9 Outras imobilizações incorpóreas" },
+] as const;
+
+export const textoContaPgc = (codigo: string | null | undefined) => (codigo ? (CONTAS_PGC_ACTIVO.find((c) => c.valor === codigo)?.texto ?? codigo) : "—");
+
 export type CamposActivo = {
   codigo: string;
+  conta: string;
   nome: string;
   categoria: string;
   localizacao: string;

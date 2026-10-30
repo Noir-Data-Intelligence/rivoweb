@@ -47,7 +47,7 @@ import {
   type Manutencao,
 } from "../api";
 import { EstadoActivo, EstadoManutencao, TIPO_MANUTENCAO } from "../comum";
-import { erroDevolucao, errosAbate, errosActivo, errosApolice, errosManutencao, METODOS, type CamposActivo, type CamposApolice } from "../regras";
+import { erroDevolucao, errosAbate, errosActivo, errosApolice, errosManutencao, METODOS, textoContaPgc, type CamposActivo, type CamposApolice } from "../regras";
 import { CamposDoActivo, camposDe, corpoActivo } from "./Activos";
 
 type LinhaPlano = FichaActivo["schedule"][number];
@@ -768,6 +768,8 @@ export default function Activo() {
           </dd>
           <dt className="text-muted-foreground">Vida útil</dt>
           <dd>{String(a.usefulLifeMonths)} meses</dd>
+          <dt className="text-muted-foreground">Conta do PGC</dt>
+          <dd>{a.ledgerAccountCode ? textoContaPgc(a.ledgerAccountCode) : "Nenhuma: a amortização não lança no razão"}</dd>
           <dt className="text-muted-foreground">Adquirido · amortiza desde</dt>
           <dd>
             {formatarData(a.acquiredOn)} · {formatarData(a.depreciationStartsOn)}

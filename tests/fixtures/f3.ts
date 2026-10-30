@@ -98,7 +98,7 @@ export const series = (): S["DocumentSeriesView"][] => [
   { seriesId: "00000000-0000-4000-8000-000000000722", type: "RG", code: "S001", nextSequence: 4, isActive: true },
 ];
 
-const linha = { lineNumber: 1, description: "Consultoria", quantity: 2, unitPrice: 50000, taxCode: "NOR", taxPercentage: 14, netAmount: 100000, taxAmount: 14000 };
+const linha = { lineNumber: 1, description: "Consultoria", quantity: 2, unitPrice: 50000, taxCode: "NOR", taxPercentage: 14, netAmount: 100000, taxAmount: 14000, kind: "Goods" };
 
 export const factura = (estado = "Normal"): S["SalesInvoiceView"] => ({
   invoiceId: IDF3.factura,
@@ -169,7 +169,7 @@ export const facturaComRetencao = (): S["SalesInvoiceView"] => ({
   withholdingRate: 6.5,
   withholdingAmount: 162.52,
   amountPayable: 2687.77,
-  lines: [{ lineNumber: 1, description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR", taxPercentage: 14, netAmount: 2500.25, taxAmount: 350.04 }],
+  lines: [{ lineNumber: 1, description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR", taxPercentage: 14, netAmount: 2500.25, taxAmount: 350.04, kind: "Service" }],
 });
 
 export const saldoComRetencao = (): S["InvoiceBalanceView"] => ({

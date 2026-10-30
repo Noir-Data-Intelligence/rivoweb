@@ -11137,7 +11137,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Regista a depreciação de um mês para os activos em uso. Idempotente por activo e mês. */
+        /** Regista a depreciação de um mês para os activos em uso. Idempotente por activo e mês. Com o PGC carregado, lança 73.x/18.x dos activos com `ledgerAccountCode` (ADR-094). */
         post: {
             parameters: {
                 query?: never;
@@ -11182,6 +11182,15 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -12275,6 +12284,65 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/exchange-rates/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Busca já o câmbio de referência do BNA (o servidor fá-lo sozinho de 3 em 3 horas) e grava-o para o dia da publicação. Nunca sobrepõe um câmbio já registado nesse dia. 409 se a busca estiver desligada. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ExchangeRateSyncResult"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -18156,6 +18224,457 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PlanningLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/pgc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Carrega o PGC angolano (Decreto n.º 82/01, com o IVA): contas, diários, regras de lançamento e de reporte. Só acrescenta; repete-se sem duplicar. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PgcLoadResult"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/document-postings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lança os documentos de um período (até 31 dias) que ficaram por lançar, como a emissão os teria lançado: na data de cada um e ao câmbio desse dia. Repete-se sem duplicar; os anulados não lançam. dryRun mostra o que lançaria, sem gravar. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DocumentHistoryRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DocumentHistoryView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/vat-settlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apuramento do IVA de um mês pelas contas do PGC: 34.5.2, 34.5.3 e 34.5.4 contra 34.5.5.1, e o saldo para 34.5.6.1 (a pagar) ou 34.5.7.1 (a recuperar). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VatSettlementRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VatSettlementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/closing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apuramento de resultados do exercício (classes 6 e 7 e conta 87 para 82–86 e 88), no período 13, pelas contas «Transferência para …». */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FiscalYearView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/opening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Abre o exercício com os saldos do anterior; o resultado (88) e os dividendos antecipados (89) passam para «81 Resultados transitados». */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FiscalYearView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/reports/statutory/balance-sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Balanço no modelo do PGC, com o exercício anterior. unit: 1, 1000 (omissão) ou 1000000 kwanzas. */
+        get: {
+            parameters: {
+                query: {
+                    fiscalYear: number | string;
+                    uptoPeriod?: number | string;
+                    unit?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StatutoryStatementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/reports/statutory/income-statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Demonstração de resultados por natureza no modelo do PGC, com o mesmo período do exercício anterior. */
+        get: {
+            parameters: {
+                query: {
+                    fiscalYear: number | string;
+                    uptoPeriod?: number | string;
+                    unit?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StatutoryStatementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
                 /** @description Sem sessão válida. */
@@ -39901,6 +40420,7 @@ export interface components {
             annualRate: null | number | string;
             /** Format: double */
             totalUnits: null | number | string;
+            ledgerAccountCode?: null | string;
         };
         AssetUnits: {
             /** Format: uuid */
@@ -40713,7 +41233,7 @@ export interface components {
             hierarchyLevel: number | string;
         };
         CostCentreRequest: {
-            code: string;
+            code: null | string;
             name: string;
             /** Format: uuid */
             departmentId: null | string;
@@ -41266,6 +41786,11 @@ export interface components {
             /** Format: double */
             total: number | string;
             skipped: string[];
+            /** Format: uuid */
+            journalEntryId?: null | string;
+            ledgerNote?: null | string;
+            /** @default false */
+            postingBlocked: boolean;
         };
         DisposalRequest: {
             /** Format: date */
@@ -41287,6 +41812,38 @@ export interface components {
             uploadedBy: null | string;
             /** Format: date-time */
             uploadedAt: string;
+        };
+        DocumentHistoryProblem: {
+            document: string;
+            /** Format: date */
+            date: string;
+            error: string;
+        };
+        DocumentHistoryRequest: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            dryRun: null | boolean;
+        };
+        DocumentHistoryView: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            dryRun: boolean;
+            /** Format: int32 */
+            posted: number | string;
+            /** Format: int32 */
+            alreadyPosted: number | string;
+            /** Format: int32 */
+            cancelled: number | string;
+            /** Format: int32 */
+            withoutRule: number | string;
+            postedByKind: {
+                [key: string]: number | string;
+            };
+            problems: components["schemas"]["DocumentHistoryProblem"][];
         };
         DocumentSeriesView: {
             /** Format: uuid */
@@ -41467,6 +42024,12 @@ export interface components {
             email?: null | string;
             phone?: null | string;
             employeeCode?: null | string;
+            /** Format: uuid */
+            currentPositionId?: null | string;
+            currentPositionName?: null | string;
+            /** Format: double */
+            monthlySalary?: null | number | string;
+            salaryCurrency?: null | string;
         };
         EmploymentContractView: {
             /** Format: uuid */
@@ -41536,6 +42099,17 @@ export interface components {
             autoResolved: number | string;
             /** Format: int32 */
             notified: number | string;
+            errors: string[];
+            /**
+             * Format: int32
+             * @default 0
+             */
+            skippedRecipients: number | string;
+        };
+        ExchangeRateSyncResult: {
+            source: string;
+            recorded: components["schemas"]["ExchangeRateView"][];
+            kept: string[];
             errors: string[];
         };
         ExchangeRateView: {
@@ -41718,6 +42292,15 @@ export interface components {
             /** Format: uuid */
             versionId: string;
         };
+        FiscalYearView: {
+            /** Format: int32 */
+            fiscalYear: number | string;
+            outcome: string;
+            message: null | string;
+            entries: components["schemas"]["PostedEntryView"][];
+            /** Format: double */
+            netResult: null | number | string;
+        };
         FixedAssetDetailView: {
             asset: components["schemas"]["FixedAssetView"];
             schedule: components["schemas"]["DepreciationLineView"][];
@@ -41763,6 +42346,7 @@ export interface components {
             /** Format: double */
             disposalValue: null | number | string;
             disposalReason: null | string;
+            ledgerAccountCode: null | string;
         };
         FleetExpenseRegisteredResponse: {
             /** Format: uuid */
@@ -42395,6 +42979,8 @@ export interface components {
             /** Format: double */
             unitPrice: number | string;
             taxCode: string;
+            /** @enum {null|string} */
+            kind?: "Goods" | "Service" | null;
         };
         IssueCreditNoteRequest: {
             /** Format: uuid */
@@ -43877,6 +44463,30 @@ export interface components {
             category: null | string;
             reference: null | string;
         };
+        PgcLoadResult: {
+            /** Format: uuid */
+            chartVersionId: string;
+            /** Format: int32 */
+            accountsCreated: number | string;
+            /** Format: int32 */
+            accountsKept: number | string;
+            /** Format: int32 */
+            accountsAdopted: number | string;
+            /** Format: int32 */
+            journalsCreated: number | string;
+            /** Format: int32 */
+            postingRulesCreated: number | string;
+            /** Format: int32 */
+            postingRulesKept: number | string;
+            /** Format: int32 */
+            reportingRulesCreated: number | string;
+            notes: string[];
+            /**
+             * Format: int32
+             * @default 0
+             */
+            postingRulesUpdated: number | string;
+        };
         PillarReport: {
             pillar: string;
             /** Format: int32 */
@@ -44052,6 +44662,16 @@ export interface components {
             /** Format: int32 */
             hierarchyLevel: number | string;
             grantsApprovalAuthority: boolean;
+        };
+        PostedEntryView: {
+            /** Format: uuid */
+            entryId: string;
+            transactionId: string;
+            description: string;
+            /** Format: int32 */
+            lines: number | string;
+            /** Format: double */
+            total: number | string;
         };
         PostEntryLineRequest: {
             accountCode: string;
@@ -44412,6 +45032,7 @@ export interface components {
             /** Format: date-time */
             cancelledAt: null | string;
             cancellationReason: null | string;
+            expenseAccountCode?: null | string;
         };
         PurchaseOrderCreatedResponse: {
             /** Format: uuid */
@@ -44591,7 +45212,7 @@ export interface components {
             lines: null | components["schemas"]["GoodsReceiptLineRequest"][];
         };
         RegisterItemRequest: {
-            sku: string;
+            sku: null | string;
             name: string;
             unit: string;
         };
@@ -44622,6 +45243,7 @@ export interface components {
             /** Format: double */
             taxTotal: number | string;
             description: null | string;
+            expenseAccountCode?: null | string;
         };
         RegisterReceiptRequest: {
             series: null | string;
@@ -44671,7 +45293,7 @@ export interface components {
             model: string;
         };
         RegisterWarehouseRequest: {
-            code: string;
+            code: null | string;
             name: string;
         };
         ReimbursementRequest: {
@@ -44887,6 +45509,8 @@ export interface components {
             netAmount: number | string;
             /** Format: double */
             taxAmount: number | string;
+            /** @default Service */
+            kind: string;
         };
         SalesInvoiceSummary: {
             /** Format: uuid */
@@ -45281,6 +45905,37 @@ export interface components {
             /** Format: double */
             total: number | string;
             accounts: components["schemas"]["StatementAccount"][];
+        };
+        StatutoryLineView: {
+            key: string;
+            label: string;
+            note: null | string;
+            kind: string;
+            /** Format: int32 */
+            level: number | string;
+            /** Format: double */
+            current: null | number | string;
+            /** Format: double */
+            previous: null | number | string;
+        };
+        StatutoryStatementView: {
+            statement: string;
+            title: string;
+            entityName: null | string;
+            entityTaxId: null | string;
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: int32 */
+            uptoPeriod: null | number | string;
+            /** Format: date */
+            reportingDate: string;
+            currency: string;
+            /** Format: int32 */
+            unit: number | string;
+            unitLabel: string;
+            lines: components["schemas"]["StatutoryLineView"][];
+            outsideThePlan: components["schemas"]["StatementAccount"][];
+            notes: string[];
         };
         StockMovementRegisteredResponse: {
             /** Format: uuid */
@@ -45773,6 +46428,36 @@ export interface components {
             tax: number | string;
             /** Format: int32 */
             documents: number | string;
+        };
+        VatSettlementRequest: {
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: int32 */
+            month: number | string;
+            carryForwardCredit: null | boolean;
+        };
+        VatSettlementView: {
+            outcome: string;
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: int32 */
+            month: number | string;
+            /** Format: uuid */
+            entryId: null | string;
+            transactionId: null | string;
+            /** Format: double */
+            outputTax: number | string;
+            /** Format: double */
+            deductibleTax: number | string;
+            /** Format: double */
+            adjustments: number | string;
+            /** Format: double */
+            creditBroughtForward: number | string;
+            /** Format: double */
+            payable: number | string;
+            /** Format: double */
+            recoverable: number | string;
+            notes: string[];
         };
         VatSummary: {
             /** Format: date */

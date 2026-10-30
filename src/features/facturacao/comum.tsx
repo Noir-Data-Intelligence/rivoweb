@@ -146,12 +146,15 @@ export function Anular({
   );
 }
 
+/** Natureza da linha (PGC): bens lançam em 61 Vendas, serviços em 62 Prestações de serviços. */
+export const NATUREZA_LINHA: Readonly<Record<string, string>> = { Goods: "Bens", Service: "Serviço" };
+
 /** Linhas de um documento emitido, com os valores do servidor. */
 export function LinhasDocumento({
   linhas,
   moedaDoc,
 }: {
-  linhas: readonly { lineNumber: Valor; description: string; quantity: Valor; unitPrice: Valor; taxCode: string; taxPercentage: Valor; netAmount: Valor; taxAmount: Valor }[];
+  linhas: readonly { lineNumber: Valor; description: string; quantity: Valor; unitPrice: Valor; taxCode: string; taxPercentage: Valor; netAmount: Valor; taxAmount: Valor; kind?: string | null | undefined }[];
   moedaDoc: string;
 }) {
   return (
@@ -169,7 +172,10 @@ export function LinhasDocumento({
         <tbody>
           {linhas.map((l) => (
             <tr key={String(l.lineNumber)} className="border-b border-border last:border-0">
-              <td className="px-3 py-2 text-foreground">{l.description}</td>
+              <td className="px-3 py-2 text-foreground">
+                {l.description}
+                {l.kind ? <span className="block text-xs text-muted-foreground">{NATUREZA_LINHA[l.kind] ?? l.kind}</span> : null}
+              </td>
               <td className="px-3 py-2 text-right tabular-nums">{String(l.quantity).replace(".", ",")}</td>
               <td className="hidden px-3 py-2 text-right tabular-nums sm:table-cell">{moeda(l.unitPrice, moedaDoc)}</td>
               <td className="hidden px-3 py-2 text-right tabular-nums md:table-cell">

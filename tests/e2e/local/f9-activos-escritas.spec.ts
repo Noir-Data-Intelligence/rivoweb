@@ -77,7 +77,7 @@ test("F9: activo amortizado, outro corrigido e abatido; manutenção, custódia 
   await page.getByRole("button", { name: "Correr amortização" }).click();
   await dialogo(page).getByLabel("Mês").fill("2020-02");
   await dialogo(page).getByRole("button", { name: "Correr" }).click();
-  await expect(dialogo(page).getByText(/activos? amortizados?/)).toBeVisible();
+  await expect(dialogo(page).getByText(/^\d+ activos? amortizados?/)).toBeVisible();
   await page.keyboard.press("Escape");
   await page.goto(`/activos/${idA}`);
   await expect(page.getByRole("table", { name: "Plano de amortização" }).getByRole("row").filter({ hasText: "Fevereiro 2020" })).toContainText("Registada");

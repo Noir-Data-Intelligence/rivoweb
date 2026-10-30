@@ -227,6 +227,7 @@ export default function FacturaCompra() {
               <Linha rotulo="Emitida em">{formatarData(f.issuedOn)}</Linha>
               <Linha rotulo="Vence em">{formatarData(f.dueOn)}</Linha>
               <Linha rotulo="Descrição">{f.description ?? "—"}</Linha>
+              <Linha rotulo="Conta da despesa">{f.expenseAccountCode ?? "—"}</Linha>
             </dl>
             <dl className="ml-auto mt-4 grid w-full max-w-xs grid-cols-2 gap-x-4 gap-y-1 text-sm">
               <dt className="text-muted-foreground">Sem IVA</dt>

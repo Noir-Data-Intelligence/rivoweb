@@ -95,6 +95,7 @@ export const EVENTOS = [
   { valor: "SalesInvoiceIssued", texto: "Factura de venda emitida" },
   { valor: "CreditNoteIssued", texto: "Nota de crédito emitida" },
   { valor: "ReceiptRegistered", texto: "Recibo registado" },
+  { valor: "CashReceiptRegistered", texto: "Recibo em numerário ou cheque" },
   { valor: "ReceiptWithholding", texto: "Retenção na fonte num recibo" },
   { valor: "PurchaseInvoiceRegistered", texto: "Factura de compra registada" },
   { valor: "PaymentExecuted", texto: "Pagamento executado" },

@@ -161,7 +161,7 @@ test.describe("relatórios e impostos", () => {
     await expect(page.getByRole("cell", { name: "Caixa", exact: true })).toBeVisible();
     await expect(page.getByText("Equilibrado", { exact: true })).toBeVisible();
     await semViolacoesAxe(page);
-    await page.getByRole("link", { name: "Balanço" }).click();
+    await page.getByRole("link", { name: "Balanço", exact: true }).click();
     await expect(page.getByText("1 conta movimentada não tem classe de reporte", { exact: false })).toBeVisible();
     await expect(page.getByText("diferença de 140 000,00 Kz", { exact: false })).toBeVisible();
     await expect(page.getByRole("link", { name: "Configurar as classes de reporte" })).toHaveAttribute("href", "/plano-contas?vista=reporte");
@@ -323,8 +323,7 @@ test.describe("contabilidade", () => {
     await d.getByLabel("Código").fill("1111");
     await d.getByLabel("Conta-mãe").fill("111");
     await d.getByLabel("Descrição").fill("Caixa sede");
-    await d.getByRole("button", { name: "Abrir conta" }).click();
-    await expect(d.getByText("111 é conta de movimento e não agrega outras.")).toBeVisible();
+    await expect(d.getByText("111 é de movimento: passa a agregadora, se não tiver lançamentos.")).toBeVisible();
     await d.getByLabel("Conta-mãe").fill("11");
     await d.getByRole("button", { name: "Abrir conta" }).click();
     await expect(d).toHaveCount(0);

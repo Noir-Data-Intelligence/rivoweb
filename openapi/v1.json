@@ -10813,7 +10813,7 @@
         "tags": [
           "TreasuryEndpoints"
         ],
-        "summary": "Regista a depreciação de um mês para os activos em uso. Idempotente por activo e mês.",
+        "summary": "Regista a depreciação de um mês para os activos em uso. Idempotente por activo e mês. Com o PGC carregado, lança 73.x/18.x dos activos com `ledgerAccountCode` (ADR-094).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -10841,6 +10841,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -11959,6 +11969,47 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/exchange-rates/sync": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Busca já o câmbio de referência do BNA (o servidor fá-lo sozinho de 3 em 3 horas) e grava-o para o dia da publicação. Nunca sobrepõe um câmbio já registado nesse dia. 409 se a busca estiver desligada.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeRateSyncResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -17879,6 +17930,435 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlanningLookups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/pgc": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Carrega o PGC angolano (Decreto n.º 82/01, com o IVA): contas, diários, regras de lançamento e de reporte. Só acrescenta; repete-se sem duplicar.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PgcLoadResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/document-postings": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Lança os documentos de um período (até 31 dias) que ficaram por lançar, como a emissão os teria lançado: na data de cada um e ao câmbio desse dia. Repete-se sem duplicar; os anulados não lançam. dryRun mostra o que lançaria, sem gravar.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentHistoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentHistoryView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/vat-settlements": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Apuramento do IVA de um mês pelas contas do PGC: 34.5.2, 34.5.3 e 34.5.4 contra 34.5.5.1, e o saldo para 34.5.6.1 (a pagar) ou 34.5.7.1 (a recuperar).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VatSettlementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatSettlementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/closing": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Apuramento de resultados do exercício (classes 6 e 7 e conta 87 para 82–86 e 88), no período 13, pelas contas «Transferência para …».",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FiscalYearView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/opening": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Abre o exercício com os saldos do anterior; o resultado (88) e os dividendos antecipados (89) passam para «81 Resultados transitados».",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FiscalYearView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/reports/statutory/balance-sheet": {
+      "get": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Balanço no modelo do PGC, com o exercício anterior. unit: 1, 1000 (omissão) ou 1000000 kwanzas.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "uptoPeriod",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "unit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatutoryStatementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/reports/statutory/income-statement": {
+      "get": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Demonstração de resultados por natureza no modelo do PGC, com o mesmo período do exercício anterior.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "uptoPeriod",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "unit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatutoryStatementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -40731,6 +41211,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "ledgerAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -43926,7 +44412,10 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -46179,6 +46668,23 @@
             "items": {
               "type": "string"
             }
+          },
+          "journalEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "ledgerNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postingBlocked": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -46261,6 +46767,126 @@
           "uploadedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "DocumentHistoryProblem": {
+        "required": [
+          "document",
+          "date",
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "document": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "DocumentHistoryRequest": {
+        "required": [
+          "from",
+          "to",
+          "dryRun"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "dryRun": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "DocumentHistoryView": {
+        "required": [
+          "from",
+          "to",
+          "dryRun",
+          "posted",
+          "alreadyPosted",
+          "cancelled",
+          "withoutRule",
+          "postedByKind",
+          "problems"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "dryRun": {
+            "type": "boolean"
+          },
+          "posted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "alreadyPosted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "cancelled": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "withoutRule": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "postedByKind": {
+            "type": "object",
+            "additionalProperties": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "problems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentHistoryProblem"
+            }
           }
         }
       },
@@ -46978,6 +47604,34 @@
               "null",
               "string"
             ]
+          },
+          "currentPositionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "currentPositionName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "monthlySalary": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "salaryCurrency": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -47231,6 +47885,47 @@
               "string"
             ],
             "format": "int32"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skippedRecipients": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 0
+          }
+        }
+      },
+      "ExchangeRateSyncResult": {
+        "required": [
+          "source",
+          "recorded",
+          "kept",
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "recorded": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeRateView"
+            }
+          },
+          "kept": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "errors": {
             "type": "array",
@@ -48016,6 +48711,50 @@
           }
         }
       },
+      "FiscalYearView": {
+        "required": [
+          "fiscalYear",
+          "outcome",
+          "message",
+          "entries",
+          "netResult"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostedEntryView"
+            }
+          },
+          "netResult": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "FixedAssetDetailView": {
         "required": [
           "asset",
@@ -48066,7 +48805,8 @@
           "status",
           "disposedOn",
           "disposalValue",
-          "disposalReason"
+          "disposalReason",
+          "ledgerAccountCode"
         ],
         "type": "object",
         "properties": {
@@ -48211,6 +48951,12 @@
             "format": "double"
           },
           "disposalReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ledgerAccountCode": {
             "type": [
               "null",
               "string"
@@ -50787,6 +51533,16 @@
           },
           "taxCode": {
             "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "Goods",
+              "Service"
+            ],
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -56778,6 +57534,97 @@
           }
         }
       },
+      "PgcLoadResult": {
+        "required": [
+          "chartVersionId",
+          "accountsCreated",
+          "accountsKept",
+          "accountsAdopted",
+          "journalsCreated",
+          "postingRulesCreated",
+          "postingRulesKept",
+          "reportingRulesCreated",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "chartVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountsCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "accountsKept": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "accountsAdopted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "journalsCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "postingRulesCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "postingRulesKept": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reportingRulesCreated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "postingRulesUpdated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 0
+          }
+        }
+      },
       "PillarReport": {
         "required": [
           "pillar",
@@ -57485,6 +58332,44 @@
           },
           "grantsApprovalAuthority": {
             "type": "boolean"
+          }
+        }
+      },
+      "PostedEntryView": {
+        "required": [
+          "entryId",
+          "transactionId",
+          "description",
+          "lines",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "lines": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
           }
         }
       },
@@ -58933,6 +59818,12 @@
               "null",
               "string"
             ]
+          },
+          "expenseAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -59654,7 +60545,10 @@
         "type": "object",
         "properties": {
           "sku": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -59773,6 +60667,12 @@
             "format": "double"
           },
           "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expenseAccountCode": {
             "type": [
               "null",
               "string"
@@ -59998,7 +60898,10 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -60829,6 +61732,10 @@
               "string"
             ],
             "format": "double"
+          },
+          "kind": {
+            "type": "string",
+            "default": "Service"
           }
         }
       },
@@ -62336,6 +63243,152 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StatementAccount"
+            }
+          }
+        }
+      },
+      "StatutoryLineView": {
+        "required": [
+          "key",
+          "label",
+          "note",
+          "kind",
+          "level",
+          "current",
+          "previous"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "current": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "previous": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "StatutoryStatementView": {
+        "required": [
+          "statement",
+          "title",
+          "entityName",
+          "entityTaxId",
+          "fiscalYear",
+          "uptoPeriod",
+          "reportingDate",
+          "currency",
+          "unit",
+          "unitLabel",
+          "lines",
+          "outsideThePlan",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "statement": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "entityName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entityTaxId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "uptoPeriod": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reportingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "unit": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "unitLabel": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatutoryLineView"
+            }
+          },
+          "outsideThePlan": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatementAccount"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
             }
           }
         }
@@ -64330,6 +65383,143 @@
           }
         }
       },
+      "VatSettlementRequest": {
+        "required": [
+          "fiscalYear",
+          "month",
+          "carryForwardCredit"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "carryForwardCredit": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "VatSettlementView": {
+        "required": [
+          "outcome",
+          "fiscalYear",
+          "month",
+          "entryId",
+          "transactionId",
+          "outputTax",
+          "deductibleTax",
+          "adjustments",
+          "creditBroughtForward",
+          "payable",
+          "recoverable",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string"
+          },
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "entryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "outputTax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "deductibleTax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "adjustments": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "creditBroughtForward": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "payable": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "recoverable": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "VatSummary": {
         "required": [
           "from",
@@ -65024,6 +66214,9 @@
     },
     {
       "name": "LedgerEndpoints"
+    },
+    {
+      "name": "PgcEndpoints"
     },
     {
       "name": "HrModuleEndpoints"

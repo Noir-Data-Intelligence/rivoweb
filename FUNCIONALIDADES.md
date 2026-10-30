@@ -14,7 +14,10 @@
 > leitura em produção 10/10 a 2026-10-22 · actualizado a 2026-10-26 (portal:
 > benefícios, contrato e dados pessoais; aprovações: validação de conformidade
 > com checklist, K4; auditoria interna; trilha por período com os eventos por
-> dia).
+> dia) · actualizado a 2026-10-30 (contabilidade pelo PGC: carregar o plano,
+> Balanço e DR nos modelos do decreto, apuramento do IVA, fecho e abertura do
+> exercício, lançar o histórico; conta do PGC no activo e na factura de
+> compra; bens ou serviços nas linhas).
 
 ---
 
@@ -169,7 +172,8 @@ AM = AssetManager.
 | Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | ✓ ⁴ | — | — | — |
 | Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Emitir notas de crédito a partir da factura | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Emitir notas de crédito a partir da factura (cada linha leva a natureza da linha da factura: bens ou serviços) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Ver nas linhas das facturas e das notas de crédito se são bens ou serviços | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Registar recebimentos (recibos) a partir da factura, com o retido na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Notas de crédito e recibos:** ver listas, fichas e PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** ver | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
@@ -184,6 +188,8 @@ AM = AssetManager.
 | **Facturas de compra** | | | | | | | | | | |
 | Ver a lista (vencem até) e a ficha, com o confronto com a encomenda | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Registar com a conta da despesa do PGC (opcional; vazio lança em 75.2.39); ver a conta na ficha | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Sugestões de contas de custos ao escrever a conta da despesa (quem lê o plano de contas) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Anular | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Compras** | | | | | | | | | | |
 | Ver as requisições (quem pediu, departamento, linhas, total estimado, estado) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -204,6 +210,8 @@ AM = AssetManager.
 | Ver os activos (custo, amortizado, valor líquido), o plano de amortização, a manutenção, a custódia e os seguros | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Registar e corrigir (antes da primeira amortização); abater | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Correr a amortização de um mês | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Conta do PGC do activo (11.2 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Abrir o lançamento da amortização no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -257,15 +265,19 @@ AM = AssetManager.
 | **Relatórios financeiros** | | | | | | | | | | |
 | Balancete por ano e período, com o equilíbrio | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Balanço e demonstração de resultados, com as contas sem classe e a diferença à vista | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Balanço e DR nos modelos do PGC: linhas do decreto, notas, exercício e comparativo, unidade (milhares, milhões, kwanzas), avisos e contas fora do plano | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Antiguidade dos saldos de clientes e de fornecedores, numa data | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Impostos** | | | | | | | | | | |
 | Resumo do IVA (liquidado, regularizado, dedutível, a entregar) e retenções na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Descarregar o SAF-T AO de facturação do mês ou do ano ¹⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Apurar o IVA do mês no razão (com ou sem o crédito anterior), com o lançamento e os valores | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Contabilidade** | | | | | | | | | | |
 | Ver lançamentos, diários, plano de contas, versões do plano, períodos e regras | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Abrir diários e contas; lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Abrir diários e contas (também debaixo de uma conta de movimento sem lançamentos, que passa a agregadora); lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fechar e reabrir períodos; versões do plano; regras de lançamento e contabilísticas | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Carregar o PGC (contas, diários, regras); apurar os resultados e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Lançar o histórico (documentos de antes das regras): simular e depois lançar, um mês ou o ano | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Planeamento** | | | | | | | | | | |
 | Ver centros de custo, orçamentos (com os meses, quem aprovou) e previsões de custos, com os nomes | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Abrir centros de custo e registar previsões de custos | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -817,6 +829,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Notas de crédito** e **Recibos**
 - Listas (recibos com filtro por datas) e fichas com **PDF**, **enviar ao
   cliente** e **anular**.
+- As linhas das facturas e das notas de crédito dizem se são **bens** ou
+  **serviço**; a nota de crédito leva a natureza da linha da factura. As
+  facturas emitidas pelo front saem como serviços até o backend aceitar a
+  natureza nos rascunhos (B43).
 
 **Pró-formas**
 - Lista por estado (em aberto, convertidas, anuladas) e detalhe.
@@ -887,7 +903,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   de produção com o total, vida útil de 1 a 1200 meses); **correr a
   amortização** de um mês (as unidades usadas, nos activos por unidades;
   correr de novo não duplica), com o resultado (registados, já registados,
-  total e saltados).
+  total e saltados), se **lançou no razão** (com a ligação ao lançamento) e,
+  se não lançou, porquê.
+- **Conta do PGC** do activo (opcional, ao registar e corrigir): 11.2 a 11.6 e
+  11.9 (corpóreas) ou 12.1 a 12.4 e 12.9 (incorpóreas); com ela, a amortização
+  lança no razão. Os terrenos não se amortizam. A ficha mostra a conta.
 - **Activo:** valores, plano de amortização com cada mês registado ou
   previsto; **corrigir** (só antes da primeira amortização registada);
   **abater** (data depois da aquisição, valor de venda, motivo).
@@ -965,6 +985,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   (PDF ou imagem até 10 MB, por botão): preenche os campos — e escolhe o
   fornecedor registado com o mesmo NIF —, mostra os avisos e as linhas
   lidas; nada se grava até carregar em registar.
+- **Conta da despesa** (opcional): a conta de movimento do PGC onde a despesa
+  lança (por exemplo 75.2.12 Electricidade), com sugestões das contas de
+  custos; vazio lança em 75.2.39 Outros serviços. A ficha mostra a conta.
 - Ficha: dados e totais, confronto com a encomenda quando a tem, os pedidos de
   pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
   **anular** com motivo.
@@ -1041,6 +1064,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   líquido; num mês, acumulado desde Janeiro ou só o mês.
 - **Antiguidade de saldos** de clientes (a receber) ou de fornecedores (a
   pagar) numa data: por vencer, 1–30, 31–60, 61–90 e mais de 90 dias.
+- **Balanço (PGC)** e **DR (PGC)**: os modelos do decreto, pela ordem e com as
+  notas, o exercício e o comparativo (fim do exercício anterior no balanço, o
+  mesmo período na DR, custos negativos); a entidade e o NIF, a data e a
+  unidade (milhares de kwanzas por omissão, milhões, ou kwanzas para
+  conferir, no URL); os avisos do servidor e as contas movimentadas fora do
+  PGC.
 
 **Impostos**
 - **IVA** do mês ou do ano: liquidado por taxa, regularizado nas notas de
@@ -1050,6 +1079,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **SAF-T AO** de facturação do mês ou do ano, descarregado em XML, com o aviso
   de que a Rivo não é software certificado. Hoje o servidor recusa por falta de
   configuração (B24) e o ecrã mostra o motivo.
+- **Apurar o IVA** de um mês no razão (com ou sem o crédito dos meses
+  anteriores): IVA liquidado, dedutível, regularizações, crédito transitado, a
+  pagar e a recuperar, com a ligação ao lançamento; um mês já apurado não
+  lança nada.
 
 **Lançamentos**
 - Lista por diário, ano e período (incluindo os de regularização), com estado.
@@ -1064,8 +1097,15 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Plano de contas**
 - **Contas** (categorias do SAF-T AO: 1.º grau, agregadoras e de movimento,
   geral e analítica): procurar, ver as inactivas, **abrir** (com a conta-mãe
-  validada como no servidor) e **desactivar**.
-- **Versões do plano**: ver e **registar** (nome, versão, fonte, vigência).
+  validada como no servidor; debaixo de uma conta de movimento sem
+  lançamentos, ela passa a agregadora, e com lançamentos o servidor recusa) e
+  **desactivar**.
+- **Carregar o PGC** (Decreto n.º 82/01, com o IVA): acrescenta as contas, os
+  diários e as regras de lançamento e de reporte e mostra quantos criou ou já
+  havia; repetir não duplica.
+- **Versões do plano**: ver e **registar** (nome, versão, fonte, vigência),
+  com o aviso de que uma versão nova começa sem contas e, em vigor, pára a
+  emissão (B44).
 - **Classes de reporte** (prefixo → activo, passivo, capital, proveitos ou
   custos, rubrica e ordem): ver, **criar**, **rever** e **apagar**.
 
@@ -1073,10 +1113,21 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Por ano: meses 1–12 e regularizações 13–16, com estado, fecho e última
   reabertura; **abrir**, **fechar** (fica registado quem fechou) e **reabrir**
   com motivo.
+- **Fecho do exercício** (pelo PGC): **apurar os resultados** do ano (a 31/12,
+  período 13, diário APU; resultado líquido e lançamentos feitos; repetir não
+  duplica) e **abrir o ano** com os saldos do anterior (a 01/01, diário ABE;
+  recusa, com a razão, se o anterior não estiver apurado ou o ano já aberto).
+- **Lançar o histórico**: os documentos emitidos antes das regras (facturas,
+  notas de crédito, recibos, facturas de compra, pagamentos) lançam na data e
+  ao câmbio de cada um. Escolhe-se um mês ou o ano inteiro (mês a mês);
+  primeiro **simula-se**, depois **lança-se** com confirmação. Mostra os
+  lançados, os já lançados, os anulados, os sem regra, por tipo, e os
+  documentos que não lançaram e porquê.
 
 **Regras contabilísticas**
 - **Lançamento automático**: por acontecimento (factura emitida, nota de
-  crédito, recibo, retenção, factura de compra, pagamento), as linhas que gera;
+  crédito, recibo, recibo em numerário ou cheque, retenção, factura de compra,
+  pagamento), as linhas que gera;
   os acontecimentos sem regra dizem que não geram lançamento. **Definir** (só
   regras equilibradas em líquido e imposto) e **desactivar**.
 - **Contabilísticas**: registo versionado com tipo de origem e fonte;
@@ -1390,7 +1441,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   cliente.
 
 **Notas de crédito**, **Recibos**, **Pró-formas** e **A receber**
-- Ver (listas, fichas e PDF); **anular** notas de crédito e recibos.
+- Ver (listas, fichas e PDF); **anular** notas de crédito e recibos. As
+  linhas dizem se são bens ou serviço.
 
 **Contratos de clientes**
 - Ver a lista (com o cliente), a ficha, os aditamentos e **abrir os
@@ -1442,7 +1494,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Lançamentos**, **Plano de contas**, **Períodos** e **Regras contabilísticas**
 - Ver tudo; **abrir** diários e contas, **lançar**, **estornar**, **abrir
   períodos** e mexer nas **classes de reporte**. Não fecha nem reabre
-  períodos, não regista versões do plano nem define regras.
+  períodos, não regista versões do plano nem define regras. Não carrega o
+  PGC, não apura nem abre o exercício e não lança o histórico.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
 - Ver tudo, com os nomes dos departamentos, dos responsáveis e de quem
@@ -1505,6 +1558,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Facturas de compra**
 - Ver, **registar** e **pedir pagamento**; **anexar** documentos ao pedido e
   **cancelá-lo**. Não anula facturas nem executa pagamentos.
+- Ao registar, escreve a **conta da despesa** do PGC (opcional), sem
+  sugestões: não lê o plano de contas.
 
 **Pedidos de pagamento**
 - Ver a lista e a ficha; **abre os anexos** pelo pedido.
@@ -1538,7 +1593,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz no inventário.
 
 **Activos fixos**
-- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
+- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador e
+  escolher a conta do PGC. A amortização diz se lançou no razão, sem a
+  ligação ao lançamento (não lê o razão).
 
 **Viaturas**, **Manutenção prevista** e **Seguros de frota**
 - Tudo o que o Admin faz na frota, incluindo atribuir viaturas, indicar o
@@ -1570,7 +1627,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   regista recebimentos.
 
 **Notas de crédito** e **Recibos**
-- Ver, **PDF** e **enviar ao cliente**.
+- Ver, **PDF** e **enviar ao cliente**. As linhas dizem se são bens ou
+  serviço.
 
 **Comprovativos**
 - Ver a fila e **descarregar** o ficheiro. Não confirma nem rejeita.
@@ -1716,5 +1774,6 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
+| — | Bens ou serviços em cada linha do rascunho de factura (o backend ainda não o aceita nos rascunhos, B43) |
 
 O login com Google (D4) entra quando o backend o tiver.

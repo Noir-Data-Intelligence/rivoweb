@@ -21,6 +21,7 @@ import { useVista, Vistas } from "@/ui/Vistas";
 import {
   useAbrirContaRazao,
   useApagarClasseReporte,
+  useCarregarPgc,
   useClassesReporte,
   useContasRazao,
   useCriarVersaoPlano,
@@ -36,13 +37,15 @@ import { CATEGORIAS_CONTA, CLASSES_REPORTE, textoDe } from "../comum";
 
 // Contas
 
-/** As regras do servidor (`LedgerAccount`) para a conta-mãe. Uma mãe que não está na lista, o servidor confirma. */
+/**
+ * As regras do servidor (`LedgerAccount`) para a conta-mãe. Uma mãe que não está na lista, o servidor confirma.
+ * Uma conta de movimento sem lançamentos pode receber subcontas e passa a agregadora; com lançamentos, o servidor recusa (409).
+ */
 function problemaContaMae(categoria: string, pai: string, contas: readonly ContaRazao[]): string | undefined {
   if (categoria === "GR" || categoria === "AR") return undefined;
   if (pai === "") return "Uma conta abaixo do 1.º grau tem conta-mãe.";
   const mae = contas.find((x) => x.code === pai);
   if (!mae) return undefined;
-  if (mae.acceptsPostings) return `${mae.code} é conta de movimento e não agrega outras.`;
   if (mae.isAnalytic !== categoria.startsWith("A")) return "A conta e a mãe são de contabilidades diferentes (geral e analítica).";
   return undefined;
 }
@@ -59,7 +62,7 @@ function AbrirConta({ contas }: { contas: readonly ContaRazao[] }) {
   const idLista = useId();
   const c = normalizarTexto(codigo).toUpperCase();
   const p = normalizarTexto(pai).toUpperCase();
-  const agregadoras = contas.filter((x) => x.isActive && !x.acceptsPostings);
+  const maes = contas.filter((x) => x.isActive);
   const erros = {
     codigo: c === "" ? "Indique o código da conta." : c.length > 30 ? "No máximo 30 caracteres." : contas.some((x) => x.code === c) ? "Já existe uma conta com este código." : undefined,
     nome: normalizarTexto(nome) === "" ? "Indique a descrição." : undefined,
@@ -91,7 +94,7 @@ function AbrirConta({ contas }: { contas: readonly ContaRazao[] }) {
         formulario={idForm}
       >
         <datalist id={idLista}>
-          {agregadoras.map((x) => (
+          {maes.map((x) => (
             <option key={x.accountId} value={x.code}>
               {x.name}
             </option>
@@ -123,7 +126,7 @@ function AbrirConta({ contas }: { contas: readonly ContaRazao[] }) {
             {({ id, descricao, invalido }) => <Input id={id} maxLength={30} autoComplete="off" className="tabular-nums" aria-describedby={descricao} invalido={invalido} value={codigo} onChange={(e) => setCodigo(e.target.value)} />}
           </Field>
           {categoria === "GR" || categoria === "AR" ? null : (
-            <Field rotulo="Conta-mãe" erro={tentou ? erros.pai : undefined}>
+            <Field rotulo="Conta-mãe" erro={tentou ? erros.pai : undefined} ajuda={contas.find((x) => x.code === p)?.acceptsPostings ? `${p} é de movimento: passa a agregadora, se não tiver lançamentos.` : undefined}>
               {({ id, descricao, invalido }) => <Input id={id} list={idLista} maxLength={30} autoComplete="off" className="tabular-nums" aria-describedby={descricao} invalido={invalido} value={pai} onChange={(e) => setPai(e.target.value)} />}
             </Field>
           )}
@@ -247,6 +250,10 @@ function NovaVersaoPlano() {
         erro={criar.error ? <ErrorPanel erro={criar.error} /> : undefined}
         formulario={idForm}
       >
+        {/* A emissão valida as contas das regras na versão em vigor no dia (`PostDocument.cs`); uma versão nova começa sem contas. */}
+        <Alert tom="aviso" className="mb-4" titulo="Uma versão nova começa sem contas.">
+          A partir da data «em vigor desde», os documentos emitidos passam a ser conferidos com ela: sem as contas que as regras de lançamento usam, a emissão de facturas, recibos e notas de crédito pára. Carregar o PGC de novo volta a pôr a versão do PGC em vigor.
+        </Alert>
         <form
           id={idForm}
           noValidate
@@ -470,6 +477,66 @@ function Reporte() {
   );
 }
 
+/** Carrega o PGC angolano (ADR-093): só acrescenta, e repetir não duplica. */
+function CarregarPgc() {
+  const [aberto, setAberto] = useState(false);
+  const carregar = useCarregarPgc();
+  const r = carregar.data;
+  const mudar = (a: boolean) => {
+    setAberto(a);
+    if (!a) carregar.reset();
+  };
+  return (
+    <>
+      <Button variante="secondary" onClick={() => setAberto(true)}>
+        Carregar o PGC
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={mudar}
+        titulo="Carregar o Plano Geral de Contabilidade"
+        descricao="Acrescenta as contas do PGC angolano (Decreto n.º 82/01, com o IVA), os diários e as regras de lançamento e de reporte. Não apaga nem altera o que já existe, e repetir não duplica."
+        rotuloConfirmar={r ? "Fechar" : "Carregar"}
+        aCarregar={carregar.isPending}
+        erro={carregar.error ? <ErrorPanel erro={carregar.error} /> : undefined}
+        aoConfirmar={() => (r ? mudar(false) : carregar.mutate())}
+      >
+        {r ? (
+          <div className="flex flex-col gap-3">
+            <Alert tom="sucesso" titulo="PGC carregado." />
+            <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm">
+              {(
+                [
+                  ["Contas criadas", r.accountsCreated],
+                  ["Contas que já existiam", r.accountsKept],
+                  ["Contas adoptadas", r.accountsAdopted],
+                  ["Diários criados", r.journalsCreated],
+                  ["Regras de lançamento criadas", r.postingRulesCreated],
+                  ["Regras de lançamento actualizadas", r.postingRulesUpdated ?? 0],
+                  ["Regras de lançamento mantidas", r.postingRulesKept],
+                  ["Regras de reporte criadas", r.reportingRulesCreated],
+                ] as const
+              ).map(([t, n]) => (
+                <div key={t} className="contents">
+                  <dt className="text-muted-foreground">{t}</dt>
+                  <dd className="text-right tabular-nums">{String(n)}</dd>
+                </div>
+              ))}
+            </dl>
+            {r.notes.length > 0 ? (
+              <ul className="list-inside list-disc text-sm text-muted-foreground">
+                {r.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+      </Confirmar>
+    </>
+  );
+}
+
 const VISTAS = [
   { valor: "contas", texto: "Contas" },
   { valor: "versoes", texto: "Versões do plano" },
@@ -481,7 +548,15 @@ export default function PlanoContas() {
   const conteudo: Record<(typeof VISTAS)[number]["valor"], ReactNode> = { contas: <Contas />, versoes: <Versoes />, reporte: <Reporte /> };
   return (
     <>
-      <PageHeader titulo="Plano de contas" descricao="As contas da contabilidade geral e analítica, as versões do plano e como cada conta chega aos relatórios." />
+      <PageHeader
+        titulo="Plano de contas"
+        descricao="As contas da contabilidade geral e analítica, as versões do plano e como cada conta chega aos relatórios."
+        accao={
+          <Can requer="finance.ledger.close">
+            <CarregarPgc />
+          </Can>
+        }
+      />
       <Vistas rotulo="Plano de contas" vistas={VISTAS} actual={vista} />
       {vista ? conteudo[vista] : null}
     </>

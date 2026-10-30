@@ -167,6 +167,7 @@ export const activo = (amortizado = false): S["FixedAssetView"] => ({
   disposedOn: null,
   disposalValue: null,
   disposalReason: null,
+  ledgerAccountCode: null,
 });
 
 export const activos = (): S["FixedAssetView"][] => [

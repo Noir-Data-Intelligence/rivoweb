@@ -350,7 +350,7 @@ test("F5: tesouraria — conta, extracto e reconciliação, câmbio, caixa peque
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByLabel("Valor").fill("10");
   await page.getByLabel("De", { exact: true }).selectOption("ZAR");
-  await page.getByLabel("Para").selectOption("AOA");
+  await page.getByLabel("Para", { exact: true }).selectOption("AOA");
   await page.getByRole("button", { name: "Converter" }).click();
   await expect(page.getByText("512,35 Kz")).toBeVisible();
 

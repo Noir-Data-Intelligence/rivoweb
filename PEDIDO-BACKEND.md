@@ -1,7 +1,8 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `e8d4a19`. Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `bcafef2`. Em aberto: **B24** (configuração),
+> **B43** (bens ou serviços nos rascunhos) e **B44** (versão do plano vazia).
 > **B42** está resolvido (PR #121) e o front já o usa: o passo de uma tarefa
 > é `TaskChecklistItemRequest` e as políticas usam `PolicyChecklistItemRequest`;
 > saiu o tipo local dos projectos.
@@ -581,3 +582,50 @@ com um tipo local até à correcção (ver `features/projectos/api.ts`).
 `TaskChecklistItemRequest` e `PolicyChecklistItemRequest`), ou configurar o
 `CreateSchemaReferenceId` para incluir o módulo, e confirmar que não há outros
 nomes repetidos entre módulos.
+
+## B43 — Os rascunhos de factura não guardam se a linha é de bens ou de serviços
+
+> Aberto a 2026-10-30, contra `main` @ `bcafef2` (merge do #126).
+
+**Facto:** o #125 acrescentou `kind` (`Goods` ou `Service`) a
+`InvoiceLineRequest`, o corpo de `POST /finance/sales-invoices` e de
+`POST /finance/credit-notes`. Este front não emite facturas por essa rota:
+emite pelos rascunhos (`POST`/`PUT /finance/invoice-drafts` e
+`POST /finance/invoice-drafts/{draftId}/issue`). `DraftLineRequest`
+(`TreasuryEndpoints.cs:420`) e `DraftLine` (`TreasuryAndAssets.cs:30`) não têm
+`kind`.
+
+**Consequência:** todas as facturas emitidas pelo front saem como serviços:
+lançam em 62 Prestações de serviços, e o SAF-T declara `S` também nas
+vendas de bens. As notas de crédito já levam o `kind` da linha da factura
+original.
+
+**Pedido:** `kind` (opcional, `Service` por omissão) em `DraftLineRequest`, na
+linha da vista do rascunho e na emissão do rascunho. O front acrescenta então
+o selector «Bens / Serviço» em cada linha do rascunho.
+
+## B44 — Registar uma versão do plano de contas pode parar a emissão
+
+> Aberto a 2026-10-30, contra `main` @ `bcafef2`.
+
+**Facto:** `POST /finance/ledger/chart-versions` cria uma versão vazia
+(`accountCount` 0) e activa. Ao emitir, `PostDocument.cs` confere as contas da
+regra com a versão activa de data mais recente
+(`FindActiveChartVersionForDateAsync`). Na base local, uma versão de teste em
+vigor desde hoje fez a emissão de facturas falhar com «A regra de postagem de
+SalesInvoiceIssued usa a conta '62.1.1', que não existe no plano de contas
+'…' ». Voltar a carregar o PGC (`POST /finance/ledger/pgc`) desactivou a outra
+versão e a emissão voltou.
+
+Em produção, hoje, só a versão do PGC está activa (758 contas); a «Sem versão
+atribuída» está inactiva. Verificado só com leituras.
+
+**Consequência:** um Admin que registe uma versão nova pelo ecrã «Versões do
+plano» pára a facturação a partir da data dessa versão. O front passou a
+avisar no formulário, mas não o impede.
+
+**Pedido:** uma destas opções:
+- a versão nova nasce com as contas da versão em vigor (cópia);
+- ou o servidor recusa activar uma versão que não tem as contas usadas pelas
+  regras de lançamento activas, e diz quais faltam;
+- ou passa a haver uma rota para desactivar uma versão.

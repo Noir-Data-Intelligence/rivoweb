@@ -361,3 +361,71 @@ export function useDesactivarRegraContabilistica() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "ledger", "accounting-rules"] }),
   });
 }
+
+// PGC (ADR-093 a 095): carregar o plano, demonstrações no modelo do decreto, IVA, exercício e histórico
+
+export type DemonstracaoOficial = S["StatutoryStatementView"];
+export type LinhaOficial = S["StatutoryLineView"];
+export type CargaPgc = S["PgcLoadResult"];
+export type ApuramentoIva = S["VatSettlementView"];
+export type Exercicio = S["FiscalYearView"];
+export type Historico = S["DocumentHistoryView"];
+
+/** Escrevem no razão: tudo o que é contabilidade e relatórios volta a ler-se. */
+const invalidarFinancas = (qc: ReturnType<typeof useQueryClient>) => qc.invalidateQueries({ queryKey: ["finance"] });
+
+export function useDemonstracaoOficial(tipo: "balanco" | "resultados", ano: number, periodo: number | null, unidade: number) {
+  return useQuery({
+    queryKey: ["finance", "reports", "statutory", tipo, ano, periodo, unidade] as const,
+    queryFn: ({ signal }) => {
+      const query = { fiscalYear: ano, unit: unidade, ...(periodo === null ? {} : { uptoPeriod: periodo }) };
+      return tipo === "balanco"
+        ? ler(api.GET("/finance/reports/statutory/balance-sheet", { params: { query }, signal }))
+        : ler(api.GET("/finance/reports/statutory/income-statement", { params: { query }, signal }));
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useCarregarPgc() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: () => ler(api.POST("/finance/ledger/pgc")),
+    onSuccess: () => invalidarFinancas(qc),
+  });
+}
+
+export function useApurarIva() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: { fiscalYear: number; month: number; carryForwardCredit: boolean }) => ler(api.POST("/finance/ledger/vat-settlements", { body: b })),
+    onSuccess: () => invalidarFinancas(qc),
+  });
+}
+
+export function useExercicio() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: ({ ano, acto }: { ano: number; acto: "apurar" | "abrir" }) =>
+      acto === "apurar"
+        ? ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/closing", { params: { path: { fiscalYear: ano } } }))
+        : ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/opening", { params: { path: { fiscalYear: ano } } })),
+    onSuccess: () => invalidarFinancas(qc),
+  });
+}
+
+/**
+ * Lança o histórico mês a mês (o servidor aceita até 31 dias por pedido) e
+ * soma as respostas. Repetir não duplica: o que já lançou vem em `alreadyPosted`.
+ */
+export function useLancarHistorico() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: async ({ janelas, simular }: { janelas: readonly { de: string; ate: string }[]; simular: boolean }) => {
+      const respostas: Historico[] = [];
+      for (const j of janelas) respostas.push(await ler(api.POST("/finance/ledger/document-postings", { body: { from: j.de, to: j.ate, dryRun: simular } })));
+      return respostas;
+    },
+    onSuccess: (_, { simular }) => (simular ? undefined : invalidarFinancas(qc)),
+  });
+}

@@ -1,7 +1,8 @@
 /**
  * Períodos contabilísticos (§5.7): 1 a 12 são os meses, 13 a 16 os de
  * regularização. Só um período aberto aceita lançamentos. Fechar e reabrir
- * pedem `finance.ledger.close`; quem fecha é a conta autenticada.
+ * pedem `finance.ledger.close`; quem fecha é a conta autenticada. Com a
+ * mesma permissão: fecho e abertura do exercício e lançar o histórico (PGC).
  */
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
@@ -19,6 +20,7 @@ import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAbrirPeriodo, useFecharPeriodo, usePeriodos, useReabrirPeriodo, type Periodo } from "../api";
 import { EscolhaAnoPeriodo, useAnoPeriodo } from "../comum";
+import { FechoExercicio, LancarHistorico } from "../Fecho";
 
 const nomePeriodo = (n: number) => (n <= 12 ? `${n} · ${nomeMes(n)}` : `${n} · Regularização`);
 
@@ -162,6 +164,10 @@ export default function Periodos() {
         erro={periodos.error ? <ErrorPanel erro={periodos.error} tentarDeNovo={() => void periodos.refetch()} /> : undefined}
         vazio={`Nenhum período aberto em ${ano}. Sem período aberto não se lança.`}
       />
+      <Can requer="finance.ledger.close">
+        <FechoExercicio ano={ano} />
+        <LancarHistorico key={ano} ano={ano} />
+      </Can>
     </>
   );
 }

@@ -112,6 +112,10 @@ test.describe("facturas de compra", () => {
     await page.getByLabel("Valor sem IVA").fill("1 234 567,89");
     await page.getByLabel("IVA", { exact: true }).fill("172839,50");
     await expect(page.getByText("1 407 407,39", { exact: false })).toBeVisible();
+    await page.getByLabel("Conta da despesa (opcional)").fill("Electricidade");
+    await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
+    await expect(page.getByText("Código de conta do PGC, por exemplo 75.2.12.")).toBeVisible();
+    await page.getByLabel("Conta da despesa (opcional)").fill(" 75.2.12 ");
     await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
     await expect(page).toHaveURL(new RegExp(`/facturas-compra/${IDF5.factura}$`));
     expect(api.escritas("POST", "/finance/purchase-invoices")[0]?.corpo).toMatchObject({
@@ -123,7 +127,10 @@ test.describe("facturas de compra", () => {
       netTotal: "1234567.89",
       taxTotal: "172839.50",
       purchaseOrderId: null,
+      expenseAccountCode: "75.2.12",
     });
+    // O Manager não lê o plano de contas: escreve o código, sem sugestões.
+    expect(api.pedidos.some((p) => p.caminho === "/finance/ledger/accounts")).toBe(false);
   });
 
   test("pedir pagamento: tecto do que falta pedir, 202 abre o pedido", async ({ page, api }) => {

@@ -34,7 +34,7 @@ test.describe("activos fixos", () => {
   test("lista, registar validado com valores em texto, correr a amortização", async ({ page, api, violacoes }) => {
     await comActivos(api)
       .em("POST", "/finance/assets", { status: 201, corpo: { id: IDF9C.portatil, number: "AF-003" } })
-      .em("POST", "/finance/assets/depreciation-runs", { status: 200, corpo: { month: "2026-10-01", recorded: 30, alreadyRecorded: 1, total: 666666.6, skipped: ["AF-009: abatido"] } })
+      .em("POST", "/finance/assets/depreciation-runs", { status: 200, corpo: { month: "2026-10-01", recorded: 30, alreadyRecorded: 1, total: 666666.6, skipped: ["AF-009: abatido"], journalEntryId: "00000000-0000-4000-8000-000000000f11", ledgerNote: "2 activos sem conta do PGC não lançaram." } })
       .ligar();
     await entrar(page);
     const menu = page.getByRole("navigation", { name: "Principal" }).first();
@@ -65,6 +65,8 @@ test.describe("activos fixos", () => {
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(d.getByText("Quotas decrescentes exigem a taxa anual", { exact: false })).toBeVisible();
     await d.getByLabel("Taxa anual (%)").fill("25");
+    await expect(d.getByLabel("Conta do PGC (opcional)").locator("option")).toHaveText(["Nenhuma (não lança no razão)", "11.2 Edifícios e outras construções", "11.3 Equipamento básico", "11.4 Equipamento de carga e transporte", "11.5 Equipamento administrativo", "11.6 Taras e vasilhame", "11.9 Outras imobilizações corpóreas", "12.1 Trespasses", "12.2 Despesas de investigação e desenvolvimento", "12.3 Propriedade industrial e outros direitos e contratos", "12.4 Despesas de constituição", "12.9 Outras imobilizações incorpóreas"]);
+    await d.getByLabel("Conta do PGC (opcional)").selectOption("11.5");
     await semViolacoesAxe(page);
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(page).toHaveURL(new RegExp(`/activos/${IDF9C.portatil}$`));
@@ -80,6 +82,7 @@ test.describe("activos fixos", () => {
       usefulLifeMonths: 48,
       annualRate: "25",
       totalUnits: null,
+      ledgerAccountCode: "11.5",
     });
 
     await page.goto("/activos");
@@ -88,6 +91,10 @@ test.describe("activos fixos", () => {
     await d.getByRole("button", { name: "Correr" }).click();
     await expect(d.getByText("30 activos amortizados, 1 já registados", { exact: false })).toBeVisible();
     await expect(d.getByText("Saltados: AF-009: abatido")).toBeVisible();
+    // Lançou no razão; a ligação ao lançamento só aparece a quem lê o razão (este perfil não lê).
+    await expect(d.getByText("Lançado no razão.")).toBeVisible();
+    await expect(d.getByRole("link", { name: "Ver o lançamento" })).toHaveCount(0);
+    await expect(d.getByText("2 activos sem conta do PGC não lançaram.")).toBeVisible();
     expect(api.escritas("POST", "/finance/assets/depreciation-runs").map((p) => p.corpo)).toEqual([{ month: "2026-10-01", unitsUsed: null }]);
     expect(await violacoes()).toEqual([]);
   });

@@ -26,7 +26,7 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import { useActivos, useApolices, useCorrerAmortizacao, useCustodias, useManutencoes, useRegistarActivo, type Activo, type Apolice, type Custodia, type Manutencao, type PedidoActivo } from "../api";
 import { EstadoActivo, EstadoManutencao, TIPO_MANUTENCAO } from "../comum";
-import { errosActivo, METODOS, type CamposActivo, type MetodoAmortizacao } from "../regras";
+import { CONTAS_PGC_ACTIVO, errosActivo, METODOS, type CamposActivo, type MetodoAmortizacao } from "../regras";
 
 const opc = (v: string) => {
   const n = normalizarTexto(v);
@@ -36,6 +36,7 @@ const texto = (v: number | string | null | undefined) => (v === null || v === un
 
 export const camposDe = (a?: Activo): CamposActivo => ({
   codigo: a?.code ?? "",
+  conta: a?.ledgerAccountCode ?? "",
   nome: a?.name ?? "",
   categoria: a?.category ?? "",
   localizacao: a?.location ?? "",
@@ -75,6 +76,7 @@ export function corpoActivo(v: CamposActivo, extra: { centro: string; fornecedor
     usefulLifeMonths: Number(v.vida),
     annualRate: taxa ? decimalParaApi(taxa) : null,
     totalUnits: unidades ? decimalParaApi(unidades) : null,
+    ledgerAccountCode: v.conta === "" ? null : v.conta,
   };
 }
 
@@ -112,6 +114,19 @@ export function CamposDoActivo({ v, mudar, erros, categorias, centro, setCentro,
               ))}
             </datalist>
           </>
+        )}
+      </Field>
+      <Field rotulo="Conta do PGC (opcional)" ajuda="Com ela, a amortização lança no razão. Os terrenos não se amortizam.">
+        {({ id, descricao }) => (
+          <Select id={id} aria-describedby={descricao} value={v.conta} onChange={(e) => mudar("conta", e.target.value)}>
+            <option value="">Nenhuma (não lança no razão)</option>
+            {v.conta !== "" && !CONTAS_PGC_ACTIVO.some((c) => c.valor === v.conta) ? <option value={v.conta}>{v.conta}</option> : null}
+            {CONTAS_PGC_ACTIVO.map((c) => (
+              <option key={c.valor} value={c.valor}>
+                {c.texto}
+              </option>
+            ))}
+          </Select>
         )}
       </Field>
       <Field rotulo="Localização (opcional)" erro={erros.localizacao}>
@@ -262,6 +277,7 @@ function CorrerAmortizacao({ activos }: { activos: Activo[] }) {
   const [unidades, setUnidades] = useState<Record<string, string>>({});
   const [tentou, setTentou] = useState(false);
   const correr = useCorrerAmortizacao();
+  const { pode } = useUtilizador();
   const idForm = useId();
   const porUnidades = activos.filter((a) => a.status === "Active" && a.method === "UnitsOfProduction");
   const errosUn = Object.fromEntries(porUnidades.map((a) => [a.assetId, (() => { const q = lerDecimalDigitado(unidades[a.assetId] ?? "", 4); return q === null || q.lt(0) ? "Unidades usadas no mês (até 4 casas)." : undefined; })()]));
@@ -291,7 +307,18 @@ function CorrerAmortizacao({ activos }: { activos: Activo[] }) {
       >
         {r ? (
           <Alert tom={r.skipped.length > 0 ? "aviso" : "sucesso"} titulo={`${String(r.recorded)} ${Number(r.recorded) === 1 ? "activo amortizado" : "activos amortizados"}, ${String(r.alreadyRecorded)} já registados; total de ${moeda(r.total, "AOA")}.`}>
-            {r.skipped.length > 0 ? `Saltados: ${r.skipped.join("; ")}` : null}
+            {r.skipped.length > 0 ? <p>Saltados: {r.skipped.join("; ")}</p> : null}
+            {r.journalEntryId ? (
+              <p>
+                Lançado no razão.{" "}
+                {pode("finance.ledger.read") ? (
+                  <Link to={`/lancamentos/${r.journalEntryId}`} className="text-primary underline-offset-4 hover:underline">
+                    Ver o lançamento
+                  </Link>
+                ) : null}
+              </p>
+            ) : null}
+            {r.ledgerNote ? <p>{r.ledgerNote}</p> : null}
           </Alert>
         ) : (
           <form

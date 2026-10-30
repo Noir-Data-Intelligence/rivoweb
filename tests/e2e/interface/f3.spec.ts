@@ -144,7 +144,7 @@ test.describe("facturas", () => {
     await page.getByRole("button", { name: "Emitir nota de crédito" }).click();
     await expect(page).toHaveURL(new RegExp(`/notas-credito/${IDF3.nota}$`));
     expect(api.escritas("POST", "/finance/credit-notes")[0]?.corpo).toEqual({
-      salesInvoiceId: IDF3.factura, series: null, issuedOn: null, reason: "Desconto acordado", lines: [{ description: "Consultoria", quantity: "1", unitPrice: "50000", taxCode: "NOR" }],
+      salesInvoiceId: IDF3.factura, series: null, issuedOn: null, reason: "Desconto acordado", lines: [{ description: "Consultoria", quantity: "1", unitPrice: "50000", taxCode: "NOR", kind: "Goods" }],
     });
     await page.goto(`/facturas/${IDF3.factura}`);
     await page.getByRole("button", { name: "Registar recebimento" }).click();

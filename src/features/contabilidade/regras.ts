@@ -58,3 +58,34 @@ export function regraEquilibra(linhas: readonly LinhaRegra[]): boolean {
   }
   return linhas.length >= 2 && liquido === 0 && imposto === 0;
 }
+
+/** Os meses de um ano até ao mês corrente (o histórico não se lança no futuro). */
+export function janelasDoAno(ano: number, hoje: string): { de: string; ate: string }[] {
+  const [a, m] = [Number(hoje.slice(0, 4)), Number(hoje.slice(5, 7))];
+  const ultimo = ano < a ? 12 : ano === a ? m : 0;
+  return Array.from({ length: ultimo }, (_, i) => janelaDoPeriodo(ano, i + 1));
+}
+
+type RespostaHistorico = {
+  readonly posted: number | string;
+  readonly alreadyPosted: number | string;
+  readonly cancelled: number | string;
+  readonly withoutRule: number | string;
+  readonly postedByKind: Readonly<Record<string, number | string>>;
+  readonly problems: readonly { readonly document: string; readonly date: string; readonly error: string }[];
+};
+
+/** Soma as respostas de vários meses do lançamento do histórico. */
+export function somarHistorico(rs: readonly RespostaHistorico[]) {
+  const porTipo: Record<string, number> = {};
+  for (const r of rs) for (const [k, v] of Object.entries(r.postedByKind)) porTipo[k] = (porTipo[k] ?? 0) + Number(v);
+  const soma = (k: "posted" | "alreadyPosted" | "cancelled" | "withoutRule") => rs.reduce((t, r) => t + Number(r[k]), 0);
+  return {
+    lancados: soma("posted"),
+    jaLancados: soma("alreadyPosted"),
+    anulados: soma("cancelled"),
+    semRegra: soma("withoutRule"),
+    porTipo,
+    problemas: rs.flatMap((r) => r.problems),
+  };
+}

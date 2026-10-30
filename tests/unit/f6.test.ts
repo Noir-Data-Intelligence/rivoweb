@@ -1,6 +1,6 @@
 import Big from "big.js";
 import { describe, expect, it } from "vitest";
-import { janelaDoPeriodo, problemaLancamento, regraEquilibra, totaisLancamento } from "@/features/contabilidade/regras";
+import { janelaDoPeriodo, janelasDoAno, problemaLancamento, regraEquilibra, somarHistorico, totaisLancamento } from "@/features/contabilidade/regras";
 import { tipoImposto } from "@/features/fiscal/api";
 import { ordenarVersoes, problemaEscaloes, versaoEmVigor, versaoSobreposta } from "@/features/fiscal/regras";
 import { mensagemErro } from "@/lib/api/mensagens";
@@ -96,5 +96,23 @@ describe("404 com detalhe do servidor", () => {
     const e = new ApiError({ tipo: "http", status: 404, detail: "Diário não encontrado." });
     expect(mensagemErro(e).detalhe).toBe("Diário não encontrado.");
     expect(mensagemErro(new ApiError({ tipo: "http", status: 404 })).detalhe).toBeNull();
+  });
+});
+
+describe("lançar o histórico (PGC)", () => {
+  it("o ano mês a mês até ao mês corrente, nunca no futuro", () => {
+    expect(janelasDoAno(2025, "2026-10-30")).toHaveLength(12);
+    expect(janelasDoAno(2026, "2026-10-30").map((j) => j.de)).toEqual(Array.from({ length: 10 }, (_, i) => `2026-${String(i + 1).padStart(2, "0")}-01`));
+    expect(janelasDoAno(2026, "2026-10-30")[1]).toEqual({ de: "2026-02-01", ate: "2026-02-28" });
+    expect(janelasDoAno(2027, "2026-10-30")).toEqual([]);
+  });
+
+  it("soma os meses: totais, por tipo e os problemas de todos", () => {
+    const vazio = { posted: 0, alreadyPosted: 0, cancelled: 0, withoutRule: 0, postedByKind: {}, problems: [] };
+    const s = somarHistorico([
+      { ...vazio, posted: 3, alreadyPosted: "2", postedByKind: { SalesInvoice: 2, Receipt: "1" }, problems: [{ document: "FT A/1", date: "2025-10-03", error: "Sem câmbio" }] },
+      { ...vazio, posted: "1", cancelled: 1, withoutRule: 4, postedByKind: { SalesInvoice: 1 } },
+    ]);
+    expect(s).toEqual({ lancados: 4, jaLancados: 2, anulados: 1, semRegra: 4, porTipo: { SalesInvoice: 3, Receipt: 1 }, problemas: [{ document: "FT A/1", date: "2025-10-03", error: "Sem câmbio" }] });
   });
 });

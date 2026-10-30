@@ -51,7 +51,7 @@ function NovaNotaCredito({ f }: { f: Factura }) {
         series: null,
         issuedOn: null,
         reason: normalizarTexto(razao),
-        lines: aCreditar.map((x) => ({ description: x.l.description, quantity: (x.q as Big).toString(), unitPrice: String(x.l.unitPrice), taxCode: x.l.taxCode })),
+        lines: aCreditar.map((x) => ({ description: x.l.description, quantity: (x.q as Big).toString(), unitPrice: String(x.l.unitPrice), taxCode: x.l.taxCode, kind: x.l.kind === "Goods" ? "Goods" : "Service" })),
       },
       { onSuccess: (r) => void navegar(`/notas-credito/${r.creditNoteId}`) },
     );

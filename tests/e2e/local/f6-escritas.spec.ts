@@ -95,14 +95,6 @@ test("F6: contabilidade — diário, contas, lançamento, balancete, estorno, pe
   await abrirConta(`${raiz}2`, "GM", raiz, `${marca} proveitos`);
   await page.getByLabel("Procurar").fill(raiz);
   await expect(page.getByRole("cell", { name: `${raiz}2`, exact: true })).toBeVisible();
-  // O servidor recusa uma conta debaixo de uma conta de movimento; o front diz porquê.
-  await page.getByRole("button", { name: "Abrir conta" }).click();
-  await page.getByRole("dialog").getByLabel("Código").fill(`${raiz}11`);
-  await page.getByRole("dialog").getByLabel("Conta-mãe").fill(`${raiz}1`);
-  await page.getByRole("dialog").getByLabel("Descrição").fill(`${marca} filha`);
-  await page.getByRole("dialog").getByRole("button", { name: "Abrir conta" }).click();
-  await expect(page.getByRole("dialog").getByText(`${raiz}1 é conta de movimento e não agrega outras.`)).toBeVisible();
-  await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
 
   // Lançamento em partida dobrada.
   await page.goto("/lancamentos/novo");
@@ -118,6 +110,17 @@ test("F6: contabilidade — diário, contas, lançamento, balancete, estorno, pe
   await page.getByRole("button", { name: "Lançar" }).click();
   await expect(page.getByRole("heading", { name: `Lançamento ${diario} A-${sufixo}`, level: 1 })).toBeVisible();
   const idLancamento = page.url().split("/").pop() ?? "";
+
+  // Subconta debaixo de uma conta de movimento já com lançamentos: o servidor recusa (409) e o front mostra a razão.
+  await page.goto("/plano-contas");
+  await page.getByRole("button", { name: "Abrir conta" }).click();
+  await page.getByRole("dialog").getByLabel("Código").fill(`${raiz}11`);
+  await page.getByRole("dialog").getByLabel("Conta-mãe").fill(`${raiz}1`);
+  await expect(page.getByRole("dialog").getByText(`${raiz}1 é de movimento: passa a agregadora, se não tiver lançamentos.`)).toBeVisible();
+  await page.getByRole("dialog").getByLabel("Descrição").fill(`${marca} filha`);
+  await page.getByRole("dialog").getByRole("button", { name: "Abrir conta" }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
 
   // O balancete do mês mostra as duas contas.
   await page.goto(`/relatorios?ano=${ano}&periodo=${mes}`);
@@ -175,6 +178,8 @@ test("F6: contabilidade — diário, contas, lançamento, balancete, estorno, pe
   await page.getByRole("dialog").getByLabel("Nome").fill(`${marca} PGC`);
   await page.getByRole("dialog").getByLabel("Versão").fill(sufixo);
   await page.getByRole("dialog").getByLabel("Fonte").fill("Decreto de teste");
+  // Em vigor só em 2099: uma versão nova começa vazia e, em vigor hoje, pararia a emissão (as regras usam contas do PGC).
+  await page.getByRole("dialog").getByLabel("Em vigor desde").fill("2099-01-01");
   await page.getByRole("dialog").getByRole("button", { name: "Registar versão" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("cell", { name: `${marca} PGC` })).toBeVisible();
