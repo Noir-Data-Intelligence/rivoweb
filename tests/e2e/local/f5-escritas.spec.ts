@@ -288,10 +288,10 @@ test("F5: tesouraria — conta, extracto e reconciliação, câmbio, caixa peque
   await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
   await page.goto(`/contas/${idConta}`);
   await expect(page.getByRole("heading", { name: conta, level: 1 })).toBeVisible();
-  await page.getByRole("button", { name: "Depositar" }).click();
+  await page.getByRole("button", { name: "Depositar", exact: true }).click();
   await page.getByLabel(/^Valor/).fill("100 000,00");
   await page.getByLabel("Referência (opcional)").fill(`DEP-${sufixo}`);
-  await page.getByRole("dialog").getByRole("button", { name: "Depositar" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Depositar", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("button", { name: "Levantar" }).click();
   await page.getByLabel(/^Valor/).fill("2500");

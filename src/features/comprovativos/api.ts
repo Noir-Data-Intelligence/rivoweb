@@ -58,10 +58,12 @@ export function useDescarregarComprovativo() {
 export function useConfirmarComprovativo() {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: (id: string) =>
+    // Com a conta, o dinheiro entra no saldo dela (ADR-099); sem conta, o servidor aceita sem corpo.
+    mutationFn: ({ id, conta }: { id: string; conta: string | null }) =>
       ler(
         api.POST("/finance/payment-claims/{claimId}/confirmation", {
           params: { path: { claimId: id } },
+          ...(conta ? { body: { bankAccountId: conta } } : {}),
         }),
       ),
     // O recibo novo muda, além da fila, os recibos, as facturas e o que está por receber.

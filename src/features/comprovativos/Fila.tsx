@@ -8,6 +8,7 @@ import { Link } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
 import { EstadoComprovativo } from "@/features/portalcliente";
+import { useContasAbertas } from "@/features/tesouraria";
 import { formatarData, formatarDataHora } from "@/lib/format/data";
 import { formatarNumeroDecimal } from "@/lib/format/numero";
 import { dinheiro, paraApi } from "@/lib/money/money";
@@ -15,7 +16,7 @@ import { normalizarTexto } from "@/lib/validation/normalizar";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
-import { Textarea } from "@/ui/Controlos";
+import { Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field } from "@/ui/Field";
 import { Paginacao } from "@/ui/Paginacao";
@@ -44,6 +45,14 @@ function Descarregar({ p }: { p: PedidoComprovativo }) {
 function ConfirmarPedido({ p, aoConfirmar }: { p: PedidoComprovativo; aoConfirmar: (receiptId: string) => void }) {
   const [aberto, setAberto] = useState(false);
   const confirmar = useConfirmarComprovativo();
+  const { pode } = useUtilizador();
+  const [conta, setConta] = useState("");
+  const [tentou, setTentou] = useState(false);
+  // É uma transferência: a conta onde entrou, da moeda da factura, a quem lê as contas bancárias.
+  const contas = useContasAbertas(aberto && pode("finance.payables.read"));
+  const daMoeda = (contas.data?.items ?? []).filter((c) => !p.currency || c.currency === p.currency);
+  const pedeConta = daMoeda.length > 0;
+  const aCarregarContas = pode("finance.payables.read") && contas.isPending;
   return (
     <>
       <Button tamanho="sm" onClick={() => setAberto(true)} aria-label={`Confirmar o pagamento de ${quem(p)} (${qual(p)})`}>
@@ -53,22 +62,46 @@ function ConfirmarPedido({ p, aoConfirmar }: { p: PedidoComprovativo; aoConfirma
         aberto={aberto}
         aoMudar={(x) => {
           setAberto(x);
-          if (!x) confirmar.reset();
+          if (!x) {
+            confirmar.reset();
+            setConta("");
+            setTentou(false);
+          }
         }}
         titulo={`Confirmar o pagamento de ${quem(p)}`}
         descricao={`Regista um recibo de ${valor(p)} para ${qual(p)}, por transferência bancária a ${formatarData(p.paidOn)}. Confira o ficheiro antes: o recibo só se desfaz anulando-o.`}
         rotuloConfirmar="Confirmar e registar o recibo"
         aCarregar={confirmar.isPending}
         erro={confirmar.error ? <ErrorPanel erro={confirmar.error} /> : undefined}
-        aoConfirmar={() =>
-          confirmar.mutate(p.id, {
-            onSuccess: (r) => {
-              setAberto(false);
-              aoConfirmar(r.receiptId);
+        aoConfirmar={() => {
+          setTentou(true);
+          if ((pedeConta && conta === "") || aCarregarContas || confirmar.isPending) return;
+          confirmar.mutate(
+            { id: p.id, conta: pedeConta ? conta : null },
+            {
+              onSuccess: (r) => {
+                setAberto(false);
+                aoConfirmar(r.receiptId);
+              },
             },
-          })
-        }
-      />
+          );
+        }}
+      >
+        {pedeConta ? (
+          <Field rotulo="Conta onde entrou" erro={tentou && conta === "" ? "Escolha a conta bancária." : undefined} ajuda="O valor entra no saldo desta conta e fica no extracto.">
+            {({ id, descricao, invalido }) => (
+              <Select id={id} aria-describedby={descricao} invalido={invalido} value={conta} onChange={(e) => setConta(e.target.value)}>
+                <option value="">Escolha…</option>
+                {daMoeda.map((c) => (
+                  <option key={c.accountId} value={c.accountId}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        ) : null}
+      </Confirmar>
     </>
   );
 }

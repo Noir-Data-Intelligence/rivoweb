@@ -19,6 +19,7 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useAbrirConta, useContas, type Conta } from "../api";
+import { PagamentoPeloBanco } from "../Liquidacoes";
 
 export const MOEDAS = ["AOA", "USD", "EUR"] as const;
 
@@ -148,9 +149,15 @@ export default function Contas() {
       <PageHeader
         titulo="Contas bancárias"
         accao={
-          <Can requer="finance.payables.write">
-            <AbrirConta />
-          </Can>
+          <div className="flex flex-wrap gap-2">
+            <Can requer="finance.payments.execute">
+              <PagamentoPeloBanco tipo="salarios" />
+              <PagamentoPeloBanco tipo="estado" />
+            </Can>
+            <Can requer="finance.payables.write">
+              <AbrirConta />
+            </Can>
+          </div>
         }
       />
       <Checkbox

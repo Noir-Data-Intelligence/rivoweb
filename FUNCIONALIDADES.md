@@ -17,7 +17,11 @@
 > dia) · actualizado a 2026-10-30 (contabilidade pelo PGC: carregar o plano,
 > Balanço e DR nos modelos do decreto, apuramento do IVA, fecho e abertura do
 > exercício, lançar o histórico; conta do PGC no activo e na factura de
-> compra; bens ou serviços nas linhas).
+> compra; bens ou serviços nas linhas; o abate e a venda de activos lançam
+> no razão) · actualizado a 2026-10-31 (a folha de salários aprovada lança
+> no razão; pagar os salários, entregar ao Estado e depositar valores pelo
+> banco; o recebimento por banco entra na conta bancária; a data-valor das
+> operações de banco).
 
 ---
 
@@ -174,7 +178,7 @@ AM = AssetManager.
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Emitir notas de crédito a partir da factura (cada linha leva a natureza da linha da factura: bens ou serviços) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Ver nas linhas das facturas e das notas de crédito se são bens ou serviços | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
-| Registar recebimentos (recibos) a partir da factura, com o retido na fonte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Registar recebimentos (recibos) a partir da factura, com o retido na fonte (por banco, a conta onde entrou ²³) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Notas de crédito e recibos:** ver listas, fichas e PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** ver | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** criar, converter em factura e anular | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
@@ -208,10 +212,10 @@ AM = AssetManager.
 | Valorização do stock por período | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Activos fixos** | | | | | | | | | | |
 | Ver os activos (custo, amortizado, valor líquido), o plano de amortização, a manutenção, a custódia e os seguros | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
-| Registar e corrigir (antes da primeira amortização); abater | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Registar e corrigir (antes da primeira amortização); abater (com a conta do PGC, o abate lança no razão; se não lançou, o ecrã diz porquê) | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Correr a amortização de um mês | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
-| Conta do PGC do activo (11.2 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
-| Abrir o lançamento da amortização no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Conta do PGC do activo (só contas de movimento: 11.2.x, 11.3.x, 11.4 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -227,7 +231,7 @@ AM = AssetManager.
 | Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Anexar documentos ao pedido (carregar ficheiro) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Executar o pagamento ⁷ ⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Executar o pagamento, com a data em que o dinheiro saiu ²⁴ ⁷ ⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir os anexos (pelo pedido) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | **Despesas** | | | | | | | | | | |
 | Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -254,8 +258,10 @@ AM = AssetManager.
 | O meu contrato: o mais recente em destaque (tipo, datas, salário, estado) e os anteriores | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Dados pessoais: ver (só leitura); pedir a correcção aos RH por um pedido interno | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Tesouraria** | | | | | | | | | | |
-| Contas bancárias: ver saldos e extracto por período | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Contas bancárias: abrir, depositar, levantar, fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -324,7 +330,9 @@ AM = AssetManager.
 | Folhas de pagamento: lista com os totais; ver uma folha (bruto, IRT, INSS e líquido por colaborador) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Abrir a folha de um mês ¹² | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Juntar colaboradores à folha em rascunho (bruto e subsídios; o servidor calcula o IRT, o INSS e o líquido); tirar um colaborador; anular o rascunho | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
-| Submeter para aprovação; ver a decisão | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Submeter para aprovação; ver a decisão (aprovada, a folha lança no razão, e o ecrã diz se lançou e porquê) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Folha aprovada: lançar no razão (repetir não duplica) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| Folha aprovada: pagar os salários pelo banco ²² | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Recibos de uma folha aprovada: ver, descarregar e anexar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Utilizadores** | | | | | | | | | | |
 | Ver contas, perfis e estado | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -364,6 +372,12 @@ Recursos Humanos.»
 ¹⁹ Os documentos abrem-se pela viatura, sem acesso ao arquivo; junta-se um ficheiro carregado na hora por quem o junta (B40).
 ²⁰ O nome do responsável vem na iniciativa; os colaboradores activos escolhem-se pela lista do ESG, sem ler os Recursos Humanos (B41).
 ²¹ A leitura usa só as áreas que a conta lê (finanças, RH, vendas); a previsão exige ler receita e despesa (o Sales não a obtém: 403).
+
+²² PR #129 (ADR-098). Os salários e os impostos pagam-se em Contas bancárias (os salários também na folha aprovada, a quem executa pagamentos); o valor não se escreve, vem do razão. O depósito de valores está na ficha de cada conta em kwanzas.
+
+²³ PR #130 (ADR-099). Nos recibos e na confirmação de comprovativos, por banco (transferência, Multicaixa, cartões), escolhe-se a conta da moeda da factura, a quem lê as contas bancárias; numerário e cheque ficam para depositar. A factura-recibo emitida de um rascunho ainda não leva a conta (B45).
+
+²⁴ PR #132 (ADR-100). Campo «Data» (hoje por omissão, nunca futura) ao executar pagamentos (não antes do pedido), pagar salários e impostos (não antes do mês), depositar valores (o dia do talão), depositar e levantar. O extracto e a reconciliação mostram a data-valor, e o dia em que se registou quando é outro.
 
 ---
 
@@ -783,7 +797,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   nota do cliente (sempre como texto).
 - **Descarregar** o ficheiro do comprovativo (sempre em anexo).
 - **Confirmar**: regista um recibo por transferência bancária na data do
-  pagamento e mostra a ligação para ele; o servidor recusa um pedido que já
+  pagamento, na **conta onde entrou** (escolhida das contas da moeda da
+  factura; entra no saldo dela), e mostra a ligação para ele; o servidor recusa um pedido que já
   não está por confirmar e diz porque o recibo falhou (por exemplo, série em
   falta), deixando-o por confirmar.
 - **Rejeitar** com o motivo (até 500 caracteres), que o cliente vê no portal.
@@ -823,7 +838,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **enviar ao cliente** por e-mail, **nota de crédito** (com as quantidades a
   creditar e o motivo), **registar recebimento** (valor recebido, retido na
   fonte quando a factura tem retenção, meio, data, notas; também só a
-  retenção, quando chega o certificado) e **anular** com motivo.
+  retenção, quando chega o certificado; por banco, a **conta onde entrou**,
+  da moeda da factura, e o dinheiro entra no saldo dela; em numerário ou
+  cheque, fica para depositar) e **anular** com motivo.
 - Um clique duplo nunca emite dois documentos.
 
 **Notas de crédito** e **Recibos**
@@ -905,12 +922,16 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   correr de novo não duplica), com o resultado (registados, já registados,
   total e saltados), se **lançou no razão** (com a ligação ao lançamento) e,
   se não lançou, porquê.
-- **Conta do PGC** do activo (opcional, ao registar e corrigir): 11.2 a 11.6 e
-  11.9 (corpóreas) ou 12.1 a 12.4 e 12.9 (incorpóreas); com ela, a amortização
-  lança no razão. Os terrenos não se amortizam. A ficha mostra a conta.
+- **Conta do PGC** do activo (opcional, ao registar e corrigir), só contas de
+  movimento: as subcontas de 11.2 (edifícios, outras construções,
+  instalações) e de 11.3 (equipamento básico), 11.4 a 11.6 e 11.9
+  (corpóreas) ou 12.1 a 12.4 e 12.9 (incorpóreas); com ela, a amortização e o
+  abate lançam no razão. Os terrenos não se amortizam. A ficha mostra a conta.
 - **Activo:** valores, plano de amortização com cada mês registado ou
   previsto; **corrigir** (só antes da primeira amortização registada);
-  **abater** (data depois da aquisição, valor de venda, motivo).
+  **abater** (data depois da aquisição, valor de venda, motivo); depois de
+  abater, a ficha diz se **lançou no razão** (com a ligação ao lançamento) ou
+  porque não lançou.
 - **Manutenção:** de cada activo e de todos (agendadas, concluídas,
   canceladas); **agendar** (tipo — preventiva, correctiva, inspecção —,
   descrição, data, prestador, custo estimado), **concluir** (data, custo,
@@ -999,8 +1020,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ficha: beneficiário, valor, quem pediu, o estado da aprovação com ligação ao
   pedido de aprovação, notas e, depois de pago, data, meio e referência.
 - **Executar**: só depois de aprovado; escolhe-se uma conta aberta na moeda do
-  pedido (com o saldo à vista), o meio de pagamento e a referência; aviso com o
-  saldo da conta depois do pagamento. Quem pediu e quem aprovou não vêem o
+  pedido (com o saldo à vista), o meio de pagamento, a referência e a **data**
+  em que o dinheiro saiu (não futura nem antes do pedido); aviso com o saldo
+  da conta depois do pagamento. Quem pediu e quem aprovou não vêem o
   botão e a ficha explica porquê (BR-3).
 - **Cancelar** com motivo; **anexar** documentos (factura, proposta, contrato)
   e **descarregá-los**.
@@ -1017,9 +1039,17 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Contas bancárias**
 - Lista com saldos (com ou sem fechadas); **abrir** (nome, banco, moeda, IBAN
   verificado).
-- Ficha: saldo, **depositar**, **levantar**, **fechar** (só com saldo zero) e
-  **reabrir**; **extracto** por período (saldo inicial, entradas, saídas,
-  saldo final, movimentos), com aviso se não bater com o saldo.
+- **Pagar salários** (o mês e a conta em kwanzas; o valor é o líquido da
+  folha lançada) e **Entregar ao Estado** (IRT, INSS ou IVA de um mês; o valor
+  vem do razão), com a data do pagamento: mostra o valor pago, o saldo que
+  ficou e a ligação ao lançamento; as recusas (folha por lançar, IVA por
+  apurar, mês já pago, saldo insuficiente, período fechado) dizem porquê.
+- Ficha: saldo, **depositar** e **levantar** (com a data-valor), **depositar
+  valores** (numerário e cheques recebidos, nas contas em kwanzas: valor e
+  referência do talão, data), **fechar** (só com saldo zero) e **reabrir**;
+  **extracto** por período (saldo inicial, entradas, saídas, saldo final,
+  movimentos pela data-valor, com o dia em que se registou quando é outro),
+  com aviso se não bater com o saldo.
 - **Reconciliação:** resumo (saldo contabilístico, linhas conciliadas,
   ignoradas e por conciliar, movimentos sem par); **importar o extracto** do
   banco em CSV (ficheiro ou colado) com conciliação automática; **conciliar
@@ -1328,8 +1358,15 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **anular** a folha (o mês fica livre) e **submeter** para aprovação.
 - Por aprovar: **ver a decisão** tomada em Aprovações (ou que ainda espera),
   com a ligação ao pedido.
-- Aprovada: por colaborador, os **recibos** anexados (descarregar) e
-  **anexar** o PDF do recibo; sem anexo, o portal gera-o da folha.
+- Ao ver a decisão, a folha aprovada diz se **lançou no razão** (com a
+  ligação ao lançamento) ou porque não lançou (PGC por carregar, período
+  fechado, sem taxa de INSS patronal).
+- Aprovada: o bloco **Razão** explica o lançamento (salários e INSS da
+  empresa a custo; líquido, IRT e INSS a pagar) e **lançar no razão** (para
+  quando não lançou; repetir não duplica); **pagar os salários** pelo banco,
+  com o mês da folha já escolhido; por colaborador, os **recibos** anexados
+  (descarregar) e **anexar** o PDF do recibo; sem anexo, o portal gera-o da
+  folha.
 - Recusada ou anulada: não se paga nem se altera; o mês fica livre.
 
 **Departamentos**
@@ -1408,7 +1445,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Tudo o que o Admin faz.
 
 **Folhas de pagamento**
-- Tudo o que o Admin faz (abrir exige a conta ligada a uma ficha).
+- Tudo o que o Admin faz (abrir exige a conta ligada a uma ficha), incluindo
+  lançar no razão. Não paga os salários: não executa pagamentos.
 
 **Arquivo de documentos**
 - Ver, filtrar e descarregar todos os ficheiros, como o Admin, sem a coluna de
@@ -1453,7 +1491,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Comprovativos**
 - Tudo o que o Admin faz: a fila, **descarregar**, **confirmar** (regista o
-  recibo) e **rejeitar** com o motivo. O cliente aparece sem ligação à ficha
+  recibo, na conta onde entrou) e **rejeitar** com o motivo. O cliente aparece sem ligação à ficha
   (o Finance não lê clientes).
 
 **Facturação**
@@ -1481,8 +1519,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **registar** em seu nome; **abre o comprovativo** pela despesa.
 
 **Contas bancárias**
-- Ver saldos e extracto; **reconciliação** completa. Não abre contas nem
-  deposita ou levanta.
+- Ver saldos e extracto (pela data-valor); **reconciliação** completa;
+  **pagar salários** e **entregar ao Estado**, como o Admin. Não abre contas
+  nem deposita, levanta ou deposita valores.
 
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
 - Tudo o que o Admin faz. Nas letras a receber escolhe o cliente da lista de
@@ -1569,8 +1608,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   regista nem reembolsa; **abre o comprovativo** pela despesa.
 
 **Contas bancárias**
-- Ver saldos e extracto; **abrir**, **depositar**, **levantar**, **fechar** e
-  **reabrir**. Sem reconciliação.
+- Ver saldos e extracto; **abrir**, **depositar** e **levantar** (com a
+  data-valor), **depositar valores** recebidos, **fechar** e **reabrir**. Sem
+  reconciliação; não paga salários nem entrega impostos.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
 - Ver tudo, com os nomes. **Cria** e **revê** orçamentos em rascunho; não os
@@ -1775,5 +1815,6 @@ entra neste documento quando estiver publicada.
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
 | — | Bens ou serviços em cada linha do rascunho de factura (o backend ainda não o aceita nos rascunhos, B43) |
+| — | A conta bancária da factura-recibo emitida de um rascunho ou de uma pró-forma (o backend ainda não a aceita, B45) |
 
 O login com Google (D4) entra quando o backend o tiver.

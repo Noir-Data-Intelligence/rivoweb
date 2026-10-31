@@ -114,7 +114,10 @@ function Corrigir({ a }: { a: TipoActivo }) {
   );
 }
 
-function Abater({ a }: { a: TipoActivo }) {
+/** O que o abate fez no razão (ADR-096): o lançamento, ou porque não lançou. O abate fica gravado em qualquer caso. */
+export type ResultadoAbate = { journalEntryId: string | null; ledgerNote: string | null };
+
+function Abater({ a, aoAbater }: { a: TipoActivo; aoAbater: (r: ResultadoAbate) => void }) {
   const [aberto, setAberto] = useState(false);
   const [v, setV] = useState({ data: hojeIso(), valor: "", motivo: "" });
   const [tentou, setTentou] = useState(false);
@@ -151,7 +154,7 @@ function Abater({ a }: { a: TipoActivo }) {
             e.preventDefault();
             setTentou(true);
             if (Object.keys(erros).length > 0 || abater.isPending) return;
-            abater.mutate({ on: v.data === "" ? null : v.data, value: dinheiroOuNulo(v.valor), reason: opc(v.motivo, true) }, { onSuccess: () => setAberto(false) });
+            abater.mutate({ on: v.data === "" ? null : v.data, value: dinheiroOuNulo(v.valor), reason: opc(v.motivo, true) }, { onSuccess: (r) => (setAberto(false), aoAbater({ journalEntryId: r.journalEntryId ?? null, ledgerNote: r.ledgerNote ?? null })) });
           }}
         >
           <Field rotulo="Data do abate" erro={tentou ? erros.data : undefined}>
@@ -687,6 +690,7 @@ export default function Activo() {
   const { pode } = useUtilizador();
   const q = useActivo(assetId);
   const vista = useVista(VISTAS);
+  const [abate, setAbate] = useState<ResultadoAbate | null>(null);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/activos">
@@ -734,13 +738,23 @@ export default function Activo() {
           emUso ? (
             <Can requer="finance.assets.write">
               <div className="flex flex-wrap gap-2">
-                <Abater a={a} />
+                <Abater a={a} aoAbater={setAbate} />
                 {!jaAmortizado ? <Corrigir key={`${a.name}-${String(a.acquisitionCost)}`} a={a} /> : null}
               </div>
             </Can>
           ) : undefined
         }
       />
+      {abate?.journalEntryId ? (
+        <Alert tom="sucesso" className="mb-4" titulo="O abate lançou no razão.">
+          {pode("finance.ledger.read") ? (
+            <Link to={`/lancamentos/${abate.journalEntryId}`} className="text-primary underline-offset-4 hover:underline">
+              Ver o lançamento
+            </Link>
+          ) : null}
+        </Alert>
+      ) : null}
+      {abate?.ledgerNote ? <Alert tom="aviso" className="mb-4" titulo="O abate ficou gravado, mas não lançou no razão.">{abate.ledgerNote}</Alert> : null}
       {!emUso ? <Alert tom="info" className="mb-4" titulo={`Abatido a ${a.disposedOn ? formatarData(a.disposedOn) : "—"}${a.disposalValue !== null ? ` por ${moeda(a.disposalValue, a.currency)}` : ""}${a.disposalReason ? `: ${a.disposalReason}` : "."}`} /> : null}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {(

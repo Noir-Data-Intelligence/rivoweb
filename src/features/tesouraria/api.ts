@@ -298,3 +298,35 @@ export function useApagarItemPrevisao() {
     onSettled: () => qc.invalidateQueries({ queryKey: chaves.fluxo }),
   });
 }
+
+// Pagamentos e depósitos pelo banco (ADR-098, data-valor ADR-100): o valor vem do razão (folha
+// lançada, IVA apurado) ou do talão; sai ou entra na conta e lança no razão na mesma gravação.
+
+export type Liquidacao = S["BankSettlementView"];
+
+/** Mexem na conta e no razão: as contas, os extractos e a contabilidade voltam a ler-se. */
+const invalidarTudo = (qc: ReturnType<typeof useQueryClient>) => qc.invalidateQueries({ queryKey: ["finance"] });
+
+export function usePagarSalarios() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["PayrollPaymentRequest"]) => ler(api.POST("/finance/treasury/payroll-payments", { body: b })),
+    onSuccess: () => invalidarTudo(qc),
+  });
+}
+
+export function useEntregarEstado() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["TaxPaymentRequest"]) => ler(api.POST("/finance/treasury/tax-payments", { body: b })),
+    onSuccess: () => invalidarTudo(qc),
+  });
+}
+
+export function useDepositarValores() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["CashDepositRequest"]) => ler(api.POST("/finance/treasury/cash-deposits", { body: b })),
+    onSuccess: () => invalidarTudo(qc),
+  });
+}

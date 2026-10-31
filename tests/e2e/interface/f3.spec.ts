@@ -6,6 +6,7 @@
 import { facturaComRetencao, IDF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 import { comF3 } from "../apoio-f3";
+import { contas, IDF5 } from "../../fixtures/f5";
 
 test.describe("clientes", () => {
   test("lista, registo com país em maiúsculas, ficha e contacto; axe e CSP", async ({ page, api, violacoes }) => {
@@ -156,6 +157,30 @@ test.describe("facturas", () => {
     await page.getByRole("button", { name: "Emitir recibo" }).click();
     await expect(page).toHaveURL(new RegExp(`/recibos/${IDF3.recibo}$`));
     expect(api.escritas("POST", "/finance/receipts")[0]?.corpo).toMatchObject({ method: "TB", settlements: [{ salesInvoiceId: IDF3.factura, amount: "40000.50" }] });
+  });
+
+  test("recibo por banco: a conta onde entrou, da moeda da factura; numerário fica para depositar", async ({ page, api }) => {
+    const leContas = { ...meFinancas, permissions: [...meFinancas.permissions, "finance.payables.read"] };
+    await comF3(api, leContas)
+      .em("GET", "/finance/accounts", { status: 200, corpo: contas(), cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "2" } })
+      .em("POST", "/finance/receipts", { status: 201, corpo: { receiptId: IDF3.recibo, number: "RG S001/6" } })
+      .em("GET", `/finance/receipts/${IDF3.recibo}`, { status: 404, corpo: { status: 404 }, cabecalhos: { "Content-Type": "application/problem+json" } })
+      .ligar();
+    await entrar(page, leContas.email);
+    await page.goto(`/facturas/${IDF3.factura}`);
+    await page.getByRole("button", { name: "Registar recebimento" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Meio").selectOption("NU");
+    await expect(d.getByText("Numerário e cheques ficam em «Valores para depositar» até ao depósito no banco.")).toBeVisible();
+    await expect(d.getByLabel("Conta onde entrou")).toHaveCount(0);
+    await d.getByLabel("Meio").selectOption("TB");
+    await expect(d.getByLabel("Conta onde entrou").locator("option")).toHaveText(["Escolha…", "Conta à ordem BAI"]);
+    await d.getByRole("button", { name: "Emitir recibo" }).click();
+    await expect(d.getByText("Escolha a conta bancária.")).toBeVisible();
+    await d.getByLabel("Conta onde entrou").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Emitir recibo" }).click();
+    await expect(page).toHaveURL(new RegExp(`/recibos/${IDF3.recibo}$`));
+    expect(api.escritas("POST", "/finance/receipts")[0]?.corpo).toMatchObject({ method: "TB", bankAccountId: IDF5.conta });
   });
 
   test("recibo de factura com retenção: dinheiro e retido na fonte (ADR-083)", async ({ page, api }) => {

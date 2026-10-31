@@ -9627,6 +9627,15 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPaymentClaimRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -10869,11 +10878,225 @@
         ]
       }
     },
+    "/finance/treasury/payroll-payments": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayrollPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankSettlementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/treasury/tax-payments": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Entrega hoje ao Estado o IRT (34.3), o INSS (34.7) ou o IVA a pagar (34.5.6.1) de um mês, contra 43.1 (ADR-098). Entregar duas vezes dá 409.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaxPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankSettlementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/treasury/cash-deposits": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Deposita hoje numerário e cheques recebidos: entra na conta bancária, e 43.1 contra 45.2 «Valores para depositar» (ADR-098).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashDepositRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankSettlementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/assets/{assetId}/disposal": {
       "post": {
         "tags": [
           "TreasuryEndpoints"
         ],
+        "summary": "Abate ou vende um activo. Com o PGC carregado e `ledgerAccountCode`, lança 18.x e 11.x contra 68.3, 78.3 ou 78.3.3, e o valor da venda na 37.2 (ADR-096). Período fechado ou câmbio em falta: 409, nada se grava.",
         "parameters": [
           {
             "name": "assetId",
@@ -10896,8 +11119,15 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDisposalView"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -28513,6 +28743,67 @@
         ]
       }
     },
+    "/payroll/runs/{runId}/ledger-posting": {
+      "post": {
+        "tags": [
+          "PayrollModuleEndpoints"
+        ],
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayrollRunLedgerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/payroll/runs/{runId}/items/{itemId}/documents": {
       "post": {
         "tags": [
@@ -40851,6 +41142,33 @@
           }
         }
       },
+      "AssetDisposalView": {
+        "required": [
+          "assetId",
+          "journalEntryId",
+          "ledgerNote"
+        ],
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "journalEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "ledgerNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "AssetInsuranceView": {
         "required": [
           "policyId",
@@ -42030,6 +42348,7 @@
         "required": [
           "movementId",
           "occurredAt",
+          "on",
           "direction",
           "amount",
           "balanceAfter",
@@ -42046,6 +42365,10 @@
           "occurredAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "on": {
+            "type": "string",
+            "format": "date"
           },
           "direction": {
             "type": "string"
@@ -42081,6 +42404,36 @@
               "string"
             ],
             "format": "uuid"
+          }
+        }
+      },
+      "BankSettlementView": {
+        "required": [
+          "journalEntryId",
+          "amount",
+          "bankBalance"
+        ],
+        "type": "object",
+        "properties": {
+          "journalEntryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "bankBalance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
           }
         }
       },
@@ -43035,6 +43388,41 @@
           }
         }
       },
+      "CashDepositRequest": {
+        "required": [
+          "bankAccountId",
+          "amount",
+          "reference"
+        ],
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "CashFlowActual": {
         "required": [
           "from",
@@ -43835,6 +44223,21 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "ConfirmPaymentClaimRequest": {
+        "required": [
+          "bankAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -46547,6 +46950,13 @@
               "null",
               "string"
             ]
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -48004,6 +48414,13 @@
               "null",
               "string"
             ]
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -51745,6 +52162,13 @@
             ]
           },
           "referencedInvoiceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "bankAccountId": {
             "type": [
               "null",
               "string"
@@ -56982,6 +57406,43 @@
           }
         }
       },
+      "PayrollPaymentRequest": {
+        "required": [
+          "year",
+          "month",
+          "bankAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "PayrollRunDecisionResponse": {
         "required": [
           "status"
@@ -56990,6 +57451,51 @@
         "properties": {
           "status": {
             "type": "string"
+          },
+          "ledgerOutcome": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "journalEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "ledgerNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PayrollRunLedgerResponse": {
+        "required": [
+          "outcome",
+          "journalEntryId",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string"
+          },
+          "journalEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -60720,6 +61226,13 @@
             "items": {
               "$ref": "#/components/schemas/SettlementRequest"
             }
+          },
+          "bankAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -64035,6 +64548,52 @@
         "type": "integer",
         "description": "0 = ValueAdded, 1 = EmployeeSocialSecurity, 2 = EmployerSocialSecurity"
       },
+      "TaxPaymentRequest": {
+        "required": [
+          "tax",
+          "year",
+          "month",
+          "bankAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "tax": {
+            "enum": [
+              "IRT",
+              "INSS",
+              "IVA"
+            ],
+            "type": "string"
+          },
+          "year": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "TaxRateScheduleCreatedResponse": {
         "required": [
           "scheduleId"
@@ -65145,6 +65704,7 @@
         "required": [
           "movementId",
           "occurredAt",
+          "on",
           "direction",
           "amount",
           "description"
@@ -65158,6 +65718,10 @@
           "occurredAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "on": {
+            "type": "string",
+            "format": "date"
           },
           "direction": {
             "type": "string"
@@ -65937,6 +66501,13 @@
           },
           "description": {
             "type": "string"
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },

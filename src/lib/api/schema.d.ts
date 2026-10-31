@@ -9921,7 +9921,11 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ConfirmPaymentClaimRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -11200,6 +11204,249 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/treasury/payroll-payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PayrollPaymentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BankSettlementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/treasury/tax-payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Entrega hoje ao Estado o IRT (34.3), o INSS (34.7) ou o IVA a pagar (34.5.6.1) de um mês, contra 43.1 (ADR-098). Entregar duas vezes dá 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TaxPaymentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BankSettlementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/treasury/cash-deposits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Deposita hoje numerário e cheques recebidos: entra na conta bancária, e 43.1 contra 45.2 «Valores para depositar» (ADR-098). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CashDepositRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BankSettlementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/assets/{assetId}/disposal": {
         parameters: {
             query?: never;
@@ -11209,6 +11456,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Abate ou vende um activo. Com o PGC carregado e `ledgerAccountCode`, lança 18.x e 11.x contra 68.3, 78.3 ou 78.3.3, e o valor da venda na 37.2 (ADR-096). Período fechado ou câmbio em falta: 409, nada se grava. */
         post: {
             parameters: {
                 query?: never;
@@ -11224,12 +11472,14 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description No Content */
-                204: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["AssetDisposalView"];
+                    };
                 };
                 /** @description Bad Request */
                 400: {
@@ -29231,6 +29481,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll/runs/{runId}/ledger-posting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    runId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayrollRunLedgerResponse"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll/runs/{runId}/items/{itemId}/documents": {
         parameters: {
             query?: never;
@@ -40335,6 +40654,13 @@ export interface components {
             notes: null | string;
             open: boolean;
         };
+        AssetDisposalView: {
+            /** Format: uuid */
+            assetId: string;
+            /** Format: uuid */
+            journalEntryId: null | string;
+            ledgerNote: null | string;
+        };
         AssetInsuranceView: {
             /** Format: uuid */
             policyId: string;
@@ -40635,6 +40961,8 @@ export interface components {
             movementId: string;
             /** Format: date-time */
             occurredAt: string;
+            /** Format: date */
+            on: string;
             direction: string;
             /** Format: double */
             amount: number | string;
@@ -40644,6 +40972,14 @@ export interface components {
             sourceType: null | string;
             /** Format: uuid */
             sourceId: null | string;
+        };
+        BankSettlementView: {
+            /** Format: uuid */
+            journalEntryId: string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: double */
+            bankBalance: number | string;
         };
         BenefitCreatedResponse: {
             /** Format: uuid */
@@ -40881,6 +41217,15 @@ export interface components {
             /** Format: uuid */
             hiredEmployeeId: null | string;
         };
+        CashDepositRequest: {
+            /** Format: uuid */
+            bankAccountId: string;
+            /** Format: double */
+            amount: number | string;
+            reference: null | string;
+            /** Format: date */
+            on?: null | string;
+        };
         CashFlowActual: {
             /** Format: date */
             from: string;
@@ -41092,6 +41437,10 @@ export interface components {
             score: null | number | string;
             notes: null | string;
             certificateNumber?: null | string;
+        };
+        ConfirmPaymentClaimRequest: {
+            /** Format: uuid */
+            bankAccountId: null | string;
         };
         ContactRequest: {
             name: string;
@@ -41757,6 +42106,8 @@ export interface components {
             /** Format: double */
             amount: number | string;
             reference: null | string;
+            /** Format: date */
+            on?: null | string;
         };
         DepreciationLineView: {
             /** Format: date */
@@ -42130,6 +42481,8 @@ export interface components {
             executedByEmployeeId: null | string;
             method: string;
             reference: null | string;
+            /** Format: date */
+            on?: null | string;
         };
         ExecutiveOverviewView: {
             /** Format: date */
@@ -43030,6 +43383,8 @@ export interface components {
             paymentMethod?: null | string;
             /** Format: uuid */
             referencedInvoiceId?: null | string;
+            /** Format: uuid */
+            bankAccountId?: null | string;
         };
         IssuePurchaseOrderRequest: {
             /** Format: uuid */
@@ -44346,8 +44701,28 @@ export interface components {
             /** Format: double */
             socialSecurityContribution: null | number | string;
         };
+        PayrollPaymentRequest: {
+            /** Format: int32 */
+            year: number | string;
+            /** Format: int32 */
+            month: number | string;
+            /** Format: uuid */
+            bankAccountId: string;
+            /** Format: date */
+            on?: null | string;
+        };
         PayrollRunDecisionResponse: {
             status: string;
+            ledgerOutcome?: null | string;
+            /** Format: uuid */
+            journalEntryId?: null | string;
+            ledgerNote?: null | string;
+        };
+        PayrollRunLedgerResponse: {
+            outcome: string;
+            /** Format: uuid */
+            journalEntryId: null | string;
+            note: null | string;
         };
         PayrollRunOpenedResponse: {
             /** Format: uuid */
@@ -45252,6 +45627,8 @@ export interface components {
             method: string;
             notes: null | string;
             settlements: null | components["schemas"]["SettlementRequest"][];
+            /** Format: uuid */
+            bankAccountId?: null | string;
         };
         RegisterStockReceiptRequest: {
             /** Format: uuid */
@@ -46099,6 +46476,18 @@ export interface components {
         };
         /** @description 0 = ValueAdded, 1 = EmployeeSocialSecurity, 2 = EmployerSocialSecurity */
         TaxKind: number;
+        TaxPaymentRequest: {
+            /** @enum {string} */
+            tax: "IRT" | "INSS" | "IVA";
+            /** Format: int32 */
+            year: number | string;
+            /** Format: int32 */
+            month: number | string;
+            /** Format: uuid */
+            bankAccountId: string;
+            /** Format: date */
+            on?: null | string;
+        };
         TaxRateScheduleCreatedResponse: {
             /** Format: uuid */
             scheduleId: string;
@@ -46383,6 +46772,8 @@ export interface components {
             movementId: string;
             /** Format: date-time */
             occurredAt: string;
+            /** Format: date */
+            on: string;
             direction: string;
             /** Format: double */
             amount: number | string;
@@ -46569,6 +46960,8 @@ export interface components {
             /** Format: double */
             amount: number | string;
             description: string;
+            /** Format: date */
+            on?: null | string;
         };
         WithholdingLine: {
             /** Format: uuid */

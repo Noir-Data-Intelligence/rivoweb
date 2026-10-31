@@ -1,8 +1,9 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `bcafef2`. Em aberto: **B24** (configuração),
-> **B43** (bens ou serviços nos rascunhos) e **B44** (versão do plano vazia).
+> Revisto contra `main` @ `313e7c7`. Em aberto: **B24** (configuração),
+> **B43** (bens ou serviços nos rascunhos), **B44** (versão do plano vazia) e
+> **B45** (conta bancária na FR emitida de um rascunho).
 > **B42** está resolvido (PR #121) e o front já o usa: o passo de uma tarefa
 > é `TaskChecklistItemRequest` e as políticas usam `PolicyChecklistItemRequest`;
 > saiu o tipo local dos projectos.
@@ -629,3 +630,23 @@ avisar no formulário, mas não o impede.
 - ou o servidor recusa activar uma versão que não tem as contas usadas pelas
   regras de lançamento activas, e diz quais faltam;
 - ou passa a haver uma rota para desactivar uma versão.
+
+## B45 — A factura-recibo emitida de um rascunho não diz em que conta entrou o dinheiro
+
+> Aberto a 2026-10-31, contra `main` @ `313e7c7` (merge do #133).
+
+**Facto:** o #130 (ADR-099) acrescentou `bankAccountId` a `IssueInvoiceRequest`
+(`POST /finance/sales-invoices`): na FR paga por banco, o total entra no saldo
+da conta. Este front emite as facturas pelos rascunhos, e
+`IssueDraftRequest` (`POST /finance/invoice-drafts/{draftId}/issue`) só tem
+`issuedOn`; `DraftRequest` também não tem a conta. O mesmo se passa com a
+conversão de uma pró-forma em FR.
+
+**Consequência:** as FR pagas por banco emitidas pelo front lançam na 43.1, mas
+não entram no saldo de nenhuma conta bancária; a tesouraria deixa de bater
+com o razão nessas facturas. Os recibos e os comprovativos já levam a conta.
+
+**Pedido:** `bankAccountId` (opcional) na emissão do rascunho e na conversão da
+pró-forma, com as mesmas regras da FR directa (só FR, só meios por banco, a
+moeda da conta igual à da factura). O front acrescenta então «Conta onde
+entrou» quando o meio é por banco.

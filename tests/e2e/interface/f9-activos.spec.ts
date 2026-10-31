@@ -65,7 +65,11 @@ test.describe("activos fixos", () => {
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(d.getByText("Quotas decrescentes exigem a taxa anual", { exact: false })).toBeVisible();
     await d.getByLabel("Taxa anual (%)").fill("25");
-    await expect(d.getByLabel("Conta do PGC (opcional)").locator("option")).toHaveText(["Nenhuma (não lança no razão)", "11.2 Edifícios e outras construções", "11.3 Equipamento básico", "11.4 Equipamento de carga e transporte", "11.5 Equipamento administrativo", "11.6 Taras e vasilhame", "11.9 Outras imobilizações corpóreas", "12.1 Trespasses", "12.2 Despesas de investigação e desenvolvimento", "12.3 Propriedade industrial e outros direitos e contratos", "12.4 Despesas de constituição", "12.9 Outras imobilizações incorpóreas"]);
+    // Só contas de movimento: o abate credita a conta do bem (a 11.2 e a 11.3 são agregadoras).
+    const opcoes = d.getByLabel("Conta do PGC (opcional)").locator("option");
+    await expect(opcoes).toHaveCount(19);
+    await expect(opcoes.filter({ hasText: "11.2.3 Instalações" })).toHaveCount(1);
+    await expect(opcoes.filter({ hasText: /^11\.[23] / })).toHaveCount(0);
     await d.getByLabel("Conta do PGC (opcional)").selectOption("11.5");
     await semViolacoesAxe(page);
     await d.getByRole("button", { name: "Registar" }).click();
@@ -100,7 +104,9 @@ test.describe("activos fixos", () => {
   });
 
   test("activo: plano registado e previsto; sem corrigir depois de amortizar; abater", async ({ page, api }) => {
-    await comActivos(api).em("POST", `/finance/assets/${IDF9C.portatil}/disposal`, { status: 204 }).ligar();
+    await comActivos(api)
+      .em("POST", `/finance/assets/${IDF9C.portatil}/disposal`, { status: 200, corpo: { assetId: IDF9C.portatil, journalEntryId: null, ledgerNote: "O activo não tem conta do PGC: o abate não lançou no razão." } })
+      .ligar();
     await entrar(page);
     await page.goto(`/activos/${IDF9C.portatil}`);
     await expect(page.getByRole("table", { name: "Plano de amortização" }).getByRole("row").filter({ hasText: "Março 2026" })).toContainText("Registada");
@@ -119,6 +125,9 @@ test.describe("activos fixos", () => {
     await d.getByRole("button", { name: "Abater" }).click();
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/finance/assets/${IDF9C.portatil}/disposal`).map((p) => p.corpo)).toEqual([{ on: "2026-10-17", value: "120000.00", reason: "Vendido." }]);
+    // O abate ficou gravado; a nota do razão fica à vista na ficha (ADR-096).
+    await expect(page.getByText("O abate ficou gravado, mas não lançou no razão.")).toBeVisible();
+    await expect(page.getByText("O activo não tem conta do PGC: o abate não lançou no razão.")).toBeVisible();
   });
 
   test("activo sem amortização registada: corrigir envia tudo", async ({ page, api }) => {

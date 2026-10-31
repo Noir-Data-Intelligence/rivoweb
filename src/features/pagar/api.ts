@@ -184,7 +184,7 @@ export function useCancelarPedidoPagamento(id: string) {
 export function useExecutarPagamento(id: string) {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: (b: { bankAccountId: string; method: string; reference: string | null }) =>
+    mutationFn: (b: { bankAccountId: string; method: string; reference: string | null; on: string }) =>
       ler(api.POST("/finance/payment-requests/{paymentRequestId}/execution", { params: { path: { paymentRequestId: id } }, body: { ...b, executedByEmployeeId: null } })),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: chaves.pedidos });

@@ -73,7 +73,7 @@ export function useCorrerAmortizacao() {
 
 export function useAbater(id: string) {
   const qc = useQueryClient();
-  return useEscrita({ mutationFn: (b: S["DisposalRequest"]) => enviar(api.POST("/finance/assets/{assetId}/disposal", { params: { path: { assetId: id } }, body: b })), onSuccess: () => invalidar(qc) });
+  return useEscrita({ mutationFn: (b: S["DisposalRequest"]) => ler(api.POST("/finance/assets/{assetId}/disposal", { params: { path: { assetId: id } }, body: b })), onSuccess: () => invalidar(qc) });
 }
 
 // --- Manutenção

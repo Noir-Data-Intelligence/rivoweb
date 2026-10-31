@@ -95,6 +95,8 @@ test("F3 de ponta a ponta na base local", async ({ page }) => {
   await page.getByRole("button", { name: "Registar recebimento" }).click();
   await page.getByLabel("Valor recebido").fill("1 000,00");
   await page.getByLabel("Meio").selectOption("TB");
+  // Por banco, o recebido entra numa conta em kwanzas (ADR-099); a base local tem contas em kwanzas.
+  await page.getByLabel("Conta onde entrou").selectOption({ index: 1 });
   await page.getByRole("button", { name: "Emitir recibo" }).click();
   await expect(page).toHaveURL(/\/recibos\/[0-9a-f-]{36}$/);
   await expect(page.getByText("1 000,00 Kz").first()).toBeVisible();

@@ -173,7 +173,10 @@ test.describe("salários", () => {
       .em("GET", `/payroll/runs/${IDF8.porAprovar}`, () => ({ status: 200, corpo: folha(estado, [itemCarlos()], IDF8.porAprovar) }))
       .em("POST", `/payroll/runs/${IDF8.porAprovar}/decision`, () => {
         if (++pedidas === 2) estado = "Approved";
-        return { status: 200, corpo: { status: estado } };
+        return {
+          status: 200,
+          corpo: estado === "Approved" ? { status: estado, ledgerOutcome: "Blocked", journalEntryId: null, ledgerNote: "Sem taxa de INSS patronal em vigor: a folha não lançou." } : { status: estado, ledgerOutcome: null, journalEntryId: null, ledgerNote: null },
+        };
       })
       .ligar();
     await entrar(page, meRhF8.email);
@@ -183,6 +186,22 @@ test.describe("salários", () => {
     await page.getByRole("button", { name: "Ver decisão" }).click();
     await expect(page.getByText("Aprovada", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Recibos de Carlos Teste" })).toBeVisible();
+    // A decisão diz o que a folha fez no razão (ADR-097): aqui não lançou, e porquê.
+    await expect(page.getByText("A folha não lançou no razão.")).toBeVisible();
+    await expect(page.getByText("Sem taxa de INSS patronal em vigor: a folha não lançou.")).toBeVisible();
+  });
+
+  test("aprovada: lançar no razão (repetir não duplica); o RH não paga os salários", async ({ page, api }) => {
+    await comSalarios(api)
+      .em("POST", `/payroll/runs/${IDF8.aprovada}/ledger-posting`, { status: 200, corpo: { outcome: "AlreadyPosted", journalEntryId: "00000000-0000-4000-8000-000000000f31", note: null } })
+      .ligar();
+    await entrar(page, meRhF8.email);
+    await page.goto(`/salarios/${IDF8.aprovada}`);
+    await expect(page.getByText("Aprovada, a folha lança no último dia do mês", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Lançar no razão" }).click();
+    await expect(page.getByText("A folha já estava lançada no razão.")).toBeVisible();
+    expect(api.escritas("POST", `/payroll/runs/${IDF8.aprovada}/ledger-posting`)).toHaveLength(1);
+    await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
   });
 
   test("aprovada: recibos do colaborador — ver, descarregar e anexar", async ({ page, api }) => {
@@ -223,5 +242,8 @@ test.describe("salários", () => {
     await page.goto(`/salarios/${IDF8.rascunho}`);
     await expect(page.getByRole("button", { name: "Juntar colaborador" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Submeter para aprovação" })).toHaveCount(0);
+    await page.goto(`/salarios/${IDF8.aprovada}`);
+    await expect(page.getByText("Aprovada, a folha lança no último dia do mês", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Lançar no razão" })).toHaveCount(0);
   });
 });

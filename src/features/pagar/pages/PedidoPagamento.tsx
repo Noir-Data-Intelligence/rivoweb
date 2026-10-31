@@ -10,9 +10,9 @@ import { EstadoAprovacao, usePedidoAprovacao } from "@/features/aprovacoes";
 import { CarregarFicheiro, type Documento } from "@/features/documentos";
 import { MEIOS, moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { useContasAbertas } from "@/features/tesouraria";
+import { erroDataValor, useContasAbertas } from "@/features/tesouraria";
 import { descarregar } from "@/lib/api/download";
-import { formatarData, formatarDataHora } from "@/lib/format/data";
+import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { formatarMoeda } from "@/lib/format/numero";
 import { dinheiro } from "@/lib/money/money";
 import { Alert } from "@/ui/Alert";
@@ -43,8 +43,12 @@ function Executar({ p, aoExecutar }: { p: TipoPedido; aoExecutar: (saldo: string
   const [conta, setConta] = useState("");
   const [meio, setMeio] = useState("TB");
   const [referencia, setReferencia] = useState("");
+  const [data, setData] = useState(hojeIso());
   const [tentou, setTentou] = useState(false);
   const idForm = useId();
+  // A data-valor não é futura nem anterior ao pedido (ADR-100).
+  const pedido = p.requestedOn?.slice(0, 10) ?? null;
+  const erroData = erroDataValor(data, hojeIso()) ?? (pedido && data < pedido ? `Não antes do pedido (${formatarData(pedido)}).` : undefined);
   const daMoeda = (contas.data?.items ?? []).filter((c) => c.currency === p.currency);
   const escolhida = daMoeda.find((c) => c.accountId === conta);
   const semSaldo = escolhida ? dinheiro(escolhida.balance).lt(dinheiro(p.amount)) : false;
@@ -53,6 +57,7 @@ function Executar({ p, aoExecutar }: { p: TipoPedido; aoExecutar: (saldo: string
     if (!a) {
       executar.reset();
       setTentou(false);
+      setData(hojeIso());
     }
   };
   return (
@@ -79,9 +84,9 @@ function Executar({ p, aoExecutar }: { p: TipoPedido; aoExecutar: (saldo: string
           onSubmit={(e) => {
             e.preventDefault();
             setTentou(true);
-            if (!conta || executar.isPending) return;
+            if (!conta || erroData || executar.isPending) return;
             executar.mutate(
-              { bankAccountId: conta, method: meio, reference: referencia.trim() === "" ? null : referencia.trim() },
+              { bankAccountId: conta, method: meio, reference: referencia.trim() === "" ? null : referencia.trim(), on: data },
               {
                 onSuccess: (r) => {
                   setAberto(false);
@@ -122,6 +127,9 @@ function Executar({ p, aoExecutar }: { p: TipoPedido; aoExecutar: (saldo: string
           </Field>
           <Field rotulo="Referência" ajuda="Opcional: número da transferência, do cheque…">
             {({ id, descricao }) => <Input id={id} maxLength={100} autoComplete="off" aria-describedby={descricao} value={referencia} onChange={(e) => setReferencia(e.target.value)} />}
+          </Field>
+          <Field rotulo="Data" erro={tentou ? erroData : undefined} ajuda="O dia em que o dinheiro saiu do banco; o pedido fica executado nesse dia.">
+            {({ id, descricao, invalido }) => <Input id={id} type="date" min={pedido ?? undefined} max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={data} onChange={(e) => setData(e.target.value)} />}
           </Field>
         </form>
       </Confirmar>

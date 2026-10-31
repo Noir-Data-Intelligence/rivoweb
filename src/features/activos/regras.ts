@@ -8,10 +8,19 @@ export const METODOS: Record<MetodoAmortizacao, string> = { StraightLine: "Linea
 /**
  * Contas do PGC aceites no activo (`PgcStatements.DepreciationAccountsFor`): 11.2 a 11.6 e 11.9
  * (amortização em 73.1/18.1) e 12.1 a 12.4 e 12.9 (73.2/18.2). Os terrenos (11.1) não se amortizam.
+ * Só contas de movimento: o abate credita a conta do bem (ADR-096), por isso a 11.2 e a 11.3, que
+ * são agregadoras, dão lugar às subcontas.
  */
 export const CONTAS_PGC_ACTIVO = [
-  { valor: "11.2", texto: "11.2 Edifícios e outras construções" },
-  { valor: "11.3", texto: "11.3 Equipamento básico" },
+  { valor: "11.2.1.1", texto: "11.2.1.1 Edifícios integrados em conjuntos industriais" },
+  { valor: "11.2.1.2", texto: "11.2.1.2 Edifícios integrados em conjuntos administrativos e comerciais" },
+  { valor: "11.2.1.3", texto: "11.2.1.3 Edifícios: outros conjuntos industriais" },
+  { valor: "11.2.1.4", texto: "11.2.1.4 Edifícios implantados em propriedade alheia" },
+  { valor: "11.2.2", texto: "11.2.2 Outras construções" },
+  { valor: "11.2.3", texto: "11.2.3 Instalações" },
+  { valor: "11.3.1", texto: "11.3.1 Material industrial" },
+  { valor: "11.3.2", texto: "11.3.2 Ferramentas industriais" },
+  { valor: "11.3.3", texto: "11.3.3 Melhoramentos em equipamentos básicos" },
   { valor: "11.4", texto: "11.4 Equipamento de carga e transporte" },
   { valor: "11.5", texto: "11.5 Equipamento administrativo" },
   { valor: "11.6", texto: "11.6 Taras e vasilhame" },

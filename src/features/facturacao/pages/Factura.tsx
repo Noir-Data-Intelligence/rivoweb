@@ -3,6 +3,7 @@ import { ArrowLeft, FileMinus, HandCoins } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useUtilizador } from "@/features/identity";
+import { MEIOS_POR_BANCO, useContasAbertas } from "@/features/tesouraria";
 import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { dinheiro, lerDecimalDigitado, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -121,16 +122,25 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
   const [meio, setMeio] = useState("");
   const [data, setData] = useState(hojeIso());
   const [notas, setNotas] = useState("");
+  const [conta, setConta] = useState("");
   const [tentou, setTentou] = useState(false);
   const id = useId();
+  const { pode } = useUtilizador();
+  // Por banco, o dinheiro entra na conta indicada (ADR-099); em numerário ou cheque fica para depositar.
+  const porBanco = MEIOS_POR_BANCO.includes(meio);
+  const contas = useContasAbertas(aberto && pode("finance.payables.read"));
+  const daMoeda = (contas.data?.items ?? []).filter((c) => c.currency === f.currency);
+  const pedeConta = porBanco && daMoeda.length > 0;
+  // Enquanto a lista chega, não se emite: sairia sem a conta.
+  const aCarregarContas = porBanco && pode("finance.payables.read") && contas.isPending;
   const v = lerDinheiroDigitado(valor, 2);
   const r = comRetencao ? lerDinheiroDigitado(retido === "" ? "0" : retido, 2) : new Big(0);
   const retidoOk = r !== null && r.gte(0) && r.lte(porComprovar);
   const somaOk = v !== null && r !== null && v.gte(0) && v.plus(r).gt(0) && v.plus(r).lte(emAberto);
-  const ok = retidoOk && somaOk && meio !== "" && /^\d{4}-\d{2}-\d{2}$/.test(data);
+  const ok = retidoOk && somaOk && meio !== "" && /^\d{4}-\d{2}-\d{2}$/.test(data) && (!pedeConta || conta !== "");
   const confirmar = () => {
     setTentou(true);
-    if (!ok || emitir.isPending || v === null || r === null) return;
+    if (!ok || aCarregarContas || emitir.isPending || v === null || r === null) return;
     emitir.mutate(
       {
         series: null,
@@ -138,6 +148,7 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
         method: meio,
         notes: normalizarTexto(notas, true) || null,
         settlements: [{ salesInvoiceId: f.invoiceId, amount: paraApi(v), withheld: comRetencao && r.gt(0) ? paraApi(r as never) : null }],
+        bankAccountId: pedeConta ? conta : null,
       },
       { onSuccess: (x) => void navegar(`/recibos/${x.receiptId}`) },
     );
@@ -203,6 +214,24 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
             </Select>
             {tentou && meio === "" ? <p className="text-xs text-danger" role="alert">Escolha o meio.</p> : null}
           </div>
+          {pedeConta ? (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={`${id}-c`} className="text-sm font-medium text-foreground">
+                Conta onde entrou
+              </label>
+              <Select id={`${id}-c`} value={conta} onChange={(e) => setConta(e.target.value)} aria-invalid={tentou && conta === "" ? true : undefined}>
+                <option value="">Escolha…</option>
+                {daMoeda.map((c) => (
+                  <option key={c.accountId} value={c.accountId}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+              {tentou && conta === "" ? <p className="text-xs text-danger" role="alert">Escolha a conta bancária.</p> : null}
+            </div>
+          ) : meio === "NU" || meio === "CH" ? (
+            <p className="self-end text-xs text-muted-foreground">Numerário e cheques ficam em «Valores para depositar» até ao depósito no banco.</p>
+          ) : null}
           <div className="flex flex-col gap-1.5">
             <label htmlFor={`${id}-d`} className="text-sm font-medium text-foreground">
               Data do recebimento

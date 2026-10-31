@@ -11,6 +11,7 @@ import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../a
 import { comF3 } from "../apoio-f3";
 import { utilizadores } from "../../fixtures/f1";
 import { IDF3 } from "../../fixtures/f3";
+import { contas, IDF5 } from "../../fixtures/f5";
 import {
   arquivo,
   artigosEquipa,
@@ -42,6 +43,27 @@ async function semHtmlInjectado(page: Page) {
 }
 
 test.describe("comprovativos", () => {
+  test("confirmar com a conta onde entrou a transferência (ADR-099); sem lista de contas, confirma sem corpo", async ({ page, api }) => {
+    const leContas = { ...meFinancasF10, permissions: [...meFinancasF10.permissions, "finance.payables.read"] };
+    await comF3(api, leContas)
+      .em("GET", "/finance/payment-claims", pag(filaComprovativos()))
+      .em("GET", "/finance/accounts", { status: 200, corpo: contas(), cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "2" } })
+      .em("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`, { status: 200, corpo: { receiptId: IDF10B.recibo } })
+      .ligar();
+    await entrar(page, leContas.email);
+    await page.goto("/comprovativos");
+    await page.getByRole("button", { name: "Confirmar o pagamento de Cliente Teste, Lda (FT 2026/57)" }).first().click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Conta onde entrou").locator("option")).toHaveText(["Escolha…", "Conta à ordem BAI"]);
+    await d.getByRole("button", { name: "Confirmar e registar o recibo" }).click();
+    await expect(d.getByText("Escolha a conta bancária.")).toBeVisible();
+    expect(api.escritas("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`)).toHaveLength(0);
+    await d.getByLabel("Conta onde entrou").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Confirmar e registar o recibo" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`)[0]?.corpo).toEqual({ bankAccountId: IDF5.conta });
+  });
+
   test("Finance: fila por confirmar, ficheiro em anexo, confirmar regista o recibo, rejeitar pede o motivo", async ({ page, api, violacoes }) => {
     await comF3(api, meFinancasF10)
       .em("GET", "/finance/payment-claims", pag(filaComprovativos()))
@@ -83,6 +105,8 @@ test.describe("comprovativos", () => {
     await d.getByRole("button", { name: "Confirmar e registar o recibo" }).click();
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`)).toHaveLength(1);
+    // Este perfil não lê as contas bancárias: confirma sem corpo, como antes.
+    expect(api.escritas("POST", `/finance/payment-claims/${IDF10B.pendente}/confirmation`)[0]?.corpo ?? null).toBeNull();
     await expect(page.getByRole("link", { name: "Ver o recibo registado" })).toHaveAttribute("href", `/recibos/${IDF10B.recibo}`);
 
     await page.getByLabel("Estado").selectOption("todos");

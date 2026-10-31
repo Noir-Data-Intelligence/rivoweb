@@ -114,3 +114,12 @@ export function useAnexarRecibo(runId: string, itemId: string) {
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.anexos(runId, itemId) }),
   });
 }
+
+/** Lança no razão uma folha aprovada que não lançou (ADR-097). Repetir não duplica. */
+export function useLancarFolhaNoRazao(runId: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: () => ler(api.POST("/payroll/runs/{runId}/ledger-posting", { params: { path: { runId } } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "ledger"] }),
+  });
+}

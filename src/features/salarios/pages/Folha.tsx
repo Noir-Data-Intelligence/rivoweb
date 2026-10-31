@@ -10,6 +10,7 @@ import { Link, useParams } from "react-router";
 import { CarregarFicheiro, type Documento } from "@/features/documentos";
 import { Can, useUtilizador } from "@/features/identity";
 import { SelectColaborador, useContratos, useNomeColaborador } from "@/features/rh";
+import { PagamentoPeloBanco } from "@/features/tesouraria";
 import { descarregar } from "@/lib/api/download";
 import { formatarDataHora } from "@/lib/format/data";
 import { paraApi, lerDinheiroDigitado, dinheiro } from "@/lib/money/money";
@@ -21,7 +22,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useAnexarRecibo, useAnexosItem, useAnularFolha, useFolha, useJuntarItem, useSubmeterFolha, useTirarItem, useVerDecisaoFolha, type Folha as TipoFolha, type ItemFolha } from "../api";
+import { useAnexarRecibo, useAnexosItem, useAnularFolha, useFolha, useJuntarItem, useSubmeterFolha, useLancarFolhaNoRazao, useTirarItem, useVerDecisaoFolha, type Folha as TipoFolha, type ItemFolha } from "../api";
 import { EstadoFolha, kz, periodoFolha, subsidiosDe, totais } from "../comum";
 import { errosItem, type CamposItem } from "../regras";
 
@@ -214,12 +215,53 @@ function Submeter({ f }: { f: TipoFolha }) {
   );
 }
 
-function VerDecisao({ f }: { f: TipoFolha }) {
+/** O que a folha aprovada fez no razão (ADR-097): `Posted`, `AlreadyPosted`, `NotPosted` (sem PGC) ou `Blocked`. */
+type RazaoFolha = { resultado: string; journalEntryId: string | null; nota: string | null };
+
+function NoRazao({ f, razao, mudar }: { f: TipoFolha; razao: RazaoFolha | null; mudar: (r: RazaoFolha) => void }) {
+  const { pode } = useUtilizador();
+  const lancar = useLancarFolhaNoRazao(f.runId);
+  const lancada = razao?.resultado === "Posted" || razao?.resultado === "AlreadyPosted";
+  return (
+    <Card className="mb-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className="font-medium text-foreground">Razão</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Aprovada, a folha lança no último dia do mês: os salários (72.2) e o INSS da empresa (72.5.2) a custo; o líquido (36.1.2), o IRT (34.3) e o INSS (34.7) a pagar. Lançar outra vez não duplica.
+          </p>
+        </div>
+        {pode("payroll.runs.write") ? (
+          <Button variante="secondary" className="shrink-0" aCarregar={lancar.isPending} onClick={() => lancar.mutate(undefined, { onSuccess: (r) => mudar({ resultado: r.outcome, journalEntryId: r.journalEntryId ?? null, nota: r.note ?? null }) })}>
+            Lançar no razão
+          </Button>
+        ) : null}
+      </div>
+      {razao ? (
+        <Alert tom={lancada ? "sucesso" : "aviso"} className="mt-3" titulo={razao.resultado === "Posted" ? "Folha lançada no razão." : razao.resultado === "AlreadyPosted" ? "A folha já estava lançada no razão." : "A folha não lançou no razão."}>
+          {razao.nota ? <p>{razao.nota}</p> : null}
+          {razao.journalEntryId && pode("finance.ledger.read") ? (
+            <Link to={`/lancamentos/${razao.journalEntryId}`} className="text-primary underline-offset-4 hover:underline">
+              Ver o lançamento
+            </Link>
+          ) : null}
+        </Alert>
+      ) : null}
+      {lancar.error ? <ErrorPanel erro={lancar.error} className="mt-3" /> : null}
+    </Card>
+  );
+}
+
+function VerDecisao({ f, aoDecidir }: { f: TipoFolha; aoDecidir: (r: RazaoFolha) => void }) {
   const ver = useVerDecisaoFolha(f.runId);
   const aindaEspera = ver.data?.status === "PendingApproval";
   return (
     <div className="flex flex-col items-end gap-1">
-      <Button variante="secondary" aCarregar={ver.isPending} onClick={() => (ver.isPending ? undefined : ver.mutate())}>
+      <Button
+        variante="secondary"
+        aCarregar={ver.isPending}
+        onClick={() => (ver.isPending ? undefined : ver.mutate(undefined, { onSuccess: (r) => (r.ledgerOutcome ? aoDecidir({ resultado: r.ledgerOutcome, journalEntryId: r.journalEntryId ?? null, nota: r.ledgerNote ?? null }) : undefined) }))}
+      >
         Ver decisão
       </Button>
       {aindaEspera ? <p className="text-sm text-muted-foreground">Ainda à espera de decisão em Aprovações.</p> : null}
@@ -305,6 +347,7 @@ export default function Folha() {
   const { pode } = useUtilizador();
   const q = useFolha(runId);
   const nomeDe = useNomeColaborador();
+  const [razao, setRazao] = useState<RazaoFolha | null>(null);
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/salarios">
@@ -363,7 +406,9 @@ export default function Folha() {
               <JuntarColaborador f={f} />
             </div>
           ) : f.status === "PendingApproval" && escreve ? (
-            <VerDecisao f={f} />
+            <VerDecisao f={f} aoDecidir={setRazao} />
+          ) : f.status === "Approved" && pode("finance.payments.execute") ? (
+            <PagamentoPeloBanco tipo="salarios" mesInicial={`${String(f.year)}-${String(f.month).padStart(2, "0")}`} />
           ) : undefined
         }
       />
@@ -376,6 +421,7 @@ export default function Folha() {
           </Can>
         </Alert>
       ) : null}
+      {f.status === "Approved" ? <NoRazao f={f} razao={razao} mudar={setRazao} /> : null}
       {f.status === "Refused" ? <Alert tom="erro" className="mb-4" titulo="Folha recusada em Aprovações: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
       {f.status === "Cancelled" ? <Alert tom="info" className="mb-4" titulo="Folha anulada: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

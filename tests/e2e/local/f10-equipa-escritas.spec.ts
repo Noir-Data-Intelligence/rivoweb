@@ -194,6 +194,8 @@ test("F10: o lado da equipa — conta e partilha no cliente, suporte, artigos, c
   await admin.getByRole("row").filter({ hasText: `${marca} primeira` }).getByRole("button", { name: `Descarregar o comprovativo de ${nome} (transferencia-1.pdf)` }).click();
   expect((await descarga).suggestedFilename()).toBe("transferencia-1.pdf");
   await admin.getByRole("row").filter({ hasText: `${marca} primeira` }).getByRole("button", { name: `Confirmar o pagamento de ${nome} (${numero})` }).click();
+  // A transferência entra numa conta da moeda da factura (ADR-099); a base local tem contas em kwanzas.
+  await dialogo(admin).getByLabel("Conta onde entrou").selectOption({ index: 1 });
   await dialogo(admin).getByRole("button", { name: "Confirmar e registar o recibo" }).click();
   await expect(dialogo(admin)).toHaveCount(0);
   await expect(admin.getByRole("link", { name: "Ver o recibo registado" })).toBeVisible();

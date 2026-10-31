@@ -241,8 +241,8 @@ export const extracto = (): S["AccountStatementView"] => ({
   accountBalance: 5000000,
   reconciles: true,
   movements: [
-    { movementId: "00000000-0000-4000-8000-000000000926", occurredAt: "2026-10-01T09:00:00Z", direction: "Credit", amount: 5100000, balanceAfter: 5100000, description: "Saldo de abertura", sourceType: null, sourceId: null },
-    { movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", direction: "Debit", amount: 100000, balanceAfter: 5000000, description: "Levantamento para caixa", sourceType: null, sourceId: null },
+    { movementId: "00000000-0000-4000-8000-000000000926", occurredAt: "2026-10-01T09:00:00Z", on: "2026-10-01", direction: "Credit", amount: 5100000, balanceAfter: 5100000, description: "Saldo de abertura", sourceType: null, sourceId: null },
+    { movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", on: "2026-10-09", direction: "Debit", amount: 100000, balanceAfter: 5000000, description: "Levantamento para caixa", sourceType: null, sourceId: null },
   ],
 });
 
@@ -256,7 +256,7 @@ export const reconciliacao = (): S["ReconciliationSummary"] => ({
   unmatched: 1,
   ignored: 0,
   unmatchedStatementTotal: -100000,
-  unreconciledMovements: [{ movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", direction: "Debit", amount: 100000, description: "Levantamento para caixa" }],
+  unreconciledMovements: [{ movementId: IDF5T.movimento, occurredAt: "2026-10-10T09:00:00Z", on: "2026-10-09", direction: "Debit", amount: 100000, description: "Levantamento para caixa" }],
 });
 
 export const linhaExtracto = (estado = "Unmatched"): S["StatementLineView"] => ({

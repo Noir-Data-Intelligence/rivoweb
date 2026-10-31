@@ -184,11 +184,16 @@ test.describe("pedidos de pagamento", () => {
     await page.getByLabel("Conta de onde sai").selectOption(IDF5.conta);
     await page.getByLabel("Meio de pagamento").selectOption("MB");
     await page.getByLabel("Referência").fill("MCX-77");
+    // A data-valor: não futura (ADR-100).
+    await page.getByRole("dialog").getByLabel("Data").fill("2099-01-01");
+    await page.getByRole("dialog").getByRole("button", { name: "Executar pagamento" }).click();
+    await expect(page.getByText("A data não pode ser futura.")).toBeVisible();
+    await page.getByRole("dialog").getByLabel("Data").fill("2026-10-20");
     await page.getByRole("dialog").getByRole("button", { name: "Executar pagamento" }).dblclick();
     await expect(page.getByText("Pagamento executado.")).toBeVisible();
     await expect(page.getByText("4 360 000,00", { exact: false })).toBeVisible();
     expect(api.escritas("POST", `/finance/payment-requests/${IDF5.pedido}/execution`).map((p) => p.corpo)).toEqual([
-      { bankAccountId: IDF5.conta, method: "MB", reference: "MCX-77", executedByEmployeeId: null },
+      { bankAccountId: IDF5.conta, method: "MB", reference: "MCX-77", on: "2026-10-20", executedByEmployeeId: null },
     ]);
     expect(await violacoes()).toEqual([]);
   });
@@ -427,16 +432,21 @@ test.describe("tesouraria", () => {
     await page.getByRole("link", { name: "Conta à ordem BAI" }).click();
     await expect(page.getByRole("cell", { name: "Levantamento para caixa" })).toBeVisible();
     await expect(page.getByText("5 100 000,00 Kz").first()).toBeVisible();
+    // A data da linha é a data-valor; registado noutro dia, diz-se por baixo.
+    const lev = page.getByRole("row").filter({ hasText: "Levantamento para caixa" });
+    await expect(lev).toContainText("09/10/2026");
+    await expect(lev).toContainText("registado a 10/10/2026");
     await semViolacoesAxe(page);
     await page.setViewportSize({ width: 360, height: 800 });
     await semScrollHorizontal(page);
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.getByRole("button", { name: "Depositar" }).click();
+    await page.getByRole("button", { name: "Depositar", exact: true }).click();
     await page.getByLabel(/^Valor/).fill("1 250 000,5");
     await page.getByLabel("Referência (opcional)").fill("DEP-1");
+    await page.getByRole("dialog").getByLabel("Data").fill("2026-10-28");
     await page.getByRole("dialog").getByRole("button", { name: "Depositar" }).dblclick();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    expect(api.escritas("POST", `/finance/accounts/${IDF5.conta}/deposits`).map((p) => p.corpo)).toEqual([{ amount: "1250000.50", reference: "DEP-1" }]);
+    expect(api.escritas("POST", `/finance/accounts/${IDF5.conta}/deposits`).map((p) => p.corpo)).toEqual([{ amount: "1250000.50", reference: "DEP-1", on: "2026-10-28" }]);
     expect(await violacoes()).toEqual([]);
   });
 
@@ -457,13 +467,77 @@ test.describe("tesouraria", () => {
     expect(api.escritas("POST", `/finance/statement-lines/${IDF5T.linha}/match`).map((p) => p.corpo)).toEqual([{ movementId: IDF5T.movimento }]);
   });
 
+  test("pagar salários e entregar ao Estado pelo banco: só contas em kwanzas, data-valor no mês, valor e saldo; axe", async ({ page, api, violacoes }) => {
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", "/finance/treasury/payroll-payments", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f21", amount: 2150000.5, bankBalance: 2849999.5 } })
+      .em("POST", "/finance/treasury/tax-payments", {
+        status: 409,
+        corpo: { status: 409, title: "Conflict", detail: "O IVA de Setembro de 2026 ainda não está apurado: apure-o em Impostos." },
+        cabecalhos: { "Content-Type": "application/problem+json" },
+      })
+      .ligar();
+    await entrar(page, meFinancasF5.email);
+    await page.goto("/contas");
+    await page.getByRole("button", { name: "Pagar salários" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Conta").locator("option")).toHaveText(["Escolha…", "Conta à ordem BAI · 5 000 000,00 Kz"]);
+    await d.getByLabel("Mês").fill("2026-09");
+    await d.getByLabel("Data").fill("2026-08-31");
+    await d.getByRole("button", { name: "Pagar", exact: true }).click();
+    await expect(d.getByText("Escolha a conta de onde sai o dinheiro.")).toBeVisible();
+    await expect(d.getByText("Não antes do mês que se paga.")).toBeVisible();
+    await d.getByLabel("Conta").selectOption(IDF5.conta);
+    await d.getByLabel("Data").fill("2026-10-05");
+    await semViolacoesAxe(page);
+    await d.getByRole("button", { name: "Pagar", exact: true }).click();
+    await expect(d.getByText("Salários de Setembro de 2026 pagos: 2 150 000,50 Kz.")).toBeVisible();
+    await expect(d.getByText("Saldo que ficou na conta: 2 849 999,50 Kz.")).toBeVisible();
+    // A ligação ao lançamento só aparece a quem lê o razão (este perfil de teste não lê).
+    await expect(d.getByRole("link", { name: "Ver o lançamento" })).toHaveCount(0);
+    expect(api.escritas("POST", "/finance/treasury/payroll-payments").map((p) => p.corpo)).toEqual([{ year: 2026, month: 9, bankAccountId: IDF5.conta, on: "2026-10-05" }]);
+    await d.getByRole("button", { name: "Fechar", exact: true }).first().click();
+
+    await page.getByRole("button", { name: "Entregar ao Estado" }).click();
+    await d.getByLabel("Imposto").selectOption("IVA");
+    await d.getByLabel("Mês").fill("2026-09");
+    await d.getByLabel("Conta").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Entregar", exact: true }).click();
+    await expect(d.getByText("O IVA de Setembro de 2026 ainda não está apurado: apure-o em Impostos.")).toBeVisible();
+    expect(api.escritas("POST", "/finance/treasury/tax-payments")[0]?.corpo).toMatchObject({ tax: "IVA", year: 2026, month: 9, bankAccountId: IDF5.conta });
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("depositar valores: o talão com a data, só nas contas em kwanzas", async ({ page, api }) => {
+    await comTesouraria(api)
+      .em("POST", "/finance/treasury/cash-deposits", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f22", amount: 75000, bankBalance: 5075000 } })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/contas/${IDF5.conta}`);
+    await page.getByRole("button", { name: "Depositar valores" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Valor do talão (AOA)").fill("75 000");
+    await d.getByLabel("Referência do talão (opcional)").fill("TAL-9");
+    await d.getByLabel("Data").fill("2026-10-27");
+    await d.getByRole("button", { name: "Depositar", exact: true }).click();
+    await expect(d.getByText("Depositado: 75 000,00 Kz.")).toBeVisible();
+    expect(api.escritas("POST", "/finance/treasury/cash-deposits").map((p) => p.corpo)).toEqual([{ bankAccountId: IDF5.conta, amount: "75000.00", reference: "TAL-9", on: "2026-10-27" }]);
+    await page.goto(`/contas/${IDF5.contaUsd}`);
+    await expect(page.getByRole("button", { name: "Depositar", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Depositar valores" })).toHaveCount(0);
+  });
+
   test("o Manager vê contas e movimenta, mas não a reconciliação", async ({ page, api }) => {
     await comTesouraria(api, meGestorF5).ligar();
     await entrar(page, "gestor5@teste.local");
     await page.goto(`/contas/${IDF5.conta}?vista=reconciliacao`);
     await expect(page.getByRole("cell", { name: "Levantamento para caixa" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reconciliação" })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Depositar" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Depositar", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Depositar valores" })).toBeVisible();
+    // Pagar salários e entregar ao Estado pedem `finance.payments.execute`, que o Manager não tem.
+    await page.goto("/contas");
+    await expect(page.getByRole("link", { name: "Conta à ordem BAI" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
   });
 
   test("câmbios: lista, taxa com 6 casas em texto e conversão; 404 sem taxa", async ({ page, api, violacoes }) => {

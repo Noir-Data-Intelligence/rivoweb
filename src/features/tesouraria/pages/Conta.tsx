@@ -8,7 +8,7 @@ import { useId, useState } from "react";
 import { Link, NavLink, useParams, useSearchParams } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { formatarData, formatarDataHora } from "@/lib/format/data";
+import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { dinheiro, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { IsoDate, normalizarTexto } from "@/lib/validation/text";
 import { Alert } from "@/ui/Alert";
@@ -41,6 +41,8 @@ import {
   type Movimento,
   type ResumoReconciliacao,
 } from "../api";
+import { DepositarValores } from "../Liquidacoes";
+import { erroDataValor } from "../regras";
 import { EstadoConta } from "./Contas";
 
 const sinal = (direccao: string) => (direccao === "Debit" ? "−" : "+");
@@ -53,9 +55,11 @@ function Movimentar({ c, tipo }: { c: TipoConta; tipo: "deposito" | "levantament
   const m = deposito ? depositar : levantar;
   const [valor, setValor] = useState("");
   const [texto, setTexto] = useState("");
+  const [data, setData] = useState(hojeIso());
   const [tentou, setTentou] = useState(false);
   const idForm = useId();
   const v = lerDinheiroDigitado(valor, 2);
+  const erroData = erroDataValor(data, hojeIso());
   const erroValor = !v || v.lte(0) ? "Indique um valor maior que zero." : !deposito && v.gt(dinheiro(c.balance)) ? "Passa do saldo da conta; o servidor vai recusar." : undefined;
   const erroTexto = !deposito && normalizarTexto(texto) === "" ? "Descreva o levantamento." : undefined;
   const fechar = (a: boolean) => {
@@ -65,6 +69,7 @@ function Movimentar({ c, tipo }: { c: TipoConta; tipo: "deposito" | "levantament
       setTentou(false);
       setValor("");
       setTexto("");
+      setData(hojeIso());
     }
   };
   return (
@@ -91,10 +96,10 @@ function Movimentar({ c, tipo }: { c: TipoConta; tipo: "deposito" | "levantament
           onSubmit={(e) => {
             e.preventDefault();
             setTentou(true);
-            if (erroValor || erroTexto || !v || m.isPending) return;
+            if (erroValor || erroTexto || erroData || !v || m.isPending) return;
             const t = normalizarTexto(texto);
-            if (deposito) depositar.mutate({ amount: paraApi(v), reference: t === "" ? null : t }, { onSuccess: () => fechar(false) });
-            else levantar.mutate({ amount: paraApi(v), description: t }, { onSuccess: () => fechar(false) });
+            if (deposito) depositar.mutate({ amount: paraApi(v), reference: t === "" ? null : t, on: data }, { onSuccess: () => fechar(false) });
+            else levantar.mutate({ amount: paraApi(v), description: t, on: data }, { onSuccess: () => fechar(false) });
           }}
         >
           <Field rotulo={`Valor (${c.currency})`} erro={tentou ? erroValor : undefined} ajuda={`Saldo actual: ${moeda(c.balance, c.currency)}.`}>
@@ -104,6 +109,9 @@ function Movimentar({ c, tipo }: { c: TipoConta; tipo: "deposito" | "levantament
           </Field>
           <Field rotulo={deposito ? "Referência (opcional)" : "Descrição"} erro={tentou ? erroTexto : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} maxLength={200} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={texto} onChange={(e) => setTexto(e.target.value)} />}
+          </Field>
+          <Field rotulo="Data" erro={tentou ? erroData : undefined} ajuda="A data-valor: o dia em que o dinheiro entrou ou saiu do banco.">
+            {({ id, descricao, invalido }) => <Input id={id} type="date" max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={data} onChange={(e) => setData(e.target.value)} />}
           </Field>
         </form>
       </Confirmar>
@@ -139,7 +147,17 @@ function Reabrir({ c }: { c: TipoConta }) {
 
 function MovimentosTabela({ movimentos, moedaConta }: { movimentos: readonly Movimento[]; moedaConta: string }) {
   const colunas: Coluna<Movimento>[] = [
-    { id: "data", cabecalho: "Data", celula: (m) => formatarDataHora(m.occurredAt) },
+    // A data da linha é a data-valor; quando se registou noutro dia, diz-se por baixo (ADR-100).
+    {
+      id: "data",
+      cabecalho: "Data",
+      celula: (m) => (
+        <span className="flex flex-col">
+          <span>{formatarData(m.on)}</span>
+          {m.occurredAt.slice(0, 10) !== m.on ? <span className="text-xs text-muted-foreground">registado a {formatarDataHora(m.occurredAt)}</span> : null}
+        </span>
+      ),
+    },
     { id: "descricao", cabecalho: "Descrição", celula: (m) => m.description, className: "max-w-[20rem] truncate" },
     { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (m) => <span className={m.direction === "Debit" ? "text-danger" : undefined}>{`${sinal(m.direction)} ${moeda(m.amount, moedaConta)}`}</span> },
     { id: "saldo", cabecalho: "Saldo", alinhar: "direita", esconderAte: "sm", celula: (m) => moeda(m.balanceAfter, moedaConta) },
@@ -328,7 +346,7 @@ function Conciliar({ contaId, linha, resumo }: { contaId: string; linha: LinhaEx
               <option value="">Escolha…</option>
               {candidatos.map((m) => (
                 <option key={m.movementId} value={m.movementId}>
-                  {formatarData(m.occurredAt.slice(0, 10))} · {m.description} · {sinal(m.direction)} {moeda(m.amount, resumo.currency)}
+                  {formatarData(m.on)} · {m.description} · {sinal(m.direction)} {moeda(m.amount, resumo.currency)}
                 </option>
               ))}
             </Select>
@@ -482,6 +500,7 @@ export default function Conta() {
                 <>
                   <Movimentar c={c} tipo="deposito" />
                   <Movimentar c={c} tipo="levantamento" />
+                  {c.currency === "AOA" ? <DepositarValores c={c} /> : null}
                   <ConfirmarComMotivo
                     rotuloBotao="Fechar"
                     icone={<Lock strokeWidth={1.75} aria-hidden />}
