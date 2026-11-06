@@ -55,4 +55,28 @@ test("PGC: carregar o plano, demonstrações oficiais e simular o histórico", a
   const cartao = page.getByRole("heading", { name: "Lançar o histórico" }).locator("..");
   await cartao.getByRole("button", { name: /^Simular / }).click();
   await expect(page.getByRole("region", { name: "Resultado da simulação" }).getByText("nada foi gravado", { exact: false })).toBeVisible({ timeout: 60_000 });
+
+  // Actualização cambial de Dezembro do ano passado, só simulada: o resultado ou a recusa (por exemplo, sem câmbio) com a razão.
+  await page.goto(`/periodos?ano=${ano - 1}`);
+  const cambial = page.getByRole("heading", { name: "Actualização cambial" }).locator("..");
+  await cambial.getByRole("button", { name: `Simular Dezembro de ${ano - 1}` }).click();
+  await expect(page.getByRole("region", { name: "Resultado da actualização cambial" }).or(cambial.getByRole("alert"))).toBeVisible({ timeout: 60_000 });
+
+  // Uma versão registada à mão nasce inactiva e vazia: activá-la dá 409 com as contas em falta (B44).
+  const versao = `[TESTE] ${Date.now().toString(36)} plano`;
+  await page.goto("/plano-contas?vista=versoes");
+  await page.getByRole("button", { name: "Nova versão" }).click();
+  await page.getByRole("dialog").getByLabel("Nome").fill(versao);
+  await page.getByRole("dialog").getByLabel("Versão").fill("1");
+  await page.getByRole("dialog").getByLabel("Fonte").fill("Teste local");
+  await page.getByRole("dialog").getByLabel("Em vigor desde").fill("2099-01-01");
+  await page.getByRole("dialog").getByRole("button", { name: "Registar versão" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  const linha = page.getByRole("row").filter({ hasText: versao });
+  await expect(linha.getByText("Inactiva")).toBeVisible();
+  await linha.getByRole("button", { name: /^Activar / }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Activar versão" }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancelar" }).click();
+  await expect(linha.getByText("Inactiva")).toBeVisible();
 });

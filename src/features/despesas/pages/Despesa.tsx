@@ -54,7 +54,7 @@ function Reembolsar({ d }: { d: TipoDespesa }) {
         aberto={aberto}
         aoMudar={fechar}
         titulo={`Reembolsar ${moeda(d.amount, d.currency)} a ${d.employeeName}?`}
-        descricao="Regista que o colaborador foi reembolsado. Não movimenta a conta nem gera lançamento: faça o pagamento pelo meio habitual."
+        descricao="Regista que o colaborador foi reembolsado. Com a conta, o valor sai dela nessa data (fica no extracto) e lança no razão; sem conta, só fica registado."
         rotuloConfirmar="Marcar reembolsada"
         aCarregar={reembolsar.isPending}
         erro={reembolsar.error ? <ErrorPanel erro={reembolsar.error} /> : undefined}
@@ -74,7 +74,7 @@ function Reembolsar({ d }: { d: TipoDespesa }) {
             {({ id, descricao, invalido }) => <Input id={id} type="date" max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={data} onChange={(e) => setData(e.target.value)} />}
           </Field>
           {pode("finance.payables.read") ? (
-            <Field rotulo="Conta de onde saiu (opcional)">
+            <Field rotulo="Conta de onde saiu (opcional)" ajuda={`Só contas abertas em ${d.currency}. Sem conta, o dinheiro não sai de nenhuma.`}>
               {({ id, descricao }) => (
                 <Select id={id} aria-describedby={descricao} aria-busy={contas.isPending || undefined} value={conta} onChange={(e) => setConta(e.target.value)}>
                   <option value="">Não indicar</option>

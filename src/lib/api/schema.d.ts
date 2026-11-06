@@ -17611,6 +17611,133 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/ledger/chart-versions/{chartVersionId}/activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Põe a versão em vigor; 409 se lhe faltarem contas das regras de lançamento activas, e diz quais (B44). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    chartVersionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/chart-versions/{chartVersionId}/deactivation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tira a versão de vigor (B44). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    chartVersionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/ledger/accounting-rules": {
         parameters: {
             query?: never;
@@ -18643,6 +18770,78 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["VatSettlementView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/exchange-revaluations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Actualização cambial dos depósitos em moeda estrangeira no fim de um mês: as contas bancárias que não são em kwanzas, ao câmbio do último dia, contra a 43.2; a diferença vai para 66.2.2 (ganho) ou 76.2.2 (perda). Repete-se sem duplicar; dryRun mostra o que lançaria, sem gravar. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ExchangeRevaluationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ExchangeRevaluationView"];
                     };
                 };
                 /** @description Bad Request */
@@ -41553,6 +41752,8 @@ export interface components {
             /** Format: double */
             withholdingRate: null | number | string;
             paymentMethod: null | string;
+            /** Format: uuid */
+            bankAccountId?: null | string;
         };
         ConversionView: {
             /** Format: double */
@@ -42227,6 +42428,8 @@ export interface components {
             taxCode: string;
             /** Format: double */
             taxPercentage?: null | number | string;
+            /** @default Service */
+            kind: string;
             /** Format: double */
             net?: number | string;
             /** Format: double */
@@ -42239,6 +42442,8 @@ export interface components {
             /** Format: double */
             unitPrice: number | string;
             taxCode: string;
+            /** @enum {null|string} */
+            kind?: "Goods" | "Service" | null;
         };
         DraftRequest: {
             /** Format: uuid */
@@ -42473,6 +42678,33 @@ export interface components {
             /** Format: double */
             rate: number | string;
             source: null | string;
+        };
+        ExchangeRevaluationRequest: {
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: int32 */
+            month: number | string;
+            dryRun: null | boolean;
+        };
+        ExchangeRevaluationView: {
+            outcome: string;
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: int32 */
+            month: number | string;
+            /** Format: date */
+            on: string;
+            /** Format: uuid */
+            entryId: null | string;
+            transactionId: null | string;
+            /** Format: double */
+            ledgerBalance: number | string;
+            /** Format: double */
+            revaluedBalance: number | string;
+            /** Format: double */
+            difference: number | string;
+            accounts: components["schemas"]["RevaluedBankAccount"][];
+            notes: string[];
         };
         ExecutePaymentRequest: {
             /** Format: uuid */
@@ -43362,6 +43594,8 @@ export interface components {
         IssueDraftRequest: {
             /** Format: date */
             issuedOn: null | string;
+            /** Format: uuid */
+            bankAccountId?: null | string;
         };
         IssueInvoiceRequest: {
             /** Format: uuid */
@@ -45821,6 +46055,20 @@ export interface components {
         };
         /** @description 0 = Employee, 1 = Vehicle */
         ResourceKind: number;
+        RevaluedBankAccount: {
+            /** Format: uuid */
+            accountId: string;
+            name: string;
+            currency: string;
+            /** Format: double */
+            balance: number | string;
+            /** Format: double */
+            rate: number | string;
+            /** Format: date */
+            rateOn: string;
+            /** Format: double */
+            kwanzas: number | string;
+        };
         RevenueForecastView: {
             currency: string;
             history: components["schemas"]["ForecastPoint"][];

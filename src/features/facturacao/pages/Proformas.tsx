@@ -11,6 +11,7 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { z } from "zod/mini";
 import { useClientesActivos } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
+import { CampoContaOndeEntrou, useContaOndeEntrou } from "@/features/tesouraria";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
 import { eApiError } from "@/lib/api/problem";
 import { formatarData, hojeIso } from "@/lib/format/data";
@@ -30,7 +31,7 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { cn } from "@/ui/cn";
 import { useAnularProforma, useConverterProforma, useEmitirProforma, usePautas, useProformas, type ProForma } from "../api";
 import { calcularTotais } from "../calculos";
-import { AVISO_DEFINITIVO, EstadoDocumento, MEIOS, moeda } from "../comum";
+import { AVISO_DEFINITIVO, EstadoDocumento, MEIOS, moeda, NATUREZA_LINHA } from "../comum";
 import { taxaEmVigor } from "./Rascunho";
 
 function Converter({ p }: { p: ProForma }) {
@@ -41,16 +42,19 @@ function Converter({ p }: { p: ProForma }) {
   const [meio, setMeio] = useState("");
   const [venc, setVenc] = useState("");
   const [data, setData] = useState(hojeIso());
+  const [conta, setConta] = useState("");
   const [tentou, setTentou] = useState(false);
   const id = useId();
-  const ok = IsoDate.safeParse(data).success && (tipo === "FT" || meio !== "") && (venc === "" || IsoDate.safeParse(venc).success);
+  // Convertida em FR por banco, diz em que conta entrou o dinheiro (B45, PR #135).
+  const contaFr = useContaOndeEntrou(aberto && tipo === "FR", p.currency, meio);
+  const ok = IsoDate.safeParse(data).success && (tipo === "FT" || meio !== "") && (venc === "" || IsoDate.safeParse(venc).success) && (!contaFr.pede || conta !== "");
   const confirmar = () => {
     setTentou(true);
-    if (!ok || converter.isPending) return;
+    if (!ok || contaFr.aCarregar || converter.isPending) return;
     converter.mutate(
       {
         proformaId: p.proformaId,
-        corpo: { series: null, issuedOn: data, documentType: tipo, dueDate: tipo === "FT" && venc ? venc : null, paymentTerms: null, withholdingRate: null, paymentMethod: tipo === "FR" ? meio : null },
+        corpo: { series: null, issuedOn: data, documentType: tipo, dueDate: tipo === "FT" && venc ? venc : null, paymentTerms: null, withholdingRate: null, paymentMethod: tipo === "FR" ? meio : null, bankAccountId: tipo === "FR" && contaFr.pede ? conta : null },
       },
       { onSuccess: (r) => void navegar(`/facturas/${r.id}`) },
     );
@@ -105,7 +109,9 @@ function Converter({ p }: { p: ProForma }) {
               </Select>
               {tentou && meio === "" ? <p className="text-xs text-danger" role="alert">Escolha o meio.</p> : null}
             </div>
-          ) : (
+          ) : null}
+          {tipo === "FR" && contaFr.pede ? <CampoContaOndeEntrou contas={contaFr.contas} valor={conta} mudar={setConta} erro={tentou && conta === "" ? "Escolha a conta bancária." : undefined} /> : null}
+          {tipo === "FR" ? null : (
             <div className="flex flex-col gap-1.5">
               <label htmlFor={`${id}-v`} className="text-sm font-medium text-foreground">
                 Vencimento (opcional)
@@ -153,7 +159,7 @@ function Detalhe({ p, aoFechar }: { p: ProForma; aoFechar: () => void }) {
           {p.lines.map((l, i) => (
             <li key={i} className="flex justify-between gap-3 py-2">
               <span>
-                {l.description} <span className="text-muted-foreground">× {String(l.quantity).replace(".", ",")} · {l.taxCode}</span>
+                {l.description} <span className="text-muted-foreground">× {String(l.quantity).replace(".", ",")} · {l.taxCode} · {NATUREZA_LINHA[l.kind] ?? l.kind}</span>
               </span>
               <span className="tabular-nums">{moeda(l.net ?? 0, p.currency)}</span>
             </li>
@@ -280,6 +286,7 @@ const esquema = z
           quantity: z.string().check(z.refine((v) => (lerDecimalDigitado(v, 4)?.gt(0) ?? false), "Maior que zero.")),
           unitPrice: z.string().check(z.refine((v) => (lerDinheiroDigitado(v, 2)?.gte(0) ?? false), "Preço inválido.")),
           taxCode: z.string().check(z.minLength(1)),
+          kind: z.enum(["Service", "Goods"]),
         }),
       )
       .check(z.minLength(1, "Pelo menos uma linha.")),
@@ -300,7 +307,7 @@ export function NovaProforma() {
   const [soltas, setSoltas] = useState<string[]>([]);
   const form = useForm<Dados>({
     resolver: zodResolver(esquema),
-    defaultValues: { customerId: "", customerName: "", validUntil: "", currency: "AOA", notes: "", lines: [{ description: "", quantity: "1", unitPrice: "", taxCode: "NOR" }] },
+    defaultValues: { customerId: "", customerName: "", validUntil: "", currency: "AOA", notes: "", lines: [{ description: "", quantity: "1", unitPrice: "", taxCode: "NOR", kind: "Service" }] },
   });
   const linhas = useFieldArray({ control: form.control, name: "lines" });
   const v = useWatch({ control: form.control }) as Dados;
@@ -331,6 +338,7 @@ export function NovaProforma() {
           quantity: decimalParaApi(lerDecimalDigitado(l.quantity, 4) ?? new Big(0)),
           unitPrice: paraApi(lerDinheiroDigitado(l.unitPrice, 2) ?? (new Big(0) as never)),
           taxCode: l.taxCode,
+          kind: l.kind,
         })),
       },
       { onSuccess: () => void navegar("/proformas"), onError: (e) => setSoltas(aplicarErrosDoServidor(e, form.setError, ["customerId", "customerName", "validUntil", "currency", "notes"])) },
@@ -394,7 +402,7 @@ export function NovaProforma() {
               return (
                 <fieldset key={f.id} className="grid gap-3 rounded-md border border-border p-3 sm:grid-cols-12">
                   <legend className="sr-only">Linha {i + 1}</legend>
-                  <Field rotulo="Descrição" erro={e?.description?.message} className="sm:col-span-5">
+                  <Field rotulo="Descrição" erro={e?.description?.message} className="sm:col-span-3">
                     {({ id, descricao, invalido }) => <Input id={id} maxLength={200} aria-describedby={descricao} invalido={invalido} {...form.register(`lines.${i}.description`)} />}
                   </Field>
                   <Field rotulo="Qtd." erro={e?.quantity?.message} className="sm:col-span-2">
@@ -402,6 +410,17 @@ export function NovaProforma() {
                   </Field>
                   <Field rotulo="Preço unitário" erro={e?.unitPrice?.message} className="sm:col-span-2">
                     {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" aria-describedby={descricao} invalido={invalido} {...form.register(`lines.${i}.unitPrice`)} />}
+                  </Field>
+                  <Field rotulo="Natureza" className="sm:col-span-2">
+                    {({ id }) => (
+                      <Select id={id} {...form.register(`lines.${i}.kind`)}>
+                        {Object.entries(NATUREZA_LINHA).map(([k, t]) => (
+                          <option key={k} value={k}>
+                            {t}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
                   </Field>
                   <Field rotulo="Imposto" className="sm:col-span-2">
                     {({ id }) => (
@@ -423,7 +442,7 @@ export function NovaProforma() {
               );
             })}
           </div>
-          <Button variante="secondary" className="mt-3" onClick={() => linhas.append({ description: "", quantity: "1", unitPrice: "", taxCode: "NOR" })}>
+          <Button variante="secondary" className="mt-3" onClick={() => linhas.append({ description: "", quantity: "1", unitPrice: "", taxCode: "NOR", kind: "Service" })}>
             <Plus strokeWidth={1.75} aria-hidden />
             Linha
           </Button>

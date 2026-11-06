@@ -21,7 +21,12 @@
 > no razão) · actualizado a 2026-10-31 (a folha de salários aprovada lança
 > no razão; pagar os salários, entregar ao Estado e depositar valores pelo
 > banco; o recebimento por banco entra na conta bancária; a data-valor das
-> operações de banco).
+> operações de banco) · actualizado a 2026-11-01 (o banco em moeda
+> estrangeira lança na 43.2; bens ou serviço e a conta da FR nos rascunhos;
+> a versão do plano nasce inactiva) · actualizado a 2026-11-05 (as despesas
+> de colaborador lançam no razão, e o reembolso sai do banco; a actualização
+> cambial dos depósitos em moeda estrangeira) · actualizado a 2026-11-06 (as
+> diferenças de câmbio realizadas no recibo e no pagamento).
 
 ---
 
@@ -172,7 +177,7 @@ AM = AssetManager.
 | Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Facturas** | | | | | | | | | | |
 | Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
-| Nova factura: rascunhos FT, FR e ND, e emitir | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Nova factura: rascunhos FT, FR e ND, e emitir ²⁶ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | ✓ ⁴ | — | — | — |
 | Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -237,7 +242,7 @@ AM = AssetManager.
 | Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
 | Aprovar e rejeitar (com motivo) ⁹ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Marcar reembolsada | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Marcar reembolsada (com a conta, sai dela e lança ²⁸) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir o comprovativo (pela despesa) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Portal do colaborador** (o próprio, pela conta) ¹¹ | | | | | | | | | | |
@@ -281,9 +286,11 @@ AM = AssetManager.
 | Ver lançamentos, diários, plano de contas, versões do plano, períodos e regras | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir diários e contas (também debaixo de uma conta de movimento sem lançamentos, que passa a agregadora); lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Fechar e reabrir períodos; versões do plano; regras de lançamento e contabilísticas | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Fechar e reabrir períodos; versões do plano ²⁷; regras de lançamento e contabilísticas ²⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Carregar o PGC (contas, diários, regras); apurar os resultados e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Lançar o histórico (documentos de antes das regras): simular e depois lançar, um mês ou o ano | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Actualizar ao câmbio do fim do mês os depósitos em moeda estrangeira: simular e depois lançar ²⁹ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Ver no razão as diferenças de câmbio realizadas, que o recibo e o pagamento em moeda estrangeira lançam sozinhos ³⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Planeamento** | | | | | | | | | | |
 | Ver centros de custo, orçamentos (com os meses, quem aprovou) e previsões de custos, com os nomes | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Abrir centros de custo e registar previsões de custos | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -378,6 +385,18 @@ Recursos Humanos.»
 ²³ PR #130 (ADR-099). Nos recibos e na confirmação de comprovativos, por banco (transferência, Multicaixa, cartões), escolhe-se a conta da moeda da factura, a quem lê as contas bancárias; numerário e cheque ficam para depositar. A factura-recibo emitida de um rascunho ainda não leva a conta (B45).
 
 ²⁴ PR #132 (ADR-100). Campo «Data» (hoje por omissão, nunca futura) ao executar pagamentos (não antes do pedido), pagar salários e impostos (não antes do mês), depositar valores (o dia do talão), depositar e levantar. O extracto e a reconciliação mostram a data-valor, e o dia em que se registou quando é outro.
+
+²⁵ PR #134 (ADR-101): dois acontecimentos novos nas regras de lançamento, o recibo por banco e o pagamento em moeda estrangeira, que lançam na 43.2. O editor de regras já os nomeia: «Recibo por banco em moeda estrangeira» e «Pagamento em moeda estrangeira».
+
+²⁶ PR #135 (B43, B45): as linhas do rascunho e da pró-forma aceitam bens ou serviço, que passa para a factura; e na emissão de um rascunho de FR, ou na conversão de uma pró-forma em FR, a conta onde entrou o dinheiro. No ecrã: «Natureza» em cada linha, e «Conta onde entrou» ao emitir a FR ou ao converter em FR por banco (a quem lê as contas bancárias).
+
+²⁷ PR #136 (B44): a versão registada nasce inactiva, e activa-se à parte, só com as contas das regras de lançamento activas (409 a dizer quais faltam); também se desactiva. No ecrã: os botões «Activar» e «Desactivar» em cada versão.
+
+²⁸ PR #137 (ADR-102): aprovar a despesa lança o custo na data dela; reembolsá-la a partir de uma conta tira-a do saldo e lança. O ecrã de reembolso pede a conta (opcional, na moeda da despesa) e a data; o editor de regras nomeia os dois acontecimentos novos.
+
+²⁹ PR #138 (ADR-103): as contas bancárias que não são em kwanzas, ao câmbio do último dia do mês, contra a 43.2; a diferença vai para 66.2.2 ou 76.2.2. Em Períodos, «Actualização cambial»: o mês (Dezembro por omissão), simular e depois lançar.
+
+³⁰ PR #139 (ADR-104): a diferença entre o câmbio da factura e o do recibo ou do pagamento vai para 66.2.1 (ganho) ou 76.2.1 (perda), e o cliente ou o fornecedor fica a zero. Anular o recibo estorna-a, e também a retenção. O editor de regras nomeia os quatro acontecimentos novos (diferença favorável e desfavorável, no recebimento e no pagamento).
 
 ---
 
@@ -830,9 +849,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   (factura-recibo, com meio de pagamento) ou ND (nota de débito, sobre uma
   factura em vigor do mesmo cliente); série; moeda (AOA, USD, EUR);
   vencimento; condições; retenção na fonte; linhas (descrição, quantidade,
-  preço, imposto); notas internas. Totais previstos com a taxa em vigor.
-  **Guardar rascunho**, **eliminar rascunho**, **emitir** com confirmação («fica
-  registado e não se apaga») e escolha da data.
+  preço, **natureza** — bens ou serviço —, imposto); notas internas. Totais
+  previstos com a taxa em vigor. **Guardar rascunho**, **eliminar rascunho**,
+  **emitir** com confirmação («fica registado e não se apaga») e escolha da
+  data; numa FR por banco, a **conta onde entrou** o dinheiro.
 - Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido em
   dinheiro, retido na fonte, em aberto, retenção por comprovar), **PDF**,
   **enviar ao cliente** por e-mail, **nota de crédito** (com as quantidades a
@@ -847,14 +867,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Listas (recibos com filtro por datas) e fichas com **PDF**, **enviar ao
   cliente** e **anular**.
 - As linhas das facturas e das notas de crédito dizem se são **bens** ou
-  **serviço**; a nota de crédito leva a natureza da linha da factura. As
-  facturas emitidas pelo front saem como serviços até o backend aceitar a
-  natureza nos rascunhos (B43).
+  **serviço**; a nota de crédito leva a natureza da linha da factura.
 
 **Pró-formas**
 - Lista por estado (em aberto, convertidas, anuladas) e detalhe.
 - **Criar** (cliente registado ou destinatário sem registo, validade, moeda,
-  linhas, notas), **converter** em factura ou factura-recibo e **anular**.
+  linhas com a natureza, notas), **converter** em factura ou factura-recibo
+  (numa FR por banco, a conta onde entrou) e **anular**.
 
 **A receber**
 - Facturas vencidas com saldo em aberto, dias de atraso e totais por moeda.
@@ -1033,7 +1052,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Registar** em nome de um colaborador (data, categoria com sugestões,
   descrição, valor, moeda, comprovativo).
 - Ficha: **aprovar** (notas opcionais), **rejeitar** (com motivo, que o
-  colaborador lê), **marcar reembolsada** (data, conta, referência) e
+  colaborador lê), **marcar reembolsada** (data, conta e referência; com a
+  conta, o valor sai dela nessa data e lança no razão) e
   **descarregar o comprovativo**. A própria despesa não se decide.
 
 **Contas bancárias**
@@ -1133,9 +1153,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Carregar o PGC** (Decreto n.º 82/01, com o IVA): acrescenta as contas, os
   diários e as regras de lançamento e de reporte e mostra quantos criou ou já
   havia; repetir não duplica.
-- **Versões do plano**: ver e **registar** (nome, versão, fonte, vigência),
-  com o aviso de que uma versão nova começa sem contas e, em vigor, pára a
-  emissão (B44).
+- **Versões do plano**: ver e **registar** (nome, versão, fonte, vigência);
+  a versão nova fica inactiva. **Activar** (só com as contas que as regras de
+  lançamento activas usam; a recusa diz quais faltam) e **desactivar**.
 - **Classes de reporte** (prefixo → activo, passivo, capital, proveitos ou
   custos, rubrica e ordem): ver, **criar**, **rever** e **apagar**.
 
@@ -1143,6 +1163,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Por ano: meses 1–12 e regularizações 13–16, com estado, fecho e última
   reabertura; **abrir**, **fechar** (fica registado quem fechou) e **reabrir**
   com motivo.
+- **Actualização cambial** (pelo PGC): as contas em moeda estrangeira ao
+  câmbio do último dia do mês (Dezembro por omissão; antes de apurar o ano).
+  **Simular** mostra, por conta, o saldo, o câmbio e a data dele, e o valor
+  em kwanzas; a 43.2 no razão, o que fica a valer e o ganho (66.2.2) ou a
+  perda (76.2.2), com os avisos do servidor. Depois, **lançar** com
+  confirmação (ligação ao lançamento); «nada a fazer» quando já vale o
+  câmbio do mês.
 - **Fecho do exercício** (pelo PGC): **apurar os resultados** do ano (a 31/12,
   período 13, diário APU; resultado líquido e lançamentos feitos; repetir não
   duplica) e **abrir o ano** com os saldos do anterior (a 01/01, diário ABE;
@@ -1156,10 +1183,14 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Regras contabilísticas**
 - **Lançamento automático**: por acontecimento (factura emitida, nota de
-  crédito, recibo, recibo em numerário ou cheque, retenção, factura de compra,
-  pagamento), as linhas que gera;
+  crédito, recibo, recibo em numerário ou cheque, recibo por banco e
+  pagamento em moeda estrangeira, retenção, factura de compra, pagamento,
+  despesa de colaborador aprovada e reembolsada, diferenças de câmbio
+  favoráveis e desfavoráveis no recebimento e no pagamento), as linhas que
+  gera, com as parcelas líquido, imposto, total, líquido dos bens e dos
+  serviços;
   os acontecimentos sem regra dizem que não geram lançamento. **Definir** (só
-  regras equilibradas em líquido e imposto) e **desactivar**.
+  regras equilibradas em bens, serviços e imposto) e **desactivar**.
 - **Contabilísticas**: registo versionado com tipo de origem e fonte;
   **criar** e **desactivar**.
 
@@ -1814,7 +1845,5 @@ entra neste documento quando estiver publicada.
 | Fase | Área |
 |---|---|
 | — | Declarações à AGT (o backend ainda não as tem, B5) |
-| — | Bens ou serviços em cada linha do rascunho de factura (o backend ainda não o aceita nos rascunhos, B43) |
-| — | A conta bancária da factura-recibo emitida de um rascunho ou de uma pró-forma (o backend ainda não a aceita, B45) |
 
 O login com Google (D4) entra quando o backend o tiver.

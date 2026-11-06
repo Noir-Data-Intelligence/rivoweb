@@ -3,24 +3,26 @@
  * - apuramento de resultados a 31/12 (período 13, diário APU) e abertura do
  *   exercício a 01/01 com os saldos do anterior (diário ABE);
  * - lançar o histórico: os documentos emitidos antes das regras, cada um na
- *   sua data e ao câmbio desse dia. Primeiro simula-se; repetir não duplica.
+ *   sua data e ao câmbio desse dia. Primeiro simula-se; repetir não duplica;
+ * - actualização cambial dos depósitos em moeda estrangeira no fim do mês
+ *   (ADR-103): a 43.2 ao câmbio do último dia, contra 66.2.2 ou 76.2.2.
  */
 import { useState } from "react";
 import { Link } from "react-router";
 import { hojeIso, formatarData } from "@/lib/format/data";
-import { formatarInteiro, formatarMoeda } from "@/lib/format/numero";
+import { formatarInteiro, formatarMoeda, formatarNumeroDecimal } from "@/lib/format/numero";
 import { nomeMes } from "@/lib/format/periodo";
 import { dinheiro } from "@/lib/money/money";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Card, CardTitle } from "@/ui/Card";
 import { Confirmar } from "@/ui/Confirmar";
-import { Checkbox } from "@/ui/Controlos";
+import { Checkbox, Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { GrelhaKpis, Kpi } from "@/ui/Kpi";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useExercicio, useLancarHistorico, type Exercicio as ExercicioView } from "./api";
+import { useActualizacaoCambial, useExercicio, useLancarHistorico, type ActualizacaoCambial as ActualizacaoView, type Exercicio as ExercicioView } from "./api";
 import { janelaDoPeriodo, janelasDoAno, somarHistorico } from "./regras";
 
 const kz = (v: number | string) => formatarMoeda(dinheiro(v));
@@ -105,6 +107,98 @@ export function FechoExercicio({ ano }: { ano: number }) {
         <AccaoExercicio ano={ano} acto="apurar" />
         <AccaoExercicio ano={ano} acto="abrir" />
       </div>
+    </Card>
+  );
+}
+
+type ContaActualizada = ActualizacaoView["accounts"][number];
+
+/** Simular e lançar a actualização cambial de um mês (Dezembro por omissão: antes de apurar o ano). */
+export function ActualizacaoCambial({ ano }: { ano: number }) {
+  const [mes, setMes] = useState(12);
+  const [simulado, setSimulado] = useState<number | null>(null);
+  const [confirmar, setConfirmar] = useState(false);
+  const actualizar = useActualizacaoCambial();
+  const r = actualizar.data;
+  const mudarMes = (m: number) => {
+    setMes(m);
+    setSimulado(null);
+    actualizar.reset();
+  };
+  const colunas: Coluna<ContaActualizada>[] = [
+    { id: "conta", cabecalho: "Conta", celula: (c) => <span className="font-medium">{c.name}</span> },
+    { id: "saldo", cabecalho: "Saldo", alinhar: "direita", celula: (c) => formatarMoeda(dinheiro(c.balance), c.currency) },
+    { id: "cambio", cabecalho: "Câmbio", alinhar: "direita", esconderAte: "sm", celula: (c) => `${formatarNumeroDecimal(String(c.rate), 6)} (${formatarData(c.rateOn)})` },
+    { id: "kz", cabecalho: "Em kwanzas", alinhar: "direita", celula: (c) => kz(c.kwanzas) },
+  ];
+  const diferenca = r ? dinheiro(r.difference) : null;
+  return (
+    <Card className="mt-6">
+      <CardTitle>Actualização cambial</CardTitle>
+      <p className="mt-1 text-sm text-muted-foreground">
+        O dinheiro nas contas em moeda estrangeira (43.2) entra ao câmbio de cada dia; no fim do mês vale ao câmbio desse dia. O ganho vai para 66.2.2 e a perda para 76.2.2. No fecho do ano, actualize Dezembro antes de apurar os resultados.
+      </p>
+      <div className="mt-3 flex flex-wrap items-end gap-3">
+        <Field rotulo="Mês" className="w-48">
+          {({ id, descricao }) => (
+            <Select id={id} aria-describedby={descricao} value={mes} onChange={(e) => mudarMes(Number(e.target.value))}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>
+                  {m} · {nomeMes(m)}
+                </option>
+              ))}
+            </Select>
+          )}
+        </Field>
+        <div className="mb-0.5 flex flex-wrap gap-2">
+          <Button variante="secondary" aCarregar={actualizar.isPending && actualizar.variables.dryRun} onClick={() => actualizar.mutate({ fiscalYear: ano, month: mes, dryRun: true }, { onSuccess: () => setSimulado(mes) })}>
+            Simular {nomeMes(mes)} de {ano}
+          </Button>
+          <Button disabled={simulado !== mes || actualizar.isPending} onClick={() => setConfirmar(true)}>
+            Lançar {nomeMes(mes)} de {ano}
+          </Button>
+        </div>
+      </div>
+      {actualizar.error && !confirmar ? <ErrorPanel erro={actualizar.error} className="mt-3" /> : null}
+      {r && diferenca ? (
+        <section aria-label="Resultado da actualização cambial" className="mt-4 flex flex-col gap-3">
+          <Alert
+            tom={r.outcome === "Revalued" ? "sucesso" : "info"}
+            titulo={r.outcome === "Preview" ? `Simulação a ${formatarData(r.on)}: nada foi gravado.` : r.outcome === "Revalued" ? `Actualização de ${nomeMes(Number(r.month))} de ${String(r.fiscalYear)} lançada.` : "Nada a fazer: a 43.2 já vale o câmbio do fim do mês."}
+          >
+            {r.entryId ? (
+              <Link to={`/lancamentos/${r.entryId}`} className="text-primary underline-offset-4 hover:underline">
+                Ver o lançamento {r.transactionId ?? ""}
+              </Link>
+            ) : null}
+          </Alert>
+          {r.notes.length > 0 ? (
+            <Alert tom="aviso" titulo={r.notes.length === 1 ? "Aviso do servidor" : "Avisos do servidor"}>
+              <ul className="list-inside list-disc">
+                {r.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+            </Alert>
+          ) : null}
+          <GrelhaKpis>
+            <Kpi rotulo="43.2 no razão" valor={kz(r.ledgerBalance)} />
+            <Kpi rotulo="Ao câmbio do fim do mês" valor={kz(r.revaluedBalance)} />
+            <Kpi rotulo={diferenca.lt(0) ? "Perda (76.2.2)" : "Ganho (66.2.2)"} valor={kz(diferenca.abs().toString())} />
+          </GrelhaKpis>
+          <Tabela rotulo="Contas em moeda estrangeira" colunas={colunas} linhas={r.accounts} chave={(c) => c.accountId} vazio="Nenhuma conta em moeda estrangeira com saldo." />
+        </section>
+      ) : null}
+      <Confirmar
+        aberto={confirmar}
+        aoMudar={setConfirmar}
+        titulo={`Lançar a actualização cambial de ${nomeMes(mes)} de ${ano}`}
+        descricao="Faz um lançamento no razão no último dia do mês. Não se apaga: só se estorna."
+        rotuloConfirmar="Lançar"
+        aCarregar={actualizar.isPending}
+        erro={actualizar.error ? <ErrorPanel erro={actualizar.error} /> : undefined}
+        aoConfirmar={() => actualizar.mutate({ fiscalYear: ano, month: mes, dryRun: false }, { onSuccess: () => setConfirmar(false) })}
+      />
     </Card>
   );
 }

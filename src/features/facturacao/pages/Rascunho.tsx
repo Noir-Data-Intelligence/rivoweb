@@ -12,6 +12,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod/mini";
 import { useClientesActivos } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
+import { CampoContaOndeEntrou, useContaOndeEntrou } from "@/features/tesouraria";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
 import { eApiError } from "@/lib/api/problem";
 import { hojeIso } from "@/lib/format/data";
@@ -27,7 +28,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { useEliminarRascunho, useEmitirRascunho, useFacturas, useGuardarRascunho, usePautas, useRascunho, useSeries, type PautaImposto, type PedidoRascunho, type Rascunho } from "../api";
 import { calcularTotais, liquidoDaLinha } from "../calculos";
-import { AVISO_DEFINITIVO, MEIOS, moeda, NOME_TIPO } from "../comum";
+import { AVISO_DEFINITIVO, MEIOS, moeda, NATUREZA_LINHA, NOME_TIPO } from "../comum";
 
 const quantidade = z.string().check(z.refine((v) => (lerDecimalDigitado(v, 4)?.gt(0) ?? false), "Quantidade maior que zero, até 4 casas."));
 const preco = z.string().check(z.refine((v) => (lerDinheiroDigitado(v, 2)?.gte(0) ?? false), "Preço válido, até 2 casas (por exemplo 1 250,00)."));
@@ -45,7 +46,7 @@ const esquema = z
     referencedInvoiceId: z.string(),
     notes: z.string().check(z.maxLength(1000, "No máximo 1000 caracteres.")),
     lines: z
-      .array(z.object({ description: texto({ max: 200, obrigatorio: "Escreva a descrição." }), quantity: quantidade, unitPrice: preco, taxCode: z.string().check(z.minLength(1, "Escolha o imposto.")) }))
+      .array(z.object({ description: texto({ max: 200, obrigatorio: "Escreva a descrição." }), quantity: quantidade, unitPrice: preco, taxCode: z.string().check(z.minLength(1, "Escolha o imposto.")), kind: z.enum(["Service", "Goods"]) }))
       .check(z.minLength(1, "Uma factura tem pelo menos uma linha.")),
   })
   .check(
@@ -60,7 +61,7 @@ const esquema = z
   );
 type Dados = z.infer<typeof esquema>;
 
-const linhaVazia = { description: "", quantity: "1", unitPrice: "", taxCode: "NOR" };
+const linhaVazia = { description: "", quantity: "1", unitPrice: "", taxCode: "NOR", kind: "Service" as const };
 
 function paraForm(r: Rascunho | undefined): Dados {
   return {
@@ -75,7 +76,7 @@ function paraForm(r: Rascunho | undefined): Dados {
     referencedInvoiceId: r?.referencedInvoiceId ?? "",
     notes: r?.notes ?? "",
     lines: r?.lines.length
-      ? r.lines.map((l) => ({ description: l.description, quantity: String(l.quantity).replace(".", ","), unitPrice: String(l.unitPrice).replace(".", ","), taxCode: l.taxCode }))
+      ? r.lines.map((l) => ({ description: l.description, quantity: String(l.quantity).replace(".", ","), unitPrice: String(l.unitPrice).replace(".", ","), taxCode: l.taxCode, kind: l.kind === "Goods" ? ("Goods" as const) : ("Service" as const) }))
       : [linhaVazia],
   };
 }
@@ -99,6 +100,7 @@ function paraPedido(d: Dados): PedidoRascunho {
       quantity: decimalParaApi(lerDecimalDigitado(l.quantity, 4) ?? new Big(0)),
       unitPrice: paraApi(lerDinheiroDigitado(l.unitPrice, 2) ?? (new Big(0) as never)),
       taxCode: l.taxCode.trim().toUpperCase(),
+      kind: l.kind,
     })),
   };
 }
@@ -124,6 +126,8 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
   const [confirmarEmissao, setConfirmarEmissao] = useState(false);
   const [confirmarEliminar, setConfirmarEliminar] = useState(false);
   const [dataEmissao, setDataEmissao] = useState(hojeIso());
+  const [conta, setConta] = useState("");
+  const [tentouEmitir, setTentouEmitir] = useState(false);
   const [soltas, setSoltas] = useState<string[]>([]);
   const idData = useId();
   const form = useForm<Dados>({ resolver: zodResolver(esquema), defaultValues: paraForm(rascunho) });
@@ -153,6 +157,8 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
   const retencao = lerDecimalDigitado(v.withholdingRate ?? "", 2);
   const totais = calcularTotais(validas, retencao);
   const m = v.currency ?? "AOA";
+  // A FR por banco diz em que conta entrou o dinheiro (B45, PR #135).
+  const contaFr = useContaOndeEntrou(confirmarEmissao && v.documentType === "FR", m, v.paymentMethod ?? "");
   // Quem não lê as taxas (Sales) vê a previsão do servidor do rascunho guardado
   // (B16), enquanto o ecrã não tiver alterações por guardar.
   const doServidor =
@@ -183,9 +189,11 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
   };
 
   const emitirAgora = () => {
+    setTentouEmitir(true);
     if (!draftId || emitir.isPending || !IsoDate.safeParse(dataEmissao).success) return;
+    if (contaFr.aCarregar || (contaFr.pede && conta === "")) return;
     emitir.mutate(
-      { draftId, issuedOn: dataEmissao },
+      { draftId, issuedOn: dataEmissao, bankAccountId: contaFr.pede ? conta : null },
       {
         onSuccess: (r) => {
           setConfirmarEmissao(false);
@@ -315,7 +323,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
             return (
               <fieldset key={f.id} className="grid gap-3 rounded-md border border-border p-3 sm:grid-cols-12">
                 <legend className="sr-only">Linha {i + 1}</legend>
-                <Field rotulo="Descrição" erro={e?.description?.message} className="sm:col-span-5">
+                <Field rotulo="Descrição" erro={e?.description?.message} className="sm:col-span-3">
                   {({ id, descricao, invalido }) => <Input id={id} maxLength={200} aria-describedby={descricao} invalido={invalido} {...form.register(`lines.${i}.description`)} />}
                 </Field>
                 <Field rotulo="Qtd." erro={e?.quantity?.message} className="sm:col-span-2">
@@ -323,6 +331,17 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
                 </Field>
                 <Field rotulo="Preço unitário" erro={e?.unitPrice?.message} className="sm:col-span-2">
                   {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" aria-describedby={descricao} invalido={invalido} {...form.register(`lines.${i}.unitPrice`)} />}
+                </Field>
+                <Field rotulo="Natureza" className="sm:col-span-2" ajuda={i === 0 ? "Bens lançam em 61 Vendas; serviços em 62." : undefined}>
+                  {({ id, descricao }) => (
+                    <Select id={id} aria-describedby={descricao} {...form.register(`lines.${i}.kind`)}>
+                      {Object.entries(NATUREZA_LINHA).map(([k, t]) => (
+                        <option key={k} value={k}>
+                          {t}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
                 </Field>
                 <Field rotulo="Imposto" erro={e?.taxCode?.message} className="sm:col-span-2">
                   {({ id, descricao, invalido }) => (
@@ -408,7 +427,10 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
         aberto={confirmarEmissao && !guardar.isPending}
         aoMudar={(a) => {
           setConfirmarEmissao(a);
-          if (!a) emitir.reset();
+          if (!a) {
+            emitir.reset();
+            setTentouEmitir(false);
+          }
         }}
         titulo={`Emitir ${NOME_TIPO[v.documentType] ?? "documento"}?`}
         descricao={AVISO_DEFINITIVO}
@@ -423,6 +445,11 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
           </label>
           <Input id={idData} type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} className="max-w-48" />
         </div>
+        {contaFr.pede ? (
+          <div className="mt-3">
+            <CampoContaOndeEntrou contas={contaFr.contas} valor={conta} mudar={setConta} erro={tentouEmitir && conta === "" ? "Escolha a conta bancária." : undefined} />
+          </div>
+        ) : null}
         <p className="mt-3 text-sm text-muted-foreground">
           {v.customerId ? (clientes.data?.items.find((c) => c.customerId === v.customerId)?.name ?? "Cliente") : "Consumidor final"} ·{" "}
           {totais.aPagar || doServidor?.aPagar ? `a pagar ${textoAPagar}` : `líquido ${moeda(totais.liquido.toFixed(2), m)} + IVA`}

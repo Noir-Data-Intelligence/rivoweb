@@ -1,9 +1,12 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `313e7c7`. Em aberto: **B24** (configuração),
-> **B43** (bens ou serviços nos rascunhos), **B44** (versão do plano vazia) e
-> **B45** (conta bancária na FR emitida de um rascunho).
+> Revisto contra `main` @ `4e200a7`. Em aberto: **B24** (configuração).
+> **B43**, **B44** e **B45** estão resolvidos (PR #135 e #136) e o front já os
+> usa: «Bens / Serviço» em cada linha do rascunho e da pró-forma; a conta onde
+> entrou na emissão da FR do rascunho e na conversão da pró-forma; a versão do
+> plano nasce inactiva, com «Activar» (o 409 diz as contas em falta) e
+> «Desactivar» (verificado na base local).
 > **B42** está resolvido (PR #121) e o front já o usa: o passo de uma tarefa
 > é `TaskChecklistItemRequest` e as políticas usam `PolicyChecklistItemRequest`;
 > saiu o tipo local dos projectos.
@@ -587,6 +590,7 @@ nomes repetidos entre módulos.
 ## B43 — Os rascunhos de factura não guardam se a linha é de bens ou de serviços
 
 > Aberto a 2026-10-30, contra `main` @ `bcafef2` (merge do #126).
+> **Resolvido** no PR #135 (`main` @ `4e200a7`): `kind` nas linhas do rascunho e da pró-forma, devolvido nas vistas e passado à factura na emissão e na conversão. O front já o usa.
 
 **Facto:** o #125 acrescentou `kind` (`Goods` ou `Service`) a
 `InvoiceLineRequest`, o corpo de `POST /finance/sales-invoices` e de
@@ -608,6 +612,7 @@ o selector «Bens / Serviço» em cada linha do rascunho.
 ## B44 — Registar uma versão do plano de contas pode parar a emissão
 
 > Aberto a 2026-10-30, contra `main` @ `bcafef2`.
+> **Resolvido** no PR #136 (`main` @ `4e200a7`): a versão registada nasce inactiva; `POST .../activation` só a põe em vigor com as contas das regras activas (409 a dizer quais faltam), e `POST .../deactivation` tira-a. O front já o usa (409 verificado na base local).
 
 **Facto:** `POST /finance/ledger/chart-versions` cria uma versão vazia
 (`accountCount` 0) e activa. Ao emitir, `PostDocument.cs` confere as contas da
@@ -634,6 +639,7 @@ avisar no formulário, mas não o impede.
 ## B45 — A factura-recibo emitida de um rascunho não diz em que conta entrou o dinheiro
 
 > Aberto a 2026-10-31, contra `main` @ `313e7c7` (merge do #133).
+> **Resolvido** no PR #135 (`main` @ `4e200a7`): `bankAccountId` na emissão do rascunho e na conversão da pró-forma, com as regras da FR directa. O front já o usa.
 
 **Facto:** o #130 (ADR-099) acrescentou `bankAccountId` a `IssueInvoiceRequest`
 (`POST /finance/sales-invoices`): na FR paga por banco, o total entra no saldo

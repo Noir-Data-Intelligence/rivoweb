@@ -8,9 +8,9 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-10-31 |
-| Commit do backend | `313e7c7` (`main`, merge do PR #133; inclui o #127, abate no razão, o #128, a folha no razão, o #129, pagar salários, entregar ao Estado e depositar valores, o #130, o recebimento por banco na conta, e o #132, a data-valor) |
-| Operações | 517 caminhos |
+| Data | 2026-11-06 |
+| Commit do backend | `4e200a7` (`main`, merge do PR #139: diferenças de câmbio realizadas; inclui o #134, banco em moeda estrangeira, o #135, B43 e B45, o #136, B44, o #137, despesas no razão e no banco, e o #138, actualização cambial) |
+| Operações | 520 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 
 O OpenAPI está desligado em produção (`GET https://syyt.tech/openapi/v1.json` →

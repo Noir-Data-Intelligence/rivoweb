@@ -99,12 +99,22 @@ export const EVENTOS = [
   { valor: "ReceiptWithholding", texto: "Retenção na fonte num recibo" },
   { valor: "PurchaseInvoiceRegistered", texto: "Factura de compra registada" },
   { valor: "PaymentExecuted", texto: "Pagamento executado" },
+  { valor: "ForeignCurrencyReceiptRegistered", texto: "Recibo por banco em moeda estrangeira" },
+  { valor: "ForeignCurrencyPaymentExecuted", texto: "Pagamento em moeda estrangeira" },
+  { valor: "ExpenseClaimApproved", texto: "Despesa de colaborador aprovada" },
+  { valor: "ExpenseReimbursed", texto: "Despesa de colaborador reembolsada" },
+  { valor: "ReceiptExchangeGain", texto: "Diferença de câmbio favorável no recebimento" },
+  { valor: "ReceiptExchangeLoss", texto: "Diferença de câmbio desfavorável no recebimento" },
+  { valor: "PaymentExchangeGain", texto: "Diferença de câmbio favorável no pagamento" },
+  { valor: "PaymentExchangeLoss", texto: "Diferença de câmbio desfavorável no pagamento" },
 ] as const;
 
 export const PARCELAS = [
   { valor: "Net", texto: "Líquido (base)" },
   { valor: "Tax", texto: "Imposto" },
   { valor: "Gross", texto: "Total (líquido + imposto)" },
+  { valor: "NetGoods", texto: "Líquido dos bens (61 Vendas)" },
+  { valor: "NetServices", texto: "Líquido dos serviços (62 Prestações de serviços)" },
 ] as const;
 
 export const textoDe = (lista: readonly { valor: string; texto: string }[], valor: string) => lista.find((x) => x.valor === valor)?.texto ?? valor;

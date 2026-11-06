@@ -3,10 +3,13 @@
  * escrita (dinheiro em texto, nunca number), confirmações de emissão e de
  * envio, sem duplo envio, permissões por perfil, axe e CSP.
  */
-import { facturaComRetencao, IDF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
+import { facturaComRetencao, IDF3, meAdminF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { contas, IDF5 } from "../../fixtures/f5";
+
+/** O Admin do F3 com a leitura das contas bancárias (para escolher a conta onde entrou). */
+const meAdminF3Pagaveis = { ...meAdminF3, permissions: [...new Set([...meAdminF3.permissions, "finance.payables.read"])] };
 
 test.describe("clientes", () => {
   test("lista, registo com país em maiúsculas, ficha e contacto; axe e CSP", async ({ page, api, violacoes }) => {
@@ -63,7 +66,7 @@ test.describe("facturas", () => {
         status: 200,
         corpo: {
           draftId: IDF3.rascunho, customerId: IDF3.cliente, documentType: "FT", series: null, currency: "AOA", dueDate: null, paymentTerms: null, withholdingRate: "6.5",
-          paymentMethod: null, referencedInvoiceId: null, lines: [{ description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR" }], netTotal: 2500.25, notes: null,
+          paymentMethod: null, referencedInvoiceId: null, lines: [{ description: "Consultoria", quantity: 2.5, unitPrice: 1000.1, taxCode: "NOR", kind: "Goods" }], netTotal: 2500.25, notes: null,
           createdAt: "2026-10-13T10:00:00Z", updatedAt: "2026-10-13T10:00:00Z", issuedInvoiceId: null,
         },
       })
@@ -81,6 +84,8 @@ test.describe("facturas", () => {
     await page.getByLabel("Descrição").fill("Consultoria");
     await page.getByLabel("Qtd.").fill("2,5");
     await page.getByLabel("Preço unitário").fill("1 000,10");
+    await expect(page.getByLabel("Natureza")).toHaveValue("Service");
+    await page.getByLabel("Natureza").selectOption("Goods");
     // Pré-visualização com a taxa em vigor (Admin lê as taxas): IVA 14 %.
     const totais = page.getByRole("definition");
     await expect(page.getByLabel("Totais previstos")).toContainText("2 500,25 Kz");
@@ -93,12 +98,44 @@ test.describe("facturas", () => {
     await expect(dialogo).toContainText("não se apaga");
     expect(api.escritas("POST", "/finance/invoice-drafts")[0]?.corpo).toEqual({
       customerId: IDF3.cliente, documentType: "FT", series: null, currency: "AOA", dueDate: null, paymentTerms: null, withholdingRate: "6.5",
-      paymentMethod: null, referencedInvoiceId: null, notes: null, lines: [{ description: "Consultoria", quantity: "2.5", unitPrice: "1000.10", taxCode: "NOR" }],
+      paymentMethod: null, referencedInvoiceId: null, notes: null, lines: [{ description: "Consultoria", quantity: "2.5", unitPrice: "1000.10", taxCode: "NOR", kind: "Goods" }],
     });
+    // Uma FT não pede a conta: só a FR por banco.
+    await expect(dialogo.getByLabel("Conta onde entrou")).toHaveCount(0);
     // Clique duplo com rede lenta: um só pedido de emissão.
     await dialogo.getByRole("button", { name: "Emitir documento" }).dblclick();
     await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
     expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)).toHaveLength(1);
+  });
+
+  test("FR por transferência a partir do rascunho: a conta onde entrou vai na emissão (B45)", async ({ page, api }) => {
+    const leContas = meAdminF3Pagaveis;
+    await comF3(api, leContas)
+      .em("GET", "/finance/accounts", { status: 200, corpo: contas(), cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "2" } })
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, {
+        status: 200,
+        corpo: {
+          draftId: IDF3.rascunho, customerId: IDF3.cliente, documentType: "FR", series: null, currency: "AOA", dueDate: null, paymentTerms: null, withholdingRate: null,
+          paymentMethod: "TB", referencedInvoiceId: null, lines: [{ description: "Caixa de papel", quantity: 3, unitPrice: 4500, taxCode: "NOR", kind: "Goods" }], netTotal: 13500, notes: null,
+          createdAt: "2026-11-05T10:00:00Z", updatedAt: "2026-11-05T10:00:00Z", issuedInvoiceId: null,
+        },
+      })
+      .em("PUT", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 204 })
+      .em("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`, { status: 201, corpo: { id: IDF3.factura, number: "FR S001/9" } })
+      .ligar();
+    await entrar(page, leContas.email);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await expect(page.getByLabel("Natureza")).toHaveValue("Goods");
+    await page.getByRole("button", { name: "Emitir…" }).click();
+    const dialogo = page.getByRole("dialog", { name: /Emitir/ });
+    await expect(dialogo.getByLabel("Conta onde entrou").locator("option")).toHaveText(["Escolha…", "Conta à ordem BAI"]);
+    await dialogo.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(dialogo.getByText("Escolha a conta bancária.")).toBeVisible();
+    expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)).toHaveLength(0);
+    await dialogo.getByLabel("Conta onde entrou").selectOption(IDF5.conta);
+    await dialogo.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
+    expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)[0]?.corpo).toMatchObject({ bankAccountId: IDF5.conta });
   });
 
   test("ficha: números do servidor, PDF, envio e anulação confirmados", async ({ page, api }) => {
@@ -217,7 +254,39 @@ test.describe("facturas", () => {
     await page.getByRole("dialog").getByLabel("Meio de pagamento").selectOption("NU");
     await page.getByRole("button", { name: "Emitir factura" }).click();
     await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
-    expect(api.escritas("POST", `/finance/proformas/${IDF3.proforma}/conversion`)[0]?.corpo).toMatchObject({ documentType: "FR", paymentMethod: "NU", dueDate: null });
+    expect(api.escritas("POST", `/finance/proformas/${IDF3.proforma}/conversion`)[0]?.corpo).toMatchObject({ documentType: "FR", paymentMethod: "NU", dueDate: null, bankAccountId: null });
+  });
+
+  test("nova pró-forma: cada linha diz se é bens ou serviço, e o servidor recebe-o (B43)", async ({ page, api }) => {
+    await comF3(api).em("POST", "/finance/proformas", { status: 201, corpo: { proformaId: IDF3.proforma, number: "PP S001/3" } }).ligar();
+    await entrar(page);
+    await page.goto("/proformas/nova");
+    await page.getByLabel("Cliente").selectOption(IDF3.cliente);
+    await page.getByLabel("Descrição").fill("Resmas de papel");
+    await page.getByLabel("Qtd.").fill("10");
+    await page.getByLabel("Preço unitário").fill("3 200");
+    await expect(page.getByLabel("Natureza")).toHaveValue("Service");
+    await page.getByLabel("Natureza").selectOption("Goods");
+    await page.getByRole("button", { name: "Emitir pró-forma" }).click();
+    await expect(page).toHaveURL(/\/proformas$/);
+    expect(api.escritas("POST", "/finance/proformas")[0]?.corpo).toMatchObject({ lines: [{ description: "Resmas de papel", quantity: "10", unitPrice: "3200.00", taxCode: "NOR", kind: "Goods" }] });
+  });
+
+  test("pró-forma em FR por banco: a conta onde entrou vai na conversão (B45)", async ({ page, api }) => {
+    await comF3(api, meAdminF3Pagaveis)
+      .em("GET", "/finance/accounts", { status: 200, corpo: contas(), cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": "2" } })
+      .em("POST", `/finance/proformas/${IDF3.proforma}/conversion`, { status: 201, corpo: { id: IDF3.factura, number: "FR S001/2" } })
+      .ligar();
+    await entrar(page, meAdminF3Pagaveis.email);
+    await page.goto("/proformas");
+    await page.getByRole("button", { name: "Converter" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Tipo").selectOption("FR");
+    await d.getByLabel("Meio de pagamento").selectOption("MB");
+    await d.getByLabel("Conta onde entrou").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Emitir factura" }).click();
+    await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
+    expect(api.escritas("POST", `/finance/proformas/${IDF3.proforma}/conversion`)[0]?.corpo).toMatchObject({ documentType: "FR", paymentMethod: "MB", bankAccountId: IDF5.conta });
   });
 
   test("a receber, configuração e responsividade", async ({ page, api }) => {

@@ -2,3 +2,4 @@
 export { useContasAbertas, type Conta } from "./api";
 export { erroDataValor, MEIOS_POR_BANCO } from "./regras";
 export { PagamentoPeloBanco } from "./Liquidacoes";
+export { CampoContaOndeEntrou, useContaOndeEntrou } from "./ContaOndeEntrou";

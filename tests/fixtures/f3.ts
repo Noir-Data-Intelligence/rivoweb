@@ -189,7 +189,7 @@ export const proforma = (): S["ProformaView"] => ({
   customerId: IDF3.cliente,
   customerName: "Cliente Teste, Lda",
   currency: "AOA",
-  lines: [{ description: "Consultoria", quantity: 1, unitPrice: 50000, taxCode: "NOR", taxPercentage: 14, net: 50000, tax: 7000 }],
+  lines: [{ description: "Consultoria", quantity: 1, unitPrice: 50000, taxCode: "NOR", taxPercentage: 14, net: 50000, tax: 7000, kind: "Service" }],
   netTotal: 50000,
   taxTotal: 7000,
   grossTotal: 57000,

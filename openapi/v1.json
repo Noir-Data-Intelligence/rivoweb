@@ -17258,6 +17258,106 @@
         ]
       }
     },
+    "/finance/ledger/chart-versions/{chartVersionId}/activation": {
+      "post": {
+        "tags": [
+          "LedgerEndpoints"
+        ],
+        "summary": "Põe a versão em vigor; 409 se lhe faltarem contas das regras de lançamento activas, e diz quais (B44).",
+        "parameters": [
+          {
+            "name": "chartVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/chart-versions/{chartVersionId}/deactivation": {
+      "post": {
+        "tags": [
+          "LedgerEndpoints"
+        ],
+        "summary": "Tira a versão de vigor (B44).",
+        "parameters": [
+          {
+            "name": "chartVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/ledger/accounting-rules": {
       "get": {
         "tags": [
@@ -18283,6 +18383,67 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VatSettlementView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/exchange-revaluations": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Actualização cambial dos depósitos em moeda estrangeira no fim de um mês: as contas bancárias que não são em kwanzas, ao câmbio do último dia, contra a 43.2; a diferença vai para 66.2.2 (ganho) ou 76.2.2 (perda). Repete-se sem duplicar; dryRun mostra o que lançaria, sem gravar.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeRevaluationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeRevaluationView"
                 }
               }
             }
@@ -44700,6 +44861,13 @@
               "null",
               "string"
             ]
+          },
+          "bankAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -47417,6 +47585,10 @@
             ],
             "format": "double"
           },
+          "kind": {
+            "type": "string",
+            "default": "Service"
+          },
           "net": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
@@ -47465,6 +47637,16 @@
           },
           "taxCode": {
             "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "Goods",
+              "Service"
+            ],
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -48383,6 +48565,128 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "ExchangeRevaluationRequest": {
+        "required": [
+          "fiscalYear",
+          "month",
+          "dryRun"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "dryRun": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "ExchangeRevaluationView": {
+        "required": [
+          "outcome",
+          "fiscalYear",
+          "month",
+          "on",
+          "entryId",
+          "transactionId",
+          "ledgerBalance",
+          "revaluedBalance",
+          "difference",
+          "accounts",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string"
+          },
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "month": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "on": {
+            "type": "string",
+            "format": "date"
+          },
+          "entryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ledgerBalance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "revaluedBalance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "difference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RevaluedBankAccount"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -52066,6 +52370,13 @@
               "string"
             ],
             "format": "date"
+          },
+          "bankAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -61979,6 +62290,58 @@
       "ResourceKind": {
         "type": "integer",
         "description": "0 = Employee, 1 = Vehicle"
+      },
+      "RevaluedBankAccount": {
+        "required": [
+          "accountId",
+          "name",
+          "currency",
+          "balance",
+          "rate",
+          "rateOn",
+          "kwanzas"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "balance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "rate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "rateOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "kwanzas": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
       },
       "RevenueForecastView": {
         "required": [

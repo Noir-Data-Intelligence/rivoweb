@@ -26,6 +26,7 @@ import {
   useContasRazao,
   useCriarVersaoPlano,
   useDesactivarContaRazao,
+  useEstadoVersaoPlano,
   useGuardarClasseReporte,
   useVersoesPlano,
   type ClasseReporte,
@@ -251,8 +252,8 @@ function NovaVersaoPlano() {
         formulario={idForm}
       >
         {/* A emissão valida as contas das regras na versão em vigor no dia (`PostDocument.cs`); uma versão nova começa sem contas. */}
-        <Alert tom="aviso" className="mb-4" titulo="Uma versão nova começa sem contas.">
-          A partir da data «em vigor desde», os documentos emitidos passam a ser conferidos com ela: sem as contas que as regras de lançamento usam, a emissão de facturas, recibos e notas de crédito pára. Carregar o PGC de novo volta a pôr a versão do PGC em vigor.
+        <Alert tom="info" className="mb-4" titulo="A versão nova fica inactiva até ser activada.">
+          Começa sem contas. Só se activa com as contas que as regras de lançamento usam: em vigor, os documentos emitidos passam a ser conferidos com ela.
         </Alert>
         <form
           id={idForm}
@@ -289,8 +290,38 @@ function NovaVersaoPlano() {
   );
 }
 
+/** Activar (só com as contas das regras activas; o 409 diz quais faltam) ou desactivar uma versão. */
+function EstadoVersao({ v }: { v: VersaoPlano }) {
+  const [aberto, setAberto] = useState(false);
+  const mudar = useEstadoVersaoPlano();
+  const activar = !v.isActive;
+  return (
+    <>
+      <Button variante={activar ? "secondary" : "ghost"} tamanho="sm" onClick={() => setAberto(true)} aria-label={`${activar ? "Activar" : "Desactivar"} ${v.name} ${v.version}`}>
+        {activar ? "Activar" : "Desactivar"}
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={(a) => (setAberto(a), a ? undefined : mudar.reset())}
+        titulo={`${activar ? "Activar" : "Desactivar"} ${v.name} (${v.version})`}
+        descricao={
+          activar
+            ? "Em vigor desde a data dela, os documentos emitidos passam a ser conferidos com esta versão. O servidor só a activa se tiver as contas que as regras de lançamento activas usam."
+            : "Deixa de estar em vigor: a emissão passa a conferir com a versão activa mais recente para cada data."
+        }
+        rotuloConfirmar={activar ? "Activar versão" : "Desactivar versão"}
+        variante={activar ? "primary" : "destructive"}
+        aCarregar={mudar.isPending}
+        erro={mudar.error ? <ErrorPanel erro={mudar.error} /> : undefined}
+        aoConfirmar={() => mudar.mutate({ id: v.chartVersionId, activar }, { onSuccess: () => setAberto(false) })}
+      />
+    </>
+  );
+}
+
 function Versoes() {
   const versoes = useVersoesPlano();
+  const { pode } = useUtilizador();
   const colunas: Coluna<VersaoPlano>[] = [
     { id: "nome", cabecalho: "Plano", celula: (v) => <span className="font-medium">{v.name}</span> },
     { id: "versao", cabecalho: "Versão", celula: (v) => v.version },
@@ -299,6 +330,7 @@ function Versoes() {
     { id: "contas", cabecalho: "Contas", alinhar: "direita", celula: (v) => String(v.accountCount) },
     { id: "fonte", cabecalho: "Fonte", esconderAte: "lg", celula: (v) => v.source },
     { id: "estado", cabecalho: "Estado", celula: (v) => (v.isActive ? <Badge tom="sucesso">Activa</Badge> : <Badge>Inactiva</Badge>) },
+    ...(pode("finance.ledger.close") ? [{ id: "accao", cabecalho: "", alinhar: "direita" as const, celula: (v: VersaoPlano) => <EstadoVersao v={v} /> }] : []),
   ];
   return (
     <>

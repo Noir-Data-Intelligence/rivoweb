@@ -43,20 +43,31 @@ export function problemaLancamento(linhas: readonly (LinhaDigitada & { readonly 
 
 type LinhaRegra = { readonly lado: string; readonly parcela: string };
 
+/** Coeficientes de cada parcela sobre (líquido dos bens, líquido dos serviços, imposto), como `PostingRule.CoefficientsOf`. */
+const COEFICIENTES: Readonly<Record<string, readonly [number, number, number]>> = {
+  Net: [1, 1, 0],
+  NetGoods: [1, 0, 0],
+  NetServices: [0, 1, 0],
+  Tax: [0, 0, 1],
+  Gross: [1, 1, 1],
+};
+
 /**
- * Uma regra de lançamento equilibra se, para cada parcela, débitos e
- * créditos se anulam sabendo que total = líquido + imposto. Conta cada
- * parcela como vector (líquido, imposto): `Gross` vale (1, 1).
+ * Uma regra de lançamento equilibra se a soma dos coeficientes a débito
+ * iguala a de crédito, com pelo menos uma linha de cada lado: total =
+ * líquido + imposto e líquido = bens + serviços. Débito do total contra
+ * crédito dos bens, dos serviços e do imposto equilibra.
  */
 export function regraEquilibra(linhas: readonly LinhaRegra[]): boolean {
-  let liquido = 0;
-  let imposto = 0;
-  for (const l of linhas) {
-    const s = l.lado === "Debit" ? 1 : -1;
-    if (l.parcela === "Net" || l.parcela === "Gross") liquido += s;
-    if (l.parcela === "Tax" || l.parcela === "Gross") imposto += s;
-  }
-  return linhas.length >= 2 && liquido === 0 && imposto === 0;
+  const soma = (lado: string) =>
+    linhas.filter((l) => l.lado === lado).reduce<[number, number, number]>((t, l) => {
+      const c = COEFICIENTES[l.parcela] ?? [0, 0, 0];
+      return [t[0] + c[0], t[1] + c[1], t[2] + c[2]];
+    }, [0, 0, 0]);
+  const d = soma("Debit");
+  const c = soma("Credit");
+  const vazio = (v: readonly number[]) => v.every((x) => x === 0);
+  return !vazio(d) && !vazio(c) && d.every((x, i) => x === c[i]);
 }
 
 /** Os meses de um ano até ao mês corrente (o histórico não se lança no futuro). */

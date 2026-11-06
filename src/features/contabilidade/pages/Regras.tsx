@@ -32,13 +32,13 @@ import {
 import { EVENTOS, NOME_LADO, PARCELAS, textoDe } from "../comum";
 import { regraEquilibra } from "../regras";
 
-type LinhaRegra = { chave: number; conta: string; lado: "Debit" | "Credit"; parcela: "Net" | "Tax" | "Gross"; descricao: string };
+type LinhaRegra = { chave: number; conta: string; lado: "Debit" | "Credit"; parcela: "Net" | "Tax" | "Gross" | "NetGoods" | "NetServices"; descricao: string };
 const linhaVazia = (chave: number, lado: "Debit" | "Credit", parcela: LinhaRegra["parcela"] = "Gross"): LinhaRegra => ({ chave, conta: "", lado, parcela, descricao: "" });
 
 function problemaLinhas(linhas: readonly LinhaRegra[]): string | null {
   if (linhas.some((l) => l.conta.trim() === "")) return "Indique a conta de cada linha.";
   if (linhas.some((l) => normalizarTexto(l.descricao) === "")) return "Cada linha tem descrição.";
-  if (!regraEquilibra(linhas.map((l) => ({ lado: l.lado, parcela: l.parcela })))) return "A regra não equilibra: a débito e a crédito tem de haver a mesma composição de líquido e imposto.";
+  if (!regraEquilibra(linhas.map((l) => ({ lado: l.lado, parcela: l.parcela })))) return "A regra não equilibra: a débito e a crédito tem de haver a mesma composição de bens, serviços e imposto (o líquido é bens mais serviços).";
   return null;
 }
 

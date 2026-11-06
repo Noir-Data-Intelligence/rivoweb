@@ -182,7 +182,7 @@ test("F6: contabilidade — diário, contas, lançamento, balancete, estorno, pe
   await page.getByRole("dialog").getByLabel("Em vigor desde").fill("2099-01-01");
   await page.getByRole("dialog").getByRole("button", { name: "Registar versão" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("cell", { name: `${marca} PGC` })).toBeVisible();
+  await expect(page.getByRole("cell", { name: `${marca} PGC`, exact: true })).toBeVisible();
 
   await page.goto("/regras-contabilisticas?vista=contabilisticas");
   await page.getByRole("button", { name: "Nova regra" }).click();

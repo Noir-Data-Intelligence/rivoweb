@@ -143,8 +143,8 @@ export function useEliminarRascunho() {
 export function useEmitirRascunho() {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: ({ draftId, issuedOn }: { draftId: string; issuedOn: string | null }) =>
-      ler(api.POST("/finance/invoice-drafts/{draftId}/issue", { params: { path: { draftId } }, body: { issuedOn } })),
+    mutationFn: ({ draftId, issuedOn, bankAccountId = null }: { draftId: string; issuedOn: string | null; bankAccountId?: string | null }) =>
+      ler(api.POST("/finance/invoice-drafts/{draftId}/issue", { params: { path: { draftId } }, body: { issuedOn, bankAccountId } })),
     onSuccess: () => invalidarDocumentos(qc),
   });
 }

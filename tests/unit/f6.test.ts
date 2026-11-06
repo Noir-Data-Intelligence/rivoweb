@@ -71,6 +71,10 @@ describe("equilíbrio simbólico das regras (PostingRule.EnsureBalances)", () =>
   it("total contra líquido mais imposto equilibra", () => {
     expect(regraEquilibra([{ lado: "Debit", parcela: "Gross" }, { lado: "Credit", parcela: "Net" }, { lado: "Credit", parcela: "Tax" }])).toBe(true);
   });
+  it("total contra bens, serviços e imposto equilibra; só os bens não (PGC)", () => {
+    expect(regraEquilibra([{ lado: "Debit", parcela: "Gross" }, { lado: "Credit", parcela: "NetGoods" }, { lado: "Credit", parcela: "NetServices" }, { lado: "Credit", parcela: "Tax" }])).toBe(true);
+    expect(regraEquilibra([{ lado: "Debit", parcela: "Gross" }, { lado: "Credit", parcela: "NetGoods" }, { lado: "Credit", parcela: "Tax" }])).toBe(false);
+  });
   it("total contra só o líquido não equilibra", () => {
     expect(regraEquilibra([{ lado: "Debit", parcela: "Gross" }, { lado: "Credit", parcela: "Net" }])).toBe(false);
   });

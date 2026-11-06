@@ -188,6 +188,21 @@ export function useCriarVersaoPlano() {
   });
 }
 
+/**
+ * Pôr em vigor ou tirar de vigor uma versão do plano (B44, PR #136). Activar só
+ * passa com as contas das regras de lançamento activas; senão 409 a dizer quais faltam.
+ */
+export function useEstadoVersaoPlano() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: ({ id, activar }: { id: string; activar: boolean }) =>
+      activar
+        ? enviar(api.POST("/finance/ledger/chart-versions/{chartVersionId}/activation", { params: { path: { chartVersionId: id } } }))
+        : enviar(api.POST("/finance/ledger/chart-versions/{chartVersionId}/deactivation", { params: { path: { chartVersionId: id } } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.versoesPlano }),
+  });
+}
+
 export function useClassesReporte() {
   return useQuery({
     queryKey: chaves.classesReporte,
@@ -427,5 +442,16 @@ export function useLancarHistorico() {
       return respostas;
     },
     onSuccess: (_, { simular }) => (simular ? undefined : invalidarFinancas(qc)),
+  });
+}
+
+export type ActualizacaoCambial = S["ExchangeRevaluationView"];
+
+/** Actualização cambial dos depósitos em moeda estrangeira no fim do mês (ADR-103): simula ou lança. */
+export function useActualizacaoCambial() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: { fiscalYear: number; month: number; dryRun: boolean }) => ler(api.POST("/finance/ledger/exchange-revaluations", { body: b })),
+    onSuccess: (_, b) => (b.dryRun ? undefined : invalidarFinancas(qc)),
   });
 }

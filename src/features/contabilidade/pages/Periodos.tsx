@@ -20,7 +20,7 @@ import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAbrirPeriodo, useFecharPeriodo, usePeriodos, useReabrirPeriodo, type Periodo } from "../api";
 import { EscolhaAnoPeriodo, useAnoPeriodo } from "../comum";
-import { FechoExercicio, LancarHistorico } from "../Fecho";
+import { ActualizacaoCambial, FechoExercicio, LancarHistorico } from "../Fecho";
 
 const nomePeriodo = (n: number) => (n <= 12 ? `${n} · ${nomeMes(n)}` : `${n} · Regularização`);
 
@@ -165,6 +165,7 @@ export default function Periodos() {
         vazio={`Nenhum período aberto em ${ano}. Sem período aberto não se lança.`}
       />
       <Can requer="finance.ledger.close">
+        <ActualizacaoCambial key={`cambio-${ano}`} ano={ano} />
         <FechoExercicio ano={ano} />
         <LancarHistorico key={ano} ano={ano} />
       </Can>

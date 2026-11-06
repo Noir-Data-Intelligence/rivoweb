@@ -244,4 +244,77 @@ test.describe("PGC", () => {
     expect(pedidos[11]?.corpo).toEqual({ from: "2025-12-01", to: "2025-12-31", dryRun: true });
     expect(await violacoes()).toEqual([]);
   });
+
+  test("actualização cambial: Dezembro por omissão, simular antes de lançar, contas, ganho ou perda e avisos; axe", async ({ page, api, violacoes }) => {
+    const resposta = (simular: boolean): S["ExchangeRevaluationView"] => ({
+      outcome: simular ? "Preview" : "Revalued",
+      fiscalYear: 2025,
+      month: 12,
+      on: "2025-12-31",
+      entryId: simular ? null : ENTRADA,
+      transactionId: simular ? null : "ACT-2025-12",
+      ledgerBalance: 9500000,
+      revaluedBalance: 9312000.4,
+      difference: -187999.6,
+      accounts: [{ accountId: "00000000-0000-4000-8000-000000000f41", name: "Conta <b>USD</b> BIC", currency: "USD", balance: 10000, rate: 931.2000400, rateOn: "2025-12-27", kwanzas: 9312000.4 }],
+      notes: ["O câmbio é de 27/12/2025, anterior ao fim do mês."],
+    });
+    await comPgc(api)
+      .em("POST", "/finance/ledger/exchange-revaluations", (route) => ({ status: 200, corpo: resposta((route.request().postDataJSON() as { dryRun: boolean }).dryRun) }))
+      .ligar();
+    await entrar(page);
+    await page.goto("/periodos?ano=2025");
+    const cartao = page.getByRole("heading", { name: "Actualização cambial" }).locator("..");
+    await expect(cartao.getByLabel("Mês")).toHaveValue("12");
+    await expect(cartao.getByRole("button", { name: "Lançar Dezembro de 2025" })).toBeDisabled();
+    await cartao.getByRole("button", { name: "Simular Dezembro de 2025" }).click();
+    const r = page.getByRole("region", { name: "Resultado da actualização cambial" });
+    await expect(r.getByText("Simulação a 31/12/2025: nada foi gravado.")).toBeVisible();
+    await expect(r.getByText("Perda (76.2.2)")).toBeVisible();
+    await expect(r.getByText("187\u00a0999,60 Kz")).toBeVisible();
+    await expect(r.getByRole("cell", { name: "Conta <b>USD</b> BIC" })).toBeVisible();
+    await expect(r.getByText("O câmbio é de 27/12/2025, anterior ao fim do mês.")).toBeVisible();
+    await semViolacoesAxe(page);
+    await cartao.getByRole("button", { name: "Lançar Dezembro de 2025" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Lançar", exact: true }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(r.getByRole("link", { name: "Ver o lançamento ACT-2025-12" })).toHaveAttribute("href", `/lancamentos/${ENTRADA}`);
+    expect(api.escritas("POST", "/finance/ledger/exchange-revaluations").map((p) => p.corpo)).toEqual([
+      { fiscalYear: 2025, month: 12, dryRun: true },
+      { fiscalYear: 2025, month: 12, dryRun: false },
+    ]);
+    // Mudar o mês obriga a simular de novo.
+    await cartao.getByLabel("Mês").selectOption("11");
+    await expect(cartao.getByRole("button", { name: "Lançar Novembro de 2025" })).toBeDisabled();
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("versões do plano: a nova fica inactiva; activar mostra o 409 com as contas em falta; desactivar", async ({ page, api }) => {
+    const ID_NOVA = "00000000-0000-4000-8000-000000000f51";
+    const ID_PGC = "00000000-0000-4000-8000-000000000f52";
+    await comPgc(api)
+      .em("GET", "/finance/ledger/chart-versions", {
+        status: 200,
+        corpo: [
+          { chartVersionId: ID_PGC, jurisdiction: "AO", name: "PGC", version: "82/01-IVA", source: "Decreto n.º 82/01", effectiveFrom: "2002-01-01", effectiveTo: null, isActive: true, accountCount: 758 },
+          { chartVersionId: ID_NOVA, jurisdiction: "AO", name: "Plano <b>novo</b>", version: "2027", source: "Teste", effectiveFrom: "2027-01-01", effectiveTo: null, isActive: false, accountCount: 0 },
+        ] satisfies S["ChartOfAccountsVersionView"][],
+      })
+      .em("POST", `/finance/ledger/chart-versions/${ID_NOVA}/activation`, problema(409, { title: "Conflict", detail: "Faltam as contas 61.1.1 e 62.1.1 usadas pelas regras de lançamento activas." }))
+      .em("POST", `/finance/ledger/chart-versions/${ID_PGC}/deactivation`, { status: 204 })
+      .ligar();
+    await entrar(page);
+    await page.goto("/plano-contas?vista=versoes");
+    await page.getByRole("button", { name: "Nova versão" }).click();
+    await expect(page.getByRole("dialog").getByText("A versão nova fica inactiva até ser activada.")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Activar Plano <b>novo</b> 2027" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Activar versão" }).click();
+    await expect(page.getByRole("dialog").getByText("Faltam as contas 61.1.1 e 62.1.1 usadas pelas regras de lançamento activas.")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Desactivar PGC 82/01-IVA" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Desactivar versão" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/ledger/chart-versions/${ID_PGC}/deactivation`)).toHaveLength(1);
+  });
 });
