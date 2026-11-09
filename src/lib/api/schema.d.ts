@@ -11213,7 +11213,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409. */
+        /** Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409. Quem paga é um colaborador que não decidiu a folha: senão, 403 (BR-3, ADR-109). */
         post: {
             parameters: {
                 query?: never;
@@ -11252,12 +11252,14 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Sessão válida, mas sem a permissão exigida. */
+                /** @description Forbidden */
                 403: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
                 };
                 /** @description Not Found */
                 404: {

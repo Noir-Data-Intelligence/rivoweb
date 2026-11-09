@@ -512,6 +512,29 @@ test.describe("tesouraria", () => {
     expect(await violacoes()).toEqual([]);
   });
 
+  test("pagar salários: quem decidiu a folha não paga (BR-3); o 403 mostra o motivo e não se repete", async ({ page, api }) => {
+    const motivo = "Quem paga os salários não pode ser quem decidiu a folha (BR-3).";
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", "/finance/treasury/payroll-payments", {
+        status: 403,
+        corpo: { status: 403, title: "Forbidden", detail: motivo },
+        cabecalhos: { "Content-Type": "application/problem+json" },
+      })
+      .ligar();
+    await entrar(page, meFinancasF5.email);
+    await page.goto("/contas");
+    await page.getByRole("button", { name: "Pagar salários" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByText("Quem decidiu a folha em Aprovações não a paga (BR-3).", { exact: false })).toBeVisible();
+    await d.getByLabel("Mês").fill("2026-09");
+    await d.getByLabel("Data").fill("2026-10-05");
+    await d.getByLabel("Conta").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Pagar", exact: true }).click();
+    await expect(d.getByText("Não pode fazer isto.")).toBeVisible();
+    await expect(d.getByText(motivo)).toBeVisible();
+    expect(api.escritas("POST", "/finance/treasury/payroll-payments")).toHaveLength(1);
+  });
+
   test("depositar valores: o talão com a data, só nas contas em kwanzas", async ({ page, api }) => {
     await comTesouraria(api)
       .em("POST", "/finance/treasury/cash-deposits", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f22", amount: 75000, bankBalance: 5075000 } })

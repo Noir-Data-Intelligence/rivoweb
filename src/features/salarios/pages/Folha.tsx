@@ -7,6 +7,8 @@
 import { ArrowLeft, Download, Paperclip, Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useParams } from "react-router";
+import { usePedidoAprovacao } from "@/features/aprovacoes";
+import { useMeuPainel } from "@/features/dashboard";
 import { CarregarFicheiro, type Documento } from "@/features/documentos";
 import { Can, useUtilizador } from "@/features/identity";
 import { SelectColaborador, useContratos, useNomeColaborador } from "@/features/rh";
@@ -342,10 +344,31 @@ function Recibos({ f, i, quem }: { f: TipoFolha; i: ItemFolha; quem: string }) {
   );
 }
 
+/**
+ * Quem paga os salários da folha aprovada (BR-3, ADR-109): um colaborador que
+ * não a decidiu em Aprovações. Uma conta sem colaborador também não paga. O
+ * servidor recusa com 403 na mesma; aqui só se evita o botão que não serve.
+ * Sem saber (a carregar, ou sem ler o painel ou o pedido), deixa-se pagar.
+ */
+function useQuemPagaSalarios(f: TipoFolha | undefined, podePagar: boolean): "pode" | "semFicha" | "decidiu" | null {
+  const { pode } = useUtilizador();
+  const aplica = podePagar && f?.status === "Approved";
+  const meu = useMeuPainel();
+  const pedido = f?.approvalRequestId ?? "";
+  const a = usePedidoAprovacao(pedido, aplica && pedido !== "" && pode("approval.requests.read"));
+  if (!aplica) return null;
+  if (meu.isPending) return null;
+  const eu = meu.data?.employeeId ?? null;
+  if (!meu.error && eu === null) return "semFicha";
+  if (eu !== null && (a.data?.decisions ?? []).some((d) => d.decidedByEmployeeId === eu)) return "decidiu";
+  return "pode";
+}
+
 export default function Folha() {
   const { runId = "" } = useParams();
   const { pode } = useUtilizador();
   const q = useFolha(runId);
+  const quemPaga = useQuemPagaSalarios(q.data, pode("finance.payments.execute"));
   const nomeDe = useNomeColaborador();
   const [razao, setRazao] = useState<RazaoFolha | null>(null);
   const voltar = (
@@ -407,7 +430,7 @@ export default function Folha() {
             </div>
           ) : f.status === "PendingApproval" && escreve ? (
             <VerDecisao f={f} aoDecidir={setRazao} />
-          ) : f.status === "Approved" && pode("finance.payments.execute") ? (
+          ) : f.status === "Approved" && quemPaga === "pode" ? (
             <PagamentoPeloBanco tipo="salarios" mesInicial={`${String(f.year)}-${String(f.month).padStart(2, "0")}`} />
           ) : undefined
         }
@@ -422,6 +445,16 @@ export default function Folha() {
         </Alert>
       ) : null}
       {f.status === "Approved" ? <NoRazao f={f} razao={razao} mudar={setRazao} /> : null}
+      {quemPaga === "semFicha" ? (
+        <Alert tom="info" className="mb-4" titulo="A sua conta não está ligada a uma ficha de colaborador.">
+          Só um colaborador pode pagar os salários, e não pode ser quem decidiu a folha (BR-3). Peça ao Admin que ligue a conta à sua ficha.
+        </Alert>
+      ) : null}
+      {quemPaga === "decidiu" ? (
+        <Alert tom="info" className="mb-4" titulo="Foi você que decidiu esta folha em Aprovações.">
+          Quem aprova não paga (BR-3): outra pessoa com a tesouraria tem de pagar os salários.
+        </Alert>
+      ) : null}
       {f.status === "Refused" ? <Alert tom="erro" className="mb-4" titulo="Folha recusada em Aprovações: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
       {f.status === "Cancelled" ? <Alert tom="info" className="mb-4" titulo="Folha anulada: não se paga nem se altera. O mês fica livre para outra folha." /> : null}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

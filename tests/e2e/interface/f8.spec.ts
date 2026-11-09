@@ -10,7 +10,8 @@ import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF1 } from "../apoio-f1";
 import { ID } from "../../fixtures/f1";
-import { documento } from "../../fixtures/f5";
+import { EU, painelComFicha } from "../../fixtures/f4";
+import { aprovacaoPagamento, documento } from "../../fixtures/f5";
 import { contratos } from "../../fixtures/f7b";
 import { folha, folhas, IDF8, itemAna, itemCarlos, meLeitorSalarios, meRhF8, recibos } from "../../fixtures/f8";
 
@@ -202,6 +203,29 @@ test.describe("salários", () => {
     await expect(page.getByText("A folha já estava lançada no razão.")).toBeVisible();
     expect(api.escritas("POST", `/payroll/runs/${IDF8.aprovada}/ledger-posting`)).toHaveLength(1);
     await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
+  });
+
+  test("aprovada: quem paga os salários (BR-3) — nem uma conta sem ficha, nem quem decidiu a folha", async ({ page, api }) => {
+    const me = { ...meRhF8, permissions: [...new Set([...meRhF8.permissions, "finance.payments.execute"])] };
+    const decisao = (por: string) => ({ ...aprovacaoPagamento("Approved", por), requestId: IDF8.aprovacao, processType: "payroll.run", sourceModule: "payroll" });
+    // Por omissão a conta não tem ficha de colaborador.
+    await comSalarios(api, me).em("GET", `/approval/requests/${IDF8.aprovacao}`, { status: 200, corpo: decisao(EU) }).ligar();
+    await entrar(page, me.email);
+    await page.goto(`/salarios/${IDF8.aprovada}`);
+    await expect(page.getByText("A sua conta não está ligada a uma ficha de colaborador.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
+
+    api.em("GET", "/dashboard/me", { status: 200, corpo: painelComFicha() });
+    await page.reload();
+    await expect(page.getByText("Foi você que decidiu esta folha em Aprovações.")).toBeVisible();
+    await expect(page.getByText("outra pessoa com a tesouraria tem de pagar os salários", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
+
+    api.em("GET", `/approval/requests/${IDF8.aprovacao}`, { status: 200, corpo: decisao(ID.emp2) });
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Pagar salários" })).toBeVisible();
+    await expect(page.getByText("Foi você que decidiu esta folha em Aprovações.")).toHaveCount(0);
+    await expect(page.getByText("A sua conta não está ligada a uma ficha de colaborador.")).toHaveCount(0);
   });
 
   test("aprovada: recibos do colaborador — ver, descarregar e anexar", async ({ page, api }) => {

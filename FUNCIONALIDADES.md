@@ -31,7 +31,7 @@
 > estrangeiro nas regras) · actualizado a 2026-11-09 (vender um activo pela
 > factura; a actualização cambial mostra as facturas em aberto; o mercado em
 > cada regra e o país do fornecedor na factura de compra; a nota da compra de
-> imobilizado).
+> imobilizado; quem decidiu a folha não paga os salários).
 
 ---
 
@@ -273,7 +273,7 @@ AM = AssetManager.
 | **Tesouraria** | | | | | | | | | | |
 | Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, só um colaborador que não decidiu a folha ³⁴; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -411,7 +411,11 @@ Recursos Humanos.»
 
 ³² PR #144 (ADR-107): a factura com `fixedAssetId` vende o bem. No front faz-se pela ficha do activo («Vender pela factura»), porque os rascunhos não levam o activo: cliente ou consumidor final, FT ou FR (meio e, por banco, a conta onde entrou), série, data (o bem fica abatido nela), descrição sugerida com o nome e o código, preço sem IVA e imposto; uma linha de bens, na moeda do activo. Só com a conta do PGC no activo; sem ela, a ficha diz porquê. A nova factura (rascunho) lembra este caminho. Na ficha da factura, a nota de crédito fica escondida e anular avisa que repõe o bem. Os recibos fazem-se factura a factura, por isso nunca juntam a do activo a outras.
 
-³³ PR #145 (ADR-108), em revisão a 2026-11-09: só razão. A factura de compra com `expenseAccountCode` na classe 1 (11, 12, 13 ou 14) lança a dívida na 37.1.1, 37.1.2 ou 37.1.3 e o IVA na 34.5.2.2. O pedido e a resposta não mudam. No front, a conta da despesa sugere também as contas do imobilizado, e o registo e a ficha avisam onde ficam a dívida e o IVA.
+³³ PR #145 (ADR-108), em produção desde 2026-11-09: só razão. A factura de compra com `expenseAccountCode` na classe 1 (11, 12, 13 ou 14) lança a dívida na 37.1.1, 37.1.2 ou 37.1.3 e o IVA na 34.5.2.2. O pedido e a resposta não mudam. No front, a conta da despesa sugere também as contas do imobilizado, e o registo e a ficha avisam onde ficam a dívida e o IVA.
+
+³⁴ PR #146 (ADR-109), em produção desde 2026-11-09. Quem decidiu a folha em Aprovações não paga os salários, e uma conta sem colaborador (a SuperAdmin, por exemplo) também não: 403. As entregas ao Estado (IRT, INSS, IVA) não mudam. No front, a folha aprovada não mostra «Pagar salários» a quem a decidiu (lê as decisões do pedido de aprovação) nem a uma conta sem ficha de colaborador, e diz porquê; o diálogo lembra a regra, e o 403 mostra o motivo do servidor, sem repetir o pedido.
+
+³⁵ PR #147 (ADR-110), em revisão a 2026-11-09. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem.
 
 ---
 
@@ -1099,7 +1103,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   folha lançada) e **Entregar ao Estado** (IRT, INSS ou IVA de um mês; o valor
   vem do razão), com a data do pagamento: mostra o valor pago, o saldo que
   ficou e a ligação ao lançamento; as recusas (folha por lançar, IVA por
-  apurar, mês já pago, saldo insuficiente, período fechado) dizem porquê.
+  apurar, mês já pago, saldo insuficiente, período fechado, quem decidiu a
+  folha ou conta sem ficha de colaborador ³⁴) dizem porquê.
 - Ficha: saldo, **depositar** e **levantar** (com a data-valor), **depositar
   valores** (numerário e cheques recebidos, nas contas em kwanzas: valor e
   referência do talão, data), **fechar** (só com saldo zero) e **reabrir**;
@@ -1438,7 +1443,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Aprovada: o bloco **Razão** explica o lançamento (salários e INSS da
   empresa a custo; líquido, IRT e INSS a pagar) e **lançar no razão** (para
   quando não lançou; repetir não duplica); **pagar os salários** pelo banco,
-  com o mês da folha já escolhido; por colaborador, os **recibos** anexados
+  com o mês da folha já escolhido (não aparece a quem decidiu a folha nem a
+  uma conta sem ficha de colaborador, e a página diz porquê ³⁴); por colaborador, os **recibos** anexados
   (descarregar) e **anexar** o PDF do recibo; sem anexo, o portal gera-o da
   folha.
 - Recusada ou anulada: não se paga nem se altera; o mês fica livre.

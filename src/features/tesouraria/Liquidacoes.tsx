@@ -96,7 +96,7 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
         titulo={salarios ? "Pagar os salários de um mês" : "Entregar ao Estado"}
         descricao={
           salarios
-            ? "Paga o líquido que a folha aprovada lançou no razão (36.1.2). O valor não se escreve: vem da folha. Sai da conta e fica no extracto."
+            ? "Paga o líquido que a folha aprovada lançou no razão (36.1.2). O valor não se escreve: vem da folha. Sai da conta e fica no extracto. Quem decidiu a folha em Aprovações não a paga (BR-3)."
             : "Entrega o imposto de um mês que está no razão. O valor não se escreve: vem da folha lançada ou do apuramento do IVA. Sai da conta e fica no extracto."
         }
         rotuloConfirmar={r ? "Fechar" : salarios ? "Pagar" : "Entregar"}

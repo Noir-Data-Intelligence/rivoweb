@@ -10883,7 +10883,7 @@
         "tags": [
           "TreasuryEndpoints"
         ],
-        "summary": "Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409.",
+        "summary": "Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409. Quem paga é um colaborador que não decidiu a folha: senão, 403 (BR-3, ADR-109).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -10915,6 +10915,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -10937,9 +10947,6 @@
           },
           "401": {
             "description": "Sem sessão válida."
-          },
-          "403": {
-            "description": "Sessão válida, mas sem a permissão exigida."
           }
         },
         "security": [

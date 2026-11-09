@@ -1,7 +1,7 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `07f5bbc` (PR #141 a #144). Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `826b606` (PR #141 a #146). Em aberto: **B24** (configuração).
 > **B43**, **B44** e **B45** estão resolvidos (PR #135 e #136) e o front já os
 > usa: «Bens / Serviço» em cada linha do rascunho e da pró-forma; a conta onde
 > entrou na emissão da FR do rascunho e na conversão da pró-forma; a versão do
