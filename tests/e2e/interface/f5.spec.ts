@@ -115,7 +115,11 @@ test.describe("facturas de compra", () => {
     await page.getByLabel("Conta da despesa (opcional)").fill("Electricidade");
     await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
     await expect(page.getByText("Código de conta do PGC, por exemplo 75.2.12.")).toBeVisible();
+    // Uma conta do imobilizado (classe 1) avisa onde ficam a dívida e o IVA (ADR-108).
+    await page.getByLabel("Conta da despesa (opcional)").fill("11.3.2");
+    await expect(page.getByText("Compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2.")).toBeVisible();
     await page.getByLabel("Conta da despesa (opcional)").fill(" 75.2.12 ");
+    await expect(page.getByText("Compra de imobilizado", { exact: false })).toHaveCount(0);
     await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
     await expect(page).toHaveURL(new RegExp(`/facturas-compra/${IDF5.factura}$`));
     expect(api.escritas("POST", "/finance/purchase-invoices")[0]?.corpo).toMatchObject({
@@ -141,6 +145,7 @@ test.describe("facturas de compra", () => {
     await page.goto(`/facturas-compra/${IDF5.factura}`);
     // 1 140 000 de total menos 640 000 já pedidos
     await expect(page.getByText("Falta pedir 500 000,00", { exact: false })).toBeVisible();
+    await expect(page.getByText("país AO, mercado nacional", { exact: false })).toBeVisible();
     await expect(page.getByRole("button", { name: "Anular" })).toHaveCount(0);
     await page.getByRole("button", { name: "Pedir pagamento" }).click();
     await expect(page.getByLabel(/^Valor/)).toHaveValue("500000,00");

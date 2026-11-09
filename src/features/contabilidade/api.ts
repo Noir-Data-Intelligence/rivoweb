@@ -447,7 +447,7 @@ export function useLancarHistorico() {
 
 export type ActualizacaoCambial = S["ExchangeRevaluationView"];
 
-/** Actualização cambial dos depósitos em moeda estrangeira no fim do mês (ADR-103): simula ou lança. */
+/** Actualização cambial no fim do mês: os depósitos (ADR-103) e os clientes e fornecedores em aberto (ADR-105); simula ou lança. */
 export function useActualizacaoCambial() {
   const qc = useQueryClient();
   return useEscrita({

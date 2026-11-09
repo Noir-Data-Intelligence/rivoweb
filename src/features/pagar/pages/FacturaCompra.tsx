@@ -19,7 +19,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useAnularFacturaCompra, useConfronto, useFacturaCompra, usePedidosPagamento, usePedirPagamento, type FacturaCompra as TipoFactura, type PedidoPagamento } from "../api";
-import { EstadoPedidoPagamento, SemFichaDeColaborador, useEuColaborador } from "../comum";
+import { eContaImobilizado, EstadoPedidoPagamento, SemFichaDeColaborador, textoPaisMercado, useEuColaborador } from "../comum";
 import { EstadoFacturaCompra } from "./FacturasCompra";
 
 function Linha({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
@@ -223,11 +223,15 @@ export default function FacturaCompra() {
                   f.supplierName
                 )}{" "}
                 · NIF {f.supplierTaxId}
+                {textoPaisMercado(f.supplierCountry, f.market) ? <span className="text-muted-foreground"> · {textoPaisMercado(f.supplierCountry, f.market)}</span> : null}
               </Linha>
               <Linha rotulo="Emitida em">{formatarData(f.issuedOn)}</Linha>
               <Linha rotulo="Vence em">{formatarData(f.dueOn)}</Linha>
               <Linha rotulo="Descrição">{f.description ?? "—"}</Linha>
-              <Linha rotulo="Conta da despesa">{f.expenseAccountCode ?? "—"}</Linha>
+              <Linha rotulo="Conta da despesa">
+                {f.expenseAccountCode ?? "—"}
+                {f.expenseAccountCode && eContaImobilizado(f.expenseAccountCode) ? <span className="block text-xs text-muted-foreground">Compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2.</span> : null}
+              </Linha>
             </dl>
             <dl className="ml-auto mt-4 grid w-full max-w-xs grid-cols-2 gap-x-4 gap-y-1 text-sm">
               <dt className="text-muted-foreground">Sem IVA</dt>

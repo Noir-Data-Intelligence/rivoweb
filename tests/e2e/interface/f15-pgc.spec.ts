@@ -245,7 +245,11 @@ test.describe("PGC", () => {
     expect(await violacoes()).toEqual([]);
   });
 
-  test("actualização cambial: Dezembro por omissão, simular antes de lançar, contas, ganho ou perda e avisos; axe", async ({ page, api, violacoes }) => {
+  test("actualização cambial: Dezembro por omissão, simular antes de lançar, contas, facturas em aberto, ganho ou perda e avisos; axe", async ({ page, api, violacoes }) => {
+    const ACD = "00000000-0000-4000-8000-000000000f43";
+    const EST = "00000000-0000-4000-8000-000000000f44";
+    const FACTURA_USD = "00000000-0000-4000-8000-000000000f45";
+    const COMPRA_USD = "00000000-0000-4000-8000-000000000f46";
     const resposta = (simular: boolean): S["ExchangeRevaluationView"] => ({
       outcome: simular ? "Preview" : "Revalued",
       fiscalYear: 2025,
@@ -258,6 +262,13 @@ test.describe("PGC", () => {
       difference: -187999.6,
       accounts: [{ accountId: "00000000-0000-4000-8000-000000000f41", name: "Conta <b>USD</b> BIC", currency: "USD", balance: 10000, rate: 931.2000400, rateOn: "2025-12-27", kwanzas: 9312000.4 }],
       notes: ["O câmbio é de 27/12/2025, anterior ao fim do mês."],
+      documents: [
+        { kind: "Receivable", documentId: FACTURA_USD, number: "FT S001/9", party: "Cliente <i>USD</i>", currency: "USD", open: 1000, rate: 931.20004, rateOn: "2025-12-27", accountCode: "31.1.2.2", registered: 912000, revalued: 931200.04, difference: 19200.04 },
+        { kind: "Payable", documentId: COMPRA_USD, number: "INV-77", party: "Fornecedor ZA", currency: "USD", open: 500, rate: 931.20004, rateOn: "2025-12-27", accountCode: "32.1.2.2", registered: 470000, revalued: 465600.02, difference: 4399.98 },
+      ],
+      debtsDifference: 23600.02,
+      debtsEntryId: simular ? null : ACD,
+      debtsReversalEntryId: simular ? null : EST,
     });
     await comPgc(api)
       .em("POST", "/finance/ledger/exchange-revaluations", (route) => ({ status: 200, corpo: resposta((route.request().postDataJSON() as { dryRun: boolean }).dryRun) }))
@@ -270,15 +281,24 @@ test.describe("PGC", () => {
     await cartao.getByRole("button", { name: "Simular Dezembro de 2025" }).click();
     const r = page.getByRole("region", { name: "Resultado da actualização cambial" });
     await expect(r.getByText("Simulação a 31/12/2025: nada foi gravado.")).toBeVisible();
-    await expect(r.getByText("Perda (76.2.2)")).toBeVisible();
+    await expect(r.getByText("Perda nos depósitos (76.2.2)")).toBeVisible();
     await expect(r.getByText("187\u00a0999,60 Kz")).toBeVisible();
+    await expect(r.getByText("Ganho nos clientes e fornecedores (66.2.2)")).toBeVisible();
+    await expect(r.getByText("23\u00a0600,02 Kz")).toBeVisible();
     await expect(r.getByRole("cell", { name: "Conta <b>USD</b> BIC" })).toBeVisible();
+    const facturas = r.getByRole("table", { name: "Facturas em moeda estrangeira em aberto" });
+    await expect(facturas.getByRole("link", { name: "FT S001/9" })).toHaveAttribute("href", `/facturas/${FACTURA_USD}`);
+    await expect(facturas.getByRole("link", { name: "INV-77" })).toHaveAttribute("href", `/facturas-compra/${COMPRA_USD}`);
+    await expect(facturas.getByRole("cell", { name: "Cliente <i>USD</i>" })).toBeVisible();
+    await expect(facturas.getByText("19\u00a0200,04 Kz")).toBeVisible();
     await expect(r.getByText("O câmbio é de 27/12/2025, anterior ao fim do mês.")).toBeVisible();
     await semViolacoesAxe(page);
     await cartao.getByRole("button", { name: "Lançar Dezembro de 2025" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Lançar", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(r.getByRole("link", { name: "Ver o lançamento ACT-2025-12" })).toHaveAttribute("href", `/lancamentos/${ENTRADA}`);
+    await expect(r.getByRole("link", { name: "Ver o lançamento dos depósitos ACT-2025-12" })).toHaveAttribute("href", `/lancamentos/${ENTRADA}`);
+    await expect(r.getByRole("link", { name: "Ver o lançamento dos clientes e fornecedores" })).toHaveAttribute("href", `/lancamentos/${ACD}`);
+    await expect(r.getByRole("link", { name: "Ver o estorno no dia 1 do mês seguinte" })).toHaveAttribute("href", `/lancamentos/${EST}`);
     expect(api.escritas("POST", "/finance/ledger/exchange-revaluations").map((p) => p.corpo)).toEqual([
       { fiscalYear: 2025, month: 12, dryRun: true },
       { fiscalYear: 2025, month: 12, dryRun: false },

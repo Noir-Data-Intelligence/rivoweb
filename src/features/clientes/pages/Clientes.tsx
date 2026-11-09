@@ -74,7 +74,13 @@ export function CamposCliente({ form, comNif }: { form: ReturnType<typeof useFor
             )}
           </Field>
         ) : (
-          <Field key={c} rotulo={ROTULOS[c]} erro={form.formState.errors[c]?.message} className={c === "addressDetail" ? "sm:col-span-2" : undefined}>
+          <Field
+            key={c}
+            rotulo={ROTULOS[c]}
+            erro={form.formState.errors[c]?.message}
+            ajuda={c === "country" ? "Código de duas letras (AO, PT…). Decide as contas da contabilidade: fora de Angola, o cliente e as vendas lançam nas do mercado estrangeiro. A moeda não conta." : undefined}
+            className={c === "addressDetail" ? "sm:col-span-2" : undefined}
+          >
             {({ id, descricao, invalido }) => (
               <Input
                 id={id}

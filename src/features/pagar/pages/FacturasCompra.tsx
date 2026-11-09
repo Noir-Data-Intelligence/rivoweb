@@ -27,6 +27,7 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useFacturasCompra, useFornecedoresActivos, useRegistarFacturaCompra, type FacturaCompra } from "../api";
+import { eContaImobilizado } from "../comum";
 
 export const MOEDAS = ["AOA", "USD", "EUR"] as const;
 
@@ -60,9 +61,9 @@ function NovaFactura() {
   const [aberto, setAberto] = useState(false);
   const fornecedores = useFornecedoresActivos(aberto && pode("procurement.suppliers.read"));
   const registar = useRegistarFacturaCompra();
-  // Sugestões de contas de custos (classe 7) a quem lê o plano; os outros escrevem o código.
+  // Sugestões de contas de custos (classe 7) e do imobilizado (11 a 14) a quem lê o plano; os outros escrevem o código.
   const contas = useContasRazao(false, aberto && pode("finance.ledger.read"));
-  const contasCusto = (contas.data ?? []).filter((c) => c.isActive && c.acceptsPostings && !c.isAnalytic && c.code.startsWith("7"));
+  const contasCusto = (contas.data ?? []).filter((c) => c.isActive && c.acceptsPostings && !c.isAnalytic && (c.code.startsWith("7") || eContaImobilizado(c.code)));
   const idContas = useId();
   const idForm = useId();
   const [soltas, setSoltas] = useState<string[]>([]);
@@ -211,7 +212,16 @@ function NovaFactura() {
           <Field rotulo="Descrição" erro={e.description?.message} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={500} autoComplete="off" aria-describedby={descricao} invalido={invalido} {...form.register("description")} />}
           </Field>
-          <Field rotulo="Conta da despesa (opcional)" erro={e.expenseAccountCode?.message} className="sm:col-span-2" ajuda="Conta de movimento do PGC onde a despesa lança, por exemplo 75.2.12 Electricidade. Vazio: 75.2.39 Outros serviços.">
+          <Field
+            rotulo="Conta da despesa (opcional)"
+            erro={e.expenseAccountCode?.message}
+            className="sm:col-span-2"
+            ajuda={
+              eContaImobilizado(v.expenseAccountCode ?? "")
+                ? "Compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2."
+                : "Conta de movimento do PGC onde a despesa lança, por exemplo 75.2.12 Electricidade, ou a do bem comprado (11 a 14). Vazio: 75.2.39 Outros serviços."
+            }
+          >
             {({ id, descricao, invalido }) => (
               <>
                 <Input id={id} maxLength={30} autoComplete="off" inputMode="decimal" list={contasCusto.length > 0 ? idContas : undefined} aria-describedby={descricao} invalido={invalido} {...form.register("expenseAccountCode")} />

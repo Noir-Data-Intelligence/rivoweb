@@ -48612,7 +48612,11 @@
           "revaluedBalance",
           "difference",
           "accounts",
-          "notes"
+          "notes",
+          "documents",
+          "debtsDifference",
+          "debtsEntryId",
+          "debtsReversalEntryId"
         ],
         "type": "object",
         "properties": {
@@ -48687,6 +48691,34 @@
             "items": {
               "type": "string"
             }
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RevaluedDocumentView"
+            }
+          },
+          "debtsDifference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "debtsEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "debtsReversalEntryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -52480,6 +52512,13 @@
             "format": "uuid"
           },
           "bankAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "fixedAssetId": {
             "type": [
               "null",
               "string"
@@ -59380,6 +59419,12 @@
             "items": {
               "$ref": "#/components/schemas/PostingRuleLineRequest"
             }
+          },
+          "market": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -59415,6 +59460,12 @@
             "items": {
               "$ref": "#/components/schemas/PostingRuleLineView"
             }
+          },
+          "market": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -60637,6 +60688,18 @@
             ]
           },
           "expenseAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "supplierCountry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "market": {
             "type": [
               "null",
               "string"
@@ -62343,6 +62406,88 @@
           }
         }
       },
+      "RevaluedDocumentView": {
+        "required": [
+          "kind",
+          "documentId",
+          "number",
+          "party",
+          "currency",
+          "open",
+          "rate",
+          "rateOn",
+          "accountCode",
+          "registered",
+          "revalued",
+          "difference"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "party": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "open": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "rate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "rateOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "accountCode": {
+            "type": "string"
+          },
+          "registered": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "revalued": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "difference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "RevenueForecastView": {
         "required": [
           "currency",
@@ -62866,6 +63011,13 @@
             "items": {
               "$ref": "#/components/schemas/SalesInvoiceLineView"
             }
+          },
+          "fixedAssetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },

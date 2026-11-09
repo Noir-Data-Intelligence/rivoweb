@@ -117,4 +117,12 @@ export const PARCELAS = [
   { valor: "NetServices", texto: "Líquido dos serviços (62 Prestações de serviços)" },
 ] as const;
 
+/** Mercado da regra (ADR-106): o país do cliente ou do fornecedor, diferente de AO, é estrangeiro. Sem mercado, serve os dois. */
+export const MERCADOS = [
+  { valor: "Domestic", texto: "Nacional" },
+  { valor: "Foreign", texto: "Estrangeiro" },
+] as const;
+
+export const textoMercado = (m: string | null | undefined) => (m ? textoDe(MERCADOS, m) : "Os dois");
+
 export const textoDe = (lista: readonly { valor: string; texto: string }[], valor: string) => lista.find((x) => x.valor === valor)?.texto ?? valor;

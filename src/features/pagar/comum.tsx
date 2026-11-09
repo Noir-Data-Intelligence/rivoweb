@@ -11,6 +11,13 @@ export function EstadoPedidoPagamento({ estado }: { estado: string }) {
 }
 
 /** Categorias de anexo de um pedido de pagamento (texto livre na API). */
+/** Conta do imobilizado (classe 1: 11 a 14): a compra lança a dívida na 37.1 e o IVA na 34.5.2.2 (ADR-108). */
+export const eContaImobilizado = (codigo: string) => /^1[1-4](\.|$)/.test(codigo.trim());
+
+/** País e mercado do fornecedor, como a factura de compra os leu (ADR-106). */
+export const textoPaisMercado = (pais: string | null | undefined, mercado: string | null | undefined) =>
+  [pais ? `país ${pais}` : null, mercado === "Foreign" ? "mercado estrangeiro" : mercado === "Domestic" ? "mercado nacional" : null].filter(Boolean).join(", ");
+
 export const CATEGORIAS_ANEXO = ["Factura", "Proposta", "Contrato", "Outro"] as const;
 
 /** O colaborador da conta: pedir e executar pagamentos exige ficha ligada (ADR-057). */

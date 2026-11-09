@@ -9,6 +9,7 @@ import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
 import { comF1 } from "../apoio-f1";
 import { ID } from "../../fixtures/f1";
+import { clientes, IDF3, pautas, series } from "../../fixtures/f3";
 import { activos, apolices, custodias, fichaActivo, IDF9C, meActivosF9, meAdminF9 } from "../../fixtures/f9";
 
 function comActivos(api: ApiSimulada, me = meAdminF9): ApiSimulada {
@@ -128,6 +129,61 @@ test.describe("activos fixos", () => {
     // O abate ficou gravado; a nota do razão fica à vista na ficha (ADR-096).
     await expect(page.getByText("O abate ficou gravado, mas não lançou no razão.")).toBeVisible();
     await expect(page.getByText("O activo não tem conta do PGC: o abate não lançou no razão.")).toBeVisible();
+  });
+
+  test("vender pela factura (ADR-107): só com a conta do PGC; FR de bens com uma linha na moeda do activo; abre a factura", async ({ page, api, violacoes }) => {
+    const FACTURA = "00000000-0000-4000-8000-000000000c91";
+    const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": String(itens.length) } });
+    // Sem conta do PGC: não se vende pela factura, e a ficha diz porquê.
+    await comActivos(api).ligar();
+    await entrar(page);
+    await page.goto(`/activos/${IDF9C.portatil}`);
+    await expect(page.getByText("Para vender este bem pela factura, indique primeiro a conta do PGC", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Vender pela factura" })).toHaveCount(0);
+
+    const ficha = fichaActivo();
+    api
+      .em("GET", `/finance/assets/${IDF9C.portatil}`, { status: 200, corpo: { ...ficha, asset: { ...ficha.asset, ledgerAccountCode: "11.5" } } })
+      .em("GET", "/commercial/customers", pag(clientes()))
+      .em("GET", "/finance/series", pag(series()))
+      .em("GET", "/fiscal/tax-rates", pag(pautas()))
+      .em("GET", "/finance/bank-accounts", pag([]))
+      .em("POST", "/finance/sales-invoices", { status: 201, corpo: { invoiceId: FACTURA, number: "FR S001/9" } });
+    await page.reload();
+    await page.getByRole("button", { name: "Vender pela factura" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Descrição")).toHaveValue("Venda de Portátil Dell (AF-001)");
+    await d.getByRole("button", { name: "Emitir factura" }).click();
+    await expect(d.getByText("Preço de venda maior que zero, até 2 casas.")).toBeVisible();
+    await d.getByLabel("Cliente").selectOption(IDF3.cliente);
+    await d.getByLabel("Tipo").selectOption("FR");
+    await d.getByRole("button", { name: "Emitir factura" }).click();
+    await expect(d.getByText("Uma factura-recibo é paga no acto: indique o meio.")).toBeVisible();
+    await d.getByLabel("Meio de pagamento").selectOption("NU");
+    await d.getByLabel("Data da factura").fill("2026-10-20");
+    await d.getByLabel("Preço de venda sem IVA (AOA)").fill("600 000");
+    await semViolacoesAxe(page);
+    await d.getByRole("button", { name: "Emitir factura" }).click();
+    await expect(page).toHaveURL(new RegExp(`/facturas/${FACTURA}$`));
+    expect(api.escritas("POST", "/finance/sales-invoices").map((p) => p.corpo)).toEqual([
+      {
+        customerId: IDF3.cliente,
+        series: null,
+        issuedOn: "2026-10-20",
+        taxPointDate: null,
+        currency: "AOA",
+        documentType: "FR",
+        dueDate: null,
+        paymentTerms: null,
+        withholdingRate: null,
+        paymentMethod: "NU",
+        referencedInvoiceId: null,
+        bankAccountId: null,
+        fixedAssetId: IDF9C.portatil,
+        lines: [{ description: "Venda de Portátil Dell (AF-001)", quantity: "1", unitPrice: "600000.00", taxCode: "NOR", kind: "Goods" }],
+      },
+    ]);
+    expect(await violacoes()).toEqual([]);
   });
 
   test("activo sem amortização registada: corrigir envia tudo", async ({ page, api }) => {

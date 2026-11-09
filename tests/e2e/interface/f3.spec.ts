@@ -3,7 +3,7 @@
  * escrita (dinheiro em texto, nunca number), confirmações de emissão e de
  * envio, sem duplo envio, permissões por perfil, axe e CSP.
  */
-import { facturaComRetencao, IDF3, meAdminF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
+import { factura, facturaComRetencao, IDF3, meAdminF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { contas, IDF5 } from "../../fixtures/f5";
@@ -194,6 +194,22 @@ test.describe("facturas", () => {
     await page.getByRole("button", { name: "Emitir recibo" }).click();
     await expect(page).toHaveURL(new RegExp(`/recibos/${IDF3.recibo}$`));
     expect(api.escritas("POST", "/finance/receipts")[0]?.corpo).toMatchObject({ method: "TB", settlements: [{ salesInvoiceId: IDF3.factura, amount: "40000.50" }] });
+  });
+
+  test("factura da venda de um activo (ADR-107): diz o bem, sem nota de crédito; anular avisa que o repõe", async ({ page, api }) => {
+    const ACTIVO = "00000000-0000-4000-8000-000000000c01";
+    const comActivos = { ...meAdminF3, permissions: [...new Set([...meAdminF3.permissions, "finance.assets.read"])] };
+    await comF3(api, comActivos)
+      .em("GET", `/finance/sales-invoices/${IDF3.factura}`, { status: 200, corpo: { ...factura(), fixedAssetId: ACTIVO } })
+      .ligar();
+    await entrar(page, comActivos.email);
+    await page.goto(`/facturas/${IDF3.factura}`);
+    await expect(page.getByText("Venda de um bem do activo.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver o activo" })).toHaveAttribute("href", `/activos/${ACTIVO}`);
+    await expect(page.getByRole("button", { name: "Registar recebimento" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Nota de crédito" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Anular" }).click();
+    await expect(page.getByRole("dialog").getByText("O bem volta ao activo (deixa de estar abatido).", { exact: false })).toBeVisible();
   });
 
   test("recibo por banco: a conta onde entrou, da moeda da factura; numerário fica para depositar", async ({ page, api }) => {

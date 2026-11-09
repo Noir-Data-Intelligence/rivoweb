@@ -66,7 +66,13 @@ export function CamposFornecedor({ form, comNif }: { form: ReturnType<typeof use
           key={c}
           rotulo={ROTULOS[c]}
           erro={form.formState.errors[c]?.message}
-          ajuda={c === "iban" ? "Para onde se paga. Só quem qualifica fornecedores o altera." : undefined}
+          ajuda={
+            c === "iban"
+              ? "Para onde se paga. Só quem qualifica fornecedores o altera."
+              : c === "country"
+                ? "Código de duas letras (AO, PT…). Decide as contas da contabilidade: fora de Angola, as compras lançam no fornecedor do mercado estrangeiro. A moeda não conta."
+                : undefined
+          }
           className={c === "addressDetail" || c === "iban" ? "sm:col-span-2" : undefined}
         >
           {({ id, descricao, invalido }) => (

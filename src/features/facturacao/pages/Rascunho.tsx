@@ -474,6 +474,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
 export default function RascunhoPagina() {
   const { draftId } = useParams();
   const rascunho = useRascunho(draftId ?? null);
+  const podeActivos = useUtilizador().pode("finance.assets.read");
   const voltar = (
     <Button asChild variante="ghost" tamanho="sm" className="-ml-2 mb-2">
       <Link to="/facturas?vista=rascunhos">
@@ -507,6 +508,7 @@ export default function RascunhoPagina() {
     <>
       {voltar}
       <PageHeader titulo={draftId ? "Rascunho de factura" : "Nova factura"} descricao="Sem número nem efeito fiscal até ser emitida." />
+      {podeActivos ? <p className="mb-4 text-sm text-muted-foreground">Para vender um bem do activo, use «Vender pela factura» na ficha do activo: a factura abate-o.</p> : null}
       <Editor rascunho={rascunho.data} />
     </>
   );

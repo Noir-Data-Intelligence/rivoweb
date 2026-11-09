@@ -5,7 +5,9 @@
  * - lançar o histórico: os documentos emitidos antes das regras, cada um na
  *   sua data e ao câmbio desse dia. Primeiro simula-se; repetir não duplica;
  * - actualização cambial dos depósitos em moeda estrangeira no fim do mês
- *   (ADR-103): a 43.2 ao câmbio do último dia, contra 66.2.2 ou 76.2.2.
+ *   (ADR-103): a 43.2 ao câmbio do último dia, contra 66.2.2 ou 76.2.2;
+ *   e das facturas de venda e de compra em aberto (ADR-105), estornada no dia 1
+ *   do mês seguinte.
  */
 import { useState } from "react";
 import { Link } from "react-router";
@@ -112,6 +114,9 @@ export function FechoExercicio({ ano }: { ano: number }) {
 }
 
 type ContaActualizada = ActualizacaoView["accounts"][number];
+type FacturaActualizada = ActualizacaoView["documents"][number];
+
+const rotuloResultado = (d: ReturnType<typeof dinheiro>, onde: string) => (d.lt(0) ? `Perda ${onde} (76.2.2)` : `Ganho ${onde} (66.2.2)`);
 
 /** Simular e lançar a actualização cambial de um mês (Dezembro por omissão: antes de apurar o ano). */
 export function ActualizacaoCambial({ ano }: { ano: number }) {
@@ -131,12 +136,34 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
     { id: "cambio", cabecalho: "Câmbio", alinhar: "direita", esconderAte: "sm", celula: (c) => `${formatarNumeroDecimal(String(c.rate), 6)} (${formatarData(c.rateOn)})` },
     { id: "kz", cabecalho: "Em kwanzas", alinhar: "direita", celula: (c) => kz(c.kwanzas) },
   ];
+  const colunasFacturas: Coluna<FacturaActualizada>[] = [
+    {
+      id: "factura",
+      cabecalho: "Factura",
+      celula: (f) => (
+        <span className="flex flex-col">
+          <Link to={f.kind === "Payable" ? `/facturas-compra/${f.documentId}` : `/facturas/${f.documentId}`} className="font-medium text-primary underline-offset-4 hover:underline">
+            {f.number}
+          </Link>
+          <span className="text-xs text-muted-foreground">{f.kind === "Payable" ? "Compra" : "Venda"}</span>
+        </span>
+      ),
+    },
+    { id: "parte", cabecalho: "Cliente ou fornecedor", celula: (f) => f.party },
+    { id: "aberto", cabecalho: "Em aberto", alinhar: "direita", celula: (f) => formatarMoeda(dinheiro(f.open), f.currency) },
+    { id: "cambio", cabecalho: "Câmbio", alinhar: "direita", esconderAte: "md", celula: (f) => `${formatarNumeroDecimal(String(f.rate), 6)} (${formatarData(f.rateOn)})` },
+    { id: "conta", cabecalho: "Conta", esconderAte: "md", celula: (f) => f.accountCode },
+    { id: "registado", cabecalho: "Como lançou", alinhar: "direita", esconderAte: "sm", celula: (f) => kz(f.registered) },
+    { id: "actualizado", cabecalho: "Ao câmbio", alinhar: "direita", celula: (f) => kz(f.revalued) },
+    { id: "diferenca", cabecalho: "Diferença", alinhar: "direita", celula: (f) => kz(f.difference) },
+  ];
   const diferenca = r ? dinheiro(r.difference) : null;
+  const diferencaDividas = r ? dinheiro(r.debtsDifference) : null;
   return (
     <Card className="mt-6">
       <CardTitle>Actualização cambial</CardTitle>
       <p className="mt-1 text-sm text-muted-foreground">
-        O dinheiro nas contas em moeda estrangeira (43.2) entra ao câmbio de cada dia; no fim do mês vale ao câmbio desse dia. O ganho vai para 66.2.2 e a perda para 76.2.2. No fecho do ano, actualize Dezembro antes de apurar os resultados.
+        O dinheiro nas contas em moeda estrangeira (43.2) e as facturas de venda e de compra em moeda estrangeira por receber ou por pagar entram ao câmbio de cada dia; no fim do mês valem ao câmbio desse dia. O ganho vai para 66.2.2 e a perda para 76.2.2. A actualização dos clientes e fornecedores estorna-se no dia 1 do mês seguinte. No fecho do ano, actualize Dezembro antes de apurar os resultados.
       </p>
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <Field rotulo="Mês" className="w-48">
@@ -160,16 +187,42 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
         </div>
       </div>
       {actualizar.error && !confirmar ? <ErrorPanel erro={actualizar.error} className="mt-3" /> : null}
-      {r && diferenca ? (
+      {r && diferenca && diferencaDividas ? (
         <section aria-label="Resultado da actualização cambial" className="mt-4 flex flex-col gap-3">
           <Alert
             tom={r.outcome === "Revalued" ? "sucesso" : "info"}
-            titulo={r.outcome === "Preview" ? `Simulação a ${formatarData(r.on)}: nada foi gravado.` : r.outcome === "Revalued" ? `Actualização de ${nomeMes(Number(r.month))} de ${String(r.fiscalYear)} lançada.` : "Nada a fazer: a 43.2 já vale o câmbio do fim do mês."}
+            titulo={
+              r.outcome === "Preview"
+                ? `Simulação a ${formatarData(r.on)}: nada foi gravado.`
+                : r.outcome === "Revalued"
+                  ? `Actualização de ${nomeMes(Number(r.month))} de ${String(r.fiscalYear)} lançada.`
+                  : "Nada a fazer: os depósitos, os clientes e os fornecedores já valem o câmbio do fim do mês."
+            }
           >
-            {r.entryId ? (
-              <Link to={`/lancamentos/${r.entryId}`} className="text-primary underline-offset-4 hover:underline">
-                Ver o lançamento {r.transactionId ?? ""}
-              </Link>
+            {r.entryId || r.debtsEntryId || r.debtsReversalEntryId ? (
+              <ul className="flex flex-col gap-1">
+                {r.entryId ? (
+                  <li>
+                    <Link to={`/lancamentos/${r.entryId}`} className="text-primary underline-offset-4 hover:underline">
+                      Ver o lançamento dos depósitos {r.transactionId ?? ""}
+                    </Link>
+                  </li>
+                ) : null}
+                {r.debtsEntryId ? (
+                  <li>
+                    <Link to={`/lancamentos/${r.debtsEntryId}`} className="text-primary underline-offset-4 hover:underline">
+                      Ver o lançamento dos clientes e fornecedores
+                    </Link>
+                  </li>
+                ) : null}
+                {r.debtsReversalEntryId ? (
+                  <li>
+                    <Link to={`/lancamentos/${r.debtsReversalEntryId}`} className="text-primary underline-offset-4 hover:underline">
+                      Ver o estorno no dia 1 do mês seguinte
+                    </Link>
+                  </li>
+                ) : null}
+              </ul>
             ) : null}
           </Alert>
           {r.notes.length > 0 ? (
@@ -184,16 +237,18 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
           <GrelhaKpis>
             <Kpi rotulo="43.2 no razão" valor={kz(r.ledgerBalance)} />
             <Kpi rotulo="Ao câmbio do fim do mês" valor={kz(r.revaluedBalance)} />
-            <Kpi rotulo={diferenca.lt(0) ? "Perda (76.2.2)" : "Ganho (66.2.2)"} valor={kz(diferenca.abs().toString())} />
+            <Kpi rotulo={rotuloResultado(diferenca, "nos depósitos")} valor={kz(diferenca.abs().toString())} />
+            <Kpi rotulo={rotuloResultado(diferencaDividas, "nos clientes e fornecedores")} valor={kz(diferencaDividas.abs().toString())} detalhe="Estornado no dia 1 do mês seguinte." />
           </GrelhaKpis>
           <Tabela rotulo="Contas em moeda estrangeira" colunas={colunas} linhas={r.accounts} chave={(c) => c.accountId} vazio="Nenhuma conta em moeda estrangeira com saldo." />
+          <Tabela rotulo="Facturas em moeda estrangeira em aberto" colunas={colunasFacturas} linhas={r.documents} chave={(f) => f.documentId} vazio="Nenhuma factura de venda ou de compra em moeda estrangeira em aberto." />
         </section>
       ) : null}
       <Confirmar
         aberto={confirmar}
         aoMudar={setConfirmar}
         titulo={`Lançar a actualização cambial de ${nomeMes(mes)} de ${ano}`}
-        descricao="Faz um lançamento no razão no último dia do mês. Não se apaga: só se estorna."
+        descricao="Lança no razão no último dia do mês os depósitos e, à parte, os clientes e fornecedores, com o estorno no dia 1 do mês seguinte. Não se apaga: só se estorna."
         rotuloConfirmar="Lançar"
         aCarregar={actualizar.isPending}
         erro={actualizar.error ? <ErrorPanel erro={actualizar.error} /> : undefined}

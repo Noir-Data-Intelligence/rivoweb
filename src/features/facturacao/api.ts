@@ -149,6 +149,22 @@ export function useEmitirRascunho() {
   });
 }
 
+/**
+ * Factura que vende um bem do activo (ADR-107): FT ou FR com uma linha, na
+ * moeda do activo. O bem fica abatido na data da factura; a dívida vai para a
+ * 37.2 e o resultado para a 68.3 ou 78.3. Não se apaga: anular repõe o bem.
+ */
+export function useVenderActivo() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["IssueInvoiceRequest"]) => ler(api.POST("/finance/sales-invoices", { body: b })),
+    onSuccess: () => {
+      invalidarDocumentos(qc);
+      void qc.invalidateQueries({ queryKey: ["finance"] });
+    },
+  });
+}
+
 // --- Facturas
 
 export function useFacturas(p: Pag & { customerId: string | null; from: string | null; to: string | null }, activo = true) {

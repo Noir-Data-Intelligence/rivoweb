@@ -148,3 +148,45 @@ test("F9: activo amortizado, outro corrigido e abatido; manutenção, custódia 
   // Arrumar: o activo A sai de uso para as próximas corridas.
   await ad("POST", `/finance/assets/${idA}/disposal`, { on: null, value: null, reason: `${marca} fim do teste` });
 });
+
+test("F9: vender um activo pela factura (ADR-107) abate-o; anular a factura repõe-no", async ({ page, request }) => {
+  test.setTimeout(180_000);
+  await soLocal(page);
+  const ad = await sessaoApi(request, process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "", process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "");
+  const clientes = await ad<{ customerId: string }[]>("GET", "/commercial/customers?page=1&pageSize=1");
+  const cliente = clientes.corpo[0]?.customerId;
+  expect(cliente, "a base local tem um cliente").toBeTruthy();
+  await entrar(page, process.env.RIVO_LOCAL_ADMIN_EMAIL ?? "", process.env.RIVO_LOCAL_ADMIN_PASSWORD ?? "");
+  const nome = `${marca} Impressora`;
+  await page.goto("/activos");
+  await page.getByRole("button", { name: "Registar activo" }).click();
+  await dialogo(page).getByLabel("Nome").fill(nome);
+  await dialogo(page).getByLabel("Código (opcional)").fill(`T${sufixo}V`);
+  await dialogo(page).getByLabel("Adquirido a").fill("2020-01-10");
+  await dialogo(page).getByLabel("Custo de aquisição").fill("360 000");
+  await dialogo(page).getByLabel("Vida útil (meses)").fill("36");
+  await dialogo(page).getByLabel("Conta do PGC (opcional)").selectOption("11.5");
+  await dialogo(page).getByRole("button", { name: "Registar" }).click();
+  await expect(page.getByRole("heading", { name: nome, level: 1 })).toBeVisible();
+  const id = page.url().split("/").pop() ?? "";
+
+  await page.getByRole("button", { name: "Vender pela factura" }).click();
+  await dialogo(page).getByLabel("Cliente").selectOption(cliente ?? "");
+  await dialogo(page).getByLabel("Preço de venda sem IVA (AOA)").fill("400 000");
+  await dialogo(page).getByRole("button", { name: "Emitir factura" }).click();
+  await expect(page).toHaveURL(/\/facturas\/[0-9a-f-]{36}$/, { timeout: 30_000 });
+  await expect(page.getByText("Venda de um bem do activo.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Nota de crédito" })).toHaveCount(0);
+  const vendido = await ad<{ asset: { status: string; disposalValue: number | null; disposalReason: string | null } }>("GET", `/finance/assets/${id}`);
+  expect(vendido.corpo.asset.status).toBe("Disposed");
+
+  // Anular a factura repõe o bem no activo.
+  await page.getByRole("button", { name: "Anular" }).click();
+  await expect(dialogo(page).getByText("O bem volta ao activo", { exact: false })).toBeVisible();
+  await dialogo(page).getByLabel("Motivo").fill(`${marca} fim do teste`);
+  await dialogo(page).getByRole("button", { name: "Anular documento" }).click();
+  await expect(page.getByText("A factura foi anulada: o bem voltou ao activo.")).toBeVisible();
+  const reposto = await ad<{ asset: { status: string } }>("GET", `/finance/assets/${id}`);
+  expect(reposto.corpo.asset.status).toBe("Active");
+  await ad("POST", `/finance/assets/${id}/disposal`, { on: null, value: null, reason: `${marca} fim do teste` });
+});

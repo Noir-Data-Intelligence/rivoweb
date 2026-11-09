@@ -359,11 +359,16 @@ test.describe("contabilidade", () => {
     await page.goto("/regras-contabilisticas");
     await expect(page.getByText("Venda a crédito")).toBeVisible();
     await expect(page.getByText("Sem regra: não gera lançamento.").first()).toBeVisible();
+    // Uma regra por acontecimento e mercado (ADR-106): a de omissão serve os dois.
+    await expect(page.getByText("Mercado: Os dois")).toBeVisible();
+    await expect(page.getByText("Mercado: Estrangeiro")).toBeVisible();
     await semViolacoesAxe(page);
     await page.getByRole("button", { name: "Nova regra" }).click();
     const d = page.getByRole("dialog");
     await d.getByLabel("Acontecimento").selectOption("ReceiptRegistered");
     await d.getByLabel("Diário").selectOption("OD");
+    await expect(d.getByLabel("Mercado")).toHaveValue("");
+    await d.getByLabel("Mercado").selectOption("Foreign");
     await d.getByLabel("Descrição", { exact: true }).fill("Recebimento");
     await d.getByLabel("Conta · 1").fill("111");
     await d.getByLabel("Descrição · 1").fill("Caixa");
@@ -383,6 +388,7 @@ test.describe("contabilidade", () => {
         { accountCode: "111", side: "Debit", amount: "Gross", description: "Caixa" },
         { accountCode: "311", side: "Credit", amount: "Gross", description: "Cliente" },
       ],
+      market: "Foreign",
     });
     await page.getByRole("button", { name: "Desactivar a regra Venda a crédito" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Desactivar" }).click();

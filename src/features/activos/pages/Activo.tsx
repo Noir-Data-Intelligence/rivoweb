@@ -1,14 +1,16 @@
 /**
  * Um activo fixo: valores, plano de amortização (registado ou previsto),
- * corrigir (só antes da primeira amortização registada), abater; manutenção
+ * corrigir (só antes da primeira amortização registada), abater ou vender pela
+ * factura (ADR-107, só com a conta do PGC); manutenção
  * (agendar, concluir, cancelar), custódia (entregar, devolver) e seguros
  * (contratar, corrigir, cancelar).
  */
 import { ArrowLeft, Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useParams } from "react-router";
-import { moeda } from "@/features/facturacao";
+import { moeda, VenderActivo } from "@/features/facturacao";
 import { Can, useUtilizador } from "@/features/identity";
+import { REQUISITO_NOVA_FACTURA } from "@/app/requisitos";
 import { formatarData, hojeIso } from "@/lib/format/data";
 import { nomeMes } from "@/lib/format/periodo";
 import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
@@ -736,15 +738,23 @@ export default function Activo() {
         }
         accao={
           emUso ? (
-            <Can requer="finance.assets.write">
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
+              {a.ledgerAccountCode ? (
+                <Can requer={REQUISITO_NOVA_FACTURA}>
+                  <VenderActivo activo={a} />
+                </Can>
+              ) : null}
+              <Can requer="finance.assets.write">
                 <Abater a={a} aoAbater={setAbate} />
                 {!jaAmortizado ? <Corrigir key={`${a.name}-${String(a.acquisitionCost)}`} a={a} /> : null}
-              </div>
-            </Can>
+              </Can>
+            </div>
           ) : undefined
         }
       />
+      {emUso && !a.ledgerAccountCode && pode("finance.invoices.write") ? (
+        <p className="mb-4 text-sm text-muted-foreground">Para vender este bem pela factura, indique primeiro a conta do PGC (só antes da primeira amortização) ou abata-o com o valor de venda.</p>
+      ) : null}
       {abate?.journalEntryId ? (
         <Alert tom="sucesso" className="mb-4" titulo="O abate lançou no razão.">
           {pode("finance.ledger.read") ? (

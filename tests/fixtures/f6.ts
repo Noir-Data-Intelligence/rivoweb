@@ -227,10 +227,24 @@ export const regrasLancamento = (): S["PostingRuleView"][] => [
     journalCode: "OD",
     description: "Venda a crédito",
     isActive: true,
+    market: null,
     lines: [
       { lineNumber: 1, accountCode: "311", side: "Debit", amount: "Gross", description: "Cliente" },
       { lineNumber: 2, accountCode: "621", side: "Credit", amount: "Net", description: "Vendas" },
       { lineNumber: 3, accountCode: "3453", side: "Credit", amount: "Tax", description: "IVA liquidado" },
+    ],
+  },
+  {
+    ruleId: "00000000-0000-4000-8000-0000000006f2",
+    event: "SalesInvoiceIssued",
+    journalCode: "OD",
+    description: "Venda ao estrangeiro",
+    isActive: true,
+    market: "Foreign",
+    lines: [
+      { lineNumber: 1, accountCode: "31.1.2.2", side: "Debit", amount: "Gross", description: "Cliente estrangeiro" },
+      { lineNumber: 2, accountCode: "62.1.2", side: "Credit", amount: "Net", description: "Serviços ao estrangeiro" },
+      { lineNumber: 3, accountCode: "34.5.3", side: "Credit", amount: "Tax", description: "IVA liquidado" },
     ],
   },
 ];

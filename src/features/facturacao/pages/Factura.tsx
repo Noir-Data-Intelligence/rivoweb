@@ -348,13 +348,24 @@ export default function FacturaPagina() {
           {f.cancellationReason}
         </Alert>
       ) : null}
+      {f.fixedAssetId ? (
+        <Alert tom="info" className="mb-6" titulo="Venda de um bem do activo.">
+          {emVigor ? "O bem ficou abatido na data da factura; a dívida está na 37.2 e o resultado na 68.3 ou 78.3. Não leva nota de crédito nem de débito: corrige-se anulando, e anular repõe o bem no activo." : "A factura foi anulada: o bem voltou ao activo."}{" "}
+          {pode("finance.assets.read") ? (
+            <Link to={`/activos/${f.fixedAssetId}`} className="text-primary underline-offset-4 hover:underline">
+              Ver o activo
+            </Link>
+          ) : null}
+        </Alert>
+      ) : null}
       <div className="mb-6 flex flex-wrap gap-2">
         <DescarregarPdf tipo="factura" id={f.invoiceId} numero={f.number} />
         {emVigor ? <EnviarPorEmail tipo="factura" id={f.invoiceId} numero={f.number} /> : null}
-        {emVigor && pode("finance.invoices.cancel") && f.documentType !== "ND" ? <NovaNotaCredito f={f} /> : null}
+        {emVigor && pode("finance.invoices.cancel") && f.documentType !== "ND" && !f.fixedAssetId ? <NovaNotaCredito f={f} /> : null}
         {emVigor && pode("finance.invoices.cancel") ? (
           <Anular
             numero={f.number}
+            {...(f.fixedAssetId ? { aviso: "A factura fica anulada, com o motivo, e continua no registo. O bem volta ao activo (deixa de estar abatido). Não se pode desfazer." } : {})}
             aCarregar={anular.isPending}
             erro={anular.error}
             aoAnular={(razao, fechar) => anular.mutate({ invoiceId: f.invoiceId, reason: razao }, { onSuccess: () => { fechar(); void factura.refetch(); } })}

@@ -8,8 +8,8 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-11-06 |
-| Commit do backend | `4e200a7` (`main`, merge do PR #139: diferenças de câmbio realizadas; inclui o #134, banco em moeda estrangeira, o #135, B43 e B45, o #136, B44, o #137, despesas no razão e no banco, e o #138, actualização cambial) |
+| Data | 2026-11-09 |
+| Commit do backend | `07f5bbc` (`main`, merge do PR #144: a factura que vende um activo; inclui o #141, actualização cambial dos clientes e fornecedores, o #142, mercado nacional e estrangeiro, e o #143, a FR em moeda estrangeira ao cêntimo; antes, o #134 a #140) |
 | Operações | 520 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 

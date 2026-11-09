@@ -26,7 +26,12 @@
 > a versão do plano nasce inactiva) · actualizado a 2026-11-05 (as despesas
 > de colaborador lançam no razão, e o reembolso sai do banco; a actualização
 > cambial dos depósitos em moeda estrangeira) · actualizado a 2026-11-06 (as
-> diferenças de câmbio realizadas no recibo e no pagamento).
+> diferenças de câmbio realizadas no recibo e no pagamento; a actualização
+> cambial dos clientes e fornecedores em aberto; o mercado nacional e o
+> estrangeiro nas regras) · actualizado a 2026-11-09 (vender um activo pela
+> factura; a actualização cambial mostra as facturas em aberto; o mercado em
+> cada regra e o país do fornecedor na factura de compra; a nota da compra de
+> imobilizado).
 
 ---
 
@@ -174,7 +179,7 @@ AM = AssetManager.
 | **Arquivo de documentos** | | | | | | | | | | |
 | Ver todos os ficheiros carregados (por categoria e período) e descarregar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Ver quem carregou cada ficheiro | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos (junto ao país, o aviso de que é ele que decide as contas do mercado estrangeiro ³¹) | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Facturas** | | | | | | | | | | |
 | Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Nova factura: rascunhos FT, FR e ND, e emitir ²⁶ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
@@ -184,6 +189,7 @@ AM = AssetManager.
 | Emitir notas de crédito a partir da factura (cada linha leva a natureza da linha da factura: bens ou serviços) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Ver nas linhas das facturas e das notas de crédito se são bens ou serviços | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Registar recebimentos (recibos) a partir da factura, com o retido na fonte (por banco, a conta onde entrou ²³) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Ver na ficha da factura que vende um bem do activo o aviso (sem nota de crédito; anular repõe o bem) e, a quem lê os activos, a ligação ao activo ³² | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Notas de crédito e recibos:** ver listas, fichas e PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** ver | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | **Pró-formas:** criar, converter em factura e anular | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
@@ -193,12 +199,12 @@ AM = AssetManager.
 | **Facturação:** ver as taxas de IVA | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Fornecedores** | | | | | | | | | | |
 | Ver a lista (com inactivos) e a ficha | ✓ | ✓ | — | ✓ | ✓ | ✓ | — | — | — | — |
-| Registar, importar CSV, corrigir (IBAN verificado), desactivar e reactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Registar, importar CSV, corrigir (IBAN verificado), desactivar e reactivar; junto ao país, o aviso de que é ele que decide as contas do mercado estrangeiro ³¹ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Facturas de compra** | | | | | | | | | | |
-| Ver a lista (vencem até) e a ficha, com o confronto com a encomenda | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Ver a lista (vencem até) e a ficha, com o confronto com a encomenda, o país e o mercado do fornecedor ³¹ e, numa conta do imobilizado, onde ficam a dívida e o IVA ³³ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Registar com a conta da despesa do PGC (opcional; vazio lança em 75.2.39); ver a conta na ficha | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Sugestões de contas de custos ao escrever a conta da despesa (quem lê o plano de contas) | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Registar com a conta da despesa do PGC (opcional; vazio lança em 75.2.39) ou a do bem comprado (11 a 14, com o aviso de que a dívida fica na 37.1 e o IVA na 34.5.2.2 ³³); ver a conta na ficha | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Sugestões de contas de custos e do imobilizado ao escrever a conta da despesa (quem lê o plano de contas) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Anular | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Compras** | | | | | | | | | | |
 | Ver as requisições (quem pediu, departamento, linhas, total estimado, estado) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -221,6 +227,8 @@ AM = AssetManager.
 | Correr a amortização de um mês | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Conta do PGC do activo (só contas de movimento: 11.2.x, 11.3.x, 11.4 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Vender um activo pela factura («Vender pela factura» na ficha do activo, só com a conta do PGC): FT ou FR de bens com uma linha, na moeda do activo; abate-o e lança a dívida na 37.2 e o resultado na 68.3/78.3; anular a factura repõe o bem ³² | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -286,11 +294,12 @@ AM = AssetManager.
 | Ver lançamentos, diários, plano de contas, versões do plano, períodos e regras | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir diários e contas (também debaixo de uma conta de movimento sem lançamentos, que passa a agregadora); lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Fechar e reabrir períodos; versões do plano ²⁷; regras de lançamento e contabilísticas ²⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Fechar e reabrir períodos; versões do plano ²⁷; regras de lançamento (com o mercado ³¹) e contabilísticas ²⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Carregar o PGC (contas, diários, regras); apurar os resultados e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Lançar o histórico (documentos de antes das regras): simular e depois lançar, um mês ou o ano | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Actualizar ao câmbio do fim do mês os depósitos em moeda estrangeira: simular e depois lançar ²⁹ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Actualizar ao câmbio do fim do mês os depósitos, os clientes e os fornecedores em moeda estrangeira: simular (as contas e as facturas em aberto) e depois lançar ²⁹ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Ver no razão as diferenças de câmbio realizadas, que o recibo e o pagamento em moeda estrangeira lançam sozinhos ³⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Ver em cada regra de lançamento o mercado (nacional, estrangeiro ou os dois); os clientes, fornecedores e vendas do estrangeiro lançam nas contas do mercado estrangeiro ³¹ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Planeamento** | | | | | | | | | | |
 | Ver centros de custo, orçamentos (com os meses, quem aprovou) e previsões de custos, com os nomes | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Abrir centros de custo e registar previsões de custos | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -394,9 +403,15 @@ Recursos Humanos.»
 
 ²⁸ PR #137 (ADR-102): aprovar a despesa lança o custo na data dela; reembolsá-la a partir de uma conta tira-a do saldo e lança. O ecrã de reembolso pede a conta (opcional, na moeda da despesa) e a data; o editor de regras nomeia os dois acontecimentos novos.
 
-²⁹ PR #138 (ADR-103): as contas bancárias que não são em kwanzas, ao câmbio do último dia do mês, contra a 43.2; a diferença vai para 66.2.2 ou 76.2.2. Em Períodos, «Actualização cambial»: o mês (Dezembro por omissão), simular e depois lançar.
+²⁹ PR #138 (ADR-103): as contas bancárias que não são em kwanzas, ao câmbio do último dia do mês, contra a 43.2; a diferença vai para 66.2.2 ou 76.2.2. Em Períodos, «Actualização cambial»: o mês (Dezembro por omissão), simular e depois lançar. O PR #141 (ADR-105) junta as facturas de venda e de compra em dólares em aberto no fim do mês: `ACD-AAAA-MM` na 66.2.2 ou 76.2.2, estornado no dia 1 do mês seguinte (`EST-ACD-AAAA-MM`). A simulação traz a lista dessas facturas.
 
 ³⁰ PR #139 (ADR-104): a diferença entre o câmbio da factura e o do recibo ou do pagamento vai para 66.2.1 (ganho) ou 76.2.1 (perda), e o cliente ou o fornecedor fica a zero. Anular o recibo estorna-a, e também a retenção. O editor de regras nomeia os quatro acontecimentos novos (diferença favorável e desfavorável, no recebimento e no pagamento).
+
+³¹ PR #142 (ADR-106): o país do cliente ou do fornecedor (diferente de AO) leva o documento a 31.1.2.2, 32.1.2.2, 61.x.2 e 62.x.2; a moeda não conta. Cada regra de lançamento mostra o mercado, e a nova regra tem o campo «Mercado» (nacional, estrangeiro ou os dois; pode haver uma activa por acontecimento e mercado). A ficha da factura de compra mostra o país e o mercado do fornecedor, e os formulários do cliente e do fornecedor lembram, junto ao país, que é ele que decide as contas.
+
+³² PR #144 (ADR-107): a factura com `fixedAssetId` vende o bem. No front faz-se pela ficha do activo («Vender pela factura»), porque os rascunhos não levam o activo: cliente ou consumidor final, FT ou FR (meio e, por banco, a conta onde entrou), série, data (o bem fica abatido nela), descrição sugerida com o nome e o código, preço sem IVA e imposto; uma linha de bens, na moeda do activo. Só com a conta do PGC no activo; sem ela, a ficha diz porquê. A nova factura (rascunho) lembra este caminho. Na ficha da factura, a nota de crédito fica escondida e anular avisa que repõe o bem. Os recibos fazem-se factura a factura, por isso nunca juntam a do activo a outras.
+
+³³ PR #145 (ADR-108), em revisão a 2026-11-09: só razão. A factura de compra com `expenseAccountCode` na classe 1 (11, 12, 13 ou 14) lança a dívida na 37.1.1, 37.1.2 ou 37.1.3 e o IVA na 34.5.2.2. O pedido e a resposta não mudam. No front, a conta da despesa sugere também as contas do imobilizado, e o registo e a ficha avisam onde ficam a dívida e o IVA.
 
 ---
 
@@ -641,6 +656,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   sector, sítio, pessoa de contacto, tipo) e **importar de um CSV** separado por
   vírgulas ou ponto e vírgula, como o Excel grava (Nome, NIF, Morada, Cidade,
   Pais), com o resultado linha a linha.
+- O **país** decide as contas da contabilidade: fora de Angola, o cliente e
+  as vendas lançam nas do mercado estrangeiro (a moeda não conta); o
+  formulário lembra-o junto ao campo.
 - Ficha: **corrigir os dados** (o NIF não se corrige), **desactivar e
   reactivar**, **eliminar** (só sem história; com história oferece desactivar),
   **contactos** (criar, rever, remover; decide compras; contacto de facturação)
@@ -852,7 +870,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   preço, **natureza** — bens ou serviço —, imposto); notas internas. Totais
   previstos com a taxa em vigor. **Guardar rascunho**, **eliminar rascunho**,
   **emitir** com confirmação («fica registado e não se apaga») e escolha da
-  data; numa FR por banco, a **conta onde entrou** o dinheiro.
+  data; numa FR por banco, a **conta onde entrou** o dinheiro. Para vender
+  um bem do activo, a página aponta para «Vender pela factura» na ficha do
+  activo.
 - Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido em
   dinheiro, retido na fonte, em aberto, retenção por comprovar), **PDF**,
   **enviar ao cliente** por e-mail, **nota de crédito** (com as quantidades a
@@ -861,6 +881,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   retenção, quando chega o certificado; por banco, a **conta onde entrou**,
   da moeda da factura, e o dinheiro entra no saldo dela; em numerário ou
   cheque, fica para depositar) e **anular** com motivo.
+- A factura que **vende um bem do activo** diz que o bem ficou abatido, que a
+  dívida está na 37.2 e o resultado na 68.3 ou 78.3, com a ligação ao
+  activo; não tem nota de crédito, e anular avisa que o bem volta ao activo.
+  Anulada, diz que o bem voltou.
 - Um clique duplo nunca emite dois documentos.
 
 **Notas de crédito** e **Recibos**
@@ -951,6 +975,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **abater** (data depois da aquisição, valor de venda, motivo); depois de
   abater, a ficha diz se **lançou no razão** (com a ligação ao lançamento) ou
   porque não lançou.
+- **Vender pela factura** (só com a conta do PGC; sem ela, a ficha diz
+  porquê): cliente ou consumidor final, FT ou FR (meio de pagamento e, por
+  banco, a conta onde entrou), série, data da factura (o bem fica abatido
+  nela; não antes da aquisição), descrição sugerida com o nome e o código,
+  preço sem IVA e imposto. Emite uma factura de bens com uma linha, na moeda
+  do activo, e abre-a: a dívida vai para a 37.2 e o resultado para a 68.3
+  (ganho) ou 78.3 (perda). Anular a factura repõe o bem.
 - **Manutenção:** de cada activo e de todos (agendadas, concluídas,
   canceladas); **agendar** (tipo — preventiva, correctiva, inspecção —,
   descrição, data, prestador, custo estimado), **concluir** (data, custo,
@@ -1010,7 +1041,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Lista paginada (nome, NIF, cidade, contacto, estado), com ou sem inactivos.
 - **Registar** (nome, NIF, IBAN, e-mail, telefone, pessoa de contacto, morada,
   cidade, país) e **importar de um CSV** (Nome e NIF obrigatórios; IBAN, Email,
-  Telefone opcionais), com o resultado linha a linha.
+  Telefone opcionais), com o resultado linha a linha. O país decide as contas:
+  fora de Angola, as compras lançam no fornecedor do mercado estrangeiro; o
+  formulário lembra-o junto ao campo.
 - O IBAN é verificado (ISO 13616) antes de gravar, como no servidor: um IBAN
   errado paga a outra pessoa.
 - Ficha: **corrigir os dados** (o NIF não se corrige) e **desactivar e
@@ -1027,8 +1060,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   lidas; nada se grava até carregar em registar.
 - **Conta da despesa** (opcional): a conta de movimento do PGC onde a despesa
   lança (por exemplo 75.2.12 Electricidade), com sugestões das contas de
-  custos; vazio lança em 75.2.39 Outros serviços. A ficha mostra a conta.
-- Ficha: dados e totais, confronto com a encomenda quando a tem, os pedidos de
+  custos e do imobilizado; vazio lança em 75.2.39 Outros serviços. A ficha
+  mostra a conta. Com a conta de um bem (11 a 14), o registo e a ficha avisam
+  que é uma compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2.
+- Ficha: o país e o mercado do fornecedor ao lado do NIF; dados e totais,
+  confronto com a encomenda quando a tem, os pedidos de
   pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
   **anular** com motivo.
 
@@ -1163,13 +1199,18 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Por ano: meses 1–12 e regularizações 13–16, com estado, fecho e última
   reabertura; **abrir**, **fechar** (fica registado quem fechou) e **reabrir**
   com motivo.
-- **Actualização cambial** (pelo PGC): as contas em moeda estrangeira ao
-  câmbio do último dia do mês (Dezembro por omissão; antes de apurar o ano).
+- **Actualização cambial** (pelo PGC): as contas em moeda estrangeira e as
+  facturas de venda e de compra em moeda estrangeira em aberto, ao câmbio do
+  último dia do mês (Dezembro por omissão; antes de apurar o ano).
   **Simular** mostra, por conta, o saldo, o câmbio e a data dele, e o valor
-  em kwanzas; a 43.2 no razão, o que fica a valer e o ganho (66.2.2) ou a
-  perda (76.2.2), com os avisos do servidor. Depois, **lançar** com
-  confirmação (ligação ao lançamento); «nada a fazer» quando já vale o
-  câmbio do mês.
+  em kwanzas; por factura (com ligação), o cliente ou fornecedor, o em
+  aberto, o câmbio, a conta, como lançou, o valor ao câmbio e a diferença; a
+  43.2 no razão, o que fica a valer, o ganho (66.2.2) ou a perda (76.2.2) nos
+  depósitos e nos clientes e fornecedores, e os avisos do servidor. Depois,
+  **lançar** com confirmação (ligações ao lançamento dos depósitos, ao dos
+  clientes e fornecedores e ao estorno no dia 1 do mês seguinte); «nada a
+  fazer» quando já vale o câmbio do mês. Se o mês já foi lançado com outros
+  valores, a recusa do servidor diz o que fazer.
 - **Fecho do exercício** (pelo PGC): **apurar os resultados** do ano (a 31/12,
   período 13, diário APU; resultado líquido e lançamentos feitos; repetir não
   duplica) e **abrir o ano** com os saldos do anterior (a 01/01, diário ABE;
@@ -1189,8 +1230,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   favoráveis e desfavoráveis no recebimento e no pagamento), as linhas que
   gera, com as parcelas líquido, imposto, total, líquido dos bens e dos
   serviços;
+  e o **mercado** de cada uma (nacional, estrangeiro ou os dois);
   os acontecimentos sem regra dizem que não geram lançamento. **Definir** (só
-  regras equilibradas em bens, serviços e imposto) e **desactivar**.
+  regras equilibradas em bens, serviços e imposto; o mercado é opcional e,
+  sem ele, a regra serve os dois) e **desactivar**.
 - **Contabilísticas**: registo versionado com tipo de origem e fonte;
   **criar** e **desactivar**.
 
@@ -1533,13 +1576,17 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   emite nem cancela ordens e não regista recepções.
 
 **Activos fixos**
-- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador.
+- Tudo o que o Admin faz, incluindo entregar um activo a um colaborador,
+  excepto **vender pela factura** (não cria facturas).
+- Na ficha da factura que vende um activo, vê o aviso e a ligação ao activo.
 
 **Fornecedores**
 - Ver a lista e a ficha (não regista nem corrige).
 
 **Facturas de compra**
-- Ver a lista e a ficha; **anular**. Não regista facturas nem pede pagamentos.
+- Ver a lista e a ficha (com o país e o mercado do fornecedor e, numa conta
+  do imobilizado, onde ficam a dívida e o IVA); **anular**. Não regista
+  facturas nem pede pagamentos.
 
 **Pedidos de pagamento**
 - Ver e **executar** os aprovados (BR-3: não executa o que pediu nem o que
@@ -1629,7 +1676,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver, **registar** e **pedir pagamento**; **anexar** documentos ao pedido e
   **cancelá-lo**. Não anula facturas nem executa pagamentos.
 - Ao registar, escreve a **conta da despesa** do PGC (opcional), sem
-  sugestões: não lê o plano de contas.
+  sugestões: não lê o plano de contas. Com a conta de um bem (11 a 14), o
+  registo e a ficha avisam que a dívida fica na 37.1 e o IVA na 34.5.2.2.
+- A ficha mostra o país e o mercado do fornecedor.
 
 **Pedidos de pagamento**
 - Ver a lista e a ficha; **abre os anexos** pelo pedido.

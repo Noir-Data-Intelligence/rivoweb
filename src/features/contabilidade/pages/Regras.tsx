@@ -29,7 +29,7 @@ import {
   useRegrasContabilisticas,
   useRegrasLancamento,
 } from "../api";
-import { EVENTOS, NOME_LADO, PARCELAS, textoDe } from "../comum";
+import { EVENTOS, MERCADOS, NOME_LADO, PARCELAS, textoDe, textoMercado } from "../comum";
 import { regraEquilibra } from "../regras";
 
 type LinhaRegra = { chave: number; conta: string; lado: "Debit" | "Credit"; parcela: "Net" | "Tax" | "Gross" | "NetGoods" | "NetServices"; descricao: string };
@@ -131,6 +131,7 @@ function NovaRegraLancamento() {
   const diarios = useDiarios(false, aberto);
   const [evento, setEvento] = useState<string>(EVENTOS[0].valor);
   const [diario, setDiario] = useState("");
+  const [mercado, setMercado] = useState("");
   const [descricao, setDescricao] = useState("");
   const [linhas, setLinhas] = useState<LinhaRegra[]>([linhaVazia(1, "Debit", "Gross"), linhaVazia(2, "Credit", "Net"), linhaVazia(3, "Credit", "Tax")]);
   const [tentou, setTentou] = useState(false);
@@ -172,7 +173,7 @@ function NovaRegraLancamento() {
             e.preventDefault();
             setTentou(true);
             if (erros.diario || erros.descricao || erros.linhas || definir.isPending) return;
-            definir.mutate({ event: evento, journalCode: diario, description: normalizarTexto(descricao), lines: paraPedido(linhas) }, { onSuccess: () => mudar(false) });
+            definir.mutate({ event: evento, journalCode: diario, description: normalizarTexto(descricao), lines: paraPedido(linhas), ...(mercado ? { market: mercado } : {}) }, { onSuccess: () => mudar(false) });
           }}
         >
           <Field rotulo="Acontecimento">
@@ -193,6 +194,18 @@ function NovaRegraLancamento() {
                 {(diarios.data ?? []).map((x) => (
                   <option key={x.journalId} value={x.code}>
                     {x.code} · {x.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field rotulo="Mercado" ajuda="Pelo país do cliente ou do fornecedor: fora de Angola é estrangeiro. Pode haver uma regra activa por acontecimento e mercado." className="sm:col-span-2">
+            {({ id, descricao: d }) => (
+              <Select id={id} aria-describedby={d} value={mercado} onChange={(e) => setMercado(e.target.value)}>
+                <option value="">Os dois</option>
+                {MERCADOS.map((x) => (
+                  <option key={x.valor} value={x.valor}>
+                    {x.texto}
                   </option>
                 ))}
               </Select>
@@ -260,6 +273,7 @@ function RegrasLancamento() {
                       {r.description} <span className="text-muted-foreground">· diário {r.journalCode}</span>
                     </p>
                     <div className="flex items-center gap-2">
+                      <Badge tom={r.market === "Foreign" ? "info" : "neutro"}>Mercado: {textoMercado(r.market)}</Badge>
                       {r.isActive ? <Badge tom="sucesso">Activa</Badge> : <Badge>Inactiva</Badge>}
                       {fecha && r.isActive ? (
                         <Desactivar

@@ -42705,6 +42705,13 @@ export interface components {
             difference: number | string;
             accounts: components["schemas"]["RevaluedBankAccount"][];
             notes: string[];
+            documents: components["schemas"]["RevaluedDocumentView"][];
+            /** Format: double */
+            debtsDifference: number | string;
+            /** Format: uuid */
+            debtsEntryId: null | string;
+            /** Format: uuid */
+            debtsReversalEntryId: null | string;
         };
         ExecutePaymentRequest: {
             /** Format: uuid */
@@ -43619,6 +43626,8 @@ export interface components {
             referencedInvoiceId?: null | string;
             /** Format: uuid */
             bankAccountId?: null | string;
+            /** Format: uuid */
+            fixedAssetId?: null | string;
         };
         IssuePurchaseOrderRequest: {
             /** Format: uuid */
@@ -45324,6 +45333,7 @@ export interface components {
             journalCode: string;
             description: string;
             lines: null | components["schemas"]["PostingRuleLineRequest"][];
+            market?: null | string;
         };
         PostingRuleView: {
             /** Format: uuid */
@@ -45333,6 +45343,7 @@ export interface components {
             description: string;
             isActive: boolean;
             lines: components["schemas"]["PostingRuleLineView"][];
+            market?: null | string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -45642,6 +45653,8 @@ export interface components {
             cancelledAt: null | string;
             cancellationReason: null | string;
             expenseAccountCode?: null | string;
+            supplierCountry?: null | string;
+            market?: null | string;
         };
         PurchaseOrderCreatedResponse: {
             /** Format: uuid */
@@ -46069,6 +46082,27 @@ export interface components {
             /** Format: double */
             kwanzas: number | string;
         };
+        RevaluedDocumentView: {
+            kind: string;
+            /** Format: uuid */
+            documentId: string;
+            number: string;
+            party: string;
+            currency: string;
+            /** Format: double */
+            open: number | string;
+            /** Format: double */
+            rate: number | string;
+            /** Format: date */
+            rateOn: string;
+            accountCode: string;
+            /** Format: double */
+            registered: number | string;
+            /** Format: double */
+            revalued: number | string;
+            /** Format: double */
+            difference: number | string;
+        };
         RevenueForecastView: {
             currency: string;
             history: components["schemas"]["ForecastPoint"][];
@@ -46199,6 +46233,8 @@ export interface components {
             referencedInvoiceId: null | string;
             referencedInvoiceNumber: null | string;
             lines: components["schemas"]["SalesInvoiceLineView"][];
+            /** Format: uuid */
+            fixedAssetId?: null | string;
         };
         SalesMonth: {
             month: string;
