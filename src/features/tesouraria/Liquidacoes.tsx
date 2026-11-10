@@ -1,8 +1,9 @@
 /**
  * Pagar os salários, entregar ao Estado e depositar valores, pelo banco
- * (ADR-098), com a data-valor (ADR-100). O valor dos pagamentos não se pede:
- * é o que a folha lançada ou o apuramento do IVA deixaram a pagar. Cada
- * operação sai ou entra na conta (fica no extracto) e lança no razão.
+ * (ADR-098), com a data-valor (ADR-100). O valor dos pagamentos vem do que a
+ * folha lançada ou o apuramento do IVA deixaram a pagar; pode pagar-se só uma
+ * parte, e o resto fica para outra vez (ADR-110). Cada operação sai ou entra
+ * na conta (fica no extracto) e lança no razão.
  */
 import { Landmark, PiggyBank, Wallet } from "lucide-react";
 import { useId, useState } from "react";
@@ -11,7 +12,7 @@ import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
 import { hojeIso } from "@/lib/format/data";
 import { nomeMes } from "@/lib/format/periodo";
-import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
+import { dinheiro, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/text";
 import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
@@ -29,10 +30,15 @@ const IMPOSTOS = [
 ] as const;
 type Imposto = (typeof IMPOSTOS)[number]["valor"];
 
+/** O que ainda falta pagar do mês depois deste pagamento (ADR-110); null quando fica tudo pago. */
+const faltaDepois = (r: Liquidacao) => (r.outstanding != null && dinheiro(r.outstanding).gt(0) ? r.outstanding : null);
+
 function Resultado({ r, texto }: { r: Liquidacao; texto: string }) {
   const { pode } = useUtilizador();
+  const falta = faltaDepois(r);
   return (
     <Alert tom="sucesso" titulo={`${texto}: ${moeda(r.amount)}.`}>
+      {falta !== null ? <p>Faltam {moeda(falta)} deste mês: paga-se noutra vez.</p> : null}
       <p>Saldo que ficou na conta: {moeda(r.bankBalance)}.</p>
       {pode("finance.ledger.read") ? (
         <Link to={`/lancamentos/${r.journalEntryId}`} className="text-primary underline-offset-4 hover:underline">
@@ -60,6 +66,7 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
   const [mes, setMes] = useState(mesInicial ?? mesAnterior(hoje));
   const [conta, setConta] = useState("");
   const [data, setData] = useState(hoje);
+  const [parte, setParte] = useState("");
   const [tentou, setTentou] = useState(false);
   const pagarSalarios = usePagarSalarios();
   const entregar = useEntregarEstado();
@@ -69,10 +76,13 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
   const emKwanzas = (contas.data?.items ?? []).filter((c) => c.currency === "AOA");
   const idForm = useId();
   const okMes = /^\d{4}-\d{2}$/.test(mes) && mes <= hoje.slice(0, 7);
+  // Vazio paga o que falta; com valor, paga só essa parte (ADR-110).
+  const valorParte = parte.trim() === "" ? null : lerDinheiroDigitado(parte, 2);
   const erros = {
     mes: okMes ? undefined : "Escolha um mês até ao corrente.",
     conta: conta === "" ? "Escolha a conta de onde sai o dinheiro." : undefined,
     data: erroDataValor(data, hoje, okMes ? mes : null),
+    parte: parte.trim() !== "" && (!valorParte || valorParte.lte(0)) ? "Indique um valor maior que zero, até 2 casas, ou deixe vazio para pagar o que falta." : undefined,
   };
   const mudar = (a: boolean) => {
     setAberto(a);
@@ -80,10 +90,19 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
       m.reset();
       setTentou(false);
       setData(hojeIso());
+      setParte("");
     }
   };
   const quando = okMes ? `${nomeMes(Number(mes.slice(5, 7)))} de ${mes.slice(0, 4)}` : "";
   const r = m.data;
+  const emParte = r ? faltaDepois(r) !== null : false;
+  const textoResultado = salarios
+    ? emParte
+      ? `Parte dos salários de ${quando} paga`
+      : `Salários de ${quando} pagos`
+    : emParte
+      ? `Parte do ${imposto} de ${quando} entregue`
+      : `${imposto} de ${quando} entregue`;
   return (
     <>
       <Button variante="secondary" onClick={() => setAberto(true)}>
@@ -96,8 +115,8 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
         titulo={salarios ? "Pagar os salários de um mês" : "Entregar ao Estado"}
         descricao={
           salarios
-            ? "Paga o líquido que a folha aprovada lançou no razão (36.1.2). O valor não se escreve: vem da folha. Sai da conta e fica no extracto. Quem decidiu a folha em Aprovações não a paga (BR-3)."
-            : "Entrega o imposto de um mês que está no razão. O valor não se escreve: vem da folha lançada ou do apuramento do IVA. Sai da conta e fica no extracto."
+            ? "Paga o líquido que a folha aprovada lançou no razão (36.1.2): o que falta do mês, ou só uma parte. Sai da conta e fica no extracto. Quem decidiu a folha em Aprovações não a paga (BR-3)."
+            : "Entrega o imposto de um mês que está no razão, como a folha lançada ou o apuramento do IVA o deixaram: o que falta, ou só uma parte. Sai da conta e fica no extracto."
         }
         rotuloConfirmar={r ? "Fechar" : salarios ? "Pagar" : "Entregar"}
         aCarregar={m.isPending}
@@ -105,7 +124,7 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
         {...(r ? { aoConfirmar: () => mudar(false) } : { formulario: idForm })}
       >
         {r ? (
-          <Resultado r={r} texto={salarios ? `Salários de ${quando} pagos` : `${imposto} de ${quando} entregue`} />
+          <Resultado r={r} texto={textoResultado} />
         ) : (
           <form
             id={idForm}
@@ -114,8 +133,8 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
             onSubmit={(e) => {
               e.preventDefault();
               setTentou(true);
-              if (erros.mes || erros.conta || erros.data || m.isPending) return;
-              const b = { year: Number(mes.slice(0, 4)), month: Number(mes.slice(5, 7)), bankAccountId: conta, on: data };
+              if (erros.mes || erros.conta || erros.data || erros.parte || m.isPending) return;
+              const b = { year: Number(mes.slice(0, 4)), month: Number(mes.slice(5, 7)), bankAccountId: conta, on: data, ...(valorParte ? { amount: paraApi(valorParte) } : {}) };
               if (salarios) pagarSalarios.mutate(b);
               else entregar.mutate({ ...b, tax: imposto });
             }}
@@ -148,6 +167,9 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
                   ))}
                 </Select>
               )}
+            </Field>
+            <Field rotulo="Valor desta parte (opcional)" erro={tentou ? erros.parte : undefined} ajuda="Vazio paga o que falta do mês." className="sm:col-span-2">
+              {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" autoComplete="off" className="text-right tabular-nums" aria-describedby={descricao} invalido={invalido} value={parte} onChange={(e) => setParte(e.target.value)} />}
             </Field>
           </form>
         )}

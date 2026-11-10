@@ -11213,7 +11213,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Paga hoje, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada; pagar duas vezes dá 409. Quem paga é um colaborador que não decidiu a folha: senão, 403 (BR-3, ADR-109). */
+        /** Paga, da conta indicada, os salários líquidos de um mês: 36.1.2 contra 43.1 (ADR-098). A folha tem de estar lançada. Com `amount`, paga só essa parte, e o resto fica para outra vez (ADR-110); sem ele, paga o que falta. Passar do que falta, ou pagar o que já está pago, dá 409. Quem paga é um colaborador que não decidiu a folha: senão, 403 (BR-3, ADR-109). */
         post: {
             parameters: {
                 query?: never;
@@ -11296,7 +11296,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Entrega hoje ao Estado o IRT (34.3), o INSS (34.7) ou o IVA a pagar (34.5.6.1) de um mês, contra 43.1 (ADR-098). Entregar duas vezes dá 409. */
+        /** Entrega ao Estado o IRT (34.3), o INSS (34.7) ou o IVA a pagar (34.5.6.1) de um mês, contra 43.1 (ADR-098). Com `amount`, entrega só essa parte (ADR-110); sem ele, o que falta. Passar do que falta, ou entregar o que já está entregue, dá 409. */
         post: {
             parameters: {
                 query?: never;
@@ -41181,6 +41181,8 @@ export interface components {
             amount: number | string;
             /** Format: double */
             bankBalance: number | string;
+            /** Format: double */
+            outstanding?: null | number | string;
         };
         BenefitCreatedResponse: {
             /** Format: uuid */
@@ -44955,6 +44957,8 @@ export interface components {
             bankAccountId: string;
             /** Format: date */
             on?: null | string;
+            /** Format: double */
+            amount?: null | number | string;
         };
         PayrollRunDecisionResponse: {
             status: string;
@@ -46773,6 +46777,8 @@ export interface components {
             bankAccountId: string;
             /** Format: date */
             on?: null | string;
+            /** Format: double */
+            amount?: null | number | string;
         };
         TaxRateScheduleCreatedResponse: {
             /** Format: uuid */

@@ -8,8 +8,8 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-11-09 |
-| Commit do backend | `826b606` (`main`, merge do PR #146: quem aprova a folha não paga os salários; inclui o #145, a compra de imobilizado nas contas próprias, o #144, a factura que vende um activo, o #141, actualização cambial dos clientes e fornecedores, o #142, mercado nacional e estrangeiro, e o #143, a FR em moeda estrangeira ao cêntimo; antes, o #134 a #140) |
+| Data | 2026-11-10 |
+| Commit do backend | `a8dcedc` (`main`, merge do PR #148: o seed com o IVA em duas prestações; inclui o #147, os salários e as entregas ao Estado em partes, o #146, quem aprova a folha não paga os salários, o #145, a compra de imobilizado nas contas próprias, o #144, a factura que vende um activo, o #141, actualização cambial dos clientes e fornecedores, o #142, mercado nacional e estrangeiro, e o #143, a FR em moeda estrangeira ao cêntimo; antes, o #134 a #140) |
 | Operações | 520 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 

@@ -31,7 +31,8 @@
 > estrangeiro nas regras) · actualizado a 2026-11-09 (vender um activo pela
 > factura; a actualização cambial mostra as facturas em aberto; o mercado em
 > cada regra e o país do fornecedor na factura de compra; a nota da compra de
-> imobilizado; quem decidiu a folha não paga os salários).
+> imobilizado; quem decidiu a folha não paga os salários) · actualizado a
+> 2026-11-10 (os salários e as entregas ao Estado pagam-se em partes).
 
 ---
 
@@ -415,7 +416,7 @@ Recursos Humanos.»
 
 ³⁴ PR #146 (ADR-109), em produção desde 2026-11-09. Quem decidiu a folha em Aprovações não paga os salários, e uma conta sem colaborador (a SuperAdmin, por exemplo) também não: 403. As entregas ao Estado (IRT, INSS, IVA) não mudam. No front, a folha aprovada não mostra «Pagar salários» a quem a decidiu (lê as decisões do pedido de aprovação) nem a uma conta sem ficha de colaborador, e diz porquê; o diálogo lembra a regra, e o 403 mostra o motivo do servidor, sem repetir o pedido.
 
-³⁵ PR #147 (ADR-110), em revisão a 2026-11-09. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem.
+³⁵ PR #147 (ADR-110), em produção desde 2026-11-10. O seed com as prestações do IVA vem com o PR #148. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem. No front, «Pagar salários» e «Entregar ao Estado» têm o campo opcional «Valor desta parte» (vazio paga o que falta); depois de uma parte, o resultado diz «Parte … paga/entregue» e quanto falta do mês. O que já se pagou do mês não se mostra antes de pagar.
 
 ---
 
@@ -1101,10 +1102,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   verificado).
 - **Pagar salários** (o mês e a conta em kwanzas; o valor é o líquido da
   folha lançada) e **Entregar ao Estado** (IRT, INSS ou IVA de um mês; o valor
-  vem do razão), com a data do pagamento: mostra o valor pago, o saldo que
-  ficou e a ligação ao lançamento; as recusas (folha por lançar, IVA por
-  apurar, mês já pago, saldo insuficiente, período fechado, quem decidiu a
-  folha ou conta sem ficha de colaborador ³⁴) dizem porquê.
+  vem do razão), com a data do pagamento: o que falta do mês, ou só uma parte
+  («Valor desta parte», opcional ³⁵); mostra o valor pago, o que ainda falta
+  do mês, o saldo que ficou e a ligação ao lançamento; as recusas (folha por
+  lançar, IVA por apurar, mês já pago, parte maior do que falta, saldo
+  insuficiente, período fechado, quem decidiu a folha ou conta sem ficha de
+  colaborador ³⁴) dizem porquê.
 - Ficha: saldo, **depositar** e **levantar** (com a data-valor), **depositar
   valores** (numerário e cheques recebidos, nas contas em kwanzas: valor e
   referência do talão, data), **fechar** (só com saldo zero) e **reabrir**;

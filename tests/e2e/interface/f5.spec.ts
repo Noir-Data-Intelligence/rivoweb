@@ -474,7 +474,7 @@ test.describe("tesouraria", () => {
 
   test("pagar salários e entregar ao Estado pelo banco: só contas em kwanzas, data-valor no mês, valor e saldo; axe", async ({ page, api, violacoes }) => {
     await comTesouraria(api, meFinancasF5)
-      .em("POST", "/finance/treasury/payroll-payments", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f21", amount: 2150000.5, bankBalance: 2849999.5 } })
+      .em("POST", "/finance/treasury/payroll-payments", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f21", amount: 2150000.5, bankBalance: 2849999.5, outstanding: 0 } })
       .em("POST", "/finance/treasury/tax-payments", {
         status: 409,
         corpo: { status: 409, title: "Conflict", detail: "O IVA de Setembro de 2026 ainda não está apurado: apure-o em Impostos." },
@@ -496,6 +496,7 @@ test.describe("tesouraria", () => {
     await semViolacoesAxe(page);
     await d.getByRole("button", { name: "Pagar", exact: true }).click();
     await expect(d.getByText("Salários de Setembro de 2026 pagos: 2 150 000,50 Kz.")).toBeVisible();
+    await expect(d.getByText("deste mês: paga-se noutra vez", { exact: false })).toHaveCount(0);
     await expect(d.getByText("Saldo que ficou na conta: 2 849 999,50 Kz.")).toBeVisible();
     // A ligação ao lançamento só aparece a quem lê o razão (este perfil de teste não lê).
     await expect(d.getByRole("link", { name: "Ver o lançamento" })).toHaveCount(0);
@@ -510,6 +511,31 @@ test.describe("tesouraria", () => {
     await expect(d.getByText("O IVA de Setembro de 2026 ainda não está apurado: apure-o em Impostos.")).toBeVisible();
     expect(api.escritas("POST", "/finance/treasury/tax-payments")[0]?.corpo).toMatchObject({ tax: "IVA", year: 2026, month: 9, bankAccountId: IDF5.conta });
     expect(await violacoes()).toEqual([]);
+  });
+
+  test("entregar ao Estado em partes (ADR-110): o valor desta parte é opcional; a resposta diz o que falta", async ({ page, api }) => {
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", "/finance/treasury/tax-payments", { status: 200, corpo: { journalEntryId: "00000000-0000-4000-8000-000000000f23", amount: 400000, bankBalance: 4600000, outstanding: 600000 } })
+      .ligar();
+    await entrar(page, meFinancasF5.email);
+    await page.goto("/contas");
+    await page.getByRole("button", { name: "Entregar ao Estado" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Imposto").selectOption("IVA");
+    await d.getByLabel("Mês").fill("2026-09");
+    await d.getByLabel("Data").fill("2026-10-20");
+    await d.getByLabel("Conta").selectOption(IDF5.conta);
+    await d.getByLabel("Valor desta parte (opcional)").fill("0");
+    await d.getByRole("button", { name: "Entregar", exact: true }).click();
+    await expect(d.getByText("Indique um valor maior que zero, até 2 casas, ou deixe vazio para pagar o que falta.")).toBeVisible();
+    expect(api.escritas("POST", "/finance/treasury/tax-payments")).toHaveLength(0);
+    await d.getByLabel("Valor desta parte (opcional)").fill("400 000");
+    await d.getByRole("button", { name: "Entregar", exact: true }).click();
+    await expect(d.getByText("Parte do IVA de Setembro de 2026 entregue: 400 000,00 Kz.")).toBeVisible();
+    await expect(d.getByText("Faltam 600 000,00 Kz deste mês: paga-se noutra vez.")).toBeVisible();
+    expect(api.escritas("POST", "/finance/treasury/tax-payments").map((p) => p.corpo)).toEqual([
+      { year: 2026, month: 9, bankAccountId: IDF5.conta, on: "2026-10-20", tax: "IVA", amount: "400000.00" },
+    ]);
   });
 
   test("pagar salários: quem decidiu a folha não paga (BR-3); o 403 mostra o motivo e não se repete", async ({ page, api }) => {
