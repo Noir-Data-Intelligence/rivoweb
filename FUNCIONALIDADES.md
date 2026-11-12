@@ -187,7 +187,7 @@ AM = AssetManager.
 | Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | ✓ ⁴ | — | — | — |
 | Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Emitir notas de crédito a partir da factura (cada linha leva a natureza da linha da factura: bens ou serviços) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Emitir notas de crédito a partir da factura (cada linha leva a natureza da linha da factura: bens ou serviços; em moeda estrangeira, ao câmbio da factura ⁴¹) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Ver nas linhas das facturas e das notas de crédito se são bens ou serviços | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
 | Registar recebimentos (recibos) a partir da factura, com o retido na fonte (por banco, a conta onde entrou ²³) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Ver na ficha da factura que vende um bem do activo o aviso (sem nota de crédito; anular repõe o bem) e, a quem lê os activos, a ligação ao activo ³² | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
@@ -229,7 +229,7 @@ AM = AssetManager.
 | Conta do PGC do activo (só contas de movimento: 11.2.x, 11.3.x, 11.4 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Vender um activo pela factura («Vender pela factura» na ficha do activo, só com a conta do PGC): FT ou FR de bens com uma linha, na moeda do activo; abate-o e lança a dívida na 37.2 e o resultado na 68.3/78.3; anular a factura repõe o bem ³² | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -251,7 +251,7 @@ AM = AssetManager.
 | Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
 | Aprovar e rejeitar (com motivo) ⁹ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Marcar reembolsada (com a conta, sai dela e lança ²⁸) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Marcar reembolsada (com a conta, sai dela e lança ²⁸; noutra moeda, pela 43.2, com a diferença de câmbio ³⁸) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir o comprovativo (pela despesa) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Portal do colaborador** (o próprio, pela conta) ¹¹ | | | | | | | | | | |
@@ -275,6 +275,7 @@ AM = AssetManager.
 | Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, só um colaborador que não decidiu a folha ³⁴; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Adiantamentos de salário: pagar a um colaborador (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto) e ver os por descontar ³⁹ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -298,7 +299,7 @@ AM = AssetManager.
 | Fechar e reabrir períodos; versões do plano ²⁷; regras de lançamento (com o mercado ³¹) e contabilísticas ²⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Carregar o PGC (contas, diários, regras); apurar os resultados e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Lançar o histórico (documentos de antes das regras): simular e depois lançar, um mês ou o ano | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Actualizar ao câmbio do fim do mês os depósitos, os clientes e os fornecedores em moeda estrangeira: simular (as contas e as facturas em aberto) e depois lançar ²⁹ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Actualizar ao câmbio do fim do mês os depósitos, os clientes, os fornecedores e as despesas de colaborador por reembolsar em moeda estrangeira: simular (as contas, as facturas e as despesas em aberto) e depois lançar ²⁹ ⁴⁰ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Ver no razão as diferenças de câmbio realizadas, que o recibo e o pagamento em moeda estrangeira lançam sozinhos ³⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Ver em cada regra de lançamento o mercado (nacional, estrangeiro ou os dois); os clientes, fornecedores e vendas do estrangeiro lançam nas contas do mercado estrangeiro ³¹ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | **Planeamento** | | | | | | | | | | |
@@ -316,7 +317,7 @@ AM = AssetManager.
 | **Departamentos:** ver | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Departamentos:** criar e corrigir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Cargos:** ver, com ocupações | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
-| **Cargos:** criar e corrigir | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| **Cargos:** criar e corrigir (com a marca de órgão social ³⁶) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Ficha do colaborador** (separadores conforme as permissões) | | | | | | | | | | |
 | Dados pessoais e imigração: só a pedido, números mascarados com «Mostrar» | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Corrigir dados pessoais (IBAN validado) e imigração | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -416,7 +417,19 @@ Recursos Humanos.»
 
 ³⁴ PR #146 (ADR-109), em produção desde 2026-11-09. Quem decidiu a folha em Aprovações não paga os salários, e uma conta sem colaborador (a SuperAdmin, por exemplo) também não: 403. As entregas ao Estado (IRT, INSS, IVA) não mudam. No front, a folha aprovada não mostra «Pagar salários» a quem a decidiu (lê as decisões do pedido de aprovação) nem a uma conta sem ficha de colaborador, e diz porquê; o diálogo lembra a regra, e o 403 mostra o motivo do servidor, sem repetir o pedido.
 
-³⁵ PR #147 (ADR-110), em produção desde 2026-11-10. O seed com as prestações do IVA vem com o PR #148. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem. No front, «Pagar salários» e «Entregar ao Estado» têm o campo opcional «Valor desta parte» (vazio paga o que falta); depois de uma parte, o resultado diz «Parte … paga/entregue» e quanto falta do mês. O que já se pagou do mês não se mostra antes de pagar.
+³⁵ PR #147 e #148 (ADR-110), em produção desde 2026-11-10. No seed, o IVA de 06/2026 foi entregue em duas prestações, a 20/07 e a 25/07. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem. No front, «Pagar salários» e «Entregar ao Estado» têm o campo opcional «Valor desta parte» (vazio paga o que falta); depois de uma parte, o resultado diz «Parte … paga/entregue» e quanto falta do mês. O que já se pagou do mês não se mostra antes de pagar.
+
+³⁶ PR #149 (ADR-111), em produção desde 2026-11-10. O cargo diz se é de um órgão social (administração, gerência, conselho fiscal); por omissão não é, e a marca corrige-se. A folha lança quem o ocupa no fim do mês na 72.1, na 72.5.1 e na 36.1.1, e não na 72.2, na 72.5.2 e na 36.1.2; o pagamento dos salários salda as duas contas da 36.1. As outras contas dos órgãos sociais (72.3.1 a 72.8.1) não se usam, porque a folha não tem essas parcelas.
+
+³⁷ PR #150 (ADR-112), em produção desde 2026-11-11. A factura de compra aceita `nonDeductibleTax`, a parte do IVA que quem regista declara não dedutível (de zero ao IVA da factura). Lança com o líquido, na conta da aquisição: no imobilizado, no valor do bem, como o PGC obriga; nas outras compras, na conta da compra. Só o resto vai para a 34.5.2, e o resumo do IVA conta só esse como dedutível. Sem o campo no ecrã de registo, tudo continua dedutível.
+
+³⁸ PR #151 (ADR-113), em produção desde 2026-11-11. O reembolso de uma despesa noutra moeda lança 36.9 contra 43.2, e a diferença para o câmbio do dia da despesa lança à parte (`DCR-…`): 36.9 contra 66.2.1 se saíram menos kwanzas, 76.2.1 contra 36.9 se saíram mais. A 36.9 fica a zero. O editor de regras tem três acontecimentos novos para nomear.
+
+³⁹ PR #152 (ADR-114), em produção desde 2026-11-11. `POST` e `GET /finance/treasury/salary-advances`. O adiantamento sai da conta em kwanzas e lança 36.3 contra 43.1. A folha do mês indicado desconta-o num lançamento à parte (`ADT-SAL-AAAA-MM`: 36.1.2 ou 36.1.1 contra 36.3), até ao líquido de cada colaborador, e o pagamento dos salários paga só o resto. Quem regista não pode ser quem recebe; a folha desse mês já lançada recusa.
+
+⁴⁰ PR #153 (ADR-115), em produção desde 2026-11-11. Desde o PR #154, o seed deixa uma despesa em dólares por reembolsar a 31/12. As despesas em moeda estrangeira aprovadas e por reembolsar no último dia do mês entram no mesmo `ACD-AAAA-MM`, pela 36.9, contra a 66.2.2 ou a 76.2.2, e o estorno do dia 1 devolve-as ao registo. Na resposta, `documents[].kind = EmployeeExpense`.
+
+⁴¹ PR #155 (ADR-116), em produção desde 2026-11-12. A nota de crédito em moeda estrangeira lança a parte proporcional do que a factura corrigida lançou (cliente, devoluções e IVA), e não ao câmbio do dia dela. A nota do valor todo deixa o cliente a zero, sem diferença de câmbio. O SAF-T converte-a ao mesmo câmbio.
 
 ---
 
