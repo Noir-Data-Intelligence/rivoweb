@@ -38,7 +38,7 @@
 > despesas por reembolsar; o tipo dos artigos; o órgão social nos cargos; o
 > IVA não dedutível na compra; a conta do custo ao aprovar a despesa; os
 > adiantamentos de salário pedidos, aprovados e pagos; o BR-3 nas entregas do
-> IRT e do INSS).
+> IRT e do INSS; o Finance pede adiantamentos em nome de um colaborador).
 
 ---
 
@@ -284,7 +284,7 @@ AM = AssetManager.
 | Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, o IRT e o INSS, só um colaborador que não decidiu a folha ³⁴ ⁴⁵; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: ver os pedidos (com o estado) e os pagos (com os por descontar) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Adiantamentos de salário: pagar os aprovados (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto; quem decidiu não paga) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Adiantamentos de salário: pedir em nome de um colaborador (vai a aprovação ⁴⁸; o Finance não lê os colaboradores, B46) | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Adiantamentos de salário: pedir em nome de um colaborador (vai a aprovação ⁴⁸; escolhe-o da lista dos colaboradores activos da tesouraria, sem ler os RH ⁵¹) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -480,7 +480,7 @@ Recursos Humanos.»
 - **O pedido:** o adiantamento pede-se pelo portal (o próprio) ou pelas finanças (em nome dele), e vai a Aprovações como `finance.salary_advance`, com o colaborador como requisitante.
 - **A política:** é preciso uma, ou o pedido é recusado.
 - **O pagamento:** só os aprovados se pagam, e quem decidiu não paga. Uma conta sem colaborador também não.
-- **No front:** Tesouraria → «Adiantamentos de salário» (quem lê as contas a pagar): os pedidos com o estado e a ligação à aprovação; «Pedir em nome de…» a quem tem `finance.treasury.write` e lê os colaboradores (o Finance não os lê: B46); «Pagar» só nos aprovados, a quem executa pagamentos (conta em kwanzas, data, referência), e não a quem decidiu o pedido nem a uma conta sem ficha; os pagos, com «Só os por descontar». No portal, «Adiantamentos de salário»: pedir (valor, a folha que o desconta, motivo) e ver o estado; o pedido interno «Adiantamento salarial» aponta para lá.
+- **No front:** Tesouraria → «Adiantamentos de salário» (quem lê as contas a pagar): os pedidos com o estado e a ligação à aprovação; «Pedir em nome de…» a quem tem `finance.treasury.write`, com o colaborador escolhido da lista da tesouraria ⁵¹; «Pagar» só nos aprovados, a quem executa pagamentos (conta em kwanzas, data, referência), e não a quem decidiu o pedido nem a uma conta sem ficha; os pagos, com «Só os por descontar». No portal, «Adiantamentos de salário»: pedir (valor, a folha que o desconta, motivo) e ver o estado; o pedido interno «Adiantamento salarial» aponta para lá.
 
 ⁴⁹ PR #165 (ADR-124), em produção desde 2026-11-13.
 - **Indicar:** o contabilista indica a regularização anual do IVA pelo pró-rata definitivo. A favor do Estado vai a custo (75.3.1.2), a favor da empresa a proveito (63.5), e uma parte pode ir para o imobilizado, sempre contra a 34.5.4.3. O Rivo não calcula nada.
@@ -493,6 +493,10 @@ Recursos Humanos.»
 - **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
 - **Anular depois** estorna também as correcções.
 - **O botão ainda não existe:** no front, está por fazer (NOVIDADES, secção 42).
+
+⁵¹ PR #167 (B46, adenda ao ADR-123), em produção desde 2026-11-13.
+- **Escolher o colaborador:** quem pede em nome de alguém (`finance.treasury.write`, o perfil Finance) tem a lista dos colaboradores activos, só com o id e o nome, sem as permissões de RH.
+- **No front:** «Pedir em nome de…» aparece a quem tem `finance.treasury.write` (o Finance incluído), e o selector «Colaborador» lê esta lista (nome; os inactivos não aparecem).
 
 ---
 
@@ -1740,8 +1744,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   nem deposita, levanta ou deposita valores.
 
 **Adiantamentos de salário**
-- Ver os pedidos e os pagos e **pagar** os aprovados, como o Admin. Não pede
-  em nome de um colaborador: não lê os colaboradores (B46).
+- Ver os pedidos e os pagos, **pedir em nome de…** um colaborador (escolhido
+  da lista da tesouraria, sem ler os RH ⁵¹) e **pagar** os aprovados, como o
+  Admin.
 
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
 - Tudo o que o Admin faz. Nas letras a receber escolhe o cliente da lista de

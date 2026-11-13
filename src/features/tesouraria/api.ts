@@ -353,6 +353,15 @@ export function useAdiantamentos(porDescontar: boolean) {
 }
 
 /** Em nome de um colaborador: vai a Aprovações com ele como requisitante. */
+/** Os colaboradores activos (id e nome) para «Pedir em nome de…»; a permissão é a do pedido, não a dos RH (PR #167). */
+export function useColaboradoresAdiantamento() {
+  return useQuery({
+    queryKey: ["finance", "salary-advance-applications", "lookups"] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/treasury/salary-advance-applications/lookups", { signal })),
+    staleTime: 5 * 60_000,
+  });
+}
+
 export function usePedirAdiantamento() {
   const qc = useQueryClient();
   return useEscrita({

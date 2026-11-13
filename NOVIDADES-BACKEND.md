@@ -47,6 +47,7 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 43 | O Finance escolhe em nome de quem pede o adiantamento de salário, sem ler os RH (B46); o seed volta a ser completo por omissão | #167 | **Em produção** desde 13/11; base recriada com o seed completo e verificada (a conta QA Finance recebe os 63 colaboradores activos na lista nova e continua com 403 em `/hr/employees`; 1453 facturas de venda, 319 de compra, 153 despesas, 25 viaturas, 4 sinistros todos dentro da vigência; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 
 **Antes de começar:** actualizar `openapi/v1.json` a partir do commit
 publicado (procedimento em `openapi/README.md`) e correr `npm run api:types`.
@@ -1314,6 +1315,30 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 43. Em nome de quem pedir o adiantamento (PR #167, B46)
+
+O Finance pede adiantamentos em nome de um colaborador
+(`finance.treasury.write`), mas não lia os colaboradores
+(`GET /hr/employees` dá-lhe 403). Agora tem a sua lista (adenda ao ADR-123).
+
+**API**
+- **`GET /finance/treasury/salary-advance-applications/lookups`**
+  (`finance.treasury.write`, a do pedido): `{ employees: [{ id, name }] }`, os
+  colaboradores activos. Só o id e o nome, como `/finance/assets/lookups`.
+
+**Front (por fazer)** — Tesouraria → «Adiantamentos de salário»:
+- **«Pedir em nome de…»** passa a aparecer a quem tem `finance.treasury.write`
+  (e não só a quem lê os colaboradores), e o selector lê esta lista.
+
+**Seed:** volta a correr a massa de dados toda por omissão (cerca de 30
+minutos em `syyt.tech`); `--minimo` dá o modo rápido de 05/11 a 13/11.
+
+**Como ver**
+- **Conta QA Finance, depois do deploy:** «Pedir em nome de…» lista os
+  colaboradores.
 
 ---
 

@@ -11404,6 +11404,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/treasury/salary-advance-applications/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colaboradores activos (id e nome) em nome de quem pedir um adiantamento, sem as permissões de RH (B46). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SalaryAdvanceLookups"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/treasury/salary-advances": {
         parameters: {
             query?: never;
@@ -16294,6 +16344,89 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/purchase-invoices/{purchaseInvoiceId}/non-deductible-tax-corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corrige o IVA não dedutível de uma factura de compra em vigor e lança a diferença: antes do apuramento do mês da factura, na data dela e na 34.5.2.x; depois, hoje, como regularização (34.5.4.1 ou 34.5.4.2). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    purchaseInvoiceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CorrectNonDeductibleTaxRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NonDeductibleTaxCorrectedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
                 };
                 /** @description Sem sessão válida. */
                 401: {
@@ -42663,6 +42796,11 @@ export interface components {
         CorrectEmployeeRequest: {
             fullName: string;
         };
+        CorrectNonDeductibleTaxRequest: {
+            /** Format: double */
+            nonDeductibleTax: number | string;
+            reason: null | string;
+        };
         CorrectPositionRequest: {
             name: string;
             /** Format: int32 */
@@ -45210,6 +45348,12 @@ export interface components {
             /** Format: double */
             rate: number | string;
         };
+        NonDeductibleTaxCorrectedResponse: {
+            purchaseInvoice: components["schemas"]["PurchaseInvoiceView"];
+            archivalNumber: null | string;
+            postedAs: null | string;
+            notes: string[];
+        };
         NotesRequest: {
             notes: null | string;
         };
@@ -46673,6 +46817,11 @@ export interface components {
              * @default 0
              */
             nonDeductibleTax: number | string;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            nonDeductibleTaxCorrections: number | string;
         };
         PurchaseOrderCreatedResponse: {
             /** Format: uuid */
@@ -47208,6 +47357,9 @@ export interface components {
             status: string;
             /** Format: uuid */
             advanceId: null | string;
+        };
+        SalaryAdvanceLookups: {
+            employees: components["schemas"]["LookupEntry"][];
         };
         SalaryAdvanceRequest: {
             /** Format: uuid */

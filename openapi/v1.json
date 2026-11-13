@@ -11069,6 +11069,37 @@
         ]
       }
     },
+    "/finance/treasury/salary-advance-applications/lookups": {
+      "get": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Colaboradores activos (id e nome) em nome de quem pedir um adiantamento, sem as permissões de RH (B46).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalaryAdvanceLookups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/treasury/salary-advances": {
       "post": {
         "tags": [
@@ -15887,6 +15918,88 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/purchase-invoices/{purchaseInvoiceId}/non-deductible-tax-corrections": {
+      "post": {
+        "tags": [
+          "PayablesEndpoints"
+        ],
+        "summary": "Corrige o IVA não dedutível de uma factura de compra em vigor e lança a diferença: antes do apuramento do mês da factura, na data dela e na 34.5.2.x; depois, hoje, como regularização (34.5.4.1 ou 34.5.4.2).",
+        "parameters": [
+          {
+            "name": "purchaseInvoiceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectNonDeductibleTaxRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NonDeductibleTaxCorrectedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -45911,6 +46024,29 @@
           }
         }
       },
+      "CorrectNonDeductibleTaxRequest": {
+        "required": [
+          "nonDeductibleTax",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "nonDeductibleTax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CorrectPositionRequest": {
         "required": [
           "name",
@@ -56261,6 +56397,38 @@
           }
         }
       },
+      "NonDeductibleTaxCorrectedResponse": {
+        "required": [
+          "purchaseInvoice",
+          "archivalNumber",
+          "postedAs",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "purchaseInvoice": {
+            "$ref": "#/components/schemas/PurchaseInvoiceView"
+          },
+          "archivalNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postedAs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "NotesRequest": {
         "required": [
           "notes"
@@ -62215,6 +62383,15 @@
             ],
             "format": "double",
             "default": 0
+          },
+          "nonDeductibleTaxCorrections": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 0
           }
         }
       },
@@ -64352,6 +64529,20 @@
               "string"
             ],
             "format": "uuid"
+          }
+        }
+      },
+      "SalaryAdvanceLookups": {
+        "required": [
+          "employees"
+        ],
+        "type": "object",
+        "properties": {
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LookupEntry"
+            }
           }
         }
       },

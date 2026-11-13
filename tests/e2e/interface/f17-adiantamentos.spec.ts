@@ -52,8 +52,12 @@ const pagos = (): S["SalaryAdvanceView"][] => [
   { advanceId: IDS.adiantamento, employeeId: ID.emp2, employeeName: "Carlos Teste", amount: 80000, paidOn: "2026-10-15", bankAccountId: IDF5.conta, reference: "TRF 991", payrollYear: 2026, payrollMonth: 10, settledAmount: 50000, outstanding: 30000, applicationId: IDS.pago },
 ];
 
-function comAdiantamentos(api: ApiSimulada, decidiuPor: string = ID.emp1): ApiSimulada {
-  return comF1(api, me)
+/** Como o Finance: pede e paga, mas não lê os colaboradores dos RH (B46). */
+const meSemRh: S["CurrentUserResponse"] = { ...me, permissions: me.permissions.filter((p) => !p.startsWith("hr.")) };
+
+function comAdiantamentos(api: ApiSimulada, decidiuPor: string = ID.emp1, quem: S["CurrentUserResponse"] = me): ApiSimulada {
+  return comF1(api, quem)
+    .em("GET", "/finance/treasury/salary-advance-applications/lookups", { status: 200, corpo: { employees: [{ id: ID.emp1, name: "Ana Teste" }, { id: ID.emp2, name: "Carlos Teste" }] } })
     .em("GET", "/finance/treasury/salary-advance-applications", { status: 200, corpo: pedidos() })
     .em("GET", "/finance/treasury/salary-advances", { status: 200, corpo: pagos() })
     .em("GET", `/approval/requests/${IDS.aprovacao}`, { status: 200, corpo: { ...aprovacaoPagamento("Approved", decidiuPor), requestId: IDS.aprovacao, processType: "finance.salary_advance" } })
@@ -122,8 +126,8 @@ test.describe("adiantamentos de salário", () => {
     await expect(tabela.getByRole("button", { name: "Pagar o adiantamento de Carlos Teste" })).toHaveCount(0);
   });
 
-  test("tesouraria: pedir em nome de um colaborador vai a Aprovações", async ({ page, api }) => {
-    await comAdiantamentos(api)
+  test("tesouraria: pedir em nome de um colaborador vai a Aprovações; a lista vem da tesouraria, sem ler os RH", async ({ page, api }) => {
+    await comAdiantamentos(api, ID.emp1, meSemRh)
       .em("POST", "/finance/treasury/salary-advance-applications", { status: 201, corpo: { applicationId: "00000000-0000-4000-8000-000000000a79" } })
       .ligar();
     await entrar(page);
@@ -133,6 +137,7 @@ test.describe("adiantamentos de salário", () => {
     await d.getByRole("button", { name: "Pedir", exact: true }).click();
     await expect(d.getByText("Escolha o colaborador.")).toBeVisible();
     await expect(d.getByText("Indique o valor, maior que zero, até 2 casas.")).toBeVisible();
+    await expect(d.getByLabel("Colaborador").getByRole("option")).toHaveText(["Escolha…", "Ana Teste", "Carlos Teste"]);
     await d.getByLabel("Colaborador").selectOption(ID.emp2);
     await d.getByLabel("Valor (Kz)").fill("45 000");
     await d.getByLabel("Desconta na folha de").fill("2099-01");

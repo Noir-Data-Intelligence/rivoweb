@@ -1,7 +1,7 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `8e9e904` (PR #141 a #165). **B24** resolvido a 2026-11-12 (configuração e PR #157). Em aberto: **B46** (o Finance não escolhe o colaborador do adiantamento).
+> Revisto contra `main` @ `2efb3d0` (PR #141 a #166). **B24** resolvido a 2026-11-12 (configuração e PR #157). **B46** resolvido no PR #167 (em produção desde 2026-11-13): `GET /finance/treasury/salary-advance-applications/lookups`. Nada em aberto.
 > **B43**, **B44** e **B45** estão resolvidos (PR #135 e #136) e o front já os
 > usa: «Bens / Serviço» em cada linha do rascunho e da pró-forma; a conta onde
 > entrou na emissão da FR do rascunho e na conversão da pró-forma; a versão do
@@ -664,6 +664,8 @@ moeda da conta igual à da factura). O front acrescenta então «Conta onde
 entrou» quando o meio é por banco.
 
 ## B46 — O Finance pede o adiantamento em nome de um colaborador, mas não lê os colaboradores
+
+> **Resolvido** no PR #167 (em produção desde 2026-11-13, adenda ao ADR-123; a conta QA Finance recebe os 63 colaboradores activos): `GET /finance/treasury/salary-advance-applications/lookups`, com `finance.treasury.write`, traz `{ employees: [{ id, name }] }`, os colaboradores activos. O perfil Finance não ganha `hr.employees.read`. Sem o n.º do colaborador: as outras escolhas fora dos RH também trazem só o id e o nome.
 
 **Facto:** `POST /finance/treasury/salary-advance-applications` (ADR-123) pede
 `finance.treasury.write`, que o perfil Finance tem, e precisa do `employeeId`.

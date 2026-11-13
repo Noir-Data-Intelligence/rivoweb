@@ -119,6 +119,7 @@ export const factura = (estado = "Normal"): S["PurchaseInvoiceView"] => ({
   supplierCountry: "AO",
   market: "Domestic",
   nonDeductibleTax: 0,
+  nonDeductibleTaxCorrections: 0,
 });
 
 export const pedidoPagamento = (estado = "Eligible", valor: number | string = 640000): S["PaymentRequestView"] => ({

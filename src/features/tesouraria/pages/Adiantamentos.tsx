@@ -13,7 +13,6 @@ import { usePedidoAprovacao } from "@/features/aprovacoes";
 import { useMeuPainel } from "@/features/dashboard";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { SelectColaborador } from "@/features/rh";
 import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/text";
@@ -26,8 +25,26 @@ import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { EstadoAdiantamento, errosAdiantamento, folhaDe, valorAdiantamento } from "../Adiantamento";
-import { useAdiantamentos, useContasAbertas, usePagarAdiantamento, usePedidosAdiantamento, usePedirAdiantamento, type Adiantamento, type PedidoAdiantamento } from "../api";
+import { useAdiantamentos, useColaboradoresAdiantamento, useContasAbertas, usePagarAdiantamento, usePedidosAdiantamento, usePedirAdiantamento, type Adiantamento, type PedidoAdiantamento } from "../api";
 import { erroDataValor } from "../regras";
+
+/** Os colaboradores activos, da lista da tesouraria: quem pede não precisa de ler os RH (PR #167). */
+function SelectColaborador({ valor, aoMudar, ...resto }: { valor: string; aoMudar: (id: string) => void; id: string; "aria-describedby"?: string | undefined; invalido?: boolean }) {
+  const lista = useColaboradoresAdiantamento();
+  return (
+    <>
+      <Select {...resto} value={valor} onChange={(e) => aoMudar(e.target.value)}>
+        <option value="">{lista.isPending ? "A carregar…" : "Escolha…"}</option>
+        {(lista.data?.employees ?? []).map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </Select>
+      {lista.error ? <ErrorPanel erro={lista.error} tentarDeNovo={() => void lista.refetch()} /> : null}
+    </>
+  );
+}
 
 /** Pedir em nome de um colaborador: o pedido vai a Aprovações como se fosse dele. */
 function PedirEmNome() {
@@ -235,7 +252,7 @@ export default function Adiantamentos() {
       <PageHeader
         titulo="Adiantamentos de salário"
         descricao="Uma parte do salário paga antes do fim do mês. Pede-se e aprova-se em Aprovações; aprovado, paga-se de uma conta em kwanzas, e a folha do mês desconta-o."
-        accao={pode("finance.treasury.write") && pode("hr.employees.read") ? <PedirEmNome /> : undefined}
+        accao={pode("finance.treasury.write") ? <PedirEmNome /> : undefined}
       />
       <Tabela
         rotulo="Pedidos de adiantamento"
