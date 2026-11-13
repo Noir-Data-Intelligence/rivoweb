@@ -37,6 +37,16 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 30 | Os adiantamentos de salário: a tesouraria paga-os (36.3 contra 43.1), a folha do mês desconta-os e o pagamento dos salários paga o resto | #152 | **Em produção** desde 11/11; base recriada e verificada (os seis adiantamentos de Fevereiro, Junho e Outubro lançados na 36.3 contra 43.1 e descontados pelos `ADT-SAL` das folhas, os `PAG-SAL` a pagar só o resto e a 36.3 a zero) |
 | 31 | A actualização cambial do fim do mês passa a levar as despesas de colaborador em moeda estrangeira por reembolsar (36.9) | #153 | **Em produção** desde 11/11, com o #154 (seed); base recriada e verificada (a despesa «Hotel em Joanesburgo», gasta a 23/12/2025 e reembolsada a 11/01/2026, entra no `ACD-2025-12` com 8,94 na 36.9 contra a 76.2.2; o `EST-ACD-2025-12` repõe-na a 01/01; o reembolso mede a diferença de 552,39 a partir da aprovação e a 36.9 dela fica a zero) |
 | 32 | A nota de crédito em moeda estrangeira lança ao câmbio da factura que corrige, e o cliente fica a zero | #155 | **Em produção** desde 12/11; base recriada e verificada (o seed não tem notas em dólares: Balanços equilibrados, 43.1 igual às contas em kwanzas, e o ACD-2025-12 e a despesa de Joanesburgo continuam a fechar a zero) |
+| 33 | Regularização de existências no fim do ano (inventário intermitente) e tipo de existência nos artigos | #156 | **Em produção** desde 12/11; base recriada e verificada (REX-2025: a 21.1 de 14 477 327,22 vai para a 71.1 e a 71.3, e a 22.1 e a 22.3 ficam com o stock do inventário a 31/12, 6 977 697,28; custo de 7 499 629,94 na DR de 2025; o ABE-2026 leva a 22) |
+| 34 | O SAF-T AO sai em produção: o NIF do produtor configurado no servidor, e o seed declara a empresa (fictícia, «Rivo Demonstração, Lda») (B24) | #157 | **Em produção** desde 12/11; base recriada e verificada (o SAF-T de 10/2026 sai com a empresa e os dois NIF no cabeçalho: 15 facturas, 3 documentos de conferência e 6 recibos) |
+| 35 | Estimativa do imposto industrial indicada pelo contabilista (D 87.1 / C 34.1, sem taxas), corrigida por ajuste; o apuramento avisa se faltar | #158 | **Em produção** desde 12/11; base recriada e verificada (2025 dá prejuízo de 172 052 221,28: o seed indicou zero, com a nota e quem indicou, sem lançamento IMP; o APU-2025 sem 87; 2026 ainda por indicar; 1999 dá 400; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 36 | Quem aprova a despesa de colaborador indica a conta da natureza (por exemplo a formação de um administrador na 72.7.1); as 72.3 a 72.8 separam órgãos sociais e pessoal pelo cargo | #159 | **Em produção** desde 13/11; base recriada e verificada (a formação do Administrador de 10/12/2025 na 72.7.1, 185 000, e a de um técnico de 29/09/2026 na 72.7.2, 48 000, ambas contra a 36.9 e reembolsadas pela 43.1; as outras 29 despesas aprovadas na 75.2.39; a regra activa com o custo pelo líquido; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 37 | Quem decidiu a folha também não entrega o IRT e o INSS dela, e uma conta sem colaborador também não (BR-3) | #160 | **Em produção** desde 13/11; base recriada e verificada (11 entregas de IRT e 11 de INSS, `PAG-IRT-…` e `PAG-INSS-…`, feitas pelo seed com a conta `admin`, que não decide a folha) |
+| 38 | O apuramento do ano lembra a actualização cambial de 31/12 se ainda deixaria diferenças (a actualização continua a pedido, sem cadência imposta) | #161 | **Em produção** desde 13/11; base recriada e verificada (o seed actualiza Dezembro antes de apurar, com `ACT-2025-12` e `ACD-2025-12`, por isso o apuramento de 2025 não tem diferenças a lembrar) |
+| 39 | Quebras e sobras da contagem física: o contabilista escolhe, em cada regularização, se ficam no custo (71) ou vão para a 78.4.1 / 68.4.1 | #162 | **Em produção** desde 13/11; base recriada e verificada (`REX-2025` com «Quebras da 22.3 (inventário físico)»: 201 631,27 na 78.4.1 contra a 71.3; a DR de 2025 mostra-os no resultado não operacional; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 
 **Antes de começar:** actualizar `openapi/v1.json` a partir do commit
 publicado (procedimento em `openapi/README.md`) e correr `npm run api:types`.
@@ -1228,6 +1238,450 @@ operação nova (ADR-116).
   emita uma nota sobre uma factura em USD de outro dia e abra o lançamento
   dela em Lançamentos: a descrição diz «ao câmbio de FT …», e o saldo do
   cliente dessa factura fica a zero quando a nota é do valor todo.
+
+---
+
+## 33. Regularização de existências e tipo de existência dos artigos (PR #156)
+
+O inventário passa a chegar ao razão no fim do ano, pelo inventário
+intermitente do PGC (ADR-117):
+- durante o ano, as compras de existências lançam na 21;
+- no fecho, a 71 recebe as existências iniciais e as compras;
+- as existências finais (o stock do inventário a 31/12) voltam à 22 e à 26.
+
+A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
+
+**API**
+- **`POST /finance/ledger/fiscal-years/{ano}/inventory-regularisation`**
+  (`finance.ledger.close`):
+  - **Pedido:** `{ closingStock?: [{ accountCode, amount }], dryRun? }`.
+  - **Lançamento:** a 31/12, no período 12, no diário DIV, com o n.º de
+    arquivo «REX-AAAA».
+  - **Resposta:**
+    - `outcome`: `Regularised`, `Preview` (com `dryRun`) ou `NothingToDo`;
+    - `entryId`;
+    - `purchases[]` (`accountCode`, `amount`): as subcontas da 21 que passam
+      para a 71;
+    - `stock[]`, uma linha por conta de existências: `stockAccountCode`,
+      `costAccountCode`, `opening` (o saldo antes), `proposed` (o que o
+      inventário dá a 31/12) e `closing` (o que fica);
+    - `costOfSales[]` (`accountCode`, `amount`): o custo do ano em cada conta
+      da 71;
+    - `notes[]`.
+  - **`closingStock`:** dá o valor final de uma conta (a contagem física), e
+    esse valor prevalece sobre o do inventário. Uma conta fora da 22 e da 26,
+    ou um valor negativo, dá 400.
+  - **Repetir** não duplica. Se o ano já estava apurado, ou o seguinte já
+    aberto, `notes` diz o que refazer.
+- **`POST /inventory/items`** aceita `kind`:
+  - `RawMaterials` (22.1), `SubsidiaryMaterials` (22.2), `SundryMaterials`
+    (22.3, a omissão), `Packaging` (22.4), `OtherMaterials` (22.5) ou `Goods`
+    (26);
+  - outro valor dá 400;
+  - `GET /inventory/items` e `GET /inventory/items/{id}` devolvem `kind`.
+- **`POST /inventory/items/{id}/kind`** `{ kind }`: muda o tipo (204). Não
+  mexe nos movimentos.
+- **Compras:** a factura de compra classificada na 21, 22 ou 26 deduz o IVA na
+  34.5.2.1 «Existências», e não na 34.5.2.3.
+
+**No front**
+- **Períodos → Fecho do exercício** (`src/features/contabilidade/Fecho.tsx`):
+  - novo cartão **«Regularização de existências»**, entre «Actualização
+    cambial» e «Fecho do exercício», com o mesmo padrão da actualização:
+    **Simular** (`dryRun: true`) e **Lançar**, com confirmação;
+  - **tabela** por conta de existências: conta, inicial, proposto pelo
+    inventário e final;
+  - o **final** é editável: se o utilizador o mudar, vai em `closingStock`;
+  - abaixo da tabela, as compras (21) e o custo (71);
+  - `notes` em aviso;
+  - **texto do cartão:** «No fim do ano, antes de apurar os resultados: as
+    compras (21) e as existências iniciais passam para o custo (71), e o stock
+    a 31/12 volta às existências (22 e 26).»
+  - no texto da actualização cambial, «No fecho do ano, actualize Dezembro e
+    regularize as existências antes de apurar os resultados».
+- **Artigos** (`src/features/inventario/pages/Artigos.tsx`):
+  - no formulário **Registar**, um campo **Tipo**: Matérias-primas, Matérias
+    subsidiárias, Materiais diversos (por omissão), Embalagens, Outros
+    materiais, Mercadorias;
+  - na lista, uma coluna **Tipo**.
+- **Artigo** (`Artigo.tsx`): mostrar o tipo e uma acção **Mudar o tipo**
+  (`POST /inventory/items/{id}/kind`), para quem tem `inventory.items.write`.
+- **Facturas de compra:** nada muda no formulário. Para uma compra de
+  existências, escolhe-se a 21.1 (matérias) ou a 21.2 (mercadorias) na conta
+  da natureza.
+- **Contas QA**, depois do reseed:
+  - a simulação de 2025 dá `NothingToDo`, porque o seed já regularizou;
+  - o lançamento «REX-2025» está em Lançamentos;
+  - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
+  - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 42. Corrigir o IVA não dedutível (PR #166)
+
+Até aqui, o IVA não dedutível declarado no registo da compra (secção do
+ADR-112) só se corrigia anulando a factura e registando-a de novo. Agora
+corrige-se na própria factura, com o motivo (ADR-125). O Rivo lança a
+diferença entre a conta da compra e o IVA, e a dívida ao fornecedor não muda:
+- **o IVA do mês da factura ainda não foi apurado:** lança na data da factura
+  e acerta o IVA dedutível (34.5.2), como se tivesse vindo certo;
+- **já foi apurado:** é uma regularização com a data de hoje, na 34.5.4.2
+  quando se deduz menos (a favor do Estado) ou na 34.5.4.1 quando se deduz
+  mais. Entra no apuramento deste mês.
+
+Anular a factura depois estorna também as correcções.
+
+**API**
+- **`POST /finance/purchase-invoices/{id}/non-deductible-tax-corrections`**
+  (`finance.payables.write`, a mesma do registo):
+  - pedido `{ nonDeductibleTax, reason }`, com o novo valor, de zero ao IVA da
+    factura, e o motivo, obrigatório;
+  - resposta 200 com `{ purchaseInvoice, archivalNumber, postedAs, notes }`.
+    `postedAs` é `Deduction` ou `Regularisation`, e o lançamento é «ND1-…»,
+    «ND2-…»;
+  - 400 sem motivo, com o mesmo valor ou fora do intervalo, com o motivo em
+    `errors.nonDeductibleTax`; 404; 409 se a factura estiver anulada.
+- **A factura** (`GET /finance/purchase-invoices/{id}` e a lista) traz
+  `nonDeductibleTaxCorrections`, o número de correcções.
+- **`notes`** avisa:
+  - o mês da factura já estava apurado, e a correcção foi uma regularização;
+  - o IVA deste mês já foi apurado, e é preciso voltar a apurá-lo;
+  - o ano já foi apurado, ou o seguinte já foi aberto;
+  - numa compra de imobilizado, a ficha do activo não muda.
+
+**Front (por fazer)** — no detalhe da factura de compra, para quem a regista:
+- **o botão «Corrigir IVA não dedutível»**, numa factura em vigor:
+  - o valor actual e o IVA da factura como máximo;
+  - o novo valor e o motivo;
+  - antes de confirmar, dizer se vai para o mês da factura ou para este
+    (o front sabe-o pelos apuramentos do IVA, `IVA-AAAA-MM`; ou mostra só o
+    `postedAs` da resposta);
+- **mostrar `notes`** depois de corrigir;
+- **o número de correcções** junto do IVA não dedutível, se for maior que
+  zero.
+
+**Como ver**
+- **Contas QA, depois do reseed:**
+  - uma compra de há dois meses, com metade do IVA não dedutível, tem o
+    «ND1-…» na data da factura, contra a 34.5.2;
+  - uma de há três meses tem o «ND1-…» com a data do seed, na 34.5.4.2.
+
+---
+
+## 41. O pró-rata do IVA (PR #165)
+
+No fim do ano, o contabilista calcula o pró-rata definitivo e indica a
+regularização do IVA deduzido (ADR-124). O Rivo lança-a e não calcula nada:
+- **a favor do Estado** (positivo): o IVA deduzido a mais passa a custo, na
+  75.3.1.2, contra a 34.5.4.3;
+- **a favor da empresa** (negativo): o IVA deduzido a menos passa a proveito,
+  na 63.5;
+- **zero:** «sem regularização».
+
+Uma parte pode ir para contas do imobilizado. O apuramento do IVA de
+Dezembro leva a 34.5.4.3. Corrigir é um ajuste, com o novo valor e o motivo,
+e nada se edita.
+
+**API**
+- **`GET /finance/ledger/fiscal-years/{ano}/vat-pro-rata`** devolve
+  `indicated`, `amount` e `records[]`. Cada registo traz `kind`, `amount`,
+  `difference`, `fixedAssets[]`, `costAccountCode`, `archivalNumber`,
+  `entryVoided`, `notes`, `recordedBy` e `recordedAt`.
+- **`POST …/vat-pro-rata`** (`finance.ledger.close`):
+  - pedido `{ amount, fixedAssets?: [{ accountCode, amount }], notes? }`;
+  - resposta 201 com `{ proRata, notes }`; 409 se já houver uma indicação;
+    400 se for inválido, com o motivo em `errors.proRata`.
+- **`POST …/vat-pro-rata/adjustments`**, com
+  `{ amount, fixedAssets?, reason }`. O `reason` é obrigatório.
+- **`notes`** avisa quando é preciso refazer alguma coisa: o IVA de Dezembro
+  já apurado, o ano já apurado, ou o seguinte já aberto.
+
+**Front (por fazer)** — em Períodos → Fecho do exercício, ao lado do cartão
+da estimativa do imposto (secção 35):
+- **o cartão «Pró-rata do IVA»:**
+  - o valor em vigor, a favor de quem;
+  - os registos, com quem e quando;
+  - «Indicar», com o valor, a escolha «a favor do Estado / da empresa», as
+    partes do imobilizado (opcional: a conta, com sugestões da 11, 12 e 14,
+    e o valor) e uma nota;
+  - «Corrigir», com o novo valor, as partes e o motivo.
+- **Mostrar `notes`**, sobretudo o de voltar a apurar o IVA de Dezembro.
+- **Ordem no fecho:**
+  1. pró-rata;
+  2. apuramento do IVA de Dezembro;
+  3. regularização de existências;
+  4. estimativa do imposto;
+  5. apuramento de resultados.
+
+**Como ver**
+- **Contas QA, depois do reseed:** 2025 tem a regularização indicada pelo
+  seed, a favor do Estado e com valor fictício. O `PRT-2025` tem a 75.3.1.2 a
+  débito contra a 34.5.4.3, e o `IVA-2025-12` leva-a.
+
+---
+
+## 40. O adiantamento de salário com aprovação própria (PR #163)
+
+Até aqui, a tesouraria registava e pagava o adiantamento de uma vez (secção
+dos adiantamentos, ADR-114). Agora há um pedido, que vai ao motor de
+aprovação, como o SGAP prevê (ADR-123):
+1. o colaborador pede pelo portal, ou as finanças pedem em nome dele;
+2. o pedido vai a Aprovações como «finance.salary_advance», com o colaborador
+   como requisitante;
+3. aprovado, a tesouraria paga-o. Quem o decidiu não o paga (BR-3).
+
+**É preciso uma política de aprovação** para `finance.salary_advance`
+(Configurações → Políticas de aprovação). Sem ela, o pedido dá 409 com o
+motivo. No seed, aprova o Director Financeiro.
+
+**API**
+- **Portal:**
+  - `POST /portal/me/salary-advance-applications`, com
+    `{ amount, payrollYear?, payrollMonth?, reason? }`, responde 201 com
+    `{ applicationId }`;
+  - `GET /portal/me/salary-advance-applications` devolve os pedidos do
+    próprio, com `status`: `PendingApproval`, `Approved` (por pagar),
+    `Refused` ou `Paid`.
+- **Finanças:**
+  - `POST /finance/treasury/salary-advance-applications` (`finance.treasury.write`),
+    com `{ employeeId, amount, payrollYear?, payrollMonth?, reason? }`;
+  - `GET /finance/treasury/salary-advance-applications?employeeId=` devolve
+    os pedidos, com `status`, `approvalRequestId` e `advanceId`.
+- **Pagar (muda):** `POST /finance/treasury/salary-advances` passa a receber
+  `{ applicationId, bankAccountId, on?, reference? }`, e já não recebe
+  `employeeId`, `amount` nem a folha, que vêm do pedido.
+  - **403:** conta sem colaborador, ou quem decidiu o pedido;
+  - **409:** pedido por aprovar, recusado ou já pago, ou o próprio a pagar-se.
+- `GET /finance/treasury/salary-advances` traz `applicationId`.
+
+**Front (por fazer)**
+- **Portal → Pedidos (ou um cartão «Adiantamento de salário»):**
+  - formulário com o valor, o mês da folha que o desconta (por omissão, o
+    corrente) e o motivo;
+  - lista dos pedidos com o estado.
+- **A categoria «Adiantamento» dos pedidos internos** pode encaminhar para
+  este formulário. Continua a existir, mas só como conversa com o RH.
+- **Tesouraria → Adiantamentos:**
+  - a lista de pedidos com o estado, e «Pedir em nome de…»;
+  - **Pagar** só nos `Approved`: a conta, o dia e a referência.
+  - Esconder ou desactivar «Pagar» a quem decidiu o pedido (ver as decisões
+    em Aprovações, como na folha) e a quem não tem ficha de colaborador.
+  - Mostrar o 403 e o 409 do servidor.
+- **O diálogo antigo de pagar o adiantamento** (colaborador, valor, folha)
+  deixa de funcionar.
+
+**Como ver**
+- **Contas QA, depois do reseed:**
+  - os adiantamentos de Fevereiro, Junho e Outubro têm pedido aprovado pelo
+    Director Financeiro e foram pagos pelo Director Geral;
+  - em Aprovações aparecem os processos `finance.salary_advance` decididos.
+
+---
+
+## 39. Quebras e sobras na regularização de existências (PR #162)
+
+Quando a contagem física de 31/12 difere do inventário, a diferença ficava
+sempre na 71, o custo das existências. Agora o contabilista escolhe em cada
+regularização (ADR-122):
+- **fica na 71**, por omissão, como até aqui;
+- **sai da 71:** as quebras para a 78.4.1 «Quebras» e as sobras para a
+  68.4.1 «Sobras».
+
+O PGC manda para a 78.4 as perdas do inventário físico «que não devam afectar
+o custo», e decidir isso é um juízo do contabilista.
+
+**API** (`POST /finance/ledger/fiscal-years/{ano}/inventory-regularisation`)
+- **Pedido:** ganha `countDifferencesToOtherResults` (opcional, `false` por
+  omissão). Só conta nas contas que vêm em `closingStock`.
+- **Resposta:** cada linha de `stock[]` passa a trazer:
+  - `countDifference`: a contagem menos o inventário. Negativo é quebra, e é
+    zero sem contagem;
+  - `differenceAccountCode`: `78.4.1`, `68.4.1`, ou `null` se a diferença
+    ficou na 71.
+- `costOfSales[]` já desconta as quebras e soma as sobras tiradas da 71.
+- **Repetir não duplica.** Repetir sem a escolha devolve-as à 71, e `notes`
+  avisa.
+
+**Front (por fazer, no ecrã da secção 33)**
+- **Quando há contagem:**
+  - uma caixa «A diferença da contagem não afecta o custo (quebras na
+    78.4.1, sobras na 68.4.1)», desligada por omissão;
+  - na pré-visualização (`dryRun`), mostrar por conta a diferença
+    (`countDifference`, a vermelho se for quebra) e para onde vai
+    (`differenceAccountCode`, ou «fica na 71»).
+- Mostrar `notes`.
+
+**Como ver**
+- **Contas QA, depois do reseed:**
+  - o `REX-2025` tem as linhas «Quebras da 22.x (inventário físico)», com a
+    78.4.1 a débito e a 71.x a crédito, por 2% do stock da conta com mais
+    stock;
+  - a DR de 2025 mostra a quebra nos outros custos e perdas.
+
+---
+
+## 38. O fecho do ano lembra a actualização cambial (PR #161)
+
+A actualização cambial continua a correr-se a pedido, em qualquer fim de mês,
+e o Rivo não obriga a uma cadência (ADR-121). Ao apurar o ano, o Rivo simula,
+sem gravar, a actualização de 31/12. Se ela ainda deixaria diferenças, avisa.
+
+**API**
+- **`POST /finance/ledger/fiscal-years/{ano}/closing`:** `notes` pode trazer,
+  além dos avisos do imposto (secção 35):
+  - «A actualização cambial de 31/12/AAAA não está lançada: deixaria X Kz na
+    43.2 e Y Kz nos clientes, fornecedores e despesas em moeda estrangeira.
+    Lance-a (…) e volte a apurar.»;
+  - «Não foi possível confirmar a actualização cambial de 31/12/AAAA: …»,
+    com o motivo (falta o câmbio, o período está fechado, o ano não foi
+    aberto).
+- **Não recusa:** o apuramento faz-se na mesma.
+
+**Front (por fazer)**
+- No cartão do apuramento (Períodos → Fecho do exercício), os `notes` já se
+  mostram desde a secção 35, por isso não há mais nada a fazer.
+- Opcional: junto ao aviso cambial, uma ligação para a actualização cambial
+  com o ano e o mês 12 já escolhidos.
+
+**Como ver**
+- **Contas QA:** o seed actualiza Dezembro antes de apurar, por isso o
+  apuramento de 2025 não traz este aviso.
+- **Numa base local:** registar uma despesa em dólares num ano antigo,
+  aprová-la sem a reembolsar e apurar esse ano. O aviso aparece.
+
+---
+
+## 37. A BR-3 nas entregas do IRT e do INSS (PR #160)
+
+Quem decidiu a folha em Aprovações já não podia pagar os salários dela
+(ADR-109). Agora também não entrega o IRT nem o INSS dessa folha (ADR-120).
+Também não os entrega uma conta sem ficha de colaborador, como a SuperAdmin.
+O IVA não muda.
+
+**API**
+- **`POST /finance/treasury/tax-payments`** com `tax` `IRT` ou `INSS` responde
+  como `payroll-payments`:
+  - 403 se a conta não tem colaborador ou se decidiu a folha, com o motivo em
+    `detail`;
+  - 409 se o lançamento da folha não guarda a decisão ou se a decisão não
+    está aprovada.
+
+**Front (por fazer)**
+- No diálogo **Entregar ao Estado**, com IRT ou INSS, aplicar a regra que
+  «Pagar salários» já aplica:
+  - esconder ou desactivar o botão a quem decidiu a folha do mês e a quem não
+    tem ficha de colaborador, e dizer porquê;
+  - mostrar o 403 do servidor sem repetir o pedido.
+- Com IVA, nada muda.
+
+**Como ver**
+- **Contas QA:** quem aprovou a folha em Aprovações recebe 403 ao entregar o
+  IRT ou o INSS. O Director Geral (`admin`) entrega-os.
+- No seed, os `PAG-IRT-…` e `PAG-INSS-…` passam a ser da conta `admin`.
+
+---
+
+## 36. A conta da natureza na aprovação da despesa (PR #159)
+
+Quem aprova uma despesa de colaborador pode dizer em que conta do PGC fica o
+custo (ADR-119). Sem conta, fica na 75.2.39 «Outros serviços», como até
+aqui. Serve sobretudo as outras despesas com o pessoal, que o PGC separa em
+«.1 Órgãos sociais» e «.2 Pessoal»: pensões (72.3), prémios para pensões
+(72.4), encargos (72.5), seguros de acidentes de trabalho (72.6), formação
+(72.7) e outras (72.8, onde também vão as ajudas de custo). Serve também
+para a 75.2.23 «Deslocações e estadas».
+
+**API**
+- **`POST /finance/expenses/{expenseId}/approval`** aceita
+  `{ notes?, expenseAccountCode? }`:
+  - a conta tem de ser de movimento, da classe 7;
+  - não pode ser a 71, a 73, uma de transferência (x.9), a 72.1 ou a 72.2.
+    As remunerações vão pela folha;
+  - nas 72.3 a 72.8, a `.1` é para quem ocupava um cargo de órgão social no
+    dia da despesa, e a `.2` para os outros;
+  - fora disto dá 400, com o motivo em `errors.pedido`, e a despesa continua
+    por decidir. Se a subconta estiver trocada, o motivo diz qual é a certa.
+- **`GET /finance/expenses/{expenseId}`** e a lista devolvem
+  `expenseAccountCode`, nulo se a despesa lançou na 75.2.39 ou ainda não foi
+  aprovada.
+- A rejeição não muda: não leva conta.
+
+**Front (por fazer)**
+- **Aprovar** (Despesas, `src/features/despesas`): juntar ao diálogo um campo
+  opcional «Conta do custo (PGC)», com as mesmas sugestões de contas da
+  factura de compra (quem lê o plano de contas).
+  - Vazio, o pedido vai como até aqui.
+  - Com um 400, mostrar `errors.pedido` junto ao campo e não fechar o
+    diálogo.
+- **Ficha da despesa:** mostrar a conta do custo quando houver.
+- **Ajuda ao lado do campo, opcional:**
+  - «Formação, seguros e outras despesas com o pessoal: 72.x.1 para órgãos
+    sociais, 72.x.2 para o pessoal.»
+  - «Alojamento e alimentação em deslocação: 75.2.23.»
+
+**Como ver**
+- **Contas QA**, depois do reseed: nas despesas há duas de formação já
+  reembolsadas.
+  - A do Administrador, em Dezembro de 2025, está na 72.7.1.
+  - A de um técnico, de há 45 dias, está na 72.7.2.
+  - Os lançamentos `DSP-…` mostram a conta contra a 36.9.
+
+---
+
+## 35. Estimativa do imposto industrial (PR #158)
+
+O contabilista indica a estimativa do imposto industrial do ano. O Rivo lança
+D 87.1 / C 34.1 a 31/12, antes do apuramento, e não tem taxas nem calcula nada
+(ADR-118). Há uma indicação por exercício. Corrigir é um ajuste, com o novo
+valor e o motivo, e nada se edita. «Sem imposto» indica-se com zero.
+
+**API**
+- **`GET /finance/ledger/fiscal-years/{ano}/income-tax-estimate`**
+  (`finance.ledger.read`):
+  - `indicated`;
+  - `amount`: o valor em vigor;
+  - `records[]`, cada um com `kind` (`Initial` ou `Adjustment`), `amount`,
+    `difference` (negativo é estorno), `archivalNumber`, `entryVoided`,
+    `notes`, `recordedBy` (o id da conta) e `recordedAt`.
+- **`POST …/income-tax-estimate`** (`finance.ledger.close`):
+  - pedido `{ amount, notes? }`, resposta 201 com `{ estimate, notes }`;
+  - lança «IMP-AAAA»;
+  - zero regista sem lançar;
+  - a segunda indicação dá 409.
+- **`POST …/income-tax-estimate/adjustments`** (`finance.ledger.close`):
+  - pedido `{ amount, reason }`: `amount` é o novo total, e `reason` é
+    obrigatório;
+  - lança só a diferença («IMP-AAAA-2»…);
+  - sem indicação prévia dá 409; igual ao valor em vigor, ou sem motivo, dá
+    400.
+- **`POST …/closing`:** a resposta ganha `notes[]`. Avisa, sem recusar, se falta
+  a estimativa ou se a 87.1 não bate com ela.
+
+**No front**
+- **Períodos → Fecho do exercício** (`src/features/contabilidade/Fecho.tsx`):
+  - novo cartão **«Imposto industrial»**, entre a regularização de
+    existências e o apuramento;
+  - **sem estimativa:** o aviso «Falta a estimativa do imposto industrial de
+    AAAA» e o botão **Indicar estimativa**. O formulário tem o valor em
+    kwanzas e uma nota opcional, e uma caixa «Sem imposto (zero)» que põe 0;
+  - **com estimativa:** o valor em vigor e uma tabela com os registos (data e
+    hora, quem, tipo, valor, diferença, lançamento com ligação a Lançamentos,
+    nota ou motivo);
+  - o botão **Corrigir** abre o formulário com o novo valor e o motivo
+    (obrigatório). Não há editar nem apagar;
+  - o `recordedBy` é um id de conta: mostrar o nome com a lista de
+    utilizadores que o ecrã de Auditoria já usa.
+- **Apurar os resultados** (o mesmo ecrã): mostrar os `notes` da resposta em
+  aviso, com uma ligação ao cartão do imposto.
+- O texto do cartão de fecho passa a ter a ordem: actualização cambial,
+  regularização de existências, imposto industrial, apuramento, abertura.
+- **Contas QA**, depois do reseed:
+  - 2025 tem a estimativa zero, «Prejuízo de … Kz: sem imposto industrial a
+    estimar», indicada pelo seed;
+  - o apuramento de 2025 não avisa.
+
+  Para testar o lançamento, numa base local: indicar um valor num ano sem
+  estimativa, corrigir para menos e ver o «IMP-AAAA-2» com D 34.1.
 
 ---
 

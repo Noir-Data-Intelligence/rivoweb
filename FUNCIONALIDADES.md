@@ -488,7 +488,7 @@ Recursos Humanos.»
 - **Apuramento:** o IVA de Dezembro leva-a.
 - **No front:** em Períodos, o cartão «Pró-rata do IVA», antes da regularização de existências: o valor em vigor e a favor de quem, os registos, «Indicar» (a favor do Estado ou da empresa, o valor sem sinal, as partes no imobilizado, opcionais, com sugestões das 11, 12 e 14, e uma nota) e «Corrigir» (com o motivo); os avisos do servidor à vista.
 
-⁵⁰ PR #166 (ADR-125), em revisão a 2026-11-13.
+⁵⁰ PR #166 (ADR-125), em produção desde 2026-11-13.
 - **Corrigir:** o IVA não dedutível de uma factura de compra corrige-se sem a anular, com o novo valor e o motivo. A dívida ao fornecedor não muda.
 - **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
 - **Anular depois** estorna também as correcções.
