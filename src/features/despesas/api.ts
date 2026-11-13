@@ -62,9 +62,10 @@ export function useRegistarDespesa() {
 export function useDecidirDespesa(id: string) {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: ({ aprovar, notas }: { aprovar: boolean; notas: string | null }) =>
+    // Quem aprova pode dizer a conta do custo (ADR-119); sem ela, fica na 75.2.39. A rejeição não leva conta.
+    mutationFn: ({ aprovar, notas, conta = null }: { aprovar: boolean; notas: string | null; conta?: string | null }) =>
       aprovar
-        ? enviar(api.POST("/finance/expenses/{expenseId}/approval", { params: { path: { expenseId: id } }, body: { notes: notas } }))
+        ? enviar(api.POST("/finance/expenses/{expenseId}/approval", { params: { path: { expenseId: id } }, body: { notes: notas, expenseAccountCode: conta } }))
         : enviar(api.POST("/finance/expenses/{expenseId}/rejection", { params: { path: { expenseId: id } }, body: { notes: notas } })),
     onSettled: () => qc.invalidateQueries({ queryKey: chaves.todas }),
   });

@@ -107,16 +107,16 @@ export function useCorrigirDepartamento() {
 export function useCriarCargo() {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: (dados: { name: string; hierarchyLevel: number; grantsApprovalAuthority: boolean }) => ler(api.POST("/hr/positions", { body: dados })),
+    mutationFn: (dados: { name: string; hierarchyLevel: number; grantsApprovalAuthority: boolean; governingBody: boolean }) => ler(api.POST("/hr/positions", { body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.cargos }),
   });
 }
 
-/** A autoridade de aprovação não se corrige: fixa-se ao criar o cargo. */
+/** A autoridade de aprovação não se corrige: fixa-se ao criar o cargo. A marca de órgão social corrige-se e vai sempre (ADR-111). */
 export function useCorrigirCargo() {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: ({ positionId, ...dados }: { positionId: string; name: string; hierarchyLevel: number }) =>
+    mutationFn: ({ positionId, ...dados }: { positionId: string; name: string; hierarchyLevel: number; governingBody: boolean }) =>
       enviar(api.PUT("/hr/positions/{positionId}", { params: { path: { positionId } }, body: dados })),
     onSuccess: () => qc.invalidateQueries({ queryKey: chaves.cargos }),
   });

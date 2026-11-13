@@ -10956,6 +10956,270 @@
         ]
       }
     },
+    "/finance/treasury/salary-advance-applications": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Pede um adiantamento de salário em nome de um colaborador (ADR-123): vai ao motor de aprovação (`finance.salary_advance`), com o colaborador como requisitante. O próprio pede em /portal/me/salary-advance-applications. Folha do mês (omitida, a corrente) já lançada, ou sem política de aprovação: 409.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalaryAdvanceApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Pedidos de adiantamento (ADR-123), os mais recentes primeiro, com o estado: PendingApproval, Approved (por pagar), Refused, Paid. Filtro: employeeId.",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SalaryAdvanceApplicationView"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/treasury/salary-advances": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Paga, da conta em kwanzas indicada, um pedido de adiantamento aprovado (ADR-123): 36.3 contra 43.1 (ADR-114). A folha do pedido desconta-o pela 36.1, até ao líquido. Conta sem colaborador ou quem decidiu o pedido: 403 (BR-3). Pedido por aprovar, recusado ou já pago, adiantamento ao próprio, folha já lançada, sem saldo ou período fechado: 409. Conta noutra moeda, data futura ou folha anterior ao pagamento: 400.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalaryAdvanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Adiantamentos de salário (ADR-114), os mais recentes primeiro. Filtros: employeeId, payrollYear, payrollMonth, outstandingOnly (só os que ainda têm o que descontar).",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "payrollYear",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "payrollMonth",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "outstandingOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SalaryAdvanceView"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/treasury/tax-payments": {
       "post": {
         "tags": [
@@ -13798,7 +14062,7 @@
         "tags": [
           "SpendingEndpoints"
         ],
-        "summary": "Aprova. Quem decide não pode ser o colaborador da despesa (409).",
+        "summary": "Aprova. Quem decide não pode ser o colaborador da despesa (409). `expenseAccountCode` (opcional, ADR-119): a conta da natureza do custo, da classe 7; nas 72.3 a 72.8, a subconta .1 (órgãos sociais) ou .2 (pessoal) pelo cargo no dia da despesa.",
         "parameters": [
           {
             "name": "expenseId",
@@ -13819,7 +14083,7 @@
                     "type": "null"
                   },
                   {
-                    "$ref": "#/components/schemas/ExpenseDecisionRequest"
+                    "$ref": "#/components/schemas/ExpenseApprovalRequest"
                   }
                 ]
               }
@@ -13846,6 +14110,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -18514,6 +18788,459 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FiscalYearView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/inventory-regularisation": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Regularização de existências do fim do ano (inventário intermitente): a 71 recebe as existências iniciais (22 e 26) e as compras (21), e as existências finais voltam à 22 e à 26 com o valor do inventário a 31/12, ou o que closingStock der. Repete-se sem duplicar; dryRun mostra o que lançaria, sem gravar.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InventoryRegularisationRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryRegularisationView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate": {
+      "get": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "A estimativa do imposto industrial do exercício (ADR-118): se foi indicada, o valor em vigor e cada indicação e ajuste, com o lançamento, quem e quando.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncomeTaxEstimateView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "O contabilista indica a estimativa do imposto industrial do exercício; o Rivo lança D 87.1 contra C 34.1 a 31/12 (período 12, diário DIV, «IMP-AAAA»), antes do apuramento. Zero é «sem imposto»: fica registado e não lança. Uma por exercício (409 se já houver); corrige-se com /adjustments.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncomeTaxEstimateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncomeTaxEstimateRecordedView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate/adjustments": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Corrige a estimativa do imposto industrial: o novo valor e o motivo. Lança só a diferença (para menos, D 34.1 contra C 87.1). Nada se edita.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncomeTaxAdjustmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncomeTaxEstimateRecordedView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata": {
+      "get": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "A regularização anual do IVA pelo pró-rata definitivo (ADR-124): se foi indicada, o valor em vigor e cada indicação e ajuste, com as partes do imobilizado, o lançamento, quem e quando.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatProRataView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "O contabilista indica a regularização anual do IVA pelo pró-rata definitivo: positiva a favor do Estado (D 75.3.1.2.1 ou 75.3.1.2 / C 34.5.4.3), negativa a favor da empresa (D 34.5.4.3 / C 63.5). fixedAssets põe partes nas contas do imobilizado (11, 12, 14). Lança a 31/12 (período 12, DIV, «PRT-AAAA»); o apuramento do IVA de Dezembro leva a 34.5.4.3. Zero é «sem regularização». Uma por exercício (409); corrige-se com /adjustments.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VatProRataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatProRataRecordedView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata/adjustments": {
+      "post": {
+        "tags": [
+          "PgcEndpoints"
+        ],
+        "summary": "Corrige a regularização do pró-rata: o novo valor, as partes do imobilizado e o motivo. Lança só a diferença de cada conta. Nada se edita.",
+        "parameters": [
+          {
+            "name": "fiscalYear",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VatProRataAdjustmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatProRataRecordedView"
                 }
               }
             }
@@ -32140,6 +32867,71 @@
         ]
       }
     },
+    "/inventory/items/{itemId}/kind": {
+      "post": {
+        "tags": [
+          "InventoryModuleEndpoints"
+        ],
+        "summary": "Muda o tipo de existência do item: RawMaterials (22.1), SubsidiaryMaterials (22.2), SundryMaterials (22.3), Packaging (22.4), OtherMaterials (22.5) ou Goods (26). Não mexe nos movimentos.",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReclassifyItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/inventory/items/{itemId}/movements/receipts": {
       "post": {
         "tags": [
@@ -37120,6 +37912,113 @@
         ]
       }
     },
+    "/portal/me/salary-advance-applications": {
+      "get": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Pedidos de adiantamento de salário do próprio (ADR-123), com o estado: PendingApproval, Approved (por pagar), Refused, Paid.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSalaryAdvanceApplication"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MySalaryAdvanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySalaryAdvanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/portal/me/assets": {
       "get": {
         "tags": [
@@ -39302,6 +40201,26 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "AccountAmount": {
+        "required": [
+          "accountCode",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
           }
         }
       },
@@ -44062,6 +44981,29 @@
           }
         }
       },
+      "ClosingStockInput": {
+        "required": [
+          "accountCode",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "CollectionActionRecordedResponse": {
         "required": [
           "actionId"
@@ -44986,6 +45928,12 @@
               "string"
             ],
             "format": "int32"
+          },
+          "governingBody": {
+            "type": [
+              "null",
+              "boolean"
+            ]
           }
         }
       },
@@ -45657,6 +46605,10 @@
           },
           "grantsApprovalAuthority": {
             "type": "boolean"
+          },
+          "governingBody": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -48849,6 +49801,27 @@
           }
         }
       },
+      "ExpenseApprovalRequest": {
+        "required": [
+          "notes",
+          "expenseAccountCode"
+        ],
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expenseAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ExpenseClaimView": {
         "required": [
           "expenseId",
@@ -48956,6 +49929,12 @@
             "format": "uuid"
           },
           "reimbursementReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expenseAccountCode": {
             "type": [
               "null",
               "string"
@@ -49486,7 +50465,8 @@
           "outcome",
           "message",
           "entries",
-          "netResult"
+          "netResult",
+          "notes"
         ],
         "type": "object",
         "properties": {
@@ -49521,6 +50501,12 @@
               "string"
             ],
             "format": "double"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -50758,6 +51744,29 @@
           }
         }
       },
+      "IncomeTaxAdjustmentRequest": {
+        "required": [
+          "amount",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "IncomeTaxBracketView": {
         "required": [
           "lowerBound",
@@ -50836,6 +51845,157 @@
           },
           "legalInstrument": {
             "type": "string"
+          }
+        }
+      },
+      "IncomeTaxEstimateRecordedView": {
+        "required": [
+          "estimate",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "estimate": {
+            "$ref": "#/components/schemas/IncomeTaxEstimateView"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "IncomeTaxEstimateRecordView": {
+        "required": [
+          "recordId",
+          "kind",
+          "amount",
+          "difference",
+          "entryId",
+          "archivalNumber",
+          "entryVoided",
+          "notes",
+          "recordedBy",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "difference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "entryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "archivalNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryVoided": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "recordedBy": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "IncomeTaxEstimateRequest": {
+        "required": [
+          "amount",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "IncomeTaxEstimateView": {
+        "required": [
+          "fiscalYear",
+          "indicated",
+          "amount",
+          "records"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "indicated": {
+            "type": "boolean"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IncomeTaxEstimateRecordView"
+            }
           }
         }
       },
@@ -51945,6 +53105,7 @@
           "averageCost",
           "totalValue",
           "status",
+          "kind",
           "quantitiesByWarehouse",
           "movements"
         ],
@@ -51990,6 +53151,9 @@
           "status": {
             "type": "string"
           },
+          "kind": {
+            "type": "string"
+          },
           "quantitiesByWarehouse": {
             "type": "array",
             "items": {
@@ -52001,6 +53165,161 @@
             "items": {
               "$ref": "#/components/schemas/StockMovementView"
             }
+          }
+        }
+      },
+      "InventoryRegularisationRequest": {
+        "required": [
+          "closingStock",
+          "dryRun"
+        ],
+        "type": "object",
+        "properties": {
+          "closingStock": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ClosingStockInput"
+            }
+          },
+          "dryRun": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "countDifferencesToOtherResults": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "InventoryRegularisationView": {
+        "required": [
+          "outcome",
+          "fiscalYear",
+          "on",
+          "entryId",
+          "transactionId",
+          "purchases",
+          "stock",
+          "costOfSales",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string"
+          },
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "on": {
+            "type": "string",
+            "format": "date"
+          },
+          "entryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "purchases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountAmount"
+            }
+          },
+          "stock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryStockLine"
+            }
+          },
+          "costOfSales": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountAmount"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "InventoryStockLine": {
+        "required": [
+          "stockAccountCode",
+          "costAccountCode",
+          "opening",
+          "proposed",
+          "closing"
+        ],
+        "type": "object",
+        "properties": {
+          "stockAccountCode": {
+            "type": "string"
+          },
+          "costAccountCode": {
+            "type": "string"
+          },
+          "opening": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "proposed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "closing": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "countDifference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double",
+            "default": 0
+          },
+          "differenceAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -54790,6 +56109,58 @@
           }
         }
       },
+      "MySalaryAdvanceRequest": {
+        "required": [
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "payrollYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "payrollMonth": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "MySalaryAdvanceResponse": {
+        "required": [
+          "applicationId"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "MyShiftChangeRequest": {
         "required": [
           "proposedEmployeeId",
@@ -56930,6 +58301,61 @@
               "string"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "OwnSalaryAdvanceApplication": {
+        "required": [
+          "applicationId",
+          "amount",
+          "payrollYear",
+          "payrollMonth",
+          "reason",
+          "submittedAt",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "payrollYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "payrollMonth": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
           }
         }
       },
@@ -59184,6 +60610,10 @@
           },
           "grantsApprovalAuthority": {
             "type": "boolean"
+          },
+          "isGoverningBody": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -59192,7 +60622,8 @@
           "positionId",
           "name",
           "hierarchyLevel",
-          "grantsApprovalAuthority"
+          "grantsApprovalAuthority",
+          "governingBody"
         ],
         "type": "object",
         "properties": {
@@ -59212,6 +60643,9 @@
             "format": "int32"
           },
           "grantsApprovalAuthority": {
+            "type": "boolean"
+          },
+          "governingBody": {
             "type": "boolean"
           }
         }
@@ -60519,6 +61953,49 @@
           }
         }
       },
+      "ProRataAllocation": {
+        "required": [
+          "accountCode",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ProRataAllocationRequest": {
+        "required": [
+          "accountCode",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "PurchaseInvoiceMatchView": {
         "required": [
           "purchaseInvoiceId",
@@ -60729,6 +62206,15 @@
               "null",
               "string"
             ]
+          },
+          "nonDeductibleTax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double",
+            "default": 0
           }
         }
       },
@@ -61153,6 +62639,28 @@
           }
         }
       },
+      "ReclassifyItemRequest": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "RawMaterials",
+              "SubsidiaryMaterials",
+              "SundryMaterials",
+              "Packaging",
+              "OtherMaterials",
+              "Goods"
+            ],
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ReconciliationSummary": {
         "required": [
           "bankAccountId",
@@ -61460,6 +62968,20 @@
           },
           "unit": {
             "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "RawMaterials",
+              "SubsidiaryMaterials",
+              "SundryMaterials",
+              "Packaging",
+              "OtherMaterials",
+              "Goods"
+            ],
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -61582,6 +63104,15 @@
               "null",
               "string"
             ]
+          },
+          "nonDeductibleTax": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double",
+            "default": 0
           }
         }
       },
@@ -62693,6 +64224,257 @@
                 "$ref": "#/components/schemas/SalesSnapshot"
               }
             ]
+          }
+        }
+      },
+      "SalaryAdvanceApplicationRequest": {
+        "required": [
+          "employeeId",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "payrollYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "payrollMonth": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SalaryAdvanceApplicationView": {
+        "required": [
+          "applicationId",
+          "employeeId",
+          "employeeName",
+          "amount",
+          "payrollYear",
+          "payrollMonth",
+          "reason",
+          "submittedAt",
+          "approvalRequestId",
+          "status",
+          "advanceId"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "payrollYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "payrollMonth": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvalRequestId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "advanceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "SalaryAdvanceRequest": {
+        "required": [
+          "applicationId",
+          "bankAccountId"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SalaryAdvanceView": {
+        "required": [
+          "advanceId",
+          "employeeId",
+          "employeeName",
+          "amount",
+          "paidOn",
+          "bankAccountId",
+          "reference",
+          "payrollYear",
+          "payrollMonth",
+          "settledAmount",
+          "outstanding"
+        ],
+        "type": "object",
+        "properties": {
+          "advanceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "payrollYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "payrollMonth": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "settledAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "outstanding": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "applicationId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -66445,6 +68227,211 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          }
+        }
+      },
+      "VatProRataAdjustmentRequest": {
+        "required": [
+          "amount",
+          "fixedAssets",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "fixedAssets": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ProRataAllocationRequest"
+            }
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VatProRataRecordedView": {
+        "required": [
+          "proRata",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "proRata": {
+            "$ref": "#/components/schemas/VatProRataView"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "VatProRataRecordView": {
+        "required": [
+          "recordId",
+          "kind",
+          "amount",
+          "difference",
+          "fixedAssets",
+          "costAccountCode",
+          "entryId",
+          "archivalNumber",
+          "entryVoided",
+          "notes",
+          "recordedBy",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "difference": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "fixedAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProRataAllocation"
+            }
+          },
+          "costAccountCode": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "archivalNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryVoided": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "recordedBy": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VatProRataRequest": {
+        "required": [
+          "amount",
+          "fixedAssets",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "fixedAssets": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ProRataAllocationRequest"
+            }
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VatProRataView": {
+        "required": [
+          "fiscalYear",
+          "indicated",
+          "amount",
+          "records"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalYear": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "indicated": {
+            "type": "boolean"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VatProRataRecordView"
             }
           }
         }

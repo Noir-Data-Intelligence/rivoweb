@@ -41,6 +41,7 @@ test.describe("inventário", () => {
     const linha = page.getByRole("row").filter({ hasText: "Papel A4" });
     await expect(linha).toContainText("12 resma");
     await expect(linha).toContainText("30 006,00");
+    await expect(linha).toContainText("Materiais diversos (22.3)");
     await verificar(page);
     await page.getByRole("button", { name: "Registar artigo" }).click();
     const d = page.getByRole("dialog");
@@ -51,9 +52,12 @@ test.describe("inventário", () => {
     await d.getByLabel("Referência (SKU)").fill("PAP-A3");
     await d.getByLabel("Nome").fill("Papel A3");
     await d.getByLabel("Unidade").fill("resma");
+    // O tipo diz a conta do stock no fecho do ano (ADR-117); por omissão, materiais diversos.
+    await expect(d.getByLabel("Tipo")).toHaveValue("SundryMaterials");
+    await d.getByLabel("Tipo").selectOption("Goods");
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(page).toHaveURL(new RegExp(`/artigos/${IDF9B.papel}$`));
-    expect(api.escritas("POST", "/inventory/items").map((p) => p.corpo)).toEqual([{ sku: "PAP-A3", name: "Papel A3", unit: "resma" }]);
+    expect(api.escritas("POST", "/inventory/items").map((p) => p.corpo)).toEqual([{ sku: "PAP-A3", name: "Papel A3", unit: "resma", kind: "Goods" }]);
     expect(await violacoes()).toEqual([]);
   });
 
@@ -116,6 +120,19 @@ test.describe("inventário", () => {
     await expect(d).toHaveCount(0);
     expect(api.escritas("POST", `/inventory/items/${IDF9B.papel}/movements/transfers`)[0]?.corpo).toMatchObject({ fromWarehouseId: IDF9B.central, toWarehouseId: IDF9B.loja, quantity: "3" });
     expect(await violacoes()).toEqual([]);
+  });
+
+  test("artigo: mudar o tipo de existência (ADR-117) sem mexer nos movimentos", async ({ page, api }) => {
+    await comInventario(api).em("POST", `/inventory/items/${IDF9B.papel}/kind`, { status: 204 }).ligar();
+    await entrar(page);
+    await page.goto(`/artigos/${IDF9B.papel}`);
+    await expect(page.getByText("Materiais diversos (22.3)", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Mudar o tipo" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Tipo").selectOption("RawMaterials");
+    await d.getByRole("button", { name: "Mudar", exact: true }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/inventory/items/${IDF9B.papel}/kind`).map((p) => p.corpo)).toEqual([{ kind: "RawMaterials" }]);
   });
 
   test("armazéns: registar (código em maiúsculas) e desactivar", async ({ page, api }) => {

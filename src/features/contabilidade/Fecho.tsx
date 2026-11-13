@@ -6,8 +6,10 @@
  *   sua data e ao câmbio desse dia. Primeiro simula-se; repetir não duplica;
  * - actualização cambial dos depósitos em moeda estrangeira no fim do mês
  *   (ADR-103): a 43.2 ao câmbio do último dia, contra 66.2.2 ou 76.2.2;
- *   e das facturas de venda e de compra em aberto (ADR-105), estornada no dia 1
- *   do mês seguinte.
+ *   e das facturas de venda e de compra em aberto (ADR-105) e das despesas de
+ *   colaborador por reembolsar (ADR-115), estornada no dia 1 do mês seguinte.
+ * O pró-rata do IVA, a regularização de existências e a estimativa do imposto
+ * industrial estão em `FechoAno.tsx`.
  */
 import { useState } from "react";
 import { Link } from "react-router";
@@ -25,6 +27,7 @@ import { Field, Input } from "@/ui/Field";
 import { GrelhaKpis, Kpi } from "@/ui/Kpi";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useActualizacaoCambial, useExercicio, useLancarHistorico, type ActualizacaoCambial as ActualizacaoView, type Exercicio as ExercicioView } from "./api";
+import { AvisosServidor } from "./FechoAno";
 import { janelaDoPeriodo, janelasDoAno, somarHistorico } from "./regras";
 
 const kz = (v: number | string) => formatarMoeda(dinheiro(v));
@@ -39,7 +42,13 @@ const TIPOS_DOCUMENTO: Readonly<Record<string, string>> = {
 
 type LancamentoFeito = ExercicioView["entries"][number];
 
-function ResultadoExercicio({ r }: { r: ExercicioView }) {
+/** Leva ao cartão do fecho que o aviso pede (o diálogo fecha antes). */
+function irPara(id: string, fechar: () => void) {
+  fechar();
+  window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+}
+
+function ResultadoExercicio({ r, fechar }: { r: ExercicioView; fechar: () => void }) {
   const colunas: Coluna<LancamentoFeito>[] = [
     {
       id: "lancamento",
@@ -59,6 +68,22 @@ function ResultadoExercicio({ r }: { r: ExercicioView }) {
       <Alert tom={r.outcome === "Done" ? "sucesso" : "info"} titulo={r.outcome === "Done" ? "Feito." : "Nada a fazer: já estava feito."}>
         {r.message}
       </Alert>
+      {/* Avisa sem recusar: falta a estimativa do imposto, a 87.1 não bate com ela, ou a actualização cambial de 31/12 deixaria diferenças (ADR-118, ADR-121). */}
+      <AvisosServidor notas={r.notes} />
+      {r.notes.some((n) => /imposto/i.test(n)) || r.notes.some((n) => /actualiza[çc][ãa]o cambial/i.test(n)) ? (
+        <div className="flex flex-wrap gap-2">
+          {r.notes.some((n) => /imposto/i.test(n)) ? (
+            <Button variante="secondary" tamanho="sm" onClick={() => irPara("imposto-industrial", fechar)}>
+              Ir para o imposto industrial
+            </Button>
+          ) : null}
+          {r.notes.some((n) => /actualiza[çc][ãa]o cambial/i.test(n)) ? (
+            <Button variante="secondary" tamanho="sm" onClick={() => irPara("actualizacao-cambial", fechar)}>
+              Ir para a actualização cambial (Dezembro)
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       {r.netResult !== null ? <p className="text-sm">Resultado líquido do exercício: <span className="font-semibold tabular-nums">{kz(r.netResult)}</span></p> : null}
       {r.entries.length > 0 ? <Tabela rotulo="Lançamentos feitos" colunas={colunas} linhas={r.entries} chave={(l) => l.entryId} vazio="Nenhum lançamento." /> : null}
     </div>
@@ -94,7 +119,7 @@ function AccaoExercicio({ ano, acto }: { ano: number; acto: "apurar" | "abrir" }
         erro={exercicio.error ? <ErrorPanel erro={exercicio.error} /> : undefined}
         aoConfirmar={() => (r ? mudar(false) : exercicio.mutate({ ano, acto }))}
       >
-        {r ? <ResultadoExercicio r={r} /> : null}
+        {r ? <ResultadoExercicio r={r} fechar={() => mudar(false)} /> : null}
       </Confirmar>
     </>
   );
@@ -104,7 +129,9 @@ export function FechoExercicio({ ano }: { ano: number }) {
   return (
     <Card className="mt-6">
       <CardTitle>Fecho do exercício de {ano}</CardTitle>
-      <p className="mt-1 text-sm text-muted-foreground">Pelo PGC: primeiro apura-se o exercício que acaba, depois abre-se o seguinte com os saldos dele.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Pelo PGC, por esta ordem: a actualização cambial de Dezembro, o pró-rata do IVA (antes de apurar o IVA de Dezembro), a regularização de existências e a estimativa do imposto industrial; depois apura-se o exercício que acaba e abre-se o seguinte com os saldos dele. O apuramento avisa se faltar alguma coisa, sem recusar.
+      </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <AccaoExercicio ano={ano} acto="apurar" />
         <AccaoExercicio ano={ano} acto="abrir" />
@@ -115,6 +142,13 @@ export function FechoExercicio({ ano }: { ano: number }) {
 
 type ContaActualizada = ActualizacaoView["accounts"][number];
 type FacturaActualizada = ActualizacaoView["documents"][number];
+
+/** De que lado é o documento em aberto: a despesa de colaborador por reembolsar (36.9) também se actualiza (ADR-115). */
+export function documentoActualizado(f: Pick<FacturaActualizada, "kind" | "documentId">): { tipo: string; ligacao: string } {
+  if (f.kind === "Payable") return { tipo: "Compra", ligacao: `/facturas-compra/${f.documentId}` };
+  if (f.kind === "EmployeeExpense") return { tipo: "Despesa de colaborador", ligacao: `/despesas/${f.documentId}` };
+  return { tipo: "Venda", ligacao: `/facturas/${f.documentId}` };
+}
 
 const rotuloResultado = (d: ReturnType<typeof dinheiro>, onde: string) => (d.lt(0) ? `Perda ${onde} (76.2.2)` : `Ganho ${onde} (66.2.2)`);
 
@@ -139,17 +173,20 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
   const colunasFacturas: Coluna<FacturaActualizada>[] = [
     {
       id: "factura",
-      cabecalho: "Factura",
-      celula: (f) => (
-        <span className="flex flex-col">
-          <Link to={f.kind === "Payable" ? `/facturas-compra/${f.documentId}` : `/facturas/${f.documentId}`} className="font-medium text-primary underline-offset-4 hover:underline">
-            {f.number}
-          </Link>
-          <span className="text-xs text-muted-foreground">{f.kind === "Payable" ? "Compra" : "Venda"}</span>
-        </span>
-      ),
+      cabecalho: "Documento",
+      celula: (f) => {
+        const d = documentoActualizado(f);
+        return (
+          <span className="flex flex-col">
+            <Link to={d.ligacao} className="font-medium text-primary underline-offset-4 hover:underline">
+              {f.number}
+            </Link>
+            <span className="text-xs text-muted-foreground">{d.tipo}</span>
+          </span>
+        );
+      },
     },
-    { id: "parte", cabecalho: "Cliente ou fornecedor", celula: (f) => f.party },
+    { id: "parte", cabecalho: "Cliente, fornecedor ou colaborador", celula: (f) => f.party },
     { id: "aberto", cabecalho: "Em aberto", alinhar: "direita", celula: (f) => formatarMoeda(dinheiro(f.open), f.currency) },
     { id: "cambio", cabecalho: "Câmbio", alinhar: "direita", esconderAte: "md", celula: (f) => `${formatarNumeroDecimal(String(f.rate), 6)} (${formatarData(f.rateOn)})` },
     { id: "conta", cabecalho: "Conta", esconderAte: "md", celula: (f) => f.accountCode },
@@ -160,10 +197,10 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
   const diferenca = r ? dinheiro(r.difference) : null;
   const diferencaDividas = r ? dinheiro(r.debtsDifference) : null;
   return (
-    <Card className="mt-6">
+    <Card className="mt-6" id="actualizacao-cambial">
       <CardTitle>Actualização cambial</CardTitle>
       <p className="mt-1 text-sm text-muted-foreground">
-        O dinheiro nas contas em moeda estrangeira (43.2) e as facturas de venda e de compra em moeda estrangeira por receber ou por pagar entram ao câmbio de cada dia; no fim do mês valem ao câmbio desse dia. O ganho vai para 66.2.2 e a perda para 76.2.2. A actualização dos clientes e fornecedores estorna-se no dia 1 do mês seguinte. No fecho do ano, actualize Dezembro antes de apurar os resultados.
+        O dinheiro nas contas em moeda estrangeira (43.2), as facturas de venda e de compra em moeda estrangeira por receber ou por pagar e as despesas de colaborador em moeda estrangeira por reembolsar (36.9) entram ao câmbio de cada dia; no fim do mês valem ao câmbio desse dia. O ganho vai para 66.2.2 e a perda para 76.2.2. A actualização dos clientes, fornecedores e despesas estorna-se no dia 1 do mês seguinte. No fecho do ano, actualize Dezembro e regularize as existências antes de apurar os resultados.
       </p>
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <Field rotulo="Mês" className="w-48">
@@ -196,7 +233,7 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
                 ? `Simulação a ${formatarData(r.on)}: nada foi gravado.`
                 : r.outcome === "Revalued"
                   ? `Actualização de ${nomeMes(Number(r.month))} de ${String(r.fiscalYear)} lançada.`
-                  : "Nada a fazer: os depósitos, os clientes e os fornecedores já valem o câmbio do fim do mês."
+                  : "Nada a fazer: os depósitos, os clientes, os fornecedores e as despesas já valem o câmbio do fim do mês."
             }
           >
             {r.entryId || r.debtsEntryId || r.debtsReversalEntryId ? (
@@ -211,7 +248,7 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
                 {r.debtsEntryId ? (
                   <li>
                     <Link to={`/lancamentos/${r.debtsEntryId}`} className="text-primary underline-offset-4 hover:underline">
-                      Ver o lançamento dos clientes e fornecedores
+                      Ver o lançamento dos clientes, fornecedores e despesas
                     </Link>
                   </li>
                 ) : null}
@@ -238,17 +275,17 @@ export function ActualizacaoCambial({ ano }: { ano: number }) {
             <Kpi rotulo="43.2 no razão" valor={kz(r.ledgerBalance)} />
             <Kpi rotulo="Ao câmbio do fim do mês" valor={kz(r.revaluedBalance)} />
             <Kpi rotulo={rotuloResultado(diferenca, "nos depósitos")} valor={kz(diferenca.abs().toString())} />
-            <Kpi rotulo={rotuloResultado(diferencaDividas, "nos clientes e fornecedores")} valor={kz(diferencaDividas.abs().toString())} detalhe="Estornado no dia 1 do mês seguinte." />
+            <Kpi rotulo={rotuloResultado(diferencaDividas, "nos clientes, fornecedores e despesas")} valor={kz(diferencaDividas.abs().toString())} detalhe="Estornado no dia 1 do mês seguinte." />
           </GrelhaKpis>
           <Tabela rotulo="Contas em moeda estrangeira" colunas={colunas} linhas={r.accounts} chave={(c) => c.accountId} vazio="Nenhuma conta em moeda estrangeira com saldo." />
-          <Tabela rotulo="Facturas em moeda estrangeira em aberto" colunas={colunasFacturas} linhas={r.documents} chave={(f) => f.documentId} vazio="Nenhuma factura de venda ou de compra em moeda estrangeira em aberto." />
+          <Tabela rotulo="Documentos em moeda estrangeira em aberto" colunas={colunasFacturas} linhas={r.documents} chave={(f) => f.documentId} vazio="Nenhuma factura nem despesa por reembolsar em moeda estrangeira em aberto." />
         </section>
       ) : null}
       <Confirmar
         aberto={confirmar}
         aoMudar={setConfirmar}
         titulo={`Lançar a actualização cambial de ${nomeMes(mes)} de ${ano}`}
-        descricao="Lança no razão no último dia do mês os depósitos e, à parte, os clientes e fornecedores, com o estorno no dia 1 do mês seguinte. Não se apaga: só se estorna."
+        descricao="Lança no razão no último dia do mês os depósitos e, à parte, os clientes, os fornecedores e as despesas por reembolsar, com o estorno no dia 1 do mês seguinte. Não se apaga: só se estorna."
         rotuloConfirmar="Lançar"
         aCarregar={actualizar.isPending}
         erro={actualizar.error ? <ErrorPanel erro={actualizar.error} /> : undefined}
@@ -287,7 +324,7 @@ export function LancarHistorico({ ano }: { ano: number }) {
     <Card className="mt-6">
       <CardTitle>Lançar o histórico</CardTitle>
       <p className="mt-1 text-sm text-muted-foreground">
-        Os documentos emitidos antes das regras de lançamento (facturas, notas de crédito, recibos, facturas de compra e pagamentos) lançam como a emissão os teria lançado: cada um na sua data e ao câmbio desse dia. Os anulados não lançam, e repetir não duplica.
+        Os documentos emitidos antes das regras de lançamento (facturas, notas de crédito, recibos, facturas de compra e pagamentos) lançam como a emissão os teria lançado: cada um na sua data e ao câmbio desse dia (as notas de crédito em moeda estrangeira, ao câmbio da factura que corrigem). Os anulados não lançam, e repetir não duplica.
       </p>
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <Field rotulo="Mês" className="w-48">

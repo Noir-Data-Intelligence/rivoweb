@@ -92,7 +92,21 @@ function Abrir() {
           <Field rotulo="Assunto" erro={tentou ? erros.assunto : undefined} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={MAXIMO_ASSUNTO} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={assunto} onChange={(e) => setAssunto(e.target.value)} />}
           </Field>
-          <Field rotulo="Área" erro={tentou ? erros.categoria : undefined}>
+          <Field
+            rotulo="Área"
+            erro={tentou ? erros.categoria : undefined}
+            ajuda={
+              categoria === "SalaryAdvance" ? (
+                <>
+                  Aqui é só uma conversa com os Recursos Humanos. O adiantamento pede-se em{" "}
+                  <Link to="/eu/adiantamentos" className="text-primary underline-offset-4 hover:underline">
+                    Adiantamentos de salário
+                  </Link>
+                  , que vai a Aprovações.
+                </>
+              ) : undefined
+            }
+          >
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} value={categoria} onChange={(e) => setCategoria(e.target.value as CategoriaPedido | "")}>
                 <option value="">Escolha…</option>

@@ -455,3 +455,67 @@ export function useActualizacaoCambial() {
     onSuccess: (_, b) => (b.dryRun ? undefined : invalidarFinancas(qc)),
   });
 }
+
+// Fecho do ano (ADR-117, ADR-118, ADR-122, ADR-124): o contabilista indica, o Rivo lança e não calcula.
+
+export type Regularizacao = S["InventoryRegularisationView"];
+export type PedidoRegularizacao = S["InventoryRegularisationRequest"];
+
+/** Regularização de existências a 31/12 (inventário intermitente, «REX-AAAA»); simula ou lança. */
+export function useRegularizacaoExistencias() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: ({ ano, ...b }: PedidoRegularizacao & { ano: number }) =>
+      ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/inventory-regularisation", { params: { path: { fiscalYear: ano } }, body: b })),
+    onSuccess: (_, b) => (b.dryRun ? undefined : invalidarFinancas(qc)),
+  });
+}
+
+export type EstimativaImposto = S["IncomeTaxEstimateView"];
+export type RegistoEstimativa = S["IncomeTaxEstimateRecordView"];
+
+export function useEstimativaImposto(ano: number) {
+  return useQuery({
+    queryKey: ["finance", "ledger", "income-tax-estimate", ano] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate", { params: { path: { fiscalYear: ano } }, signal })),
+  });
+}
+
+/** Indicar a estimativa do imposto industrial (uma por ano) ou corrigi-la por ajuste, com o motivo. */
+export function useIndicarEstimativa() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (p: { ano: number; amount: string; notes: string | null; reason: string | null }) => {
+      const path = { fiscalYear: p.ano };
+      return p.reason === null
+        ? ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate", { params: { path }, body: { amount: p.amount, notes: p.notes } }))
+        : ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate/adjustments", { params: { path }, body: { amount: p.amount, reason: p.reason } }));
+    },
+    onSuccess: () => invalidarFinancas(qc),
+  });
+}
+
+export type ProRata = S["VatProRataView"];
+export type RegistoProRata = S["VatProRataRecordView"];
+export type ParteImobilizado = S["ProRataAllocationRequest"];
+
+export function useProRata(ano: number) {
+  return useQuery({
+    queryKey: ["finance", "ledger", "vat-pro-rata", ano] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata", { params: { path: { fiscalYear: ano } }, signal })),
+  });
+}
+
+/** Indicar a regularização do IVA pelo pró-rata (positivo a favor do Estado) ou corrigi-la por ajuste, com o motivo. */
+export function useIndicarProRata() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (p: { ano: number; amount: string; fixedAssets: ParteImobilizado[] | null; notes: string | null; reason: string | null }) => {
+      const path = { fiscalYear: p.ano };
+      return p.reason === null
+        ? ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata", { params: { path }, body: { amount: p.amount, fixedAssets: p.fixedAssets, notes: p.notes } }))
+        : ler(api.POST("/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata/adjustments", { params: { path }, body: { amount: p.amount, fixedAssets: p.fixedAssets, reason: p.reason } }));
+    },
+    onSuccess: () => invalidarFinancas(qc),
+  });
+}

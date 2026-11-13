@@ -32,7 +32,13 @@
 > factura; a actualização cambial mostra as facturas em aberto; o mercado em
 > cada regra e o país do fornecedor na factura de compra; a nota da compra de
 > imobilizado; quem decidiu a folha não paga os salários) · actualizado a
-> 2026-11-10 (os salários e as entregas ao Estado pagam-se em partes).
+> 2026-11-10 (os salários e as entregas ao Estado pagam-se em partes) ·
+> actualizado a 2026-11-13 (no fecho do ano, a regularização de existências,
+> o imposto industrial e o pró-rata do IVA; a actualização cambial das
+> despesas por reembolsar; o tipo dos artigos; o órgão social nos cargos; o
+> IVA não dedutível na compra; a conta do custo ao aprovar a despesa; os
+> adiantamentos de salário pedidos, aprovados e pagos; o BR-3 nas entregas do
+> IRT e do INSS).
 
 ---
 
@@ -217,7 +223,7 @@ AM = AssetManager.
 | Registar recepção (sem passar o que falta) e anular com motivo ¹³ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Inventário** | | | | | | | | | | |
 | Artigos: em mão, custo médio e valor; por armazém e movimentos | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
-| Registar artigo; activar e desactivar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
+| Registar artigo (com o tipo de existência ⁴²); activar e desactivar; mudar o tipo | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Movimentar: entrada com custo, saída, ajuste com motivo, transferência (sem deixar um armazém negativo) | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Armazéns: ver, registar, activar e desactivar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Contagens: abrir, contar artigos, fechar (com divergências pode ir a aprovação), ver a decisão, cancelar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
@@ -229,7 +235,7 @@ AM = AssetManager.
 | Conta do PGC do activo (só contas de movimento: 11.2.x, 11.3.x, 11.4 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Vender um activo pela factura («Vender pela factura» na ficha do activo, só com a conta do PGC): FT ou FR de bens com uma linha, na moeda do activo; abate-o e lança a dívida na 37.2 e o resultado na 68.3/78.3; anular a factura repõe o bem ³² | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ (corrigi-lo depois do registo ⁵⁰ ainda não está no front) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -250,7 +256,7 @@ AM = AssetManager.
 | **Despesas** | | | | | | | | | | |
 | Ver a lista, o resumo por moeda e a ficha | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
-| Aprovar e rejeitar (com motivo) ⁹ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Aprovar e rejeitar (com motivo) ⁹; ao aprovar, indicar a conta do custo no PGC ⁴⁴ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Marcar reembolsada (com a conta, sai dela e lança ²⁸; noutra moeda, pela 43.2, com a diferença de câmbio ³⁸) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir o comprovativo (pela despesa) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
@@ -264,6 +270,7 @@ AM = AssetManager.
 | Documentos da ficha: ver e descarregar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Declarações: emitir em PDF (fica registada, com código de verificação) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Pedidos internos: abrir, acompanhar a conversa e responder | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Adiantamento de salário: pedir (vai a aprovação) e ver o estado ⁴⁸ | — | — | — | — | — | — | — | — | ✓ | — |
 | Formação: acções, horas, nota e certificado | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Objectivos: progresso e resultados-chave; registar o valor actual (ciclo aberto) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Conquistas recebidas e pontos | — | — | — | — | — | — | — | — | ✓ ¹ | — |
@@ -274,8 +281,10 @@ AM = AssetManager.
 | **Tesouraria** | | | | | | | | | | |
 | Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, só um colaborador que não decidiu a folha ³⁴; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Adiantamentos de salário: pagar a um colaborador (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto) e ver os por descontar ³⁹ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, o IRT e o INSS, só um colaborador que não decidiu a folha ³⁴ ⁴⁵; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Adiantamentos de salário: ver os pedidos (com o estado) e os pagos (com os por descontar) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Adiantamentos de salário: pagar os aprovados (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto; quem decidiu não paga) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Adiantamentos de salário: pedir em nome de um colaborador (vai a aprovação ⁴⁸; o Finance não lê os colaboradores, B46) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -297,7 +306,7 @@ AM = AssetManager.
 | Abrir diários e contas (também debaixo de uma conta de movimento sem lançamentos, que passa a agregadora); lançar em partida dobrada; estornar com motivo | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir períodos; criar, rever e apagar classes de reporte | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fechar e reabrir períodos; versões do plano ²⁷; regras de lançamento (com o mercado ³¹) e contabilísticas ²⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Carregar o PGC (contas, diários, regras); apurar os resultados e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Carregar o PGC (contas, diários, regras); regularizar as existências ⁴² (com as quebras e sobras da contagem no custo ou fora dele ⁴⁷), indicar e corrigir a estimativa do imposto industrial ⁴³ e a regularização do pró-rata do IVA ⁴⁹, apurar os resultados (com avisos ⁴⁶) e abrir o exercício | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Lançar o histórico (documentos de antes das regras): simular e depois lançar, um mês ou o ano | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Actualizar ao câmbio do fim do mês os depósitos, os clientes, os fornecedores e as despesas de colaborador por reembolsar em moeda estrangeira: simular (as contas, as facturas e as despesas em aberto) e depois lançar ²⁹ ⁴⁰ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Ver no razão as diferenças de câmbio realizadas, que o recibo e o pagamento em moeda estrangeira lançam sozinhos ³⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -378,7 +387,7 @@ Recursos Humanos.»
 ⁷ Só com ficha de colaborador ligada à conta: o registo fica em nome de quem o faz. O Finance não lê colaboradores, por isso regista despesas só em seu nome.
 ⁸ Só depois de aprovado (BR-5), e nunca por quem pediu nem por quem aprovou (BR-3); o servidor confirma com 403. O dinheiro sai de uma conta aberta na moeda do pedido.
 ⁹ A própria despesa não se decide.
-¹⁰ Hoje o servidor recusa com o motivo: falta configurar o NIF do produtor do software em produção (B24).
+¹⁰ Sai em produção desde 2026-11-12 (B24 resolvido: o NIF do produtor do software está configurado, e o seed declara a identificação fiscal da empresa). Sem a identificação fiscal declarada (Configurações → Dados da empresa), o servidor recusa e o ecrã mostra o motivo.
 ¹¹ Qualquer conta ligada a uma ficha de colaborador usa o portal (os perfis de gestão entram por «O meu portal»); sem ficha, o portal explica-o.
 ¹² Só com a conta ligada a uma ficha de colaborador: quem abre a folha fica registado.
 ¹³ Só com a conta ligada a uma ficha de colaborador: quem requisita ou recebe fica registado.
@@ -419,17 +428,71 @@ Recursos Humanos.»
 
 ³⁵ PR #147 e #148 (ADR-110), em produção desde 2026-11-10. No seed, o IVA de 06/2026 foi entregue em duas prestações, a 20/07 e a 25/07. Os salários e as entregas ao Estado pagam-se de uma vez ou em partes: `amount` opcional (sem ele, paga o que falta), e a resposta diz o que ainda falta (`outstanding`). Cada parte é um lançamento `PAG-…`, `-2`, `-3`… Os adiantamentos antes da folha (conta 36.3) ainda não se fazem. No front, «Pagar salários» e «Entregar ao Estado» têm o campo opcional «Valor desta parte» (vazio paga o que falta); depois de uma parte, o resultado diz «Parte … paga/entregue» e quanto falta do mês. O que já se pagou do mês não se mostra antes de pagar.
 
-³⁶ PR #149 (ADR-111), em produção desde 2026-11-10. O cargo diz se é de um órgão social (administração, gerência, conselho fiscal); por omissão não é, e a marca corrige-se. A folha lança quem o ocupa no fim do mês na 72.1, na 72.5.1 e na 36.1.1, e não na 72.2, na 72.5.2 e na 36.1.2; o pagamento dos salários salda as duas contas da 36.1. As outras contas dos órgãos sociais (72.3.1 a 72.8.1) não se usam, porque a folha não tem essas parcelas.
+³⁶ PR #149 (ADR-111), em produção desde 2026-11-10. O cargo diz se é de um órgão social (administração, gerência, conselho fiscal); por omissão não é, e a marca corrige-se. A folha lança quem o ocupa no fim do mês na 72.1, na 72.5.1 e na 36.1.1, e não na 72.2, na 72.5.2 e na 36.1.2; o pagamento dos salários salda as duas contas da 36.1. As outras contas dos órgãos sociais (72.3.1 a 72.8.1) não se usam, porque a folha não tem essas parcelas. No front, os Cargos têm a caixa «Órgão social (administração, gerência, conselho fiscal)» ao criar e ao corrigir (a correcção envia-a sempre) e a etiqueta «Órgão social» na lista.
 
-³⁷ PR #150 (ADR-112), em produção desde 2026-11-11. A factura de compra aceita `nonDeductibleTax`, a parte do IVA que quem regista declara não dedutível (de zero ao IVA da factura). Lança com o líquido, na conta da aquisição: no imobilizado, no valor do bem, como o PGC obriga; nas outras compras, na conta da compra. Só o resto vai para a 34.5.2, e o resumo do IVA conta só esse como dedutível. Sem o campo no ecrã de registo, tudo continua dedutível.
+³⁷ PR #150 (ADR-112), em produção desde 2026-11-11. A factura de compra aceita `nonDeductibleTax`, a parte do IVA que quem regista declara não dedutível (de zero ao IVA da factura). Lança com o líquido, na conta da aquisição: no imobilizado, no valor do bem, como o PGC obriga; nas outras compras, na conta da compra. Só o resto vai para a 34.5.2, e o resumo do IVA conta só esse como dedutível. No front, o registo tem o campo «IVA não dedutível» (zero por omissão, até ao IVA da factura) e, preenchido, mostra o que vai para a conta do bem ou da compra e o IVA dedutível; a ficha mostra o não dedutível e o dedutível e, numa compra de imobilizado, o custo de aquisição a usar ao registar o bem (o front não regista o activo a partir da factura).
 
-³⁸ PR #151 (ADR-113), em produção desde 2026-11-11. O reembolso de uma despesa noutra moeda lança 36.9 contra 43.2, e a diferença para o câmbio do dia da despesa lança à parte (`DCR-…`): 36.9 contra 66.2.1 se saíram menos kwanzas, 76.2.1 contra 36.9 se saíram mais. A 36.9 fica a zero. O editor de regras tem três acontecimentos novos para nomear.
+³⁸ PR #151 (ADR-113), em produção desde 2026-11-11. O reembolso de uma despesa noutra moeda lança 36.9 contra 43.2, e a diferença para o câmbio do dia da despesa lança à parte (`DCR-…`): 36.9 contra 66.2.1 se saíram menos kwanzas, 76.2.1 contra 36.9 se saíram mais. A 36.9 fica a zero. No front, o editor de regras nomeia os três acontecimentos novos; o reembolso não muda.
 
-³⁹ PR #152 (ADR-114), em produção desde 2026-11-11. `POST` e `GET /finance/treasury/salary-advances`. O adiantamento sai da conta em kwanzas e lança 36.3 contra 43.1. A folha do mês indicado desconta-o num lançamento à parte (`ADT-SAL-AAAA-MM`: 36.1.2 ou 36.1.1 contra 36.3), até ao líquido de cada colaborador, e o pagamento dos salários paga só o resto. Quem regista não pode ser quem recebe; a folha desse mês já lançada recusa.
+³⁹ PR #152 (ADR-114), em produção desde 2026-11-11. `POST` e `GET /finance/treasury/salary-advances`. O adiantamento sai da conta em kwanzas e lança 36.3 contra 43.1. A folha do mês indicado desconta-o num lançamento à parte (`ADT-SAL-AAAA-MM`: 36.1.2 ou 36.1.1 contra 36.3), até ao líquido de cada colaborador, e o pagamento dos salários paga só o resto. Quem regista não pode ser quem recebe; a folha desse mês já lançada recusa. No front, «Pagar salários» lembra que os adiantamentos que a folha descontou não saem outra vez do banco, e o editor de regras nomeia «Adiantamento de salário pago». Desde o ⁴⁸ paga-se o pedido aprovado.
 
-⁴⁰ PR #153 (ADR-115), em produção desde 2026-11-11. Desde o PR #154, o seed deixa uma despesa em dólares por reembolsar a 31/12. As despesas em moeda estrangeira aprovadas e por reembolsar no último dia do mês entram no mesmo `ACD-AAAA-MM`, pela 36.9, contra a 66.2.2 ou a 76.2.2, e o estorno do dia 1 devolve-as ao registo. Na resposta, `documents[].kind = EmployeeExpense`.
+⁴⁰ PR #153 (ADR-115), em produção desde 2026-11-11. Desde o PR #154, o seed deixa uma despesa em dólares por reembolsar a 31/12. As despesas em moeda estrangeira aprovadas e por reembolsar no último dia do mês entram no mesmo `ACD-AAAA-MM`, pela 36.9, contra a 66.2.2 ou a 76.2.2, e o estorno do dia 1 devolve-as ao registo. Na resposta, `documents[].kind = EmployeeExpense`. No front, a tabela passou a «Documentos em moeda estrangeira em aberto», e estas linhas dizem «Despesa de colaborador», com ligação à despesa.
 
-⁴¹ PR #155 (ADR-116), em produção desde 2026-11-12. A nota de crédito em moeda estrangeira lança a parte proporcional do que a factura corrigida lançou (cliente, devoluções e IVA), e não ao câmbio do dia dela. A nota do valor todo deixa o cliente a zero, sem diferença de câmbio. O SAF-T converte-a ao mesmo câmbio.
+⁴¹ PR #155 (ADR-116), em produção desde 2026-11-12. A nota de crédito em moeda estrangeira lança a parte proporcional do que a factura corrigida lançou (cliente, devoluções e IVA), e não ao câmbio do dia dela. A nota do valor todo deixa o cliente a zero, sem diferença de câmbio. O SAF-T converte-a ao mesmo câmbio. No front, o texto de «Lançar o histórico» di-lo.
+
+⁴² PR #156 (ADR-117), em produção desde 2026-11-12. Inventário intermitente:
+- **No fecho do ano**, `POST /finance/ledger/fiscal-years/{ano}/inventory-regularisation` passa as existências iniciais (22, 26) e as compras (21) para a 71, e devolve à 22 e à 26 o stock a 31/12.
+- **O stock final** vem do inventário pelo tipo de cada artigo. A contagem física pode substituí-lo.
+- **Os artigos** têm tipo: matérias-primas, matérias subsidiárias, materiais diversos (por omissão), embalagens, outros materiais ou mercadorias.
+- **A compra de existências** deduz o IVA na 34.5.2.1.
+- **No front:** em Períodos, o cartão «Regularização de existências»: simular, a tabela por conta (inicial, pelo inventário e o final, editável pela contagem física), as compras (21) e o custo (71); mudar o final obriga a simular de novo antes de lançar. Os artigos têm o campo «Tipo» ao registar, a coluna na lista e «Mudar o tipo» na ficha.
+
+⁴³ PR #158 (ADR-118), em produção desde 2026-11-12.
+- **Indicar:** o contabilista indica a estimativa do imposto industrial do ano, e o Rivo lança D 87.1 / C 34.1 a 31/12. Não há taxas nem cálculo.
+- **Zero** é «sem imposto»: fica registado e não lança.
+- **Uma indicação por exercício:** corrige-se por ajuste, com o novo valor e o motivo, e o ajuste lança só a diferença. Cada registo guarda quem indicou e quando.
+- **Apuramento:** avisa se faltar a estimativa.
+- **No front:** em Períodos, o cartão «Imposto industrial»: sem estimativa, o aviso e «Indicar estimativa» (o valor ou «Sem imposto (zero)», e uma nota); com ela, o valor em vigor, os registos (quando, quem, tipo, valor, diferença, lançamento, nota ou motivo) e «Corrigir» (o novo total e o motivo). O apuramento mostra os avisos e leva ao cartão.
+
+⁴⁴ PR #159 (ADR-119), em produção desde 2026-11-13.
+- **Conta do custo:** quem aprova a despesa pode indicar a conta do PGC. Sem ela, o custo fica na 75.2.39.
+- **Despesas com o pessoal:** nas 72.3 a 72.8 (pensões, seguros, formação, outras), a .1 é para os órgãos sociais e a .2 para o pessoal, pelo cargo no dia da despesa. Trocá-las é recusado, com a subconta certa.
+- **Fora de alcance:** as remunerações (72.1, 72.2) continuam a ser só da folha.
+- **No front:** aprovar a despesa tem o campo «Conta do custo (PGC, opcional)», com sugestões a quem lê o plano de contas; a recusa do servidor aparece junto ao campo, e o diálogo não fecha. A ficha mostra a conta.
+
+⁴⁵ PR #160 (ADR-120), em produção desde 2026-11-13.
+- **IRT e INSS:** quem decidiu a folha em Aprovações não os entrega ao Estado, e uma conta sem colaborador também não: 403. É a regra dos salários (³⁴).
+- **IVA:** não muda.
+- **No front:** o diálogo «Entregar ao Estado» lembra a regra, e o 403 mostra o motivo do servidor.
+
+⁴⁶ PR #161 (ADR-121), em produção desde 2026-11-13.
+- **Actualização cambial a pedido:** corre-se em qualquer fim de mês, sem cadência imposta.
+- **Aviso no apuramento:** se a actualização de 31/12 ainda deixaria diferenças, o apuramento avisa quanto e como a lançar. Se não a puder simular, diz porquê. O apuramento não é recusado.
+- **No front:** o apuramento mostra os avisos e leva à actualização cambial (com Dezembro já escolhido).
+
+⁴⁷ PR #162 (ADR-122), em produção desde 2026-11-13.
+- **A escolha:** com a contagem física, o contabilista escolhe em cada regularização se a diferença para o inventário fica no custo (71) ou sai para a 78.4.1 «Quebras» e a 68.4.1 «Sobras».
+- **Por omissão** fica na 71.
+- **Repetir** não duplica.
+- **No front:** com a contagem, a caixa «A diferença da contagem não afecta o custo (quebras na 78.4.1, sobras na 68.4.1)»; a simulação mostra, por conta, a diferença (a quebra a vermelho) e para onde vai.
+
+⁴⁸ PR #163 e #164 (ADR-123), em produção desde 2026-11-13.
+- **O pedido:** o adiantamento pede-se pelo portal (o próprio) ou pelas finanças (em nome dele), e vai a Aprovações como `finance.salary_advance`, com o colaborador como requisitante.
+- **A política:** é preciso uma, ou o pedido é recusado.
+- **O pagamento:** só os aprovados se pagam, e quem decidiu não paga. Uma conta sem colaborador também não.
+- **No front:** Tesouraria → «Adiantamentos de salário» (quem lê as contas a pagar): os pedidos com o estado e a ligação à aprovação; «Pedir em nome de…» a quem tem `finance.treasury.write` e lê os colaboradores (o Finance não os lê: B46); «Pagar» só nos aprovados, a quem executa pagamentos (conta em kwanzas, data, referência), e não a quem decidiu o pedido nem a uma conta sem ficha; os pagos, com «Só os por descontar». No portal, «Adiantamentos de salário»: pedir (valor, a folha que o desconta, motivo) e ver o estado; o pedido interno «Adiantamento salarial» aponta para lá.
+
+⁴⁹ PR #165 (ADR-124), em produção desde 2026-11-13.
+- **Indicar:** o contabilista indica a regularização anual do IVA pelo pró-rata definitivo. A favor do Estado vai a custo (75.3.1.2), a favor da empresa a proveito (63.5), e uma parte pode ir para o imobilizado, sempre contra a 34.5.4.3. O Rivo não calcula nada.
+- **Uma por exercício:** corrige-se por ajuste, com motivo, e guarda quem e quando.
+- **Apuramento:** o IVA de Dezembro leva-a.
+- **No front:** em Períodos, o cartão «Pró-rata do IVA», antes da regularização de existências: o valor em vigor e a favor de quem, os registos, «Indicar» (a favor do Estado ou da empresa, o valor sem sinal, as partes no imobilizado, opcionais, com sugestões das 11, 12 e 14, e uma nota) e «Corrigir» (com o motivo); os avisos do servidor à vista.
+
+⁵⁰ PR #166 (ADR-125), em revisão a 2026-11-13.
+- **Corrigir:** o IVA não dedutível de uma factura de compra corrige-se sem a anular, com o novo valor e o motivo. A dívida ao fornecedor não muda.
+- **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
+- **Anular depois** estorna também as correcções.
+- **O botão ainda não existe:** no front, está por fazer (NOVIDADES, secção 42).
 
 ---
 
@@ -948,13 +1011,17 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Artigos**
 - Lista com a referência, a quantidade em mão, o custo médio, o valor e o
-  estado (os inactivos a pedido); **registar** (referência, nome, unidade).
+  estado (os inactivos a pedido), com o **tipo** de existência; **registar**
+  (referência, nome, unidade e tipo: matérias-primas, subsidiárias, materiais
+  diversos por omissão, embalagens, outros materiais ou mercadorias, que diz a
+  conta do stock no fecho do ano ⁴²).
 - **Artigo:** em mão, custo médio e valor; por armazém; os movimentos (data,
   tipo, armazém — e o outro, nas transferências —, quantidade, custo, valor,
   motivo); **movimentar**: entrada (quantidade e custo unitário, até 4 casas;
   recalcula o custo médio), saída, ajuste (variação positiva ou negativa, com
   motivo) e transferência entre armazéns diferentes — nenhum deixa um armazém
-  negativo; **activar** e **desactivar** (inactivo não se movimenta nem conta).
+  negativo; **activar** e **desactivar** (inactivo não se movimenta nem conta);
+  **mudar o tipo** (não mexe nos movimentos).
 
 **Armazéns**
 - Código, nome e estado; **registar**, **activar** e **desactivar**
@@ -1081,6 +1148,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   custos e do imobilizado; vazio lança em 75.2.39 Outros serviços. A ficha
   mostra a conta. Com a conta de um bem (11 a 14), o registo e a ficha avisam
   que é uma compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2.
+- **IVA não dedutível** (zero por omissão, até ao IVA da factura ³⁷):
+  preenchido, mostra o que vai para a conta do bem ou da compra (líquido mais
+  o não dedutível) e o IVA dedutível. A ficha mostra os dois e, numa compra de
+  imobilizado, o custo de aquisição a usar ao registar o bem.
 - Ficha: o país e o mercado do fornecedor ao lado do NIF; dados e totais,
   confronto com a encomenda quando a tem, os pedidos de
   pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
@@ -1105,10 +1176,14 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   rejeitadas) e lista com filtros por estado e datas.
 - **Registar** em nome de um colaborador (data, categoria com sugestões,
   descrição, valor, moeda, comprovativo).
-- Ficha: **aprovar** (notas opcionais), **rejeitar** (com motivo, que o
-  colaborador lê), **marcar reembolsada** (data, conta e referência; com a
-  conta, o valor sai dela nessa data e lança no razão) e
-  **descarregar o comprovativo**. A própria despesa não se decide.
+- Ficha: **aprovar** (notas e a **conta do custo** do PGC, opcional, com
+  sugestões; vazio fica na 75.2.39; a recusa do servidor, por exemplo a
+  subconta .1 ou .2 trocada, aparece junto ao campo ⁴⁴), **rejeitar** (com
+  motivo, que o colaborador lê), **marcar reembolsada** (data, conta e
+  referência; com a conta, o valor sai dela nessa data e lança no razão;
+  noutra moeda, pela 43.2, com a diferença de câmbio ³⁸) e **descarregar o
+  comprovativo**. A ficha mostra a conta do custo. A própria despesa não se
+  decide.
 
 **Contas bancárias**
 - Lista com saldos (com ou sem fechadas); **abrir** (nome, banco, moeda, IBAN
@@ -1117,10 +1192,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   folha lançada) e **Entregar ao Estado** (IRT, INSS ou IVA de um mês; o valor
   vem do razão), com a data do pagamento: o que falta do mês, ou só uma parte
   («Valor desta parte», opcional ³⁵); mostra o valor pago, o que ainda falta
-  do mês, o saldo que ficou e a ligação ao lançamento; as recusas (folha por
+  do mês, o saldo que ficou e a ligação ao lançamento; os adiantamentos que a
+  folha descontou não saem outra vez do banco ³⁹; as recusas (folha por
   lançar, IVA por apurar, mês já pago, parte maior do que falta, saldo
   insuficiente, período fechado, quem decidiu a folha ou conta sem ficha de
-  colaborador ³⁴) dizem porquê.
+  colaborador, nos salários, no IRT e no INSS ³⁴ ⁴⁵) dizem porquê.
 - Ficha: saldo, **depositar** e **levantar** (com a data-valor), **depositar
   valores** (numerário e cheques recebidos, nas contas em kwanzas: valor e
   referência do talão, data), **fechar** (só com saldo zero) e **reabrir**;
@@ -1132,6 +1208,19 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   banco em CSV (ficheiro ou colado) com conciliação automática; **conciliar
   automaticamente**; **conciliar à mão** (os movimentos do mesmo valor primeiro),
   **desfazer** e **ignorar** linhas.
+
+**Adiantamentos de salário** ³⁹ ⁴⁸
+- **Pedidos** (colaborador, valor, a folha que o desconta, motivo, quando,
+  estado: por aprovar, aprovado por pagar, recusado, pago), com a ligação ao
+  pedido de aprovação.
+- **Pedir em nome de…** um colaborador (valor, folha do mês corrente ou
+  seguinte, motivo): vai a Aprovações com ele como requisitante.
+- **Pagar** os aprovados: a conta em kwanzas, a data e a referência; sai do
+  banco e lança 36.3 contra 43.1. Quem decidiu o pedido, ou uma conta sem
+  ficha de colaborador, não vê o botão e a linha diz porquê (BR-3); o 403 e o
+  409 do servidor mostram o motivo.
+- **Pagos:** valor, data, folha, descontado e por descontar, referência; o
+  filtro «Só os por descontar».
 
 **Caixa pequena**
 - Fundos com fundo fixo, saldo e o que falta repor; **abrir** e **rever**
@@ -1184,8 +1273,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   recuperar, com a nota de que não é a declaração oficial.
 - **Retenções na fonte** feitas pelos clientes, por cliente.
 - **SAF-T AO** de facturação do mês ou do ano, descarregado em XML, com o aviso
-  de que a Rivo não é software certificado. Hoje o servidor recusa por falta de
-  configuração (B24) e o ecrã mostra o motivo.
+  de que a Rivo não é software certificado. Sem a identificação fiscal da
+  empresa declarada, o servidor recusa e o ecrã mostra o motivo.
 - **Apurar o IVA** de um mês no razão (com ou sem o crédito dos meses
   anteriores): IVA liquidado, dedutível, regularizações, crédito transitado, a
   pagar e a recuperar, com a ligação ao lançamento; um mês já apurado não
@@ -1220,9 +1309,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Por ano: meses 1–12 e regularizações 13–16, com estado, fecho e última
   reabertura; **abrir**, **fechar** (fica registado quem fechou) e **reabrir**
   com motivo.
-- **Actualização cambial** (pelo PGC): as contas em moeda estrangeira e as
-  facturas de venda e de compra em moeda estrangeira em aberto, ao câmbio do
-  último dia do mês (Dezembro por omissão; antes de apurar o ano).
+- **Actualização cambial** (pelo PGC): as contas em moeda estrangeira, as
+  facturas de venda e de compra em moeda estrangeira em aberto e as despesas
+  de colaborador em moeda estrangeira por reembolsar (36.9 ⁴⁰), ao câmbio do
+  último dia do mês (Dezembro por omissão; antes de apurar o ano). A tabela
+  «Documentos em moeda estrangeira em aberto» diz se cada um é venda, compra
+  ou despesa de colaborador, com a ligação a cada um.
   **Simular** mostra, por conta, o saldo, o câmbio e a data dele, e o valor
   em kwanzas; por factura (com ligação), o cliente ou fornecedor, o em
   aberto, o câmbio, a conta, como lançou, o valor ao câmbio e a diferença; a
@@ -1232,13 +1324,32 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   clientes e fornecedores e ao estorno no dia 1 do mês seguinte); «nada a
   fazer» quando já vale o câmbio do mês. Se o mês já foi lançado com outros
   valores, a recusa do servidor diz o que fazer.
+- **Pró-rata do IVA** ⁴⁹: o valor em vigor e a favor de quem, os registos
+  (quando, quem, tipo, valor, diferença, lançamento, nota ou motivo);
+  **indicar** (a favor do Estado ou da empresa, o valor, as partes no
+  imobilizado, opcionais, e uma nota; zero é «sem regularização») e
+  **corrigir** (o novo total, as partes e o motivo). Os avisos do servidor
+  (por exemplo, voltar a apurar o IVA de Dezembro) ficam à vista.
+- **Regularização de existências** ⁴² ⁴⁷: **simular** (por conta de
+  existências: a inicial, a do inventário e a final; as compras da 21 e o
+  custo da 71; os avisos); a final muda-se pela contagem física, e então
+  escolhe-se se a diferença fica no custo ou vai para quebras (78.4.1) e
+  sobras (68.4.1); mudar obriga a simular de novo; **lançar** com
+  confirmação («REX-AAAA», com a ligação).
+- **Imposto industrial** ⁴³: sem estimativa, o aviso e **indicar** (o valor
+  ou «Sem imposto (zero)», e uma nota); com ela, o valor em vigor, os
+  registos e **corrigir** (o novo total e o motivo).
 - **Fecho do exercício** (pelo PGC): **apurar os resultados** do ano (a 31/12,
   período 13, diário APU; resultado líquido e lançamentos feitos; repetir não
-  duplica) e **abrir o ano** com os saldos do anterior (a 01/01, diário ABE;
-  recusa, com a razão, se o anterior não estiver apurado ou o ano já aberto).
+  duplica; os avisos do servidor — falta a estimativa do imposto, a
+  actualização cambial de 31/12 deixaria diferenças ⁴⁶ —, com o atalho para o
+  cartão certo) e **abrir o ano** com os saldos do anterior (a 01/01, diário
+  ABE; recusa, com a razão, se o anterior não estiver apurado ou o ano já
+  aberto).
 - **Lançar o histórico**: os documentos emitidos antes das regras (facturas,
   notas de crédito, recibos, facturas de compra, pagamentos) lançam na data e
-  ao câmbio de cada um. Escolhe-se um mês ou o ano inteiro (mês a mês);
+  ao câmbio de cada um (as notas de crédito em moeda estrangeira, ao da factura
+  que corrigem ⁴¹). Escolhe-se um mês ou o ano inteiro (mês a mês);
   primeiro **simula-se**, depois **lança-se** com confirmação. Mostra os
   lançados, os já lançados, os anulados, os sem regra, por tipo, e os
   documentos que não lançaram e porquê.
@@ -1247,8 +1358,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Lançamento automático**: por acontecimento (factura emitida, nota de
   crédito, recibo, recibo em numerário ou cheque, recibo por banco e
   pagamento em moeda estrangeira, retenção, factura de compra, pagamento,
-  despesa de colaborador aprovada e reembolsada, diferenças de câmbio
-  favoráveis e desfavoráveis no recebimento e no pagamento), as linhas que
+  despesa de colaborador aprovada e reembolsada, reembolsada em moeda
+  estrangeira ³⁸, diferenças de câmbio favoráveis e desfavoráveis no
+  recebimento, no pagamento e no reembolso de despesa, adiantamento de salário
+  pago ³⁹), as linhas que
   gera, com as parcelas líquido, imposto, total, líquido dos bens e dos
   serviços;
   e o **mercado** de cada uma (nacional, estrangeiro ou os dois);
@@ -1470,9 +1583,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   responsável).
 
 **Cargos**
-- Lista paginada com o nível e a autoridade para aprovar; **criar** (a
-  autoridade fixa-se ao criar) e **corrigir** (nome e nível); ver as
-  **ocupações** de cada cargo.
+- Lista paginada com o nível, a autoridade para aprovar e a etiqueta
+  «Órgão social»; **criar** (a autoridade fixa-se ao criar) e **corrigir**
+  (nome e nível); nos dois, a marca de **órgão social** (administração,
+  gerência, conselho fiscal), que leva quem o ocupa às contas dos órgãos
+  sociais na folha ³⁶; ver as **ocupações** de cada cargo.
 
 **Arquivo de documentos**
 - Todos os ficheiros carregados na Rivo (comprovativos, anexos, documentos
@@ -1606,22 +1721,27 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver a lista e a ficha (não regista nem corrige).
 
 **Facturas de compra**
-- Ver a lista e a ficha (com o país e o mercado do fornecedor e, numa conta
-  do imobilizado, onde ficam a dívida e o IVA); **anular**. Não regista
-  facturas nem pede pagamentos.
+- Ver a lista e a ficha (com o país e o mercado do fornecedor, o IVA não
+  dedutível e o dedutível ³⁷ e, numa conta do imobilizado, onde ficam a dívida
+  e o IVA); **anular**. Não regista facturas nem pede pagamentos.
 
 **Pedidos de pagamento**
 - Ver e **executar** os aprovados (BR-3: não executa o que pediu nem o que
   aprovou). **Abre os anexos** pelo pedido, sem ler o arquivo de documentos.
 
 **Despesas**
-- Resumo, lista e ficha; **aprovar**, **rejeitar**, **marcar reembolsada** e
-  **registar** em seu nome; **abre o comprovativo** pela despesa.
+- Resumo, lista e ficha; **aprovar** (com a conta do custo do PGC, opcional,
+  com sugestões ⁴⁴), **rejeitar**, **marcar reembolsada** e **registar** em
+  seu nome; **abre o comprovativo** pela despesa.
 
 **Contas bancárias**
 - Ver saldos e extracto (pela data-valor); **reconciliação** completa;
   **pagar salários** e **entregar ao Estado**, como o Admin. Não abre contas
   nem deposita, levanta ou deposita valores.
+
+**Adiantamentos de salário**
+- Ver os pedidos e os pagos e **pagar** os aprovados, como o Admin. Não pede
+  em nome de um colaborador: não lê os colaboradores (B46).
 
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
 - Tudo o que o Admin faz. Nas letras a receber escolhe o cliente da lista de
@@ -1634,7 +1754,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver tudo; **abrir** diários e contas, **lançar**, **estornar**, **abrir
   períodos** e mexer nas **classes de reporte**. Não fecha nem reabre
   períodos, não regista versões do plano nem define regras. Não carrega o
-  PGC, não apura nem abre o exercício e não lança o histórico.
+  PGC, não apura nem abre o exercício e não lança o histórico; não vê o
+  pró-rata do IVA, a regularização de existências nem o imposto industrial.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
 - Ver tudo, com os nomes dos departamentos, dos responsáveis e de quem
@@ -1700,14 +1821,20 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ao registar, escreve a **conta da despesa** do PGC (opcional), sem
   sugestões: não lê o plano de contas. Com a conta de um bem (11 a 14), o
   registo e a ficha avisam que a dívida fica na 37.1 e o IVA na 34.5.2.2.
+- Ao registar, o **IVA não dedutível** (opcional ³⁷), com o que vai para cada
+  conta; a ficha mostra-o.
 - A ficha mostra o país e o mercado do fornecedor.
 
 **Pedidos de pagamento**
 - Ver a lista e a ficha; **abre os anexos** pelo pedido.
 
 **Despesas**
-- Resumo, lista e ficha; **aprovar** e **rejeitar** (não as da própria). Não
-  regista nem reembolsa; **abre o comprovativo** pela despesa.
+- Resumo, lista e ficha; **aprovar** (com a conta do custo do PGC, opcional,
+  escrita sem sugestões ⁴⁴) e **rejeitar** (não as da própria). Não regista nem
+  reembolsa; **abre o comprovativo** pela despesa.
+
+**Adiantamentos de salário**
+- Ver os pedidos e os pagos. Não pede em nome de ninguém nem paga.
 
 **Contas bancárias**
 - Ver saldos e extracto; **abrir**, **depositar** e **levantar** (com a
@@ -1863,6 +1990,10 @@ decide pela conta, nunca por um id escolhido no ecrã.
   moeda, comprovativo até 10 MB), acompanhar o estado, ler o motivo de uma
   rejeição, ver a data do reembolso e **retirar** as que ainda não foram
   decididas.
+- **Adiantamentos de salário** ⁴⁸: **pedir** (valor, o mês da folha que o
+  desconta, o corrente por omissão, e o motivo) e acompanhar o estado (por
+  aprovar, aprovado por pagar, recusado, pago). Nos pedidos internos, a área
+  «Adiantamento salarial» aponta para aqui: lá é só uma conversa com os RH.
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem ficha ligada, o portal explica que a conta ainda não está ligada e pede
   para falar com os Recursos Humanos.

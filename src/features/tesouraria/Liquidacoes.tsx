@@ -115,8 +115,8 @@ export function PagamentoPeloBanco({ tipo, mesInicial }: { tipo: "salarios" | "e
         titulo={salarios ? "Pagar os salários de um mês" : "Entregar ao Estado"}
         descricao={
           salarios
-            ? "Paga o líquido que a folha aprovada lançou no razão (36.1.2): o que falta do mês, ou só uma parte. Sai da conta e fica no extracto. Quem decidiu a folha em Aprovações não a paga (BR-3)."
-            : "Entrega o imposto de um mês que está no razão, como a folha lançada ou o apuramento do IVA o deixaram: o que falta, ou só uma parte. Sai da conta e fica no extracto."
+            ? "Paga o líquido que a folha aprovada lançou no razão (36.1): o que falta do mês, ou só uma parte. Os adiantamentos que a folha já descontou não saem outra vez do banco: paga-se o resto. Sai da conta e fica no extracto. Quem decidiu a folha em Aprovações não a paga (BR-3)."
+            : "Entrega o imposto de um mês que está no razão, como a folha lançada ou o apuramento do IVA o deixaram: o que falta, ou só uma parte. Sai da conta e fica no extracto. O IRT e o INSS da folha não os entrega quem a decidiu em Aprovações (BR-3)."
         }
         rotuloConfirmar={r ? "Fechar" : salarios ? "Pagar" : "Entregar"}
         aCarregar={m.isPending}

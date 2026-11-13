@@ -101,6 +101,7 @@ export const artigo = (emMaoCentral = 10): S["InventoryItemView"] => ({
   sku: "PAP-A4",
   name: "Papel A4",
   unit: "resma",
+  kind: "SundryMaterials",
   quantityOnHand: emMaoCentral + 2,
   averageCost: 2500.5,
   totalValue: (emMaoCentral + 2) * 2500.5,

@@ -66,6 +66,15 @@ export function useRegistarArtigo() {
   });
 }
 
+/** Muda o tipo de existência (a conta do stock no fecho); não mexe nos movimentos (ADR-117). */
+export function useMudarTipoArtigo(id: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (kind: S["ReclassifyItemRequest"]["kind"]) => enviar(api.POST("/inventory/items/{itemId}/kind", { params: { path: { itemId: id } }, body: { kind } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chaves.artigos }),
+  });
+}
+
 export function useEstadoArtigo(id: string) {
   const qc = useQueryClient();
   return useEscrita({

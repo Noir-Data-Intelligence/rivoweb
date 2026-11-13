@@ -238,4 +238,30 @@ test.describe("núcleo organizacional", () => {
     await expect(page.getByRole("dialog").getByText("Em vigor")).toBeVisible();
     await semViolacoesAxe(page);
   });
+
+  test("cargos: a marca de órgão social (ADR-111) ao criar e ao corrigir, e a etiqueta na lista", async ({ page, api }) => {
+    await comF1(api)
+      .em("POST", "/hr/positions", { status: 201, corpo: { positionId: "00000000-0000-4000-8000-000000000032" } })
+      .em("PUT", `/hr/positions/${ID.cargoSimples}`, { status: 204 })
+      .ligar();
+    await entrar(page);
+    await page.goto("/cargos");
+    await expect(page.getByRole("row").filter({ hasText: "Director" })).toContainText("Órgão social");
+    await expect(page.getByRole("row").filter({ hasText: "Técnico" })).not.toContainText("Órgão social");
+    await page.getByRole("button", { name: "Novo cargo" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Nome").fill("Administrador");
+    await d.getByLabel("Nível hierárquico").fill("1");
+    await expect(d.getByLabel("Órgão social (administração, gerência, conselho fiscal)")).not.toBeChecked();
+    await d.getByLabel("Órgão social (administração, gerência, conselho fiscal)").check();
+    await d.getByRole("button", { name: "Criar cargo" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", "/hr/positions").map((p) => p.corpo)).toEqual([{ name: "Administrador", hierarchyLevel: 1, grantsApprovalAuthority: false, governingBody: true }]);
+    // Corrigir envia sempre a marca, mesmo sem mudar.
+    await page.getByRole("button", { name: "Corrigir Técnico" }).click();
+    await expect(d.getByLabel("Órgão social (administração, gerência, conselho fiscal)")).not.toBeChecked();
+    await d.getByRole("button", { name: "Guardar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("PUT", `/hr/positions/${ID.cargoSimples}`).map((p) => p.corpo)).toEqual([{ name: "Técnico", hierarchyLevel: 5, governingBody: false }]);
+  });
 });

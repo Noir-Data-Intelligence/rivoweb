@@ -152,6 +152,8 @@ export default function FacturaCompra() {
   }
   const f = q.data;
   const anulada = f.status === "Cancelled";
+  // A parte do IVA que não se deduz (ADR-112): lançou com o líquido, e o dedutível é o resto.
+  const naoDedutivel = !dinheiro(f.nonDeductibleTax).eq(0);
   const resto = pedidos.data ? porPedir(f, pedidos.data.items) : null;
   const colunas: Coluna<PedidoPagamento>[] = [
     {
@@ -238,9 +240,24 @@ export default function FacturaCompra() {
               <dd className="text-right tabular-nums">{moeda(f.netTotal, f.currency)}</dd>
               <dt className="text-muted-foreground">IVA</dt>
               <dd className="text-right tabular-nums">{moeda(f.taxTotal, f.currency)}</dd>
+              {naoDedutivel ? (
+                <>
+                  <dt className="pl-3 text-muted-foreground">não dedutível</dt>
+                  <dd className="text-right tabular-nums">{moeda(f.nonDeductibleTax, f.currency)}</dd>
+                  <dt className="pl-3 text-muted-foreground">dedutível</dt>
+                  <dd className="text-right tabular-nums">{moeda(dinheiro(f.taxTotal).minus(dinheiro(f.nonDeductibleTax)).toString(), f.currency)}</dd>
+                </>
+              ) : null}
               <dt className="font-semibold text-foreground">Total</dt>
               <dd className="text-right font-semibold tabular-nums">{moeda(f.grossTotal, f.currency)}</dd>
             </dl>
+            {naoDedutivel ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                O IVA não dedutível entrou na {f.expenseAccountCode && eContaImobilizado(f.expenseAccountCode) ? "conta do bem, com o líquido" : "conta da compra, com o líquido"}:{" "}
+                {moeda(dinheiro(f.netTotal).plus(dinheiro(f.nonDeductibleTax)).toString(), f.currency)}
+                {f.expenseAccountCode && eContaImobilizado(f.expenseAccountCode) ? ". É esse o custo de aquisição do bem, ao registá-lo nos activos." : "."}
+              </p>
+            ) : null}
           </Card>
           <Confronto f={f} />
         </div>

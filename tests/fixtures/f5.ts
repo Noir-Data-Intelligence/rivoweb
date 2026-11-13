@@ -118,6 +118,7 @@ export const factura = (estado = "Normal"): S["PurchaseInvoiceView"] => ({
   cancellationReason: null,
   supplierCountry: "AO",
   market: "Domestic",
+  nonDeductibleTax: 0,
 });
 
 export const pedidoPagamento = (estado = "Eligible", valor: number | string = 640000): S["PaymentRequestView"] => ({

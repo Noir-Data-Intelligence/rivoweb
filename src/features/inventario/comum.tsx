@@ -34,3 +34,17 @@ export const EstadoContagem = estado({
   Refused: { texto: "Recusada", tom: "erro" },
   Cancelled: { texto: "Cancelada", tom: "neutro" },
 });
+
+/** Tipo de existência do artigo (ADR-117): diz a conta onde o stock volta no fecho do ano (22.x ou 26). */
+export const TIPOS_EXISTENCIA = [
+  { valor: "RawMaterials", texto: "Matérias-primas (22.1)" },
+  { valor: "SubsidiaryMaterials", texto: "Matérias subsidiárias (22.2)" },
+  { valor: "SundryMaterials", texto: "Materiais diversos (22.3)" },
+  { valor: "Packaging", texto: "Embalagens (22.4)" },
+  { valor: "OtherMaterials", texto: "Outros materiais (22.5)" },
+  { valor: "Goods", texto: "Mercadorias (26)" },
+] as const;
+
+export type TipoExistencia = (typeof TIPOS_EXISTENCIA)[number]["valor"];
+
+export const textoTipoExistencia = (k: string | null | undefined) => TIPOS_EXISTENCIA.find((t) => t.valor === k)?.texto ?? k ?? "—";

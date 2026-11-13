@@ -82,8 +82,8 @@ export const governacao = (): S["AdministrationOverview"] => ({
 export const departamentos = (): S["DepartmentView"][] => [{ departmentId: ID.dep1, name: "Operações", managerId: ID.emp1 }];
 
 export const cargos = (): S["PositionView"][] => [
-  { positionId: ID.cargoAprovador, name: "Director", hierarchyLevel: 1, grantsApprovalAuthority: true },
-  { positionId: ID.cargoSimples, name: "Técnico", hierarchyLevel: 5, grantsApprovalAuthority: false },
+  { positionId: ID.cargoAprovador, name: "Director", hierarchyLevel: 1, grantsApprovalAuthority: true, governingBody: true },
+  { positionId: ID.cargoSimples, name: "Técnico", hierarchyLevel: 5, grantsApprovalAuthority: false, governingBody: false },
 ];
 
 export const colaboradores = (): S["EmployeeView"][] => [

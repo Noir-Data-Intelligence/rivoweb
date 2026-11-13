@@ -330,3 +330,42 @@ export function useDepositarValores() {
     onSuccess: () => invalidarTudo(qc),
   });
 }
+
+// Adiantamentos de salário (ADR-114, ADR-123): pede-se (o próprio no portal, ou as finanças em nome dele),
+// aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu (BR-3).
+// A folha do mês desconta-o (36.3), e o pagamento dos salários paga o resto.
+
+export type PedidoAdiantamento = S["SalaryAdvanceApplicationView"];
+export type Adiantamento = S["SalaryAdvanceView"];
+
+export function usePedidosAdiantamento() {
+  return useQuery({
+    queryKey: ["finance", "salary-advance-applications"] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/treasury/salary-advance-applications", { signal })),
+  });
+}
+
+export function useAdiantamentos(porDescontar: boolean) {
+  return useQuery({
+    queryKey: ["finance", "salary-advances", porDescontar] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/treasury/salary-advances", { params: { query: porDescontar ? { outstandingOnly: true } : {} }, signal })),
+  });
+}
+
+/** Em nome de um colaborador: vai a Aprovações com ele como requisitante. */
+export function usePedirAdiantamento() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["SalaryAdvanceApplicationRequest"]) => ler(api.POST("/finance/treasury/salary-advance-applications", { body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "salary-advance-applications"] }),
+  });
+}
+
+/** Paga um pedido aprovado: sai da conta em kwanzas e lança 36.3 contra 43.1. */
+export function usePagarAdiantamento() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: S["SalaryAdvanceRequest"]) => ler(api.POST("/finance/treasury/salary-advances", { body: b })),
+    onSuccess: () => invalidarTudo(qc),
+  });
+}

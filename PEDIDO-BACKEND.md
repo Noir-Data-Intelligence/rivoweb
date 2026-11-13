@@ -1,7 +1,7 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `a8dcedc` (PR #141 a #148). Em aberto: **B24** (configuração).
+> Revisto contra `main` @ `8e9e904` (PR #141 a #165). **B24** resolvido a 2026-11-12 (configuração e PR #157). Em aberto: **B46** (o Finance não escolhe o colaborador do adiantamento).
 > **B43**, **B44** e **B45** estão resolvidos (PR #135 e #136) e o front já os
 > usa: «Bens / Serviço» em cada linha do rascunho e da pró-forma; a conta onde
 > entrou na emissão da FR do rascunho e na conversão da pró-forma; a versão do
@@ -153,6 +153,12 @@ rascunho) e `POST /finance/planning/cost-forecasts/{forecastId}/submission`,
 com `finance.planning.write`.
 
 ## B24 — O SAF-T recusa em produção por falta de configuração
+
+> **Resolvido (2026-11-12):**
+> - O NIF do produtor está no `.env` de produção.
+> - O seed declara a identificação fiscal da empresa, fictícia: «Rivo Demonstração, Lda» (PR #157).
+> - Verificado em produção: `GET /finance/saft-ao?from=2026-10-01&to=2026-10-31` dá 200, com o ficheiro `SAFT-AO_<NIF>_20261001_20261031.xml`.
+> - O cabeçalho do ficheiro traz a empresa, o NIF dela e o `ProductCompanyTaxID`. O ficheiro tem 15 facturas, 3 documentos de conferência e 6 recibos.
 
 **Facto:** `GET /finance/saft-ao` responde **400** em produção (e na base
 local): «Falta o NIF do produtor do software (Finance:SaftProductCompanyTaxId,
@@ -656,3 +662,22 @@ com o razão nessas facturas. Os recibos e os comprovativos já levam a conta.
 pró-forma, com as mesmas regras da FR directa (só FR, só meios por banco, a
 moeda da conta igual à da factura). O front acrescenta então «Conta onde
 entrou» quando o meio é por banco.
+
+## B46 — O Finance pede o adiantamento em nome de um colaborador, mas não lê os colaboradores
+
+**Facto:** `POST /finance/treasury/salary-advance-applications` (ADR-123) pede
+`finance.treasury.write`, que o perfil Finance tem, e precisa do `employeeId`.
+A única lista de colaboradores é `GET /hr/employees`, com `hr.employees.read`,
+que o Finance não tem. Verificado em produção a 2026-11-13, só leitura, com a
+conta Finance de QA: `GET /hr/employees` → 403;
+`GET /finance/treasury/salary-advance-applications` → 200.
+
+**Consequência:** no front, «Pedir em nome de…» (Tesouraria → Adiantamentos de
+salário) só aparece a quem tem também `hr.employees.read` (SuperAdmin e Admin).
+O Finance vê os pedidos e paga os aprovados, mas não pede em nome de ninguém.
+O front não remenda: não há outra fonte dos colaboradores para o Finance.
+
+**Pedido (uma das duas):**
+- uma lista mínima de colaboradores activos (id, nome, n.º) para quem tem
+  `finance.treasury.write`, por exemplo `GET /finance/treasury/salary-advance-applications/employees`; ou
+- dar ao perfil Finance `hr.employees.read`, se for essa a intenção do ADR-123.

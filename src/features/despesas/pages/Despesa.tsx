@@ -18,6 +18,10 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
+import { useContasRazao } from "@/features/contabilidade";
+import { eApiError } from "@/lib/api/problem";
+import { normalizarTexto } from "@/lib/validation/text";
+import { Textarea } from "@/ui/Controlos";
 import { useDecidirDespesa, useDespesa, useReembolsar, type Despesa as TipoDespesa } from "../api";
 import { EstadoDespesa } from "../comum";
 
@@ -98,6 +102,94 @@ function Reembolsar({ d }: { d: TipoDespesa }) {
   );
 }
 
+/**
+ * A conta do custo que quem aprova pode indicar (ADR-119): de movimento, da
+ * classe 7, sem a 71, a 73, as de transferência (x.9), a 72.1 e a 72.2 (as
+ * remunerações vão pela folha). O servidor confirma e diz a subconta certa.
+ */
+const eContaDoCusto = (c: string) => /^7/.test(c) && !/^7[13](\.|$)/.test(c) && !/^7\d?\.9(\.|$)/.test(c) && !/^72\.[12](\.|$)/.test(c);
+
+function AprovarDespesa({ id }: { id: string }) {
+  const { pode } = useUtilizador();
+  const decidir = useDecidirDespesa(id);
+  const [aberto, setAberto] = useState(false);
+  const [notas, setNotas] = useState("");
+  const [conta, setConta] = useState("");
+  const [tentou, setTentou] = useState(false);
+  const contas = useContasRazao(false, aberto && pode("finance.ledger.read"));
+  const sugestoes = (contas.data ?? []).filter((c) => c.isActive && c.acceptsPostings && !c.isAnalytic && eContaDoCusto(c.code));
+  const idContas = useId();
+  const idForm = useId();
+  const codigo = conta.trim();
+  const erroConta = codigo !== "" && !/^\d+(\.\d+)*$/.test(codigo) ? "Código de conta do PGC, por exemplo 72.7.2." : undefined;
+  // O 400 diz porque a conta não serve (e qual é a subconta certa): fica junto ao campo, e o diálogo não fecha.
+  const recusa = decidir.error && eApiError(decidir.error) && decidir.error.status === 400 ? (decidir.error.errors["pedido"] ?? []).join(" ") || decidir.error.detail : null;
+  const mudar = (a: boolean) => {
+    setAberto(a);
+    if (!a) {
+      decidir.reset();
+      setNotas("");
+      setConta("");
+      setTentou(false);
+    }
+  };
+  return (
+    <>
+      <Button onClick={() => setAberto(true)}>
+        <Check strokeWidth={1.75} aria-hidden />
+        Aprovar
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={mudar}
+        titulo="Aprovar esta despesa?"
+        descricao="Fica aprovada para reembolso e lança no razão contra a 36.9. O colaborador vê a decisão no portal."
+        rotuloConfirmar="Aprovar"
+        aCarregar={decidir.isPending}
+        erro={decidir.error && !recusa ? <ErrorPanel erro={decidir.error} /> : undefined}
+        formulario={idForm}
+      >
+        <form
+          id={idForm}
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setTentou(true);
+            if (erroConta || decidir.isPending) return;
+            const n = normalizarTexto(notas);
+            decidir.mutate({ aprovar: true, notas: n === "" ? null : n, conta: codigo === "" ? null : codigo }, { onSuccess: () => mudar(false) });
+          }}
+        >
+          <Field
+            rotulo="Conta do custo (PGC, opcional)"
+            erro={(tentou ? erroConta : undefined) ?? recusa ?? undefined}
+            ajuda="Vazio: 75.2.39 Outros serviços. Formação, seguros e outras despesas com o pessoal: 72.x.1 para órgãos sociais, 72.x.2 para o pessoal. Alojamento e alimentação em deslocação: 75.2.23."
+          >
+            {({ id: idCampo, descricao, invalido }) => (
+              <>
+                <Input id={idCampo} maxLength={30} autoComplete="off" inputMode="decimal" list={sugestoes.length > 0 ? idContas : undefined} aria-describedby={descricao} invalido={invalido} value={conta} onChange={(e) => setConta(e.target.value)} />
+                {sugestoes.length > 0 ? (
+                  <datalist id={idContas}>
+                    {sugestoes.map((c) => (
+                      <option key={c.accountId} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </datalist>
+                ) : null}
+              </>
+            )}
+          </Field>
+          <Field rotulo="Notas (opcional)">
+            {({ id: idCampo, descricao }) => <Textarea id={idCampo} rows={2} maxLength={500} aria-describedby={descricao} value={notas} onChange={(e) => setNotas(e.target.value)} />}
+          </Field>
+        </form>
+      </Confirmar>
+    </>
+  );
+}
+
 export default function Despesa() {
   const { expenseId = "" } = useParams();
   const { pode } = useUtilizador();
@@ -144,21 +236,7 @@ export default function Despesa() {
             <div className="flex flex-wrap gap-2">
               {podeDecidir ? (
                 <>
-                  <ConfirmarComMotivo
-                    rotuloBotao="Aprovar"
-                    icone={<Check strokeWidth={1.75} aria-hidden />}
-                    varianteBotao="primary"
-                    titulo="Aprovar esta despesa?"
-                    descricao="Fica aprovada para reembolso. O colaborador vê a decisão no portal."
-                    rotuloConfirmar="Aprovar"
-                    variante="primary"
-                    rotuloCampo="Notas (opcional)"
-                    opcional
-                    maximo={500}
-                    aCarregar={decidir.isPending}
-                    erro={decidir.error ? <ErrorPanel erro={decidir.error} /> : undefined}
-                    aoConfirmar={(notas, fechar) => decidir.mutate({ aprovar: true, notas: notas === "" ? null : notas }, { onSuccess: fechar })}
-                  />
+                  <AprovarDespesa id={expenseId} />
                   <ConfirmarComMotivo
                     rotuloBotao="Rejeitar"
                     icone={<X strokeWidth={1.75} aria-hidden />}
@@ -191,6 +269,7 @@ export default function Despesa() {
           <Linha rotulo="Data">{formatarData(d.spentOn)}</Linha>
           <Linha rotulo="Categoria">{d.category}</Linha>
           <Linha rotulo="Valor">{moeda(d.amount, d.currency)}</Linha>
+          {d.expenseAccountCode ? <Linha rotulo="Conta do custo">{d.expenseAccountCode}</Linha> : null}
           <Linha rotulo="Submetida em">{formatarDataHora(d.submittedAt)}</Linha>
           <Linha rotulo="Comprovativo">
             {d.receiptDocumentId === null ? (

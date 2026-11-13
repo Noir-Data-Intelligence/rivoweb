@@ -20,8 +20,8 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useArtigo, useEstadoArtigo, useMovimentar, useTodosArmazens, type Artigo as TipoArtigo, type Movimento, type TipoMovimento } from "../api";
-import { EstadoActivo, kz, qtd, TIPO_MOVIMENTO } from "../comum";
+import { useArtigo, useEstadoArtigo, useMovimentar, useMudarTipoArtigo, useTodosArmazens, type Artigo as TipoArtigo, type Movimento, type TipoMovimento } from "../api";
+import { EstadoActivo, kz, qtd, textoTipoExistencia, TIPO_MOVIMENTO, TIPOS_EXISTENCIA, type TipoExistencia } from "../comum";
 import { errosMovimento, lerComSinal, type CamposMovimento } from "../regras";
 
 const TIPOS: Record<TipoMovimento, string> = { entrada: "Entrada", saida: "Saída", ajuste: "Ajuste", transferencia: "Transferência" };
@@ -181,6 +181,64 @@ function MudarEstado({ a }: { a: TipoArtigo }) {
   );
 }
 
+/** Mudar o tipo de existência: muda a conta do stock no próximo fecho, sem mexer nos movimentos (ADR-117). */
+function MudarTipo({ a }: { a: TipoArtigo }) {
+  const [aberto, setAberto] = useState(false);
+  const [tipo, setTipo] = useState(a.kind as TipoExistencia);
+  const mudarTipo = useMudarTipoArtigo(a.itemId);
+  const idForm = useId();
+  const mudar = (x: boolean) => {
+    setAberto(x);
+    if (!x) {
+      mudarTipo.reset();
+      setTipo(a.kind as TipoExistencia);
+    }
+  };
+  return (
+    <>
+      <Button variante="secondary" onClick={() => setAberto(true)}>
+        Mudar o tipo
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={mudar}
+        titulo={`Mudar o tipo de ${a.name}`}
+        descricao="O tipo diz a conta onde o stock volta no fecho do ano (22.x ou 26). Não mexe nos movimentos."
+        rotuloConfirmar="Mudar"
+        aCarregar={mudarTipo.isPending}
+        erro={mudarTipo.error ? <ErrorPanel erro={mudarTipo.error} /> : undefined}
+        formulario={idForm}
+      >
+        <form
+          id={idForm}
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (mudarTipo.isPending) return;
+            if (tipo === a.kind) {
+              mudar(false);
+              return;
+            }
+            mudarTipo.mutate(tipo, { onSuccess: () => mudar(false) });
+          }}
+        >
+          <Field rotulo="Tipo">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={tipo} onChange={(e) => setTipo(e.target.value as TipoExistencia)}>
+                {TIPOS_EXISTENCIA.map((t) => (
+                  <option key={t.valor} value={t.valor}>
+                    {t.texto}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        </form>
+      </Confirmar>
+    </>
+  );
+}
+
 export default function Artigo() {
   const { itemId = "" } = useParams();
   const { pode } = useUtilizador();
@@ -239,13 +297,14 @@ export default function Artigo() {
           <span className="inline-flex flex-wrap items-center gap-2">
             <EstadoActivo estado={a.status} />
             <span>
-              {a.sku} · {qtd(a.quantityOnHand)} {a.unit} em mão
+              {a.sku} · {qtd(a.quantityOnHand)} {a.unit} em mão · {textoTipoExistencia(a.kind)}
             </span>
           </span>
         }
         accao={
           pode("inventory.items.write") ? (
             <div className="flex flex-wrap gap-2">
+              <MudarTipo a={a} />
               <MudarEstado a={a} />
               {activo ? <Movimentar a={a} /> : null}
             </div>

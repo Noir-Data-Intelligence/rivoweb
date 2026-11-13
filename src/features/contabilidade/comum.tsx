@@ -107,6 +107,10 @@ export const EVENTOS = [
   { valor: "ReceiptExchangeLoss", texto: "Diferença de câmbio desfavorável no recebimento" },
   { valor: "PaymentExchangeGain", texto: "Diferença de câmbio favorável no pagamento" },
   { valor: "PaymentExchangeLoss", texto: "Diferença de câmbio desfavorável no pagamento" },
+  { valor: "ForeignCurrencyExpenseReimbursed", texto: "Despesa de colaborador reembolsada em moeda estrangeira" },
+  { valor: "ExpenseReimbursementExchangeGain", texto: "Diferença de câmbio favorável no reembolso de despesa" },
+  { valor: "ExpenseReimbursementExchangeLoss", texto: "Diferença de câmbio desfavorável no reembolso de despesa" },
+  { valor: "SalaryAdvancePaid", texto: "Adiantamento de salário pago" },
 ] as const;
 
 export const PARCELAS = [

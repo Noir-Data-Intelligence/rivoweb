@@ -62,6 +62,9 @@ function comF6(api: ApiSimulada, me = meAdminF6): ApiSimulada {
     .em("GET", "/finance/ledger/entries", pag([lancamento()]))
     .em("GET", `/finance/ledger/entries/${IDF6.lancamento}`, { status: 200, corpo: lancamento() })
     .em("GET", "/finance/ledger/periods", { status: 200, corpo: periodos() })
+    // O fecho do ano lê o que o contabilista já indicou (ADR-118, ADR-124): aqui, nada.
+    .em("GET", "/finance/ledger/fiscal-years/2026/income-tax-estimate", { status: 200, corpo: { fiscalYear: 2026, indicated: false, amount: null, records: [] } })
+    .em("GET", "/finance/ledger/fiscal-years/2026/vat-pro-rata", { status: 200, corpo: { fiscalYear: 2026, indicated: false, amount: null, records: [] } })
     .em("GET", "/finance/ledger/posting-rules", { status: 200, corpo: regrasLancamento() })
     .em("GET", "/finance/ledger/accounting-rules", { status: 200, corpo: [] })
     .em("GET", "/finance/ledger/chart-versions", { status: 200, corpo: versoesPlano() })

@@ -31,6 +31,7 @@ const esquema = z.object({
     z.regex(/^\d{1,3}$/, "Um número inteiro, de 0 a 999."),
   ),
   grantsApprovalAuthority: z.boolean(),
+  governingBody: z.boolean(),
 });
 type Dados = z.infer<typeof esquema>;
 
@@ -43,7 +44,7 @@ function FormularioCargo({ cargo, aberto, aoMudar }: { cargo: Cargo | null; aber
   const [soltas, setSoltas] = useState<string[]>([]);
   const form = useForm<Dados>({
     resolver: zodResolver(esquema),
-    values: { name: cargo?.name ?? "", hierarchyLevel: cargo ? String(cargo.hierarchyLevel) : "", grantsApprovalAuthority: cargo?.grantsApprovalAuthority ?? false },
+    values: { name: cargo?.name ?? "", hierarchyLevel: cargo ? String(cargo.hierarchyLevel) : "", grantsApprovalAuthority: cargo?.grantsApprovalAuthority ?? false, governingBody: cargo?.governingBody ?? false },
   });
   const fechar = (a: boolean) => {
     aoMudar(a);
@@ -64,8 +65,8 @@ function FormularioCargo({ cargo, aberto, aoMudar }: { cargo: Cargo | null; aber
     }
     const aoErrar = (e: unknown) => setSoltas(aplicarErrosDoServidor(e, form.setError, ["name", "hierarchyLevel"]));
     const nivel = Number(d.hierarchyLevel);
-    if (cargo) corrigir.mutate({ positionId: cargo.positionId, name: d.name, hierarchyLevel: nivel }, { onSuccess: () => fechar(false), onError: aoErrar });
-    else criar.mutate({ name: d.name, hierarchyLevel: nivel, grantsApprovalAuthority: d.grantsApprovalAuthority }, { onSuccess: () => fechar(false), onError: aoErrar });
+    if (cargo) corrigir.mutate({ positionId: cargo.positionId, name: d.name, hierarchyLevel: nivel, governingBody: d.governingBody }, { onSuccess: () => fechar(false), onError: aoErrar });
+    else criar.mutate({ name: d.name, hierarchyLevel: nivel, grantsApprovalAuthority: d.grantsApprovalAuthority, governingBody: d.governingBody }, { onSuccess: () => fechar(false), onError: aoErrar });
   });
   return (
     <Confirmar
@@ -105,6 +106,11 @@ function FormularioCargo({ cargo, aberto, aoMudar }: { cargo: Cargo | null; aber
             {...form.register("grantsApprovalAuthority")}
           />
         )}
+        <Checkbox
+          rotulo="Órgão social (administração, gerência, conselho fiscal)"
+          ajuda="Quem o ocupar no fim do mês lança na folha nas contas dos órgãos sociais (72.1, 72.5.1 e 36.1.1), e não nas do pessoal. Corrige-se depois; muda só as folhas que lançarem a seguir."
+          {...form.register("governingBody")}
+        />
       </form>
     </Confirmar>
   );
@@ -156,7 +162,16 @@ export default function Cargos() {
   const podeEscrever = pode("hr.positions.write");
 
   const colunas: Coluna<Cargo>[] = [
-    { id: "nome", cabecalho: "Nome", celula: (c) => <span className="font-medium">{c.name}</span> },
+    {
+      id: "nome",
+      cabecalho: "Nome",
+      celula: (c) => (
+        <span className="inline-flex flex-wrap items-center gap-2">
+          <span className="font-medium">{c.name}</span>
+          {c.governingBody ? <Badge>Órgão social</Badge> : null}
+        </span>
+      ),
+    },
     { id: "nivel", cabecalho: "Nível", alinhar: "direita", esconderAte: "sm", celula: (c) => String(c.hierarchyLevel) },
     {
       id: "autoridade",

@@ -11287,6 +11287,245 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/treasury/salary-advance-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pedidos de adiantamento (ADR-123), os mais recentes primeiro, com o estado: PendingApproval, Approved (por pagar), Refused, Paid. Filtro: employeeId. */
+        get: {
+            parameters: {
+                query?: {
+                    employeeId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SalaryAdvanceApplicationView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** Pede um adiantamento de salário em nome de um colaborador (ADR-123): vai ao motor de aprovação (`finance.salary_advance`), com o colaborador como requisitante. O próprio pede em /portal/me/salary-advance-applications. Folha do mês (omitida, a corrente) já lançada, ou sem política de aprovação: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SalaryAdvanceApplicationRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdCreatedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/treasury/salary-advances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Adiantamentos de salário (ADR-114), os mais recentes primeiro. Filtros: employeeId, payrollYear, payrollMonth, outstandingOnly (só os que ainda têm o que descontar). */
+        get: {
+            parameters: {
+                query?: {
+                    employeeId?: string;
+                    payrollYear?: number | string;
+                    payrollMonth?: number | string;
+                    outstandingOnly?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SalaryAdvanceView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** Paga, da conta em kwanzas indicada, um pedido de adiantamento aprovado (ADR-123): 36.3 contra 43.1 (ADR-114). A folha do pedido desconta-o pela 36.1, até ao líquido. Conta sem colaborador ou quem decidiu o pedido: 403 (BR-3). Pedido por aprovar, recusado ou já pago, adiantamento ao próprio, folha já lançada, sem saldo ou período fechado: 409. Conta noutra moeda, data futura ou folha anterior ao pagamento: 400. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SalaryAdvanceRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdCreatedResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/treasury/tax-payments": {
         parameters: {
             query?: never;
@@ -14194,7 +14433,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Aprova. Quem decide não pode ser o colaborador da despesa (409). */
+        /** Aprova. Quem decide não pode ser o colaborador da despesa (409). `expenseAccountCode` (opcional, ADR-119): a conta da natureza do custo, da classe 7; nas 72.3 a 72.8, a subconta .1 (órgãos sociais) ou .2 (pessoal) pelo cargo no dia da despesa. */
         post: {
             parameters: {
                 query?: never;
@@ -14206,7 +14445,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": null | components["schemas"]["ExpenseDecisionRequest"];
+                    "application/json": null | components["schemas"]["ExpenseApprovalRequest"];
                 };
             };
             responses: {
@@ -14216,6 +14455,15 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
                 };
                 /** @description Sem sessão válida. */
                 401: {
@@ -18914,6 +19162,448 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["FiscalYearView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/inventory-regularisation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Regularização de existências do fim do ano (inventário intermitente): a 71 recebe as existências iniciais (22 e 26) e as compras (21), e as existências finais voltam à 22 e à 26 com o valor do inventário a 31/12, ou o que closingStock der. Repete-se sem duplicar; dryRun mostra o que lançaria, sem gravar. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": null | components["schemas"]["InventoryRegularisationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InventoryRegularisationView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A estimativa do imposto industrial do exercício (ADR-118): se foi indicada, o valor em vigor e cada indicação e ajuste, com o lançamento, quem e quando. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IncomeTaxEstimateView"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** O contabilista indica a estimativa do imposto industrial do exercício; o Rivo lança D 87.1 contra C 34.1 a 31/12 (período 12, diário DIV, «IMP-AAAA»), antes do apuramento. Zero é «sem imposto»: fica registado e não lança. Uma por exercício (409 se já houver); corrige-se com /adjustments. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["IncomeTaxEstimateRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IncomeTaxEstimateRecordedView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/income-tax-estimate/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corrige a estimativa do imposto industrial: o novo valor e o motivo. Lança só a diferença (para menos, D 34.1 contra C 87.1). Nada se edita. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["IncomeTaxAdjustmentRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IncomeTaxEstimateRecordedView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A regularização anual do IVA pelo pró-rata definitivo (ADR-124): se foi indicada, o valor em vigor e cada indicação e ajuste, com as partes do imobilizado, o lançamento, quem e quando. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VatProRataView"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** O contabilista indica a regularização anual do IVA pelo pró-rata definitivo: positiva a favor do Estado (D 75.3.1.2.1 ou 75.3.1.2 / C 34.5.4.3), negativa a favor da empresa (D 34.5.4.3 / C 63.5). fixedAssets põe partes nas contas do imobilizado (11, 12, 14). Lança a 31/12 (período 12, DIV, «PRT-AAAA»); o apuramento do IVA de Dezembro leva a 34.5.4.3. Zero é «sem regularização». Uma por exercício (409); corrige-se com /adjustments. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VatProRataRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VatProRataRecordedView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/ledger/fiscal-years/{fiscalYear}/vat-pro-rata/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corrige a regularização do pró-rata: o novo valor, as partes do imobilizado e o motivo. Lança só a diferença de cada conta. Nada se edita. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    fiscalYear: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VatProRataAdjustmentRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VatProRataRecordedView"];
                     };
                 };
                 /** @description Bad Request */
@@ -32911,6 +33601,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/inventory/items/{itemId}/kind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Muda o tipo de existência do item: RawMaterials (22.1), SubsidiaryMaterials (22.2), SundryMaterials (22.3), Packaging (22.4), OtherMaterials (22.5) ou Goods (26). Não mexe nos movimentos. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    itemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReclassifyItemRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/inventory/items/{itemId}/movements/receipts": {
         parameters: {
             query?: never;
@@ -38094,6 +38856,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portal/me/salary-advance-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pedidos de adiantamento de salário do próprio (ADR-123), com o estado: PendingApproval, Approved (por pagar), Refused, Paid. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OwnSalaryAdvanceApplication"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MySalaryAdvanceRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MySalaryAdvanceResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/portal/me/assets": {
         parameters: {
             query?: never;
@@ -40360,6 +41232,11 @@ export interface components {
             name: string;
             permissions: string[];
         };
+        AccountAmount: {
+            accountCode: string;
+            /** Format: double */
+            amount: number | string;
+        };
         AccountingPeriodView: {
             /** Format: uuid */
             periodId: string;
@@ -41553,6 +42430,11 @@ export interface components {
             /** Format: date */
             effectiveTo: string;
         };
+        ClosingStockInput: {
+            accountCode: null | string;
+            /** Format: double */
+            amount: number | string;
+        };
         CollectionActionRecordedResponse: {
             /** Format: uuid */
             actionId: string;
@@ -41785,6 +42667,7 @@ export interface components {
             name: string;
             /** Format: int32 */
             hierarchyLevel: number | string;
+            governingBody?: null | boolean;
         };
         CostCentreRequest: {
             code: null | string;
@@ -41945,6 +42828,8 @@ export interface components {
             /** Format: int32 */
             hierarchyLevel: number | string;
             grantsApprovalAuthority: boolean;
+            /** @default false */
+            governingBody: boolean;
         };
         CreditNoteIssuedResponse: {
             /** Format: uuid */
@@ -42745,6 +43630,10 @@ export interface components {
             payables: number | string;
             topCustomers: components["schemas"]["CustomerRevenueView"][];
         };
+        ExpenseApprovalRequest: {
+            notes: null | string;
+            expenseAccountCode: null | string;
+        };
         ExpenseClaimView: {
             /** Format: uuid */
             expenseId: string;
@@ -42774,6 +43663,7 @@ export interface components {
             /** Format: uuid */
             reimbursedFromAccountId: null | string;
             reimbursementReference: null | string;
+            expenseAccountCode?: null | string;
         };
         ExpenseDecisionRequest: {
             notes: null | string;
@@ -42896,6 +43786,7 @@ export interface components {
             entries: components["schemas"]["PostedEntryView"][];
             /** Format: double */
             netResult: null | number | string;
+            notes: string[];
         };
         FixedAssetDetailView: {
             asset: components["schemas"]["FixedAssetView"];
@@ -43192,6 +44083,11 @@ export interface components {
             expenses: components["schemas"]["StatementSection"][];
             unmapped: components["schemas"]["StatementAccount"][];
         };
+        IncomeTaxAdjustmentRequest: {
+            /** Format: double */
+            amount: number | string;
+            reason: null | string;
+        };
         IncomeTaxBracketView: {
             /** Format: double */
             lowerBound: number | string;
@@ -43210,6 +44106,41 @@ export interface components {
             /** Format: double */
             bracketLowerBound: number | string;
             legalInstrument: string;
+        };
+        IncomeTaxEstimateRecordedView: {
+            estimate: components["schemas"]["IncomeTaxEstimateView"];
+            notes: string[];
+        };
+        IncomeTaxEstimateRecordView: {
+            /** Format: uuid */
+            recordId: string;
+            kind: string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: double */
+            difference: number | string;
+            /** Format: uuid */
+            entryId: null | string;
+            archivalNumber: null | string;
+            entryVoided: boolean;
+            notes: null | string;
+            /** Format: uuid */
+            recordedBy: null | string;
+            /** Format: date-time */
+            recordedAt: string;
+        };
+        IncomeTaxEstimateRequest: {
+            /** Format: double */
+            amount: number | string;
+            notes: null | string;
+        };
+        IncomeTaxEstimateView: {
+            /** Format: int32 */
+            fiscalYear: number | string;
+            indicated: boolean;
+            /** Format: double */
+            amount: null | number | string;
+            records: components["schemas"]["IncomeTaxEstimateRecordView"][];
         };
         IncomeTaxScheduleVersionView: {
             /** Format: uuid */
@@ -43491,8 +44422,44 @@ export interface components {
             /** Format: double */
             totalValue: number | string;
             status: string;
+            kind: string;
             quantitiesByWarehouse: components["schemas"]["WarehouseQuantityView"][];
             movements: components["schemas"]["StockMovementView"][];
+        };
+        InventoryRegularisationRequest: {
+            closingStock: null | components["schemas"]["ClosingStockInput"][];
+            dryRun: null | boolean;
+            countDifferencesToOtherResults?: null | boolean;
+        };
+        InventoryRegularisationView: {
+            outcome: string;
+            /** Format: int32 */
+            fiscalYear: number | string;
+            /** Format: date */
+            on: string;
+            /** Format: uuid */
+            entryId: null | string;
+            transactionId: null | string;
+            purchases: components["schemas"]["AccountAmount"][];
+            stock: components["schemas"]["InventoryStockLine"][];
+            costOfSales: components["schemas"]["AccountAmount"][];
+            notes: string[];
+        };
+        InventoryStockLine: {
+            stockAccountCode: string;
+            costAccountCode: string;
+            /** Format: double */
+            opening: number | string;
+            /** Format: double */
+            proposed: number | string;
+            /** Format: double */
+            closing: number | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            countDifference: number | string;
+            differenceAccountCode?: null | string;
         };
         InvitationCreatedResponse: {
             /** Format: uuid */
@@ -44202,6 +45169,19 @@ export interface components {
             departmentId: null | string;
             currentPosition: null | components["schemas"]["MyPositionView"];
         };
+        MySalaryAdvanceRequest: {
+            /** Format: double */
+            amount: number | string;
+            /** Format: int32 */
+            payrollYear?: null | number | string;
+            /** Format: int32 */
+            payrollMonth?: null | number | string;
+            reason?: null | string;
+        };
+        MySalaryAdvanceResponse: {
+            /** Format: uuid */
+            applicationId: string;
+        };
         MyShiftChangeRequest: {
             /** Format: uuid */
             proposedEmployeeId: null | string;
@@ -44723,6 +45703,20 @@ export interface components {
             emergencyContactPhone: null | string;
             /** Format: date-time */
             updatedAt: null | string;
+        };
+        OwnSalaryAdvanceApplication: {
+            /** Format: uuid */
+            applicationId: string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: int32 */
+            payrollYear: number | string;
+            /** Format: int32 */
+            payrollMonth: number | string;
+            reason: null | string;
+            /** Format: date-time */
+            submittedAt: string;
+            status: string;
         };
         OwnShift: {
             /** Format: uuid */
@@ -45278,6 +46272,8 @@ export interface components {
             positionId: string;
             name: string;
             grantsApprovalAuthority: boolean;
+            /** @default false */
+            isGoverningBody: boolean;
         };
         PositionView: {
             /** Format: uuid */
@@ -45286,6 +46282,7 @@ export interface components {
             /** Format: int32 */
             hierarchyLevel: number | string;
             grantsApprovalAuthority: boolean;
+            governingBody: boolean;
         };
         PostedEntryView: {
             /** Format: uuid */
@@ -45612,6 +46609,16 @@ export interface components {
             customerName?: null | string;
             leadName?: null | string;
         };
+        ProRataAllocation: {
+            accountCode: string;
+            /** Format: double */
+            amount: number | string;
+        };
+        ProRataAllocationRequest: {
+            accountCode: null | string;
+            /** Format: double */
+            amount: number | string;
+        };
         PurchaseInvoiceMatchView: {
             /** Format: uuid */
             purchaseInvoiceId: string;
@@ -45661,6 +46668,11 @@ export interface components {
             expenseAccountCode?: null | string;
             supplierCountry?: null | string;
             market?: null | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            nonDeductibleTax: number | string;
         };
         PurchaseOrderCreatedResponse: {
             /** Format: uuid */
@@ -45771,6 +46783,10 @@ export interface components {
              */
             withheldTotal: number | string;
         };
+        ReclassifyItemRequest: {
+            /** @enum {null|string} */
+            kind: "RawMaterials" | "SubsidiaryMaterials" | "SundryMaterials" | "Packaging" | "OtherMaterials" | "Goods" | null;
+        };
         ReconciliationSummary: {
             /** Format: uuid */
             bankAccountId: string;
@@ -45843,6 +46859,8 @@ export interface components {
             sku: null | string;
             name: string;
             unit: string;
+            /** @enum {null|string} */
+            kind?: "RawMaterials" | "SubsidiaryMaterials" | "SundryMaterials" | "Packaging" | "OtherMaterials" | "Goods" | null;
         };
         RegisterMovementRequest: {
             /** Format: uuid */
@@ -45872,6 +46890,11 @@ export interface components {
             taxTotal: number | string;
             description: null | string;
             expenseAccountCode?: null | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            nonDeductibleTax: number | string;
         };
         RegisterReceiptRequest: {
             series: null | string;
@@ -46153,6 +47176,71 @@ export interface components {
             finance: null | components["schemas"]["FinanceKpis"];
             hr: null | components["schemas"]["WorkforceSnapshot"];
             sales: null | components["schemas"]["SalesSnapshot"];
+        };
+        SalaryAdvanceApplicationRequest: {
+            /** Format: uuid */
+            employeeId: string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: int32 */
+            payrollYear?: null | number | string;
+            /** Format: int32 */
+            payrollMonth?: null | number | string;
+            reason?: null | string;
+        };
+        SalaryAdvanceApplicationView: {
+            /** Format: uuid */
+            applicationId: string;
+            /** Format: uuid */
+            employeeId: string;
+            employeeName: null | string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: int32 */
+            payrollYear: number | string;
+            /** Format: int32 */
+            payrollMonth: number | string;
+            reason: null | string;
+            /** Format: date-time */
+            submittedAt: string;
+            /** Format: uuid */
+            approvalRequestId: null | string;
+            status: string;
+            /** Format: uuid */
+            advanceId: null | string;
+        };
+        SalaryAdvanceRequest: {
+            /** Format: uuid */
+            applicationId: string;
+            /** Format: uuid */
+            bankAccountId: string;
+            /** Format: date */
+            on?: null | string;
+            reference?: null | string;
+        };
+        SalaryAdvanceView: {
+            /** Format: uuid */
+            advanceId: string;
+            /** Format: uuid */
+            employeeId: string;
+            employeeName: null | string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: date */
+            paidOn: string;
+            /** Format: uuid */
+            bankAccountId: string;
+            reference: null | string;
+            /** Format: int32 */
+            payrollYear: number | string;
+            /** Format: int32 */
+            payrollMonth: number | string;
+            /** Format: double */
+            settledAmount: number | string;
+            /** Format: double */
+            outstanding: number | string;
+            /** Format: uuid */
+            applicationId?: null | string;
         };
         SalesInvoiceIssuedResponse: {
             /** Format: uuid */
@@ -47100,6 +48188,50 @@ export interface components {
             email: string;
             isActive: boolean;
             roles: string[];
+        };
+        VatProRataAdjustmentRequest: {
+            /** Format: double */
+            amount: number | string;
+            fixedAssets: null | components["schemas"]["ProRataAllocationRequest"][];
+            reason: null | string;
+        };
+        VatProRataRecordedView: {
+            proRata: components["schemas"]["VatProRataView"];
+            notes: string[];
+        };
+        VatProRataRecordView: {
+            /** Format: uuid */
+            recordId: string;
+            kind: string;
+            /** Format: double */
+            amount: number | string;
+            /** Format: double */
+            difference: number | string;
+            fixedAssets: components["schemas"]["ProRataAllocation"][];
+            costAccountCode: string;
+            /** Format: uuid */
+            entryId: null | string;
+            archivalNumber: null | string;
+            entryVoided: boolean;
+            notes: null | string;
+            /** Format: uuid */
+            recordedBy: null | string;
+            /** Format: date-time */
+            recordedAt: string;
+        };
+        VatProRataRequest: {
+            /** Format: double */
+            amount: number | string;
+            fixedAssets: null | components["schemas"]["ProRataAllocationRequest"][];
+            notes: null | string;
+        };
+        VatProRataView: {
+            /** Format: int32 */
+            fiscalYear: number | string;
+            indicated: boolean;
+            /** Format: double */
+            amount: null | number | string;
+            records: components["schemas"]["VatProRataRecordView"][];
         };
         VatRateLine: {
             taxCode: string;

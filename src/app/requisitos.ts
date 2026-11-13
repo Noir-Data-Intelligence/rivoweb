@@ -39,6 +39,7 @@ export const REQUISITO_PAGINA = {
   "/despesas": "finance.expenses.read",
   "/contas": "finance.payables.read",
   "/caixa-pequena": "finance.treasury.read",
+  "/adiantamentos": "finance.payables.read",
   "/letras": "finance.treasury.read",
   "/cambios": "finance.treasury.read",
   "/fluxo-caixa": { anyOf: ["finance.reports.read", "finance.treasury.read"] },

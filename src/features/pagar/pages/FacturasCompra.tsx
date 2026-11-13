@@ -44,6 +44,7 @@ const esquema = z
     currency: z.enum(MOEDAS),
     netTotal: valor("Valor sem IVA inválido."),
     taxTotal: valor("IVA inválido (escreva 0 se não tiver)."),
+    nonDeductibleTax: valor("IVA não dedutível inválido (0 se todo o IVA se deduz)."),
     description: texto({ max: 500 }),
     expenseAccountCode: z.string().check(z.refine((v) => v.trim() === "" || /^\d+(\.\d+)*$/.test(v.trim()), "Código de conta do PGC, por exemplo 75.2.12.")),
   })
@@ -51,9 +52,17 @@ const esquema = z
     z.refine((d) => d.supplierId !== "" || d.supplierName.trim() !== "", { message: "Escolha o fornecedor ou escreva o nome.", path: ["supplierName"] }),
     z.refine((d) => d.supplierId !== "" || d.supplierTaxId.trim() !== "", { message: "Escreva o NIF do fornecedor.", path: ["supplierTaxId"] }),
     z.refine((d) => d.dueOn === "" || d.issuedOn === "" || d.dueOn >= d.issuedOn, { message: "O vencimento não pode ser antes da emissão.", path: ["dueOn"] }),
+    z.refine(
+      (d) => {
+        const nd = lerDinheiroDigitado(d.nonDeductibleTax, 2);
+        const iva = lerDinheiroDigitado(d.taxTotal, 2);
+        return !nd || !iva || nd.lte(iva);
+      },
+      { message: "Não pode passar do IVA da factura.", path: ["nonDeductibleTax"] },
+    ),
   );
 type Dados = z.infer<typeof esquema>;
-const CAMPOS = ["supplierId", "supplierName", "supplierTaxId", "supplierInvoiceNumber", "issuedOn", "dueOn", "currency", "netTotal", "taxTotal", "description", "expenseAccountCode"] as const;
+const CAMPOS = ["supplierId", "supplierName", "supplierTaxId", "supplierInvoiceNumber", "issuedOn", "dueOn", "currency", "netTotal", "taxTotal", "nonDeductibleTax", "description", "expenseAccountCode"] as const;
 
 function NovaFactura() {
   const navegar = useNavigate();
@@ -68,13 +77,16 @@ function NovaFactura() {
   const idForm = useId();
   const [soltas, setSoltas] = useState<string[]>([]);
   const hoje = hojeIso();
-  const inicial: Dados = { supplierId: "", supplierName: "", supplierTaxId: "", supplierInvoiceNumber: "", issuedOn: hoje, dueOn: hoje, currency: "AOA", netTotal: "", taxTotal: "0", description: "", expenseAccountCode: "" };
+  const inicial: Dados = { supplierId: "", supplierName: "", supplierTaxId: "", supplierInvoiceNumber: "", issuedOn: hoje, dueOn: hoje, currency: "AOA", netTotal: "", taxTotal: "0", nonDeductibleTax: "0", description: "", expenseAccountCode: "" };
   const form = useForm<Dados>({ resolver: zodResolver(esquema), defaultValues: inicial });
   const v = useWatch({ control: form.control });
   const escolhido = v.supplierId ?? "";
   const liq = lerDinheiroDigitado(v.netTotal ?? "", 2);
   const iva = lerDinheiroDigitado(v.taxTotal ?? "", 2);
   const total = liq && iva ? (liq.plus(iva) as Dinheiro) : null;
+  // A parte do IVA que não se deduz entra no custo da compra, ou no valor do bem (ADR-112).
+  const naoDedutivel = lerDinheiroDigitado(v.nonDeductibleTax ?? "", 2);
+  const comNaoDedutivel = liq && iva && naoDedutivel && naoDedutivel.gt(0) && naoDedutivel.lte(iva) ? { conta: liq.plus(naoDedutivel) as Dinheiro, dedutivel: iva.minus(naoDedutivel) as Dinheiro } : null;
   const fechar = (a: boolean) => {
     setAberto(a);
     if (!a) {
@@ -148,6 +160,7 @@ function NovaFactura() {
                 currency: d.currency,
                 netTotal: paraApi(lerDinheiroDigitado(d.netTotal, 2) as Dinheiro),
                 taxTotal: paraApi(lerDinheiroDigitado(d.taxTotal, 2) as Dinheiro),
+                nonDeductibleTax: paraApi(lerDinheiroDigitado(d.nonDeductibleTax, 2) as Dinheiro),
                 description: d.description === "" ? null : d.description,
                 expenseAccountCode: d.expenseAccountCode.trim() === "" ? null : d.expenseAccountCode.trim(),
               },
@@ -209,6 +222,16 @@ function NovaFactura() {
           <p className="text-sm text-muted-foreground sm:col-span-2" aria-live="polite">
             Total: <span className="font-medium tabular-nums text-foreground">{total ? formatarMoeda(total, v.currency ?? "AOA") : "—"}</span>
           </p>
+          <Field rotulo="IVA não dedutível" erro={e.nonDeductibleTax?.message} className="sm:col-span-2" ajuda="A parte do IVA que não se deduz (Código do IVA). Entra no custo da compra ou no valor do bem. Zero: todo o IVA se deduz.">
+            {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" autoComplete="off" className="text-right tabular-nums sm:max-w-[50%]" aria-describedby={descricao} invalido={invalido} {...form.register("nonDeductibleTax")} />}
+          </Field>
+          {comNaoDedutivel ? (
+            <p className="text-sm text-muted-foreground sm:col-span-2" aria-live="polite">
+              {eContaImobilizado(v.expenseAccountCode ?? "") ? "Conta do bem" : "Conta da compra"}: líquido + não dedutível ={" "}
+              <span className="font-medium tabular-nums text-foreground">{formatarMoeda(comNaoDedutivel.conta, v.currency ?? "AOA")}</span>. IVA dedutível:{" "}
+              <span className="font-medium tabular-nums text-foreground">{formatarMoeda(comNaoDedutivel.dedutivel, v.currency ?? "AOA")}</span>.
+            </p>
+          ) : null}
           <Field rotulo="Descrição" erro={e.description?.message} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={500} autoComplete="off" aria-describedby={descricao} invalido={invalido} {...form.register("description")} />}
           </Field>

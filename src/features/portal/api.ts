@@ -224,3 +224,19 @@ export function useMeusContratos() {
 export function useMeusDados() {
   return useQuery({ queryKey: chaves.dados, queryFn: ({ signal }) => ler(api.GET("/portal/me/personal-data", { signal })) });
 }
+
+// Adiantamento de salário (ADR-123): o próprio pede; vai a Aprovações, e a tesouraria paga-o depois de aprovado.
+
+export type MeuAdiantamento = components["schemas"]["OwnSalaryAdvanceApplication"];
+
+export function useMeusAdiantamentos() {
+  return useQuery({ queryKey: [...base, "salary-advance-applications"] as const, queryFn: ({ signal }) => ler(api.GET("/portal/me/salary-advance-applications", { signal })) });
+}
+
+export function usePedirMeuAdiantamento() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: components["schemas"]["MySalaryAdvanceRequest"]) => ler(api.POST("/portal/me/salary-advance-applications", { body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [...base, "salary-advance-applications"] }),
+  });
+}

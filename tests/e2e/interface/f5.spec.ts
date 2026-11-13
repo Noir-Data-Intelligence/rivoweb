@@ -120,6 +120,14 @@ test.describe("facturas de compra", () => {
     await expect(page.getByText("Compra de imobilizado: a dívida fica na 37.1 e o IVA na 34.5.2.2.")).toBeVisible();
     await page.getByLabel("Conta da despesa (opcional)").fill(" 75.2.12 ");
     await expect(page.getByText("Compra de imobilizado", { exact: false })).toHaveCount(0);
+    // O IVA não dedutível (ADR-112): até ao IVA da factura; entra no custo da compra.
+    await expect(page.getByLabel("IVA não dedutível")).toHaveValue("0");
+    await page.getByLabel("IVA não dedutível").fill("200 000");
+    await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
+    await expect(page.getByText("Não pode passar do IVA da factura.")).toBeVisible();
+    await page.getByLabel("IVA não dedutível").fill("72 839,50");
+    await expect(page.getByText("Conta da compra: líquido + não dedutível =", { exact: false })).toContainText("1 307 407,39");
+    await expect(page.getByText("Conta da compra: líquido + não dedutível =", { exact: false })).toContainText("IVA dedutível: 100 000,00");
     await page.getByRole("dialog").getByRole("button", { name: "Registar factura" }).click();
     await expect(page).toHaveURL(new RegExp(`/facturas-compra/${IDF5.factura}$`));
     expect(api.escritas("POST", "/finance/purchase-invoices")[0]?.corpo).toMatchObject({
@@ -132,9 +140,21 @@ test.describe("facturas de compra", () => {
       taxTotal: "172839.50",
       purchaseOrderId: null,
       expenseAccountCode: "75.2.12",
+      nonDeductibleTax: "72839.50",
     });
     // O Manager não lê o plano de contas: escreve o código, sem sugestões.
     expect(api.pedidos.some((p) => p.caminho === "/finance/ledger/accounts")).toBe(false);
+  });
+
+  test("ficha da factura de compra: o IVA não dedutível e o dedutível; no imobilizado, o custo do bem (ADR-112)", async ({ page, api }) => {
+    await comF5(api, meGestorF5, painelCarlos())
+      .em("GET", `/finance/purchase-invoices/${IDF5.factura}`, { status: 200, corpo: { ...factura(), expenseAccountCode: "11.4", nonDeductibleTax: 140000 } })
+      .ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/facturas-compra/${IDF5.factura}`);
+    await expect(page.getByText("não dedutível", { exact: true })).toBeVisible();
+    await expect(page.getByText("dedutível", { exact: true })).toBeVisible();
+    await expect(page.getByText("É esse o custo de aquisição do bem, ao registá-lo nos activos.", { exact: false })).toContainText("conta do bem, com o líquido");
   });
 
   test("pedir pagamento: tecto do que falta pedir, 202 abre o pedido", async ({ page, api }) => {
@@ -333,7 +353,37 @@ test.describe("despesas", () => {
     await page.getByRole("button", { name: "Aprovar" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/approval`).map((p) => p.corpo)).toEqual([{ notes: null }]);
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/approval`).map((p) => p.corpo)).toEqual([{ notes: null, expenseAccountCode: null }]);
+  });
+
+  test("aprovar com a conta do custo (ADR-119): o 400 fica junto ao campo e o diálogo não fecha", async ({ page, api }) => {
+    let tentativas = 0;
+    await comDespesas(api)
+      .em("POST", `/finance/expenses/${IDF5D.despesa}/approval`, () =>
+        ++tentativas === 1
+          ? { status: 400, corpo: { status: 400, title: "Pedido inválido", errors: { pedido: ["Quem fez a despesa não ocupava um cargo de órgão social: use a 72.7.2."] } }, cabecalhos: { "Content-Type": "application/problem+json" } }
+          : { status: 204 },
+      )
+      .ligar();
+    await entrar(page);
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Conta do custo (PGC, opcional)").fill("formação");
+    await d.getByRole("button", { name: "Aprovar" }).click();
+    await expect(d.getByText("Código de conta do PGC, por exemplo 72.7.2.")).toBeVisible();
+    await d.getByLabel("Conta do custo (PGC, opcional)").fill("72.7.1");
+    await d.getByLabel("Notas (opcional)").fill("Curso de gestão");
+    await d.getByRole("button", { name: "Aprovar" }).click();
+    await expect(d.getByText("Quem fez a despesa não ocupava um cargo de órgão social: use a 72.7.2.")).toBeVisible();
+    await expect(d.getByLabel("Conta do custo (PGC, opcional)")).toHaveAttribute("aria-invalid", "true");
+    await d.getByLabel("Conta do custo (PGC, opcional)").fill(" 72.7.2 ");
+    await d.getByRole("button", { name: "Aprovar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/approval`).map((p) => p.corpo)).toEqual([
+      { notes: "Curso de gestão", expenseAccountCode: "72.7.1" },
+      { notes: "Curso de gestão", expenseAccountCode: "72.7.2" },
+    ]);
   });
 
   test("a própria despesa não se decide; o comprovativo abre-se pela despesa (B20)", async ({ page, api }) => {

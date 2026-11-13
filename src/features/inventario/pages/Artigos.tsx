@@ -6,7 +6,7 @@ import { Can } from "@/features/identity";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
-import { Checkbox } from "@/ui/Controlos";
+import { Checkbox, Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
@@ -14,12 +14,12 @@ import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useArtigos, useRegistarArtigo, type Artigo } from "../api";
-import { EstadoActivo, kz, qtd } from "../comum";
+import { EstadoActivo, kz, qtd, textoTipoExistencia, TIPOS_EXISTENCIA, type TipoExistencia } from "../comum";
 import { errosArtigo } from "../regras";
 
 function RegistarArtigo() {
   const [aberto, setAberto] = useState(false);
-  const [v, setV] = useState({ sku: "", nome: "", unidade: "un" });
+  const [v, setV] = useState<{ sku: string; nome: string; unidade: string; tipo: TipoExistencia }>({ sku: "", nome: "", unidade: "un", tipo: "SundryMaterials" });
   const [tentou, setTentou] = useState(false);
   const registar = useRegistarArtigo();
   const navegar = useNavigate();
@@ -38,7 +38,7 @@ function RegistarArtigo() {
           if (!a) {
             registar.reset();
             setTentou(false);
-            setV({ sku: "", nome: "", unidade: "un" });
+            setV({ sku: "", nome: "", unidade: "un", tipo: "SundryMaterials" });
           }
         }}
         titulo="Registar um artigo"
@@ -56,7 +56,7 @@ function RegistarArtigo() {
             e.preventDefault();
             setTentou(true);
             if (Object.keys(erros).length > 0 || registar.isPending) return;
-            registar.mutate({ sku: normalizarTexto(v.sku), name: normalizarTexto(v.nome), unit: normalizarTexto(v.unidade) }, { onSuccess: (r) => void navegar(`/artigos/${r.itemId}`) });
+            registar.mutate({ sku: normalizarTexto(v.sku), name: normalizarTexto(v.nome), unit: normalizarTexto(v.unidade), kind: v.tipo }, { onSuccess: (r) => void navegar(`/artigos/${r.itemId}`) });
           }}
         >
           <Field rotulo="Referência (SKU)" erro={tentou ? erros.sku : undefined}>
@@ -67,6 +67,17 @@ function RegistarArtigo() {
           </Field>
           <Field rotulo="Nome" erro={tentou ? erros.nome : undefined} className="sm:col-span-2">
             {({ id, descricao, invalido }) => <Input id={id} maxLength={200} autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.nome} onChange={(e) => setV((x) => ({ ...x, nome: e.target.value }))} />}
+          </Field>
+          <Field rotulo="Tipo" className="sm:col-span-2" ajuda="A conta onde o stock volta no fecho do ano. Muda-se depois, na ficha.">
+            {({ id, descricao }) => (
+              <Select id={id} aria-describedby={descricao} value={v.tipo} onChange={(e) => setV((x) => ({ ...x, tipo: e.target.value as TipoExistencia }))}>
+                {TIPOS_EXISTENCIA.map((t) => (
+                  <option key={t.valor} value={t.valor}>
+                    {t.texto}
+                  </option>
+                ))}
+              </Select>
+            )}
           </Field>
         </form>
       </Confirmar>
@@ -92,6 +103,7 @@ export default function Artigos() {
       ),
       className: "max-w-[20rem]",
     },
+    { id: "tipo", cabecalho: "Tipo", esconderAte: "lg", celula: (a) => textoTipoExistencia(a.kind) },
     { id: "mao", cabecalho: "Em mão", alinhar: "direita", celula: (a) => `${qtd(a.quantityOnHand)} ${a.unit}` },
     { id: "custo", cabecalho: "Custo médio", alinhar: "direita", esconderAte: "md", celula: (a) => kz(a.averageCost) },
     { id: "valor", cabecalho: "Valor", alinhar: "direita", esconderAte: "sm", celula: (a) => kz(a.totalValue) },
