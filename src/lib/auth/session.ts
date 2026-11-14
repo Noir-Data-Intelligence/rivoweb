@@ -9,6 +9,11 @@ export type Sessao = {
   /** Prazo absoluto, em ms desde a época (sem renovação, ADR-067). */
   readonly expiraEm: number;
   readonly inactividadeSegundos: number;
+  /**
+   * Obrigada ao segundo factor e ainda sem ele (ADR-127): a sessão só serve
+   * para o ligar. Liberta-se ao confirmar a inscrição.
+   */
+  readonly mfaPendente?: boolean;
 };
 
 export type MotivoFim =
@@ -46,7 +51,8 @@ function valida(v: unknown, agora: number): v is Sessao {
     typeof s.expiraEm === "number" &&
     s.expiraEm > agora &&
     typeof s.inactividadeSegundos === "number" &&
-    s.inactividadeSegundos > 0
+    s.inactividadeSegundos > 0 &&
+    (s.mfaPendente === undefined || typeof s.mfaPendente === "boolean")
   );
 }
 
@@ -69,12 +75,12 @@ export function restaurarSessao(agora: number = Date.now()): Sessao | null {
 }
 
 export function iniciarSessao(
-  resposta: { accessToken: string; expiresAt: string; idleTimeoutSeconds: number | string },
+  resposta: { accessToken: string; expiresAt: string; idleTimeoutSeconds: number | string; mfaEnrolmentRequired?: boolean },
   agora: number = Date.now(),
 ): Sessao {
   const expiraEm = Date.parse(resposta.expiresAt);
   const inactividadeSegundos = Number(resposta.idleTimeoutSeconds);
-  const s: Sessao = { token: resposta.accessToken, expiraEm, inactividadeSegundos };
+  const s: Sessao = { token: resposta.accessToken, expiraEm, inactividadeSegundos, mfaPendente: resposta.mfaEnrolmentRequired === true };
   if (!valida(s, agora)) throw new Error("Resposta de login inválida.");
   atual = s;
   ultimoMotivo = null;
@@ -92,6 +98,18 @@ export function terminarSessaoLocal(motivo: MotivoFim): void {
   if (atual === null) return;
   atual = null;
   ultimoMotivo = motivo;
+  avisar();
+}
+
+/**
+ * Marca (ou liberta) a sessão como à espera do segundo factor (ADR-127): o
+ * login disse `mfaEnrolmentRequired`, ou a API respondeu 401 com
+ * `mfa_enrolment_required`; a confirmação da inscrição liberta-a.
+ */
+export function marcarMfaPendente(pendente: boolean): void {
+  if (atual === null || (atual.mfaPendente === true) === pendente) return;
+  atual = { ...atual, mfaPendente: pendente };
+  armazenamento()?.setItem(CHAVE, JSON.stringify(atual));
   avisar();
 }
 

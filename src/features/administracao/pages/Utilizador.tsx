@@ -23,6 +23,7 @@ import {
   useMudarEstadoConta,
   usePerfis,
   useReporPassword,
+  useReporSegundoFactor,
   useRetirarPerfil,
   useUtilizadores,
   type ResumoUtilizador,
@@ -183,6 +184,67 @@ function EstadoConta({ alvo, propria }: { alvo: ResumoUtilizador; propria: boole
   );
 }
 
+/** Perdeu o telemóvel: desliga o segundo factor da pessoa e termina as sessões dela (ADR-127). */
+function SegundoFactor({ alvo }: { alvo: ResumoUtilizador }) {
+  const [aberto, setAberto] = useState(false);
+  const repor = useReporSegundoFactor();
+  const idForm = useId();
+  const form = useForm<{ razao: string }>({ resolver: zodResolver(esquemaRazao), defaultValues: { razao: "" } });
+  const fechar = (a: boolean) => {
+    setAberto(a);
+    if (!a) form.reset();
+  };
+  const submeter = form.handleSubmit((d) => {
+    if (repor.isPending) return;
+    repor.mutate(
+      { userId: alvo.userId, reason: d.razao },
+      {
+        onSuccess: () => fechar(false),
+        onError: (e) => {
+          const soltas = aplicarErrosDoServidor(e, form.setError, ["razao"], { reason: "razao" });
+          if (soltas.length > 0) form.setError("razao", { type: "server", message: soltas.join(" ") });
+        },
+      },
+    );
+  });
+  return (
+    <Card>
+      <CardTitle>Segundo factor</CardTitle>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Se a pessoa perdeu o telemóvel com a app autenticadora: desliga o segundo factor dela e termina as sessões abertas. Ela volta a ligá-lo em «A minha conta».
+      </p>
+      {repor.isSuccess ? <Alert tom="sucesso" className="mt-3" titulo="Segundo factor reposto. As sessões da pessoa terminaram." /> : null}
+      <Button
+        className="mt-4"
+        variante="secondary"
+        onClick={() => {
+          repor.reset();
+          setAberto(true);
+        }}
+      >
+        Repor segundo factor
+      </Button>
+      <Confirmar
+        aberto={aberto}
+        aoMudar={fechar}
+        titulo="Repor o segundo factor?"
+        descricao={`${alvo.email} entra só com a password até voltar a ligar o segundo factor; as sessões abertas terminam já.`}
+        rotuloConfirmar="Repor"
+        variante="destructive"
+        aCarregar={repor.isPending}
+        erro={repor.error && !(eApiError(repor.error) && repor.error.status === 400) ? <ErrorPanel erro={repor.error} /> : undefined}
+        formulario={idForm}
+      >
+        <form id={idForm} onSubmit={submeter} noValidate>
+          <Field rotulo="Razão" erro={form.formState.errors.razao?.message} ajuda="Fica na trilha de auditoria.">
+            {({ id, descricao, invalido }) => <Textarea id={id} maxLength={500} aria-describedby={descricao} invalido={invalido} {...form.register("razao")} />}
+          </Field>
+        </form>
+      </Confirmar>
+    </Card>
+  );
+}
+
 const esquemaReposicao = z
   .object({ nova: novaPassword, confirmacao: z.string() })
   .check(z.refine((d) => d.nova === d.confirmacao, { path: ["confirmacao"], error: "As passwords não coincidem." }));
@@ -322,6 +384,11 @@ export default function Utilizador() {
         {!protegida && !propria ? (
           <Can requer="identity.users.write">
             <Password alvo={alvo} />
+          </Can>
+        ) : null}
+        {!protegida && !propria ? (
+          <Can requer="identity.users.write">
+            <SegundoFactor alvo={alvo} />
           </Can>
         ) : null}
       </div>

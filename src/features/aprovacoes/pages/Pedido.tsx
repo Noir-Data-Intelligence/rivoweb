@@ -355,6 +355,13 @@ export default function PedidoPagina() {
                 <dd className="tabular-nums text-foreground">{formatarMoeda(dinheiro(h.amount), h.currency ?? "AOA")}</dd>
               </div>
             ) : null}
+            {h?.amount !== null && h?.amount !== undefined && h.cumulativeAmount !== null && h.cumulativeAmount !== undefined && dinheiro(h.cumulativeAmount).gt(dinheiro(h.amount)) ? (
+              <div>
+                <dt className="text-muted-foreground">Acumulado em 30 dias (mesmo fornecedor e rubrica)</dt>
+                <dd className="tabular-nums text-foreground">{formatarMoeda(dinheiro(h.cumulativeAmount), h.currency ?? "AOA")}</dd>
+                <dd className="text-xs text-muted-foreground">A alçada escolheu-se por este valor: os pedidos partidos somam-se (BR-7).</dd>
+              </div>
+            ) : null}
             {h?.closedAt ? (
               <div>
                 <dt className="text-muted-foreground">Fechado</dt>

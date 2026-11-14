@@ -38,7 +38,10 @@
 > despesas por reembolsar; o tipo dos artigos; o órgão social nos cargos; o
 > IVA não dedutível na compra; a conta do custo ao aprovar a despesa; os
 > adiantamentos de salário pedidos, aprovados e pagos; o BR-3 nas entregas do
-> IRT e do INSS; o Finance pede adiantamentos em nome de um colaborador).
+> IRT e do INSS; o Finance pede adiantamentos em nome de um colaborador) ·
+> actualizado a 2026-11-14 (o segundo factor: entrar com o código da app,
+> ligar e gerir em «A minha conta», a sessão restrita de quem é obrigado e o
+> «Repor» do admin; o acumulado de 30 dias na ficha da aprovação).
 
 ---
 
@@ -367,6 +370,7 @@ AM = AssetManager.
 | Convidar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Juntar e retirar perfis | ✓ | ✓ ³ | — | — | — | — | — | — | — | — |
 | Desactivar e reactivar contas; ligação de recuperação; definir password | ✓ | ✓ ³ | — | — | — | — | — | — | — | — |
+| Repor o segundo factor de outra conta (perdeu o telemóvel; com a razão; termina as sessões dela) ⁵³ | ✓ | ✓ ³ | — | — | — | — | — | — | — | — |
 | **Configurações** | | | | | | | | | | |
 | Dados da empresa: ver | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Dados da empresa: declarar e corrigir | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -495,14 +499,19 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **O botão ainda não existe:** no front, está por fazer (NOVIDADES, secção 42).
 
-⁵³ PR #170 (ADR-127), em revisão a 2026-11-13.
+⁵³ PR #170 (ADR-127), no `main` desde 2026-11-14.
 - **O segundo factor** é um código de 6 dígitos de uma app autenticadora, com 10 códigos de recuperação de uso único.
 - **Obrigatório** para quem decide (aprovações, orçamentos, despesas) ou movimenta fundos (pagamentos, contas bancárias, tesouraria), mas **ainda desligado no servidor**: liga-se quando o front tiver os ecrãs (NOVIDADES, secção 45).
-- **Os ecrãs ainda não existem.** Por agora, ligar o segundo factor só se faz pela API.
+- **No front:**
+  - **Entrar:** com o `202`, o passo «Segundo factor»: o código da app (6 dígitos) ou, por «Usar um código de recuperação», um desses; o código errado diz «Código errado. Tente de novo.»; o desafio acaba em 5 minutos e volta ao primeiro passo, com o aviso.
+  - **A minha conta → «Segundo factor»:** ligar (a chave em grupos de 4 para escrever na app, e a ligação `otpauth://` que abre a app no telemóvel; um código; os 10 códigos de recuperação com «Copiar» e «Descarregar», que não voltam a aparecer); ligado, quantos códigos restam (aviso com 2 ou menos), «Gerar códigos novos» e «Desligar», com um código; quem é obrigado, com a obrigatoriedade ligada, não vê «Desligar».
+  - **Sessão restrita:** com `mfaEnrolmentRequired` no login, ou um `401` com `mfa_enrolment_required`, a Rivo mostra só o ecrã de ligar (e «Sair»); a sessão não termina. Ligado e guardados os códigos, a Rivo toda.
+  - **Utilizadores (admin):** «Repor segundo factor» na ficha de outra conta, com a razão.
+  - **Falta o QR:** a biblioteca que o desenha no browser ainda não foi instalada; até lá, a chave escreve-se à mão ou abre-se pela ligação.
 
-⁵² PR #169 (ADR-126, BR-7), em revisão a 2026-11-13.
+⁵² PR #169 (ADR-126, BR-7), no `main` desde 2026-11-14.
 - **A regra:** ao pedir um pagamento, a alçada escolhe-se pelo valor do pedido somado aos do mesmo fornecedor (NIF) e da mesma rubrica (centro de custo) dos últimos 30 dias, na mesma moeda, que não foram rejeitados nem cancelados. O pedido não é recusado: vai para quem tem alçada sobre o total, e a trilha de auditoria regista-o.
-- **Quem decide** vê o acumulado (`cumulativeAmount`) na ficha. O front ainda não o mostra (NOVIDADES, secção 44).
+- **Quem decide** vê o acumulado (`cumulativeAmount`) na ficha. No front, quando passa do valor do pedido, a ficha mostra «Acumulado em 30 dias (mesmo fornecedor e rubrica)» por baixo do valor. A caixa não o mostra: a lista não traz o valor do pedido para comparar (B47).
 - **Só tem efeito com políticas com faixas de valor.** Em produção há uma só, e nada muda.
 
 ⁵¹ PR #167 (B46, adenda ao ADR-123), em produção desde 2026-11-13.
@@ -515,7 +524,9 @@ Recursos Humanos.»
 
 ### Acesso
 - **Entrar** com e-mail e password. Credenciais erradas mostram «E-mail ou
-  password incorrectos.», sem dizer qual dos dois falhou.
+  password incorrectos.», sem dizer qual dos dois falhou. Com o segundo
+  factor ligado ⁵³, um segundo passo pede o código da app ou um código de
+  recuperação; o pedido dura 5 minutos e, ao acabar, volta-se ao primeiro.
   A password pode mostrar-se e esconder-se. Não há registo nem conta de
   demonstração: o acesso é dado por convite. Os ecrãs públicos (entrar,
   convite, recuperação) têm o tema da marca: painel escuro com «Your
@@ -544,10 +555,15 @@ Recursos Humanos.»
   cada uma. Terminar uma sessão noutro dispositivo, ou a actual.
 - **Notificações por e-mail:** ligar ou desligar. Convites e recuperação de
   password vão sempre por e-mail.
-- **Segundo factor (MFA)** ⁵³: ligar a app autenticadora (QR e códigos de
-  recuperação), gerar códigos novos e desligar. Com ele ligado, entrar pede o
-  código da app depois da password ou do Google. O administrador repõe o de
-  quem perdeu o telemóvel. **Só na API por agora.**
+- **Segundo factor (MFA)** ⁵³: **ligar** a app autenticadora (a chave para
+  escrever na app ou a ligação que a abre no telemóvel; um código; os 10
+  códigos de recuperação, com «Copiar» e «Descarregar», mostrados uma vez);
+  ligado, quantos códigos de recuperação restam, **gerar códigos novos** e
+  **desligar**, ambos com um código (quem é obrigado não desliga). Sem o QR
+  por agora.
+- **Sessão restrita** ⁵³: com a obrigatoriedade ligada no servidor, quem
+  decide ou movimenta fundos e ainda não tem o segundo factor só vê o ecrã de
+  o ligar (e «Sair»); depois de o ligar, a Rivo toda.
 
 ### Notificações
 - **Sino** no topo com a contagem por ler, actualizada a cada minuto enquanto
@@ -671,7 +687,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ficha: estado, o resumo do pedido (o que se aprova), quem pediu, passos com o modo (basta um ou todos os ocupantes
   do cargo) e o prazo, aprovadores e decisões com notas e, nos passos de
   validação, as respostas ao checklist (✓ conforme, ✗ não conforme, — não
-  aplicável).
+  aplicável). Num pedido de pagamento cujo acumulado de 30 dias (mesmo
+  fornecedor e rubrica) passa do valor, a ficha mostra-o: foi por ele que se
+  escolheu a alçada ⁵².
 - **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
   motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
   mostra o estado actual. Numa atribuição de cargo aprovada, o cargo fica em
@@ -1619,8 +1637,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - **Convidar** (e-mail e perfil).
 - Ficha da conta: **juntar e retirar perfis**; **desactivar e reactivar** com
   razão (fica na trilha); **enviar ligação de recuperação**; **definir uma
-  password** por outra pessoa, atrás de confirmação. Não pode desactivar a
-  própria conta.
+  password** por outra pessoa, atrás de confirmação; **repor o segundo
+  factor** de quem perdeu o telemóvel, com a razão (termina as sessões dela ⁵³).
+  Não pode desactivar a própria conta.
 
 **Facturação** (configuração)
 - **Séries de numeração**: ver e **abrir** (tipo e código).

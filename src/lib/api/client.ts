@@ -4,7 +4,7 @@
  */
 import createClient, { type Middleware } from "openapi-fetch";
 import { registarPedidoAutenticado } from "@/lib/auth/actividade";
-import { obterToken, terminarSessaoLocal } from "@/lib/auth/session";
+import { marcarMfaPendente, obterToken, terminarSessaoLocal } from "@/lib/auth/session";
 import { API_URL } from "@/lib/env";
 import { lerPaginacao, type Pagina } from "./pagination";
 import { ApiError, paraApiError } from "./problem";
@@ -14,7 +14,7 @@ const TEMPO_LEITURA_MS = 20_000;
 const TEMPO_ESCRITA_MS = 30_000;
 
 /** Rotas cujo 401 é resposta de negócio («credenciais erradas»), não fim de sessão. */
-const ROTAS_SEM_SESSAO = /^\/identity\/(login|login\/google|invitations\/acceptance|password-recovery(\/completion)?)$/;
+const ROTAS_SEM_SESSAO = /^\/identity\/(login|login\/google|login\/mfa|invitations\/acceptance|password-recovery(\/completion)?)$/;
 
 const autenticacao: Middleware = {
   onRequest({ request }) {
@@ -46,10 +46,21 @@ export function eFimDeSessao(r: Response): boolean {
   return !(r.headers.get("Content-Type") ?? "").includes("json");
 }
 
+/**
+ * Sessão obrigada ao segundo factor e ainda sem ele (ADR-127): o 401 traz
+ * `error_description="mfa_enrolment_required"` e a sessão continua; só serve
+ * para o ligar.
+ */
+export function eInscricaoMfaPendente(r: Response): boolean {
+  return r.status === 401 && (r.headers.get("WWW-Authenticate") ?? "").includes("mfa_enrolment_required");
+}
+
 const sessao: Middleware = {
   onResponse({ request, response, schemaPath }) {
     if (!request.headers.has("Authorization")) return response;
-    if (eFimDeSessao(response) && !ROTAS_SEM_SESSAO.test(schemaPath)) {
+    if (eInscricaoMfaPendente(response)) {
+      marcarMfaPendente(true);
+    } else if (eFimDeSessao(response) && !ROTAS_SEM_SESSAO.test(schemaPath)) {
       terminarSessaoLocal("terminada");
     } else if (response.ok) {
       registarPedidoAutenticado();

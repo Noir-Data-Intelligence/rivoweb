@@ -3,7 +3,7 @@
  * As guardas só evitam ecrãs vazios ou a rebentar, e não pedem dados que a
  * conta não pode ler.
  */
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useMe, useSessao } from "@/features/identity/api";
 import { ProvedorUtilizador, useUtilizador } from "@/features/identity/utilizador";
@@ -12,6 +12,8 @@ import type { Requisito } from "@/lib/auth/permissions";
 import { motivoUltimoFim } from "@/lib/auth/session";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, Logo } from "@/ui/Layout";
+
+const SessaoRestrita = lazy(() => import("@/features/identity/components/SessaoRestrita"));
 
 export function PaginaSimples({ children }: { children: ReactNode }) {
   return (
@@ -38,6 +40,16 @@ export function AreaAutenticada() {
     if (motivo === "saiu" || motivo === "outra-aba") return <Navigate to="/entrar" replace />;
     const voltar = local.pathname + local.search;
     return <Navigate to={voltar === "/" ? "/entrar" : `/entrar?voltar=${encodeURIComponent(voltar)}`} replace />;
+  }
+  // Obrigada ao segundo factor e ainda sem ele (ADR-127): só o ecrã de o ligar.
+  if (sessao.mfaPendente) {
+    return (
+      <PaginaSimples>
+        <Suspense fallback={<CarregandoPagina />}>
+          <SessaoRestrita />
+        </Suspense>
+      </PaginaSimples>
+    );
   }
   if (me.isPending) return <CarregandoPagina />;
   if (me.error) {

@@ -17,6 +17,7 @@ import { PageHeader, Skeleton } from "@/ui/Layout";
 import { PreferenciasNotificacoes } from "@/features/notificacoes";
 import { chaves, sair, useMudarPassword, useSessoesActivas, useTerminarSessao, type SessaoActiva } from "../api";
 import { RegrasPassword } from "../components/DefinirPassword";
+import { CartaoSegundoFactor } from "../components/SegundoFactor";
 import { useUtilizador } from "../utilizador";
 
 const esquema = z
@@ -178,6 +179,7 @@ export default function MinhaConta() {
       <PageHeader titulo="A minha conta" descricao={utilizador.email} />
       <div className="flex flex-col gap-6">
         <MudarPassword />
+        <CartaoSegundoFactor />
         <SessoesActivas />
         <PreferenciasNotificacoes />
       </div>

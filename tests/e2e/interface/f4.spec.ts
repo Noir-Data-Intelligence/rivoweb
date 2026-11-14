@@ -30,6 +30,21 @@ function comF4(api: ApiSimulada, me = meAdminF4): ApiSimulada {
 }
 
 test.describe("caixa e decisão", () => {
+  test("pagamento partido: o acumulado de 30 dias aparece quando passa do valor (BR-7)", async ({ page, api }) => {
+    const pagamento = { ...historico(), processType: "finance.payment_request", sourceModule: "finance", amount: 600000, currency: "AOA" };
+    await comF4(api)
+      .em("GET", `/approval/requests/${IDF4.pedido}/history`, { status: 200, corpo: { ...pagamento, cumulativeAmount: 1200000 } })
+      .em("GET", `/approval/requests/${IDF4.meu}/history`, { status: 200, corpo: { ...pagamento, requestId: IDF4.meu, cumulativeAmount: 600000 } })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/aprovacoes/${IDF4.pedido}`);
+    await expect(page.getByText("Acumulado em 30 dias (mesmo fornecedor e rubrica)")).toBeVisible();
+    await expect(page.getByText(/^1\s200\s000,00/)).toBeVisible();
+    await page.goto(`/aprovacoes/${IDF4.meu}`);
+    await expect(page.getByText("Valor", { exact: true })).toBeVisible();
+    await expect(page.getByText("Acumulado em 30 dias", { exact: false })).toHaveCount(0);
+  });
+
   test("à minha espera: aprovar e antecipar a aplicação no RH; axe, responsivo, CSP", async ({ page, api, violacoes }) => {
     await comF4(api)
       .em("POST", `/approval/requests/${IDF4.pedido}/decisions`, { status: 200, corpo: { ...pedido("Approved"), pendingApprovers: [], currentStep: 2 } })

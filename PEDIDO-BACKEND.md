@@ -1,7 +1,7 @@
 # Pedidos ao backend
 
 > 2026-10-18 · Do front de produção (`Noir-Data-Intelligence/rivoweb`) para a API.
-> Revisto contra `main` @ `2efb3d0` (PR #141 a #166). **B24** resolvido a 2026-11-12 (configuração e PR #157). **B46** resolvido no PR #167 (em produção desde 2026-11-13): `GET /finance/treasury/salary-advance-applications/lookups`. Nada em aberto.
+> Revisto contra `main` @ `6cd0300` (PR #141 a #170). **B24** resolvido a 2026-11-12 (configuração e PR #157). **B46** resolvido no PR #167 (em produção desde 2026-11-13): `GET /finance/treasury/salary-advance-applications/lookups`. Em aberto: **B47** (a caixa das aprovações não traz o valor do pedido).
 > **B43**, **B44** e **B45** estão resolvidos (PR #135 e #136) e o front já os
 > usa: «Bens / Serviço» em cada linha do rascunho e da pró-forma; a conta onde
 > entrou na emissão da FR do rascunho e na conversão da pró-forma; a versão do
@@ -683,3 +683,25 @@ O front não remenda: não há outra fonte dos colaboradores para o Finance.
 - uma lista mínima de colaboradores activos (id, nome, n.º) para quem tem
   `finance.treasury.write`, por exemplo `GET /finance/treasury/salary-advance-applications/employees`; ou
 - dar ao perfil Finance `hr.employees.read`, se for essa a intenção do ADR-123.
+
+## B47 — A caixa das aprovações não traz o valor do pedido, e o acumulado não se compara
+
+> Aberto a 2026-11-14, contra `main` @ `6cd0300` (merge do #170).
+
+**Facto:** o #169 (ADR-126, BR-7) pôs `cumulativeAmount` em
+`GET /approval/requests` e em `GET /approval/requests/{id}`
+(`ApprovalStatusView`), e a NOVIDADES (secção 44) pede ao front que mostre o
+acumulado «quando for maior do que `amount`», na ficha e na caixa. Mas
+`ApprovalStatusView` não tem `amount` nem `currency`: só
+`ApprovalHistoryView` (`GET /approval/requests/{id}/history`) os tem.
+
+**Consequência:** a ficha mostra o acumulado (lê o histórico). A caixa, que é
+uma lista, não sabe se o acumulado passa do valor do pedido. Mostrá-lo sempre
+seria ruído (num pedido sem outros, o acumulado é o próprio valor), e pedir o
+histórico de cada linha seria um pedido por linha. O front não remenda: a
+caixa não o mostra.
+
+**Pedido:** `amount` e `currency` em `ApprovalStatusView` (os de
+`ApprovalHistoryView`), ou um campo booleano que diga que o acumulado passou
+do valor do pedido. O front acrescenta então «Acumulado em 30 dias» à linha
+da caixa.

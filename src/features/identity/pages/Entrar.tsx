@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
 import { rotaConhecida } from "@/app/rotasConhecidas";
@@ -11,7 +11,7 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
-import { useEntrar, useSessao } from "../api";
+import { useEntrar, useEntrarComCodigo, useSessao, type DesafioMfa } from "../api";
 import { BOTAO_ENTRADA, CAMPO_ENTRADA, LayoutPublico, LIGACAO_ENTRADA, ROTULOS_ENTRADA } from "../components/LayoutPublico";
 
 type Dados = { email: string; password: string };
@@ -41,6 +41,105 @@ const MENSAGEM_FIM: Readonly<Record<MotivoFim, string | null>> = {
   terminada: "A sessão terminou. Entre de novo.",
 };
 
+/** Código da app: 6 dígitos, com ou sem o espaço do meio. Código de recuperação: como vier, sem espaços. */
+function validarCodigo(valor: string, recuperacao: boolean): { erro?: string; codigo: string } {
+  const codigo = valor.replace(/\s+/g, "");
+  if (recuperacao) return codigo === "" ? { erro: "Escreva um código de recuperação.", codigo } : codigo.length > 64 ? { erro: "Este código não é válido.", codigo } : { codigo };
+  return /^\d{6}$/.test(codigo) ? { codigo } : { erro: "Escreva os 6 dígitos da app.", codigo };
+}
+
+/**
+ * Segundo passo do login (ADR-127): a conta tem a app autenticadora ligada.
+ * O desafio dura poucos minutos; ao acabar, volta-se ao primeiro passo.
+ */
+function PassoCodigo({ desafio, aoExpirar, aoVoltar, aoEntrar }: { desafio: DesafioMfa; aoExpirar: () => void; aoVoltar: () => void; aoEntrar: () => void }) {
+  const entrar = useEntrarComCodigo();
+  const [recuperacao, setRecuperacao] = useState(false);
+  const [valor, setValor] = useState("");
+  const [erro, setErro] = useState<string | undefined>();
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const t = window.setTimeout(aoExpirar, Math.max(0, desafio.expiraEm - Date.now()));
+    return () => window.clearTimeout(t);
+  }, [desafio, aoExpirar]);
+
+  useEffect(() => ref.current?.focus(), [recuperacao]);
+
+  const submeter = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { erro: encontrado, codigo } = validarCodigo(valor, recuperacao);
+    setErro(encontrado);
+    if (encontrado) {
+      ref.current?.focus();
+      return;
+    }
+    if (entrar.isPending) return;
+    if (Date.now() >= desafio.expiraEm) {
+      aoExpirar();
+      return;
+    }
+    entrar.mutate({ challenge: desafio.desafio, code: codigo }, { onSuccess: aoEntrar, onError: () => setValor("") });
+  };
+
+  const codigoErrado = eApiError(entrar.error) && entrar.error.status === 401;
+
+  return (
+    <>
+      {codigoErrado ? (
+        <Alert tom="erro" className="mb-4" titulo="Código errado. Tente de novo." />
+      ) : entrar.error ? (
+        <ErrorPanel erro={entrar.error} className="mb-4" />
+      ) : null}
+      <form onSubmit={submeter} noValidate className={`flex flex-col gap-5 ${ROTULOS_ENTRADA}`}>
+        <Field
+          rotulo={recuperacao ? "Código de recuperação" : "Código da app"}
+          erro={erro}
+          ajuda={recuperacao ? "Um dos códigos que guardou ao ligar o segundo factor. Cada um serve uma vez." : "Os 6 dígitos que a app autenticadora mostra agora para a Rivo."}
+        >
+          {({ id, descricao, invalido }) => (
+            <Input
+              key={recuperacao ? "recuperacao" : "app"}
+              id={id}
+              ref={ref}
+              name="code"
+              className={CAMPO_ENTRADA}
+              autoComplete={recuperacao ? "off" : "one-time-code"}
+              inputMode={recuperacao ? "text" : "numeric"}
+              maxLength={recuperacao ? 64 : 7}
+              aria-describedby={descricao}
+              invalido={invalido}
+              value={valor}
+              onChange={(e) => {
+                setValor(e.target.value);
+                if (erro) setErro(validarCodigo(e.target.value, recuperacao).erro);
+              }}
+            />
+          )}
+        </Field>
+        <button
+          type="button"
+          className={`-mt-2 self-end text-xs ${LIGACAO_ENTRADA}`}
+          onClick={() => {
+            setRecuperacao((r) => !r);
+            setValor("");
+            setErro(undefined);
+            entrar.reset();
+          }}
+        >
+          {recuperacao ? "Usar o código da app" : "Usar um código de recuperação"}
+        </button>
+        <Button type="submit" tamanho="lg" className={BOTAO_ENTRADA} aCarregar={entrar.isPending}>
+          Entrar
+        </Button>
+        <Button type="button" variante="secondary" onClick={aoVoltar}>
+          Voltar
+        </Button>
+      </form>
+    </>
+  );
+}
+
 export default function Entrar() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -58,9 +157,27 @@ export default function Entrar() {
   // Como no resto dos formulários: valida ao submeter e, a partir daí, a cada alteração.
   const [submetido, setSubmetido] = useState(false);
   const [verPassword, setVerPassword] = useState(false);
+  const [desafio, setDesafio] = useState<DesafioMfa | null>(null);
+  const [expirou, setExpirou] = useState(false);
   const refs = { email: useRef<HTMLInputElement>(null), password: useRef<HTMLInputElement>(null) };
 
   if (sessao !== null && !entrar.isPending) return <Navigate to={destino} replace />;
+
+  if (desafio !== null) {
+    return (
+      <LayoutPublico titulo="Segundo factor" descricao="A sua conta pede o código da app autenticadora.">
+        <PassoCodigo
+          desafio={desafio}
+          aoExpirar={() => {
+            setDesafio(null);
+            setExpirou(true);
+          }}
+          aoVoltar={() => setDesafio(null)}
+          aoEntrar={() => navigate(destino, { replace: true })}
+        />
+      </LayoutPublico>
+    );
+  }
 
   const mudar = (campo: keyof Dados, valor: string) => {
     const novos = { ...valores, [campo]: valor };
@@ -79,8 +196,14 @@ export default function Entrar() {
       return;
     }
     if (entrar.isPending) return;
+    setExpirou(false);
     entrar.mutate(dados, {
-      onSuccess: () => navigate(destino, { replace: true }),
+      onSuccess: (d) => {
+        // Com o segundo factor, a password não fica no ecrã do passo seguinte.
+        setValores((v) => ({ ...v, password: "" }));
+        if (d === null) navigate(destino, { replace: true });
+        else setDesafio(d);
+      },
       onError: () => setValores((v) => ({ ...v, password: "" })),
     });
   };
@@ -89,7 +212,9 @@ export default function Entrar() {
 
   return (
     <LayoutPublico titulo="Entrar na Rivo" descricao="Insira as suas credenciais para aceder à plataforma.">
-      {motivo ? (
+      {expirou ? (
+        <Alert tom="info" className="mb-4" titulo="O tempo para o código acabou. Entre de novo." />
+      ) : motivo ? (
         <Alert tom="info" className="mb-4" titulo={motivo} />
       ) : null}
       {credenciaisErradas ? (

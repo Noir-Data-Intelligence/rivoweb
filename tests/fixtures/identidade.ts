@@ -10,6 +10,7 @@ export const loginOk = (inactividadeSegundos = 900, validadeMs = 12 * 3600_000):
   accessToken: "token-de-teste",
   expiresAt: new Date(Date.now() + validadeMs).toISOString(),
   idleTimeoutSeconds: inactividadeSegundos,
+  mfaEnrolmentRequired: false,
 });
 
 export const meAdmin: S["CurrentUserResponse"] = {

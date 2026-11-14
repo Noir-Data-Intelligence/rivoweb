@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { eFimDeSessao } from "@/lib/api/client";
+import { eFimDeSessao, eInscricaoMfaPendente } from "@/lib/api/client";
 import { lerPaginacao } from "@/lib/api/pagination";
 import { eTransitorio, paraApiError } from "@/lib/api/problem";
 import { avaliarRelogio } from "@/lib/auth/actividade";
 import { pode, shellInicial } from "@/lib/auth/permissions";
-import { iniciarSessao, motivoUltimoFim, obterToken, restaurarSessao, terminarSessaoLocal } from "@/lib/auth/session";
+import { iniciarSessao, marcarMfaPendente, motivoUltimoFim, obterSessao, obterToken, restaurarSessao, terminarSessaoLocal } from "@/lib/auth/session";
 
 const login = (expira = "2099-01-01T00:00:00Z") => ({ accessToken: "tok", expiresAt: expira, idleTimeoutSeconds: "900" });
 
@@ -57,6 +57,25 @@ describe("relógio de inactividade (S5)", () => {
   });
   it("prazo absoluto com 30 s de margem", () => {
     expect(avaliarRelogio({ ...base, msDesdePedido: 0, agoraEpoch: base.expiraEm - 30_000 }).fase).toBe("fim-expirada");
+  });
+});
+
+describe("segundo factor por ligar (ADR-127)", () => {
+  it("o login marca a sessão restrita; marca e liberta sobrevivem ao F5", () => {
+    iniciarSessao({ ...login(), mfaEnrolmentRequired: true });
+    expect(obterSessao()?.mfaPendente).toBe(true);
+    marcarMfaPendente(false);
+    expect(restaurarSessao()?.mfaPendente).toBe(false);
+    marcarMfaPendente(true);
+    expect(restaurarSessao()?.mfaPendente).toBe(true);
+    expect(obterToken()).toBe("tok");
+  });
+
+  it("o 401 com mfa_enrolment_required não é fim de sessão", () => {
+    const r = new Response(null, { status: 401, headers: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="mfa_enrolment_required"' } });
+    expect(eInscricaoMfaPendente(r)).toBe(true);
+    expect(eInscricaoMfaPendente(new Response(null, { status: 401, headers: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="revoked"' } }))).toBe(false);
+    expect(eInscricaoMfaPendente(new Response(null, { status: 403 }))).toBe(false);
   });
 });
 

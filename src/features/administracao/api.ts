@@ -85,6 +85,17 @@ export function useReporPassword() {
   });
 }
 
+/**
+ * Repor o segundo factor de quem perdeu o telemóvel (ADR-127): desliga-o e
+ * termina as sessões da pessoa. Motivo obrigatório; não serve à própria conta.
+ */
+export function useReporSegundoFactor() {
+  return useEscrita({
+    mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
+      enviar(api.POST("/identity/users/{userId}/mfa/reset", { params: { path: { userId } }, body: { reason } })),
+  });
+}
+
 /** O caminho por omissão: a própria pessoa recebe a ligação e define a password. */
 export function useEnviarLigacaoRecuperacao() {
   return useEscrita({

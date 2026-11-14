@@ -71,6 +71,8 @@ export class ApiSimulada {
     return this.em("POST", "/identity/login", { status: 200, corpo: loginOk() })
       .em("GET", "/identity/me", { status: 200, corpo: me })
       .em("GET", "/identity/me/sessions", { status: 200, corpo: sessoes() })
+      // ADR-127: «A minha conta» lê o estado do segundo factor; por omissão, desligado e sem obrigação.
+      .em("GET", "/identity/me/mfa", { status: 200, corpo: { enabled: false, required: false, enforced: false, recoveryCodesLeft: 0 } })
       .em("POST", "/identity/logout", { status: 204 })
       // F2: o sino e o painel pedem isto em todas as páginas; por omissão, vazio.
       .em("GET", "/notifications/me", { status: 200, corpo: [], cabecalhos: { "X-Page": "1", "X-Page-Size": "1", "X-Total-Count": "0" } })
