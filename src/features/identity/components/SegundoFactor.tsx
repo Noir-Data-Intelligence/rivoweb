@@ -4,7 +4,7 @@
  * ainda não o ligou.
  */
 import { Check, Copy, Download, ShieldCheck } from "lucide-react";
-import { useId, useState, type FormEvent } from "react";
+import { lazy, Suspense, useId, useState, type FormEvent } from "react";
 import { eApiError } from "@/lib/api/problem";
 import { descarregarTexto } from "@/lib/security/csv";
 import { Alert } from "@/ui/Alert";
@@ -15,6 +15,9 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { Skeleton } from "@/ui/Layout";
 import { useConfirmarMfa, useDesligarMfa, useEstadoMfa, useIniciarMfa, useNovosCodigosMfa } from "../api";
+
+// O codificador do QR só se carrega no ecrã de ligar.
+const QrSegundoFactor = lazy(() => import("./QrSegundoFactor"));
 
 /** Um código da app (6 dígitos) ou de recuperação; os espaços não contam. */
 export function validarCodigoMfa(valor: string, soApp = false): { erro?: string; codigo: string } {
@@ -145,11 +148,19 @@ export function LigarSegundoFactor({ aoTerminar, rotuloTerminar = "Já os guarde
     <div className="flex flex-col gap-4">
       <ol className="flex list-decimal flex-col gap-3 pl-5 text-sm text-foreground">
         <li>
-          Na app autenticadora, acrescente uma conta e escreva esta chave (ou, no telemóvel,{" "}
-          <a href={authenticatorUri} className="font-medium text-primary underline-offset-4 hover:underline">
-            abra-a directamente na app
-          </a>
-          ):
+          Na app autenticadora, acrescente uma conta e leia este QR:
+          <div className="mt-2">
+            <Suspense fallback={<Skeleton className="h-44 w-44" />}>
+              <QrSegundoFactor uri={authenticatorUri} />
+            </Suspense>
+          </div>
+          <p className="mt-3">
+            Ou escreva esta chave (no telemóvel,{" "}
+            <a href={authenticatorUri} className="font-medium text-primary underline-offset-4 hover:underline">
+              abra-a directamente na app
+            </a>
+            ):
+          </p>
           <p className="mt-2 break-all rounded-md border border-border bg-muted px-3 py-2 font-mono text-sm tracking-wider" aria-label="Chave para a app">
             {agrupar(sharedKey)}
           </p>

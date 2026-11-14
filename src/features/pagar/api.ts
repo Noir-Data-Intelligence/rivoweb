@@ -138,6 +138,22 @@ export function useAnularFacturaCompra(id: string) {
   });
 }
 
+export type CorreccaoIvaNaoDedutivel = S["NonDeductibleTaxCorrectedResponse"];
+
+/**
+ * Corrige o IVA não dedutível de uma factura em vigor (ADR-125): o servidor
+ * lança a diferença no mês da factura (antes do apuramento) ou hoje, como
+ * regularização. Mexe no razão, por isso invalida tudo o que é das finanças.
+ */
+export function useCorrigirIvaNaoDedutivel(id: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: { nonDeductibleTax: string; reason: string }) =>
+      ler(api.POST("/finance/purchase-invoices/{purchaseInvoiceId}/non-deductible-tax-corrections", { params: { path: { purchaseInvoiceId: id } }, body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance"] }),
+  });
+}
+
 // Pedidos de pagamento
 
 export function usePedidosPagamento(p: { pagina: number; tamanho: number; factura: string | null }, activo = true) {

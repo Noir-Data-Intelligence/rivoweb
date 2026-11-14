@@ -47,6 +47,9 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 48 | Prazos das aprovações: lembrete antes do fim do prazo do passo e, no fim, escalonamento para um cargo (CFO, CEO…) que passa também a poder decidir; o prazo e o «escalado» na caixa e na ficha | #173 | Em revisão |
+| 47 | Delegação de aprovação: o aprovador (ou o admin, por ele) delega num colega por um período, e o colega decide em nome dele; a decisão mostra os dois | #172 | Em revisão |
+| 46 | Sessão única reforçada: quem decide e entra noutro sítio termina a sessão anterior, que recebe `401` com `superseded`; desligada no servidor | #171 | Em revisão |
 | 45 | Segundo factor (MFA) com a app autenticadora: login em dois passos, inscrição com QR e códigos de recuperação, reposição pelo admin; a obrigatoriedade para quem decide ou movimenta fundos fica desligada até o front ter o ecrã | #170 | Em revisão |
 | 44 | Anti-fraccionamento: a alçada de um pedido de pagamento escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica (BR-7) | #169 | Em revisão |
 | 43 | O Finance escolhe em nome de quem pede o adiantamento de salário, sem ler os RH (B46); o seed volta a ser completo por omissão | #167 | **Em produção** desde 13/11; base recriada com o seed completo e verificada (a conta QA Finance recebe os 63 colaboradores activos na lista nova e continua com 403 em `/hr/employees`; 1453 facturas de venda, 319 de compra, 153 despesas, 25 viaturas, 4 sinistros todos dentro da vigência; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
@@ -1317,6 +1320,132 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 48. Prazos das aprovações: lembrete e escalonamento (PR #173, ADR-130)
+
+Cada passo de uma política pode ter um prazo em horas (`slaHours`, que já
+existia) e, agora, um **cargo de escalonamento**.
+- **O lembrete:** passados 75% do prazo, os aprovadores do passo (e quem
+  decide por delegação em nome deles) recebem um lembrete na aplicação.
+- **No fim do prazo:** os ocupantes do cargo de escalonamento passam também a
+  poder decidir o passo. Quem já o tinha continua a poder, e basta a decisão
+  de um.
+- **Os avisos do fim:** os escalados recebem «Aprovação escalada para si» e os
+  originais «Aprovação fora de prazo», na aplicação e por e-mail. Sem cargo de
+  escalonamento, só o aviso de atraso.
+
+**API** (detalhe em `API-FRONTEND.md`, secção Aprovações)
+- **Políticas:** cada passo aceita `escalationPositionId` (outro cargo; exige
+  `slaHours`) e mostra-o em `GET /approval/policies`.
+- **Pedido** (ficha e lista):
+  - `currentStepDueAt`: quando acaba o prazo do passo em curso;
+  - `escalatedAt`: quando o passo escalou;
+  - quem entrou por escalonamento vem em `pendingApprovers` e
+    `pendingApproverNames`, como os outros.
+- **Histórico:** `assignments[].isEscalation`.
+- `POST /approval/deadlines/evaluation` (`approval.policies.write`): corre já
+  a volta que corre sozinha de 15 em 15 minutos.
+- **Notificações novas:** `approval.request.deadline_reminder`,
+  `approval.request.overdue` e `approval.request.escalated`.
+
+**Front (por fazer)**
+- **Políticas → passo:** «Prazo (horas)» e «Escalar para o cargo» (lista de
+  cargos, só com prazo).
+- **Caixa e ficha:**
+  - «Prazo: 16/11 08:00», a vermelho quando passou;
+  - «Escalado» quando `escalatedAt` vier preenchido;
+  - no histórico, «por escalonamento» junto de quem entrou assim.
+- **Notificações:** ícone ou cor próprios para os três tipos novos.
+
+**Como ver**
+- **Produção:** as políticas do seed têm prazos (24 a 72 horas) e nenhum cargo
+  de escalonamento. Um pedido pendente recebe o lembrete e, depois, o aviso de
+  atraso.
+- **A suite `verify-approval.ps1`** (casos 20 a 24) recua o início do passo por
+  SQL e corre a volta pela rota.
+
+---
+
+## 47. Delegação de aprovação (PR #172, ADR-129)
+
+Quem aprova e se ausenta (férias, baixa) delega num colega. Durante o período,
+o colega decide os passos que esperam pelo delegante, em nome dele. As regras
+de segregação valem para os dois: nenhum decide um pedido que submeteu, nem
+intervém duas vezes no mesmo processo, nem paga o que aprovou.
+
+**API** (detalhe em `API-FRONTEND.md`, secção Aprovações)
+- `GET /approval/delegations`: as minhas, em vigor ou por começar (como
+  delegante ou delegado). `?scope=all` para quem tem
+  `approval.policies.write`.
+- `GET /approval/delegations/candidates`: `[{ employeeId, name }]`, os
+  colaboradores activos.
+- `POST /approval/delegations`
+  `{ delegateEmployeeId, endsAt, startsAt?, reason?, delegatorEmployeeId? }`:
+  - para si, com `approval.requests.decide`;
+  - por outrem (`delegatorEmployeeId`), com `approval.policies.write`;
+  - `409` se o delegante já tiver outra para parte do período.
+- `POST /approval/delegations/{id}/revocation`: o delegante, o delegado ou o
+  admin.
+- **Na decisão:**
+  - `onBehalfOfEmployeeId` (facultativo). Sem ele, quem não está no passo
+    decide pela única pessoa que lhe delegou e espera nele;
+  - se forem várias, `400` com o campo `onBehalfOfEmployeeId`;
+  - as decisões trazem `onBehalfOfEmployeeId` e `onBehalfOfName`.
+- **A caixa** (`pendingFor` = eu) inclui os pedidos dos meus delegantes.
+
+**Front (por fazer)**
+- **Aprovações → «Delegações»:**
+  - a lista (delegante, delegado, período, motivo, «Em vigor» ou «Por
+    começar»), com «Revogar»;
+  - «Delegar»: colega (de `candidates`; sugerir quem decide aprovações, porque
+    sem `approval.requests.decide` o colega não chega a decidir), fim,
+    início opcional e motivo;
+  - o admin vê todas, e escolhe também o delegante.
+- **Na caixa e na ficha:**
+  - o botão «Decidir» aparece também quando um dos `pendingApprovers` me
+    delegou;
+  - com mais de um delegante no mesmo passo, perguntar em nome de quem e
+    enviar `onBehalfOfEmployeeId`.
+- **Nas decisões:** «Fulano, em nome de Sicrano» quando houver
+  `onBehalfOfName`.
+
+**Como ver**
+- **Com duas contas QA que decidam:**
+  1. uma delega na outra;
+  2. a outra vê o pedido na caixa e decide-o;
+  3. a ficha mostra «em nome de».
+- **A suite `verify-approval.ps1`** (casos 16 a 19) faz isto.
+
+---
+
+## 46. Sessão única reforçada (PR #171, ADR-128)
+
+O requisito do SGAP de impedir duas sessões abertas a quem decide. **Ganha o
+último login:** quem entra noutro sítio termina a sessão que lá estava.
+
+**Está desligada** (`SESSION_SINGLE_SESSION=false` no servidor), e enquanto
+estiver nada muda.
+
+**API**
+- **Abrange** quem decide aprovações (`approval.requests.decide`, a mesma
+  lista do prazo de inactividade de 15 minutos).
+- **A sessão terminada** recebe `401` com
+  `error_description=superseded` no `WWW-Authenticate` (tabela «Porque
+  terminou a sessão» em `API-FRONTEND.md`).
+- **Sem rota nova.** Em «Sessões activas», a anterior deixa de aparecer como
+  activa.
+
+**Front (por fazer)**
+- Com `superseded`, o ecrã de entrar mostra «A sessão terminou porque a sua
+  conta entrou noutro sítio.», e não a mensagem de inactividade.
+- O resto já existe: o `401` leva ao login.
+
+**Como ver**
+- Só com o interruptor ligado. Numa API local com
+  `Session__SingleSession=true`: entrar com o admin em dois browsers, e o
+  primeiro volta ao login com a mensagem.
 
 ---
 

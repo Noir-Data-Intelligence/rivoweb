@@ -157,6 +157,79 @@ test.describe("facturas de compra", () => {
     await expect(page.getByText("É esse o custo de aquisição do bem, ao registá-lo nos activos.", { exact: false })).toContainText("conta do bem, com o líquido");
   });
 
+  test("corrigir o IVA não dedutível (ADR-125): intervalo e motivo no cliente, 400 no campo, regularização e avisos", async ({ page, api, violacoes }) => {
+    let tentativas = 0;
+    let corrigida = false;
+    const depois = { ...factura(), nonDeductibleTax: 70000, nonDeductibleTaxCorrections: 1 };
+    await comF5(api, meGestorF5, painelCarlos())
+      .em("GET", `/finance/purchase-invoices/${IDF5.factura}`, () => ({ status: 200, corpo: corrigida ? depois : factura() }))
+      .em("POST", `/finance/purchase-invoices/${IDF5.factura}/non-deductible-tax-corrections`, () => {
+        if (++tentativas === 1) {
+          return { status: 400, corpo: { status: 400, title: "Pedido inválido", errors: { nonDeductibleTax: ["O IVA não dedutível vai de 0 a 140 000,00."] } }, cabecalhos: { "Content-Type": "application/problem+json" } };
+        }
+        corrigida = true;
+        return {
+          status: 200,
+          corpo: {
+            purchaseInvoice: depois,
+            archivalNumber: "ND1-2026-000001",
+            postedAs: "Regularisation",
+            notes: ["O IVA de 10/2026 já estava apurado: a correcção é uma regularização deste mês.", "O IVA deste mês já foi apurado: volte a apurá-lo."],
+          },
+        };
+      })
+      .ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/facturas-compra/${IDF5.factura}`);
+    await expect(page.getByText("corrigido", { exact: false })).toHaveCount(0);
+    await page.getByRole("button", { name: "Corrigir IVA não dedutível" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByText("Se o IVA de 10/2026 ainda não foi apurado", { exact: false })).toBeVisible();
+    const campo = d.getByLabel("IVA não dedutível (AOA)");
+    await expect(campo).toHaveValue("0,00");
+    await d.getByRole("button", { name: "Corrigir" }).click();
+    await expect(d.getByText("É o valor actual: indique outro.")).toBeVisible();
+    await expect(d.getByText("Indique o motivo da correcção.")).toBeVisible();
+    await campo.fill("140000,01");
+    await expect(d.getByText("Não pode passar de 140 000,00", { exact: false })).toBeVisible();
+    expect(api.escritas("POST", `/finance/purchase-invoices/${IDF5.factura}/non-deductible-tax-corrections`)).toHaveLength(0);
+    await campo.fill("70 000");
+    await d.getByLabel("Motivo").fill("Viatura ligeira: metade do IVA não se deduz");
+    expect(await violacoes()).toEqual([]);
+    await d.getByRole("button", { name: "Corrigir" }).click();
+    await expect(d.getByText("O IVA não dedutível vai de 0 a 140 000,00.")).toBeVisible();
+    await expect(campo).toHaveAttribute("aria-invalid", "true");
+    await d.getByRole("button", { name: "Corrigir" }).dblclick();
+    await expect(d).toHaveCount(0);
+    const aviso = page.getByRole("status").filter({ hasText: "IVA não dedutível corrigido." });
+    await expect(aviso).toContainText("O IVA de 10/2026 já estava apurado: o lançamento ND1-2026-000001 é uma regularização com a data de hoje");
+    await expect(aviso.getByRole("listitem")).toHaveText(["O IVA de 10/2026 já estava apurado: a correcção é uma regularização deste mês.", "O IVA deste mês já foi apurado: volte a apurá-lo."]);
+    await expect(page.getByText("IVA não dedutível corrigido uma vez depois do registo.")).toBeVisible();
+    await expect(page.getByText("não dedutível", { exact: true })).toBeVisible();
+    expect(api.escritas("POST", `/finance/purchase-invoices/${IDF5.factura}/non-deductible-tax-corrections`).map((p) => p.corpo)).toEqual([
+      { nonDeductibleTax: "70000.00", reason: "Viatura ligeira: metade do IVA não se deduz" },
+      { nonDeductibleTax: "70000.00", reason: "Viatura ligeira: metade do IVA não se deduz" },
+    ]);
+  });
+
+  test("quem só lê as contas a pagar não corrige o IVA não dedutível", async ({ page, api }) => {
+    await comF5(api, meFinancasF5).ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto(`/facturas-compra/${IDF5.factura}`);
+    await expect(page.getByRole("heading", { name: "FT 2026/123" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Corrigir IVA não dedutível" })).toHaveCount(0);
+  });
+
+  test("numa factura anulada não se corrige o IVA não dedutível", async ({ page, api }) => {
+    await comF5(api, meGestorF5, painelCarlos())
+      .em("GET", `/finance/purchase-invoices/${IDF5.factura}`, { status: 200, corpo: { ...factura("Cancelled"), cancelledAt: "2026-10-05T10:00:00Z", cancellationReason: "Duplicada" } })
+      .ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/facturas-compra/${IDF5.factura}`);
+    await expect(page.getByText("Duplicada")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Corrigir IVA não dedutível" })).toHaveCount(0);
+  });
+
   test("pedir pagamento: tecto do que falta pedir, 202 abre o pedido", async ({ page, api }) => {
     await comF5(api, meGestorF5, painelCarlos())
       .em("POST", "/finance/payment-requests", { status: 202, corpo: { paymentRequestId: IDF5.pedido, approvalRequestId: IDF5.aprovacao, estado: "PendenteAprovacao" } })

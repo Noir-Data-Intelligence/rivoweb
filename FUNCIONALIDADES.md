@@ -41,7 +41,9 @@
 > IRT e do INSS; o Finance pede adiantamentos em nome de um colaborador) ·
 > actualizado a 2026-11-14 (o segundo factor: entrar com o código da app,
 > ligar e gerir em «A minha conta», a sessão restrita de quem é obrigado e o
-> «Repor» do admin; o acumulado de 30 dias na ficha da aprovação).
+> «Repor» do admin; o acumulado de 30 dias na ficha da aprovação; o QR para
+> a app autenticadora; corrigir o IVA não dedutível de uma factura de compra
+> já registada).
 
 ---
 
@@ -120,6 +122,10 @@ AM = AssetManager.
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Anti-fraccionamento: num pedido de pagamento, a alçada escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica ⁵² | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Delegar as minhas aprovações num colega por um período, e revogar; decidir em nome de quem me delegou ⁵⁵ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Delegações de outras pessoas: ver todas, criar por quem está ausente, revogar ⁵⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Prazo de cada passo: lembrete antes do fim; no fim, o pedido escala para o cargo do passo (CFO, CEO…), que passa também a poder decidir; avisos na aplicação e por e-mail ⁵⁶ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Políticas de aprovação: prazo e cargo de escalonamento por passo; correr já a vigilância dos prazos ⁵⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: passos de validação com checklist (itens obrigatórios e opcionais) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Auditoria**: consultar a trilha (quem, o quê, quando) de um período até 366 dias, por entidade, por páginas | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -217,6 +223,7 @@ AM = AssetManager.
 | Registar com a conta da despesa do PGC (opcional; vazio lança em 75.2.39) ou a do bem comprado (11 a 14, com o aviso de que a dívida fica na 37.1 e o IVA na 34.5.2.2 ³³); ver a conta na ficha | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Sugestões de contas de custos e do imobilizado ao escrever a conta da despesa (quem lê o plano de contas) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Anular | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Corrigir o IVA não dedutível de uma factura em vigor, sem a anular (novo valor e motivo; lança no mês da factura ou, já apurado, hoje como regularização) ⁵⁰ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | **Compras** | | | | | | | | | | |
 | Ver as requisições (quem pediu, departamento, linhas, total estimado, estado) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Abrir requisição, submeter para aprovação, ver a decisão, cancelar com motivo ¹³ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
@@ -239,7 +246,7 @@ AM = AssetManager.
 | Conta do PGC do activo (só contas de movimento: 11.2.x, 11.3.x, 11.4 a 11.6, 11.9, 12.x): escolher, ver; a amortização diz se lançou no razão e porquê | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Vender um activo pela factura («Vender pela factura» na ficha do activo, só com a conta do PGC): FT ou FR de bens com uma linha, na moeda do activo; abate-o e lança a dívida na 37.2 e o resultado na 68.3/78.3; anular a factura repõe o bem ³² | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ (corrigi-lo depois do registo ⁵⁰ ainda não está no front) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ (corrige-se depois do registo ⁵⁰) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
@@ -497,17 +504,35 @@ Recursos Humanos.»
 - **Corrigir:** o IVA não dedutível de uma factura de compra corrige-se sem a anular, com o novo valor e o motivo. A dívida ao fornecedor não muda.
 - **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
 - **Anular depois** estorna também as correcções.
-- **O botão ainda não existe:** no front, está por fazer (NOVIDADES, secção 42).
+- **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
+
+⁵⁶ PR #173 (ADR-130), em revisão a 2026-11-14.
+- **O prazo** conta de quando o passo começa, em horas corridas (sem dias úteis).
+- **O lembrete** sai passados 75% do prazo, a quem tem o passo e a quem o substitui por delegação.
+- **No fim:** os ocupantes do cargo de escalonamento passam também a poder decidir, e quem tinha o passo mantém-no. Cada aviso sai uma vez por passo.
+- **Num pedido de esclarecimento** não há avisos.
+- **Só na API por agora:** os ecrãs estão na NOVIDADES, secção 48.
+
+⁵⁵ PR #172 (ADR-129), em revisão a 2026-11-14.
+- **A delegação:** durante o período, o colega decide os passos que esperam pelo delegante, em nome dele. A decisão regista os dois.
+- **A segregação vale para os dois:** nenhum decide um pedido que submeteu, nem intervém duas vezes no mesmo processo, nem paga o que aprovou.
+- **Uma de cada vez:** um delegante não tem duas delegações para o mesmo período.
+- **Só na API por agora:** os ecrãs estão na NOVIDADES, secção 47.
+
+⁵⁴ PR #171 (ADR-128), em revisão a 2026-11-14.
+- **Ganha o último login:** a sessão anterior termina, com um `401` que diz `superseded`.
+- **Abrange** quem decide aprovações, e só com `SESSION_SINGLE_SESSION=true` no servidor.
+- **No front:** falta a mensagem própria no ecrã de entrar (NOVIDADES, secção 46).
 
 ⁵³ PR #170 (ADR-127), no `main` desde 2026-11-14.
 - **O segundo factor** é um código de 6 dígitos de uma app autenticadora, com 10 códigos de recuperação de uso único.
 - **Obrigatório** para quem decide (aprovações, orçamentos, despesas) ou movimenta fundos (pagamentos, contas bancárias, tesouraria), mas **ainda desligado no servidor**: liga-se quando o front tiver os ecrãs (NOVIDADES, secção 45).
 - **No front:**
   - **Entrar:** com o `202`, o passo «Segundo factor»: o código da app (6 dígitos) ou, por «Usar um código de recuperação», um desses; o código errado diz «Código errado. Tente de novo.»; o desafio acaba em 5 minutos e volta ao primeiro passo, com o aviso.
-  - **A minha conta → «Segundo factor»:** ligar (a chave em grupos de 4 para escrever na app, e a ligação `otpauth://` que abre a app no telemóvel; um código; os 10 códigos de recuperação com «Copiar» e «Descarregar», que não voltam a aparecer); ligado, quantos códigos restam (aviso com 2 ou menos), «Gerar códigos novos» e «Desligar», com um código; quem é obrigado, com a obrigatoriedade ligada, não vê «Desligar».
+  - **A minha conta → «Segundo factor»:** ligar (o QR para ler com a app, a chave em grupos de 4 para escrever na app, e a ligação `otpauth://` que abre a app no telemóvel; um código; os 10 códigos de recuperação com «Copiar» e «Descarregar», que não voltam a aparecer); ligado, quantos códigos restam (aviso com 2 ou menos), «Gerar códigos novos» e «Desligar», com um código; quem é obrigado, com a obrigatoriedade ligada, não vê «Desligar».
   - **Sessão restrita:** com `mfaEnrolmentRequired` no login, ou um `401` com `mfa_enrolment_required`, a Rivo mostra só o ecrã de ligar (e «Sair»); a sessão não termina. Ligado e guardados os códigos, a Rivo toda.
   - **Utilizadores (admin):** «Repor segundo factor» na ficha de outra conta, com a razão.
-  - **Falta o QR:** a biblioteca que o desenha no browser ainda não foi instalada; até lá, a chave escreve-se à mão ou abre-se pela ligação.
+  - **O QR** desenha-se no browser a partir do `otpauth://` (biblioteca `uqr`, carregada só nesse ecrã): a chave não vai a nenhum serviço externo.
 
 ⁵² PR #169 (ADR-126, BR-7), no `main` desde 2026-11-14.
 - **A regra:** ao pedir um pagamento, a alçada escolhe-se pelo valor do pedido somado aos do mesmo fornecedor (NIF) e da mesma rubrica (centro de custo) dos últimos 30 dias, na mesma moeda, que não foram rejeitados nem cancelados. O pedido não é recusado: vai para quem tem alçada sobre o total, e a trilha de auditoria regista-o.
@@ -546,6 +571,9 @@ Recursos Humanos.»
   servidor. Quem perde a sessão a meio do trabalho volta à mesma página depois
   de entrar.
 - **Prazo absoluto da sessão:** aviso antes do fim.
+- **Sessão única** ⁵⁴: quem decide aprovações só tem uma sessão aberta;
+  entrar noutro sítio termina a anterior. **Desligada no servidor por
+  agora.**
 - **Sem ligação ao servidor:** faixa no topo, com nova tentativa.
 
 ### A minha conta
@@ -555,12 +583,12 @@ Recursos Humanos.»
   cada uma. Terminar uma sessão noutro dispositivo, ou a actual.
 - **Notificações por e-mail:** ligar ou desligar. Convites e recuperação de
   password vão sempre por e-mail.
-- **Segundo factor (MFA)** ⁵³: **ligar** a app autenticadora (a chave para
-  escrever na app ou a ligação que a abre no telemóvel; um código; os 10
-  códigos de recuperação, com «Copiar» e «Descarregar», mostrados uma vez);
-  ligado, quantos códigos de recuperação restam, **gerar códigos novos** e
-  **desligar**, ambos com um código (quem é obrigado não desliga). Sem o QR
-  por agora.
+- **Segundo factor (MFA)** ⁵³: **ligar** a app autenticadora (o QR para ler
+  com a app, a chave para escrever ou a ligação que a abre no telemóvel; um
+  código; os 10 códigos de recuperação, com «Copiar» e «Descarregar»,
+  mostrados uma vez); ligado, quantos códigos de recuperação restam, **gerar
+  códigos novos** e **desligar**, ambos com um código (quem é obrigado não
+  desliga).
 - **Sessão restrita** ⁵³: com a obrigatoriedade ligada no servidor, quem
   decide ou movimenta fundos e ainda não tem o segundo factor só vê o ecrã de
   o ligar (e «Sair»); depois de o ligar, a Rivo toda.
@@ -1189,6 +1217,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   preenchido, mostra o que vai para a conta do bem ou da compra (líquido mais
   o não dedutível) e o IVA dedutível. A ficha mostra os dois e, numa compra de
   imobilizado, o custo de aquisição a usar ao registar o bem.
+- **Corrigir o IVA não dedutível** ⁵⁰ numa factura em vigor, sem a anular: o
+  novo valor (de zero ao IVA da factura) e o motivo. Lança no mês da factura
+  se esse IVA ainda não foi apurado; senão, hoje, como regularização. O aviso
+  diz onde ficou, com o lançamento («ND1-…») e os avisos do servidor (por
+  exemplo, voltar a apurar o IVA deste mês). A ficha diz quantas vezes foi
+  corrigido.
 - Ficha: o país e o mercado do fornecedor ao lado do NIF; dados e totais,
   confronto com a encomenda quando a tem, os pedidos de
   pagamento da factura e quanto **falta pedir**; **pedir pagamento** e
@@ -1861,7 +1895,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   sugestões: não lê o plano de contas. Com a conta de um bem (11 a 14), o
   registo e a ficha avisam que a dívida fica na 37.1 e o IVA na 34.5.2.2.
 - Ao registar, o **IVA não dedutível** (opcional ³⁷), com o que vai para cada
-  conta; a ficha mostra-o.
+  conta; a ficha mostra-o. Depois do registo, **corrige-o** ⁵⁰ (novo valor e
+  motivo), sem anular a factura; o aviso diz se lançou no mês da factura ou
+  hoje, como regularização.
 - A ficha mostra o país e o mercado do fornecedor.
 
 **Pedidos de pagamento**

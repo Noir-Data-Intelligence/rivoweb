@@ -76,6 +76,10 @@ test.describe("segundo factor", () => {
     await cartao.getByRole("button", { name: "Ligar o segundo factor" }).click();
     await expect(page.getByLabel("Chave para a app")).toHaveText("JBSW Y3DP EHPK 3PXP JBSW Y3DP EHPK 3PXP");
     await expect(page.getByRole("link", { name: "abra-a directamente na app" })).toHaveAttribute("href", URI);
+    // O QR desenha-se no browser, a partir do `otpauth://`: módulos no SVG, nada pedido lá fora.
+    const qr = page.getByRole("img", { name: "QR para ler com a app autenticadora" });
+    await expect(qr).toBeVisible();
+    expect(((await qr.locator("path").getAttribute("d")) ?? "").length).toBeGreaterThan(500);
     await page.getByRole("button", { name: "Confirmar e ligar" }).click();
     await expect(page.getByText("Escreva os 6 dígitos da app.")).toBeVisible();
     await page.getByLabel("Código da app").fill("654321");
