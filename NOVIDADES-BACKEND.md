@@ -47,6 +47,8 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 45 | Segundo factor (MFA) com a app autenticadora: login em dois passos, inscrição com QR e códigos de recuperação, reposição pelo admin; a obrigatoriedade para quem decide ou movimenta fundos fica desligada até o front ter o ecrã | #170 | Em revisão |
+| 44 | Anti-fraccionamento: a alçada de um pedido de pagamento escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica (BR-7) | #169 | Em revisão |
 | 43 | O Finance escolhe em nome de quem pede o adiantamento de salário, sem ler os RH (B46); o seed volta a ser completo por omissão | #167 | **Em produção** desde 13/11; base recriada com o seed completo e verificada (a conta QA Finance recebe os 63 colaboradores activos na lista nova e continua com 403 em `/hr/employees`; 1453 facturas de venda, 319 de compra, 153 despesas, 25 viaturas, 4 sinistros todos dentro da vigência; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 
 **Antes de começar:** actualizar `openapi/v1.json` a partir do commit
@@ -1315,6 +1317,99 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 45. Segundo factor: a app autenticadora (PR #170, ADR-127)
+
+O MFA que o SGAP exige a quem decide ou movimenta fundos. O segundo factor é
+um código de 6 dígitos de uma app autenticadora (Google Authenticator,
+Microsoft Authenticator…), com 10 códigos de recuperação para quando o
+telemóvel não está à mão.
+
+**A obrigatoriedade está desligada** (`MFA_ENFORCED=false` no servidor).
+Enquanto estiver, quem liga o segundo factor passa a precisar dele, e mais
+ninguém muda. Liga-se no VPS quando estes ecrãs existirem.
+
+**API** (detalhe em `API-FRONTEND.md`, secção Identity)
+- **Login:** `POST /identity/login` e `/login/google` respondem **`202`** com
+  `{ mfaChallenge, expiresInSeconds }` quando a conta tem o segundo factor.
+  Não trazem token. `POST /identity/login/mfa` `{ challenge, code }` devolve o
+  `LoginResponse` de sempre; um código errado ou um desafio expirado dá `401`.
+- **A minha conta:**
+  - `GET /identity/me/mfa`: `{ enabled, required, enforced, recoveryCodesLeft }`;
+  - `POST /identity/me/mfa/authenticator`: `{ sharedKey, authenticatorUri }`;
+  - `POST …/authenticator/confirmation` `{ code }`: devolve
+    `{ recoveryCodes }`, uma só vez;
+  - `POST …/recovery-codes` `{ code }` e `POST …/deactivation` `{ code }`.
+- **Administração:** `POST /identity/users/{userId}/mfa/reset` `{ reason }`
+  (`identity.users.write`).
+- **Obrigatoriedade ligada:**
+  - quem é obrigado e não se inscreveu recebe `mfaEnrolmentRequired: true` no
+    `LoginResponse`;
+  - o resto da API dá-lhe `401` com `error_description=mfa_enrolment_required`;
+  - `/identity/me`, `/identity/me/mfa…` e o logout continuam a responder.
+
+**Front (por fazer)**
+- **Entrar:**
+  - no `202`, um passo «Código da app» com 6 dígitos, e a opção «Usar um
+    código de recuperação»;
+  - o desafio dura 5 minutos: se expirar, voltar ao primeiro passo;
+  - o mesmo serve para o Google.
+- **A minha conta → «Segundo factor»:**
+  - **ligar:** mostrar o `authenticatorUri` em QR e a `sharedKey` por baixo,
+    para escrever à mão; pedir um código; mostrar os 10 códigos de recuperação
+    com «Copiar» e «Descarregar», avisando que não voltam a aparecer;
+  - **gerar códigos novos e desligar,** ambos com um código;
+  - `required` e `enforced` dizem se o perfil é obrigado. Esconder «Desligar»
+    a quem é obrigado com a obrigatoriedade ligada (o servidor dá `409`).
+- **Utilizadores (admin):** «Repor segundo factor», com o motivo obrigatório.
+- **Sessão restrita:** com `mfaEnrolmentRequired: true` no login, ou um `401`
+  com `mfa_enrolment_required`, levar a pessoa ao ecrã de ligar, sem mais
+  nada.
+
+**Como ver**
+- **Numa base local, ou com uma conta QA em produção:**
+  1. ligar o segundo factor pela API, com uma app no telemóvel;
+  2. sair e voltar a entrar: o login responde `202`.
+- **A suite `verify-authorization.ps1` (caso 30)** faz isto, calculando os
+  códigos em PowerShell.
+- **Cuidado em produção:** uma conta QA com o segundo factor ligado deixa de
+  servir aos scripts e ao seed, que só sabem a password. Repor pelo admin no
+  fim.
+
+---
+
+## 44. Anti-fraccionamento (PR #169, BR-7)
+
+Partir uma despesa em vários pedidos de pagamento, cada um abaixo da alçada,
+deixa de a contornar (ADR-126). Ao submeter um pedido de pagamento, a alçada
+escolhe-se pelo valor dele **somado** aos pedidos do mesmo fornecedor (NIF) e
+da mesma rubrica (centro de custo) dos últimos 30 dias, na mesma moeda, que não
+foram rejeitados nem cancelados. O pedido não é recusado: vai para quem tem
+alçada sobre o total.
+
+**API**
+- **`cumulativeAmount`** (número ou `null`) em `GET /approval/requests`,
+  `GET /approval/requests/{id}`, no histórico e na resposta de decidir. Nos
+  pedidos de pagamento, é o valor que escolheu a alçada (na moeda do pedido);
+  nos outros processos, `null`.
+- Se não houver política para o acumulado, o pedido de pagamento é recusado
+  como hoje (409), e a mensagem diz que a alçada se procurou pelo acumulado.
+
+**Front (por fazer)** — Aprovações, na ficha e na caixa:
+- quando `cumulativeAmount` for maior do que `amount`, mostrar «Acumulado em 30
+  dias (mesmo fornecedor e rubrica): …» junto ao valor, para quem decide
+  perceber porque lhe chegou um pedido pequeno.
+
+**Como ver**
+- **Em produção nada muda:** o seed tem uma só política de pagamento, sem
+  faixas. A regra só tem efeito com políticas com faixas de valor.
+- **Numa base local:** duas políticas `finance.payment_request` com o mesmo
+  departamento (até 1 000 000 e de 1 000 000 para cima), um centro de custo
+  desse departamento, e dois pedidos de 600 000 da mesma factura com esse
+  centro. O segundo segue a política de cima, com `cumulativeAmount` de
+  1 200 000. A suite `verify-payables.ps1` (caso 31) faz isto.
 
 ---
 

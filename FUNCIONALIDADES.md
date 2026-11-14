@@ -116,6 +116,7 @@ AM = AssetManager.
 | Validar a conformidade num passo de validação: checklist item a item (conforme, não conforme, N/A nos opcionais) ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Anti-fraccionamento: num pedido de pagamento, a alçada escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica ⁵² | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: passos de validação com checklist (itens obrigatórios e opcionais) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Auditoria**: consultar a trilha (quem, o quê, quando) de um período até 366 dias, por entidade, por páginas | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -494,6 +495,16 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **O botão ainda não existe:** no front, está por fazer (NOVIDADES, secção 42).
 
+⁵³ PR #170 (ADR-127), em revisão a 2026-11-13.
+- **O segundo factor** é um código de 6 dígitos de uma app autenticadora, com 10 códigos de recuperação de uso único.
+- **Obrigatório** para quem decide (aprovações, orçamentos, despesas) ou movimenta fundos (pagamentos, contas bancárias, tesouraria), mas **ainda desligado no servidor**: liga-se quando o front tiver os ecrãs (NOVIDADES, secção 45).
+- **Os ecrãs ainda não existem.** Por agora, ligar o segundo factor só se faz pela API.
+
+⁵² PR #169 (ADR-126, BR-7), em revisão a 2026-11-13.
+- **A regra:** ao pedir um pagamento, a alçada escolhe-se pelo valor do pedido somado aos do mesmo fornecedor (NIF) e da mesma rubrica (centro de custo) dos últimos 30 dias, na mesma moeda, que não foram rejeitados nem cancelados. O pedido não é recusado: vai para quem tem alçada sobre o total, e a trilha de auditoria regista-o.
+- **Quem decide** vê o acumulado (`cumulativeAmount`) na ficha. O front ainda não o mostra (NOVIDADES, secção 44).
+- **Só tem efeito com políticas com faixas de valor.** Em produção há uma só, e nada muda.
+
 ⁵¹ PR #167 (B46, adenda ao ADR-123), em produção desde 2026-11-13.
 - **Escolher o colaborador:** quem pede em nome de alguém (`finance.treasury.write`, o perfil Finance) tem a lista dos colaboradores activos, só com o id e o nome, sem as permissões de RH.
 - **No front:** «Pedir em nome de…» aparece a quem tem `finance.treasury.write` (o Finance incluído), e o selector «Colaborador» lê esta lista (nome; os inactivos não aparecem).
@@ -533,6 +544,10 @@ Recursos Humanos.»
   cada uma. Terminar uma sessão noutro dispositivo, ou a actual.
 - **Notificações por e-mail:** ligar ou desligar. Convites e recuperação de
   password vão sempre por e-mail.
+- **Segundo factor (MFA)** ⁵³: ligar a app autenticadora (QR e códigos de
+  recuperação), gerar códigos novos e desligar. Com ele ligado, entrar pede o
+  código da app depois da password ou do Google. O administrador repõe o de
+  quem perdeu o telemóvel. **Só na API por agora.**
 
 ### Notificações
 - **Sino** no topo com a contagem por ler, actualizada a cada minuto enquanto
