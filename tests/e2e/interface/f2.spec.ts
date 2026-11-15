@@ -98,6 +98,22 @@ test.describe("notificações", () => {
     await semViolacoesAxe(page);
   });
 
+  test("os avisos dos prazos das aprovações têm ícone e etiqueta próprios (ADR-130)", async ({ page, api }) => {
+    const n = (id: string, type: string, title: string) => ({ notificationId: id, type, title, message: "Pagamento à Kwanza Serviços.", read: false, createdAt: "2026-11-14T09:00:00Z", readAt: null });
+    const lista = [
+      n("00000000-0000-4000-8000-000000000411", "approval.request.deadline_reminder", "Aprovação a acabar o prazo"),
+      n("00000000-0000-4000-8000-000000000412", "approval.request.overdue", "Aprovação fora do prazo"),
+      n("00000000-0000-4000-8000-000000000413", "approval.request.escalated", "Aprovação escalada para si"),
+    ];
+    await comF2(api).em("GET", "/notifications/me", { status: 200, corpo: lista, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": "3" } }).ligar();
+    await entrar(page);
+    await page.goto("/notificacoes");
+    await expect(page.getByRole("listitem").filter({ hasText: "Aprovação a acabar o prazo" })).toContainText("Prazo a acabar");
+    await expect(page.getByRole("listitem").filter({ hasText: "Aprovação fora do prazo" })).toContainText("Prazo passado");
+    await expect(page.getByRole("listitem").filter({ hasText: "Aprovação escalada para si" })).toContainText("Escalado");
+    await semViolacoesAxe(page);
+  });
+
   test("preferência de e-mail na minha conta", async ({ page, api }) => {
     let email = true;
     await comF2(api)

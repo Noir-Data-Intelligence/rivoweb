@@ -1,5 +1,6 @@
 /** Peças partilhadas pelos ecrãs de aprovações. */
 import { useMeuPainel } from "@/features/dashboard";
+import { formatarDataHora } from "@/lib/format/data";
 import { Badge } from "@/ui/Badge";
 
 /** Tipos de processo (Facto: `ApprovalContracts.cs`). */
@@ -80,4 +81,20 @@ export function useNomeColaborador() {
     if (id === eu) return nome ? `${nome} (você)` : "Você";
     return nome ?? "Colaborador";
   };
+}
+
+/**
+ * O prazo do passo em curso (ADR-130): «Prazo: DD/MM/AAAA HH:mm», a vermelho
+ * e com «passou» quando já acabou; e «Escalado» quando o cargo de
+ * escalonamento também já pode decidir. Só com o pedido aberto.
+ */
+export function PrazoDoPasso({ ate, escaladoEm, agora = new Date() }: { ate?: string | null | undefined; escaladoEm?: string | null | undefined; agora?: Date }) {
+  if (!ate && !escaladoEm) return null;
+  const passou = ate ? new Date(ate).getTime() < agora.getTime() : false;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1.5 text-xs">
+      {ate ? <span className={passou ? "font-medium text-danger" : "text-muted-foreground"}>Prazo: {formatarDataHora(ate)}{passou ? " · passou" : ""}</span> : null}
+      {escaladoEm ? <Badge tom="aviso">Escalado</Badge> : null}
+    </span>
+  );
 }

@@ -21,7 +21,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { cn } from "@/ui/cn";
 import { useCancelar, useDecidir, useHistorico, usePedido, type Accao, type ItemChecklist, type Pedido } from "../api";
-import { EstadoPedido, estadoChecklist, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, RESPOSTAS_CHECKLIST, useEuColaborador, useNomeColaborador, type RespostaChecklist } from "../comum";
+import { EstadoPedido, estadoChecklist, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, PrazoDoPasso, RESPOSTAS_CHECKLIST, useEuColaborador, useNomeColaborador, type RespostaChecklist } from "../comum";
 
 const ACCOES: readonly { accao: Accao; rotulo: string; titulo: string; icone: typeof Check; variante: "primary" | "destructive" | "secondary"; notasObrigatorias: boolean }[] = [
   { accao: "Approved", rotulo: "Aprovar", titulo: "Aprovar o pedido?", icone: Check, variante: "primary", notasObrigatorias: false },
@@ -284,6 +284,7 @@ export default function PedidoPagina() {
             <span>
               De {nome(p.requestedByEmployeeId, p.requestedByName)} · {formatarDataHora(p.submittedAt)}
             </span>
+            {aberto ? <PrazoDoPasso ate={p.currentStepDueAt} escaladoEm={p.escalatedAt} /> : null}
           </span>
         }
         accao={aberto && souRequerente ? <Cancelar p={p} aoCancelar={recarregar} /> : undefined}
@@ -323,7 +324,11 @@ export default function PedidoPagina() {
                         {atribuicoes[0] ? <span className="font-normal text-muted-foreground"> · {NOME_MODO[atribuicoes[0].mode] ?? atribuicoes[0].mode}</span> : null}
                         {atribuicoes[0]?.slaHours ? <span className="font-normal text-muted-foreground"> · prazo {String(atribuicoes[0].slaHours)} h</span> : null}
                       </p>
-                      {atribuicoes.length > 0 ? <p className="mt-1 text-sm text-muted-foreground">Aprovadores: {atribuicoes.map((a) => nome(a.approverEmployeeId, a.approverName)).join(", ")}</p> : null}
+                      {atribuicoes.length > 0 ? (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Aprovadores: {atribuicoes.map((a) => `${nome(a.approverEmployeeId, a.approverName)}${a.isEscalation ? " (por escalonamento)" : ""}`).join(", ")}
+                        </p>
+                      ) : null}
                       {decisoes.length > 0 ? (
                         <ul className="mt-2 flex flex-col gap-1 text-sm">
                           {decisoes.map((d) => (

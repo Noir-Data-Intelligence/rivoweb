@@ -25,9 +25,12 @@ import { useCriarPolitica, useDesactivarPolitica, usePoliticas, type Politica } 
 import { MAXIMO_ITENS_CHECKLIST, MAXIMO_TEXTO_ITEM, NOME_MODO, nomeProcesso, PROCESSOS } from "../comum";
 
 type Item = { texto: string; obrigatorio: boolean };
-type Passo = { cargo: string; modo: "AnyApprover" | "AllApprovers"; sla: string; tipo: "Approval" | "Validation"; itens: Item[] };
+/** `escalar`: o cargo que também passa a poder decidir quando o prazo acaba (ADR-130); só com prazo, e outro cargo. */
+type Passo = { cargo: string; modo: "AnyApprover" | "AllApprovers"; sla: string; escalar: string; tipo: "Approval" | "Validation"; itens: Item[] };
 
-const passoNovo = (): Passo => ({ cargo: "", modo: "AnyApprover", sla: "", tipo: "Approval", itens: [] });
+const passoNovo = (): Passo => ({ cargo: "", modo: "AnyApprover", sla: "", escalar: "", tipo: "Approval", itens: [] });
+/** O cargo de escalonamento que vai ao servidor: só com prazo, e diferente do cargo do passo. */
+const escalarDe = (p: Passo): string | null => (p.escalar !== "" && p.sla.trim() !== "" && p.escalar !== p.cargo ? p.escalar : null);
 const itemNovo = (): Item => ({ texto: "", obrigatorio: true });
 
 /** Validação: 1 a 30 itens, cada um com texto até 500 caracteres (o servidor confirma). */
@@ -116,6 +119,7 @@ function NovaPolitica() {
           approverPositionId: p.cargo,
           mode: p.modo,
           slaHours: p.sla ? Number(p.sla) : null,
+          escalationPositionId: escalarDe(p),
           kind: p.tipo,
           ...(p.tipo === "Validation" ? { checklist: p.itens.map((i) => ({ text: normalizarTexto(i.texto), mandatory: i.obrigatorio })) } : {}),
         })),
@@ -224,7 +228,7 @@ function NovaPolitica() {
                   <label htmlFor={`${id}-c${i}`} className="text-sm text-foreground">
                     Passo {i + 1}: cargo
                   </label>
-                  <Select id={`${id}-c${i}`} value={p.cargo} onChange={(e) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, cargo: e.target.value } : y)))} aria-invalid={tentou && !p.cargo ? true : undefined}>
+                  <Select id={`${id}-c${i}`} value={p.cargo} onChange={(e) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, cargo: e.target.value, escalar: y.escalar === e.target.value ? "" : y.escalar } : y)))} aria-invalid={tentou && !p.cargo ? true : undefined}>
                     <option value="">Escolha…</option>
                     {autoridade.map((c) => (
                       <option key={c.positionId} value={c.positionId}>
@@ -246,12 +250,38 @@ function NovaPolitica() {
                   <label htmlFor={`${id}-s${i}`} className="text-sm text-foreground">
                     Prazo (h)
                   </label>
-                  <Input id={`${id}-s${i}`} inputMode="numeric" maxLength={4} value={p.sla} onChange={(e) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, sla: e.target.value } : y)))} />
+                  <Input id={`${id}-s${i}`} inputMode="numeric" maxLength={4} value={p.sla} onChange={(e) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, sla: e.target.value, escalar: e.target.value.trim() === "" ? "" : y.escalar } : y)))} />
                 </div>
                 <div className="flex items-end sm:col-span-1">
                   <Button variante="ghost" tamanho="icone" aria-label={`Remover passo ${i + 1}`} disabled={passos.length === 1} onClick={() => setPassos((x) => x.filter((_, j) => j !== i))}>
                     <Trash2 strokeWidth={1.75} aria-hidden />
                   </Button>
+                </div>
+                <div className="flex flex-col gap-1.5 sm:col-span-12">
+                  <label htmlFor={`${id}-e${i}`} className="text-sm text-foreground">
+                    Passo {i + 1}: escalar para o cargo (opcional)
+                  </label>
+                  <Select
+                    id={`${id}-e${i}`}
+                    aria-describedby={`${id}-e${i}-ajuda`}
+                    disabled={p.sla.trim() === ""}
+                    value={p.escalar}
+                    onChange={(e) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, escalar: e.target.value } : y)))}
+                  >
+                    <option value="">Não escalar</option>
+                    {autoridade
+                      .filter((c) => c.positionId !== p.cargo)
+                      .map((c) => (
+                        <option key={c.positionId} value={c.positionId}>
+                          {c.name}
+                        </option>
+                      ))}
+                  </Select>
+                  <p id={`${id}-e${i}-ajuda`} className="text-xs text-muted-foreground">
+                    {p.sla.trim() === ""
+                      ? "Só com prazo. Aos 75% do prazo, quem decide recebe um lembrete."
+                      : "No fim do prazo, quem ocupar este cargo também passa a poder decidir; basta a decisão de um. Aos 75%, quem decide recebe um lembrete."}
+                  </p>
                 </div>
                 {p.tipo === "Validation" ? <EditorChecklist id={id} passo={i + 1} itens={p.itens} tentou={tentou} mudar={(itens) => setPassos((x) => x.map((y, j) => (j === i ? { ...y, itens } : y)))} /> : null}
               </div>
@@ -354,6 +384,7 @@ export default function Politicas() {
                         · {s.kind === "Validation" ? `Validação · ${String(s.checklist?.length ?? 0)} ${s.checklist?.length === 1 ? "item" : "itens"} · ` : ""}
                         {NOME_MODO[s.mode] ?? s.mode}
                         {s.slaHours ? ` · ${String(s.slaHours)} h` : ""}
+                        {s.escalationPositionId ? ` · escala para ${nomeCargo(s.escalationPositionId)}` : ""}
                       </span>
                       {s.kind === "Validation" && s.checklist && s.checklist.length > 0 ? (
                         <details className="ml-4 mt-1">

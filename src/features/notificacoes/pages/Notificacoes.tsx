@@ -1,6 +1,7 @@
-import { CheckCheck } from "lucide-react";
+import { AlarmClock, ArrowUpRight, CheckCheck, Clock } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { formatarDataHora } from "@/lib/format/data";
+import { Badge, type TomBadge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Card } from "@/ui/Card";
 import { Checkbox } from "@/ui/Controlos";
@@ -10,14 +11,28 @@ import { Paginacao } from "@/ui/Paginacao";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { useMarcarLida, useMarcarTodasLidas, useNotificacoes, type Notificacao } from "../api";
 
+/** Os avisos dos prazos das aprovações (ADR-130): ícone e etiqueta próprios; a etiqueta diz o tipo, a cor só reforça. */
+const PRAZOS: Readonly<Record<string, { Icone: typeof Clock; tom: TomBadge; rotulo: string }>> = {
+  "approval.request.deadline_reminder": { Icone: Clock, tom: "aviso", rotulo: "Prazo a acabar" },
+  "approval.request.overdue": { Icone: AlarmClock, tom: "erro", rotulo: "Prazo passado" },
+  "approval.request.escalated": { Icone: ArrowUpRight, tom: "info", rotulo: "Escalado" },
+};
+
 function Linha({ n }: { n: Notificacao }) {
+  const prazo = PRAZOS[n.type];
   const marcar = useMarcarLida();
   return (
     <li className="flex flex-col gap-2 py-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <p className="flex items-start gap-2 font-medium text-foreground">
           {!n.read ? <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" aria-hidden /> : null}
+          {prazo ? <prazo.Icone strokeWidth={1.75} aria-hidden className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> : null}
           <span className="min-w-0 break-words">
+            {prazo ? (
+              <Badge tom={prazo.tom} className="mr-2 align-middle">
+                {prazo.rotulo}
+              </Badge>
+            ) : null}
             {n.title}
             {!n.read ? <span className="sr-only"> (por ler)</span> : null}
           </span>

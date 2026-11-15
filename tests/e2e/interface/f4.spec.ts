@@ -165,12 +165,68 @@ test.describe("políticas", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(api.escritas("POST", "/approval/policies")[0]?.corpo).toEqual({
       processType: "hr.leave_request", departmentId: null, minimumAmount: "1000.50", maximumAmount: null, requiresBudgetCheck: false,
-      steps: [{ approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: 72, kind: "Approval" }],
+      steps: [{ approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: 72, escalationPositionId: null, kind: "Approval" }],
     });
     await page.getByRole("button", { name: "Desactivar" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Desactivar" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(api.escritas("POST", `/approval/policies/${IDF4.politica}/deactivation`)).toHaveLength(1);
+  });
+});
+
+test.describe("prazos e escalonamento (ADR-130)", () => {
+  const ADMINISTRADOR = "00000000-0000-4000-8000-000000000049";
+
+  test("política: escalar só com prazo e para outro cargo; a lista diz para onde escala", async ({ page, api }) => {
+    const escalando = politicas().map((p) => ({ ...p, steps: p.steps.map((s) => ({ ...s, slaHours: 48, escalationPositionId: ADMINISTRADOR })) }));
+    await comF4(api)
+      .em("GET", "/hr/positions", pag([...cargos(), { positionId: ADMINISTRADOR, name: "Administrador", hierarchyLevel: 0, grantsApprovalAuthority: true, governingBody: true }]))
+      .em("GET", "/approval/policies", { status: 200, corpo: escalando })
+      .em("POST", "/approval/policies", { status: 201, corpo: { policyId: "00000000-0000-4000-8000-000000000808" } })
+      .ligar();
+    await entrar(page);
+    await page.goto("/politicas-aprovacao");
+    await expect(page.getByText("· 48 h · escala para Administrador", { exact: false }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Nova política" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Processo").selectOption("finance.payment_request");
+    await d.getByLabel("Passo 1: cargo").selectOption({ label: "Director" });
+    const escalar = d.getByLabel("Passo 1: escalar para o cargo (opcional)");
+    await expect(escalar).toBeDisabled();
+    await d.getByLabel("Prazo (h)").fill("24");
+    await expect(escalar).toBeEnabled();
+    // O cargo do próprio passo não aparece.
+    await expect(escalar.locator("option")).toHaveText(["Não escalar", "Administrador"]);
+    await escalar.selectOption({ label: "Administrador" });
+    await semViolacoesAxe(page);
+    await d.getByRole("button", { name: "Criar política" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", "/approval/policies")[0]?.corpo).toMatchObject({
+      steps: [{ approverPositionId: "00000000-0000-4000-8000-000000000040", slaHours: 24, escalationPositionId: ADMINISTRADOR }],
+    });
+  });
+
+  test("caixa e ficha: o prazo, a vermelho quando passou; «Escalado»; quem entrou por escalonamento", async ({ page, api, violacoes }) => {
+    const escalado = { ...pedido(), currentStepDueAt: "2026-10-13T09:00:00Z", escalatedAt: "2026-10-13T09:05:00Z" };
+    const noPrazo = { ...meuPedido(), currentStepDueAt: "2099-01-02T10:30:00Z", escalatedAt: null };
+    const h = historico();
+    await comF4(api)
+      .em("GET", "/approval/requests", pag([escalado, noPrazo]))
+      .em("GET", `/approval/requests/${IDF4.pedido}`, { status: 200, corpo: escalado })
+      .em("GET", `/approval/requests/${IDF4.pedido}/history`, {
+        status: 200,
+        corpo: { ...h, assignments: [...h.assignments, { step: 1, mode: "AnyApprover", approverEmployeeId: "00000000-0000-4000-8000-000000000099", approverName: "Rui Administrador", slaHours: 48, isEscalation: true }] },
+      })
+      .ligar();
+    await entrar(page);
+    await page.goto("/aprovacoes?vista=todos");
+    const linhaEscalada = page.getByRole("row").filter({ hasText: "Escalado" });
+    await expect(linhaEscalada).toContainText("Prazo: 13/10/2026 10:00 · passou");
+    await expect(page.getByText("Prazo: 02/01/2099 11:30", { exact: true })).toBeVisible();
+    expect(await violacoes()).toEqual([]);
+    await page.goto(`/aprovacoes/${IDF4.pedido}`);
+    await expect(page.getByText("Prazo: 13/10/2026 10:00 · passou")).toBeVisible();
+    await expect(page.getByText("Rui Administrador (por escalonamento)", { exact: false })).toBeVisible();
   });
 });
 
@@ -213,10 +269,10 @@ test.describe("validação de conformidade (K4)", () => {
       processType: "finance.payment_request", departmentId: null, minimumAmount: null, maximumAmount: null, requiresBudgetCheck: false,
       steps: [
         {
-          approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: null, kind: "Validation",
+          approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: null, escalationPositionId: null, kind: "Validation",
           checklist: [{ text: "Factura original anexada", mandatory: true }, { text: "Três cotações comparativas", mandatory: false }],
         },
-        { approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: null, kind: "Approval" },
+        { approverPositionId: "00000000-0000-4000-8000-000000000040", mode: "AnyApprover", slaHours: null, escalationPositionId: null, kind: "Approval" },
       ],
     });
   });

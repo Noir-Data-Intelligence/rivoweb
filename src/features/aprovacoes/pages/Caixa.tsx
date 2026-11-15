@@ -12,7 +12,7 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { cn } from "@/ui/cn";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { usePedidos, type Pedido } from "../api";
-import { EstadoPedido, nomeProcesso, PROCESSOS, useEuColaborador, useNomeColaborador } from "../comum";
+import { EstadoPedido, nomeProcesso, PrazoDoPasso, PROCESSOS, useEuColaborador, useNomeColaborador } from "../comum";
 
 export default function Caixa() {
   const [params, setParams] = useSearchParams();
@@ -52,7 +52,16 @@ export default function Caixa() {
       ),
     },
     { id: "data", cabecalho: "Submetido", esconderAte: "lg", celula: (p) => formatarDataHora(p.submittedAt) },
-    { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoPedido estado={p.status} /> },
+    {
+      id: "estado",
+      cabecalho: "Estado",
+      celula: (p) => (
+        <span className="flex flex-col items-start gap-1">
+          <EstadoPedido estado={p.status} />
+          {p.status === "InProgress" || p.status === "ClarificationRequested" ? <PrazoDoPasso ate={p.currentStepDueAt} escaladoEm={p.escalatedAt} /> : null}
+        </span>
+      ),
+    },
   ];
   return (
     <>
