@@ -47,6 +47,10 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 52 | Anular o reembolso de uma despesa: o dinheiro volta, os lançamentos estornam-se e a despesa volta a aprovada | #177 | Em revisão |
+| 51 | Retirar férias por decidir fecha também o processo de aprovação | #176 | Em revisão |
+| 50 | O recibo de vencimento mostra o adiantamento de salário que a folha descontou, e o que se recebe | #175 | Em revisão |
+| 49 | Adiantamentos: o colaborador retira o pedido antes de pago; a tesouraria anula o adiantamento devolvido (volta ao banco e sai da folha); o pedido pelo portal liga-se ao pedido interno ao RH | #174 | Em revisão |
 | 48 | Prazos das aprovações: lembrete antes do fim do prazo do passo e, no fim, escalonamento para um cargo (CFO, CEO…) que passa também a poder decidir; o prazo e o «escalado» na caixa e na ficha | #173 | Em revisão |
 | 47 | Delegação de aprovação: o aprovador (ou o admin, por ele) delega num colega por um período, e o colega decide em nome dele; a decisão mostra os dois | #172 | Em revisão |
 | 46 | Sessão única reforçada: quem decide e entra noutro sítio termina a sessão anterior, que recebe `401` com `superseded`; desligada no servidor | #171 | Em revisão |
@@ -1320,6 +1324,120 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 52. Anular o reembolso de uma despesa (PR #177, ADR-134)
+
+**API**
+- **`POST /finance/expenses/{expenseId}/reimbursement-cancellation`**
+  `{ reason, returnedOn? }`, com `finance.expenses.write`:
+  - o dinheiro volta à conta de onde saiu, no dia `returnedOn` (omitido, hoje);
+  - o reembolso e a diferença de câmbio estornam-se nesse dia;
+  - a despesa volta a «Aprovada», e pode reembolsar-se outra vez.
+- **Recusas:** sem motivo, ou o dia antes do reembolso ou futuro (400); não
+  reembolsada, despesa do próprio, conta fechada ou período fechado (409).
+- **`GET /finance/expenses`** e o detalhe ganham `reimbursementCancellations`,
+  `reimbursementCancelledOn` e `reimbursementCancellationReason`.
+
+**Front (por fazer)**
+- **Na despesa reembolsada,** a quem reembolsa: «Anular reembolso», com o
+  motivo (obrigatório) e o dia em que o dinheiro voltou (hoje por omissão).
+  Esconder ao próprio colaborador. Um `400` fica no campo.
+- **Na despesa com um reembolso anulado:** «Reembolso anulado a DD/MM/AAAA:
+  motivo».
+
+**Como ver**
+- **Reembolsar uma despesa por banco e anulá-la:** o extracto da conta mostra a
+  devolução, e a despesa volta a «Aprovada».
+- **A suite `verify-pgc.ps1`** (caso 7j2) faz isto em dólares.
+
+---
+
+## 51. Férias retiradas fecham o processo de aprovação (PR #176, ADR-133)
+
+**API**
+- **Retirar um pedido de férias por decidir** fecha também o processo de
+  aprovação, pelos dois caminhos:
+  - o próprio, em `POST /portal/me/leave/{leaveId}/cancellation`;
+  - os RH, em `POST /hr/leave/{leaveId}/cancellation`.
+- **Antes,** o processo ficava pendente na caixa de quem aprova, sobre um
+  pedido que já não existia.
+- **As rotas não mudam:** os mesmos códigos (204, 404 e 409).
+
+**Front**
+- **Nada a mudar.** Depois de retirar, o processo aparece como «Cancelado» em
+  Aprovações e sai da caixa de quem aprova.
+
+**Como ver**
+- **Retirar um pedido de férias por decidir** (no portal ou nos RH) e abrir o
+  processo em Aprovações: está «Cancelado».
+- **As suites:** `verify-hr.ps1` (caso 51b) e `verify-employee-portal.ps1`
+  (caso 13b).
+
+---
+
+## 50. O recibo com o adiantamento descontado (PR #175, ADR-132)
+
+**API**
+- **`GET /portal/me/payslips`** ganha dois campos:
+  - `advancesDeducted`: os adiantamentos que essa folha descontou (0 sem
+    nenhum);
+  - `netPaid`: o líquido menos eles, o que se recebe.
+  - `netSalary` continua a ser o líquido da folha.
+- **O PDF gerado** (`GET /portal/me/payslips/{itemId}/document`) mostra
+  «Líquido», uma linha por adiantamento («Adiantamento de salário recebido a
+  DD/MM/AAAA») e «Líquido a receber».
+- **O recibo anexado pelos RH** sai como foi anexado.
+
+**Front (por fazer)**
+- **Portal → Recibos:** com `advancesDeducted` maior que zero, mostrar
+  «Adiantamentos descontados» e «A receber» (`netPaid`) por baixo do líquido.
+  Sem adiantamentos, fica como está.
+
+**Como ver**
+- **Numa conta QA de colaborador** com um adiantamento pago para o mês de uma
+  folha já aprovada e lançada: o recibo desse mês mostra-o.
+- **A suite `verify-pgc.ps1`** (caso 7k5) faz isto.
+
+---
+
+## 49. Adiantamentos: retirar, anular e ligar ao pedido interno (PR #174, ADR-131)
+
+**API** (detalhe em `API-FRONTEND.md`, secção Tesouraria)
+- **Retirar (o próprio):** `POST /portal/me/salary-advance-applications/{id}/withdrawal`
+  (`204`).
+  - Por decidir, o processo de aprovação cancela-se; aprovado e por pagar, a
+    tesouraria já não o paga.
+  - Pago, recusado ou já retirado: `409`.
+- **Anular (a tesouraria):** `POST /finance/treasury/salary-advances/{id}/cancellation`
+  `{ reason, returnedOn? }` (`finance.payments.execute`).
+  - O colaborador devolveu o dinheiro: entra no banco nesse dia, e o
+    lançamento estorna-se.
+  - Só antes de alguma folha o descontar (`409` depois).
+- **Ligar:** `POST /portal/me/salary-advance-applications` aceita
+  `internalRequestId`, um pedido interno do próprio da categoria
+  `SalaryAdvance`. A conversa com o RH recebe a mensagem «Registei o pedido de
+  adiantamento…».
+- **Estados novos:**
+  - nos pedidos, `Withdrawn` e `Cancelled`, e o campo `internalRequestId`;
+  - nos adiantamentos, `cancelledAt`, `returnedOn` e `cancellationReason`.
+
+**Front (por fazer)**
+- **Portal → Adiantamentos:**
+  - «Retirar» nos pedidos `PendingApproval` e `Approved`, com confirmação;
+  - os estados «Retirado» e «Anulado».
+- **Portal → Pedidos internos:** num pedido da categoria «Adiantamento», o
+  botão «Pedir adiantamento» abre o formulário com `internalRequestId`
+  preenchido.
+- **Tesouraria → Adiantamentos:** «Anular» nos adiantamentos sem nada
+  descontado (`settledAmount` 0 e sem `cancelledAt`). O formulário pede o
+  motivo e o dia da devolução. Os anulados mostram-se riscados, com o motivo.
+
+**Como ver**
+- **Numa conta QA de colaborador:** pedir, retirar, e ver «Retirado».
+- **Tesouraria:** anular um adiantamento pago e ainda por descontar.
+- **A suite `verify-pgc.ps1`** (casos 7k2 a 7k4) faz isto.
 
 ---
 

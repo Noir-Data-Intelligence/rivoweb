@@ -11,6 +11,7 @@ export const PROCESSOS: Readonly<Record<string, string>> = {
   "hr.position_assignment": "Atribuição de cargo",
   "hr.leave_request": "Férias",
   "finance.payment_request": "Pedido de pagamento",
+  "finance.salary_advance": "Adiantamento de salário",
   "procurement.purchase_requisition": "Requisição de compra",
   "payroll.payroll_run": "Folha de salários",
   "inventory.stock_count": "Contagem de inventário",

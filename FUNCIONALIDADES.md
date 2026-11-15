@@ -43,7 +43,11 @@
 > ligar e gerir em «A minha conta», a sessão restrita de quem é obrigado e o
 > «Repor» do admin; o acumulado de 30 dias na ficha da aprovação; o QR para
 > a app autenticadora; corrigir o IVA não dedutível de uma factura de compra
-> já registada).
+> já registada) · actualizado a 2026-11-15 (a delegação de aprovação; os
+> prazos e o escalonamento dos passos; retirar e anular adiantamentos de
+> salário e pedi-los a partir do pedido interno; o recibo com o adiantamento
+> descontado; anular o reembolso de uma despesa; a mensagem da sessão
+> substituída; o adiantamento de salário entre os processos das políticas).
 
 ---
 
@@ -125,7 +129,7 @@ AM = AssetManager.
 | Delegar as minhas aprovações num colega por um período, e revogar; decidir em nome de quem me delegou ⁵⁵ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Delegações de outras pessoas: ver todas, criar por quem está ausente, revogar ⁵⁵ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Prazo de cada passo: lembrete antes do fim; no fim, o pedido escala para o cargo do passo (CFO, CEO…), que passa também a poder decidir; avisos na aplicação e por e-mail ⁵⁶ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Políticas de aprovação: prazo e cargo de escalonamento por passo; correr já a vigilância dos prazos ⁵⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Políticas de aprovação: prazo e cargo de escalonamento por passo (correr já a vigilância dos prazos só pela API) ⁵⁶ | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: ver, criar e desactivar | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Políticas de aprovação: passos de validação com checklist (itens obrigatórios e opcionais) | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | **Auditoria**: consultar a trilha (quem, o quê, quando) de um período até 366 dias, por entidade, por páginas | ✓ | ✓ | — | — | — | — | — | — | — | — |
@@ -269,19 +273,22 @@ AM = AssetManager.
 | Registar em nome de um colaborador, com comprovativo | ✓ | ✓ | — | ✓ ⁷ | — | — | — | — | — | — |
 | Aprovar e rejeitar (com motivo) ⁹; ao aprovar, indicar a conta do custo no PGC ⁴⁴ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Marcar reembolsada (com a conta, sai dela e lança ²⁸; noutra moeda, pela 43.2, com a diferença de câmbio ³⁸) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Anular o reembolso: o dinheiro volta, o reembolso e a diferença de câmbio estornam-se, e a despesa volta a aprovada ⁶⁰ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Abrir o comprovativo (pela despesa) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Portal: submeter com comprovativo, acompanhar e retirar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Portal do colaborador** (o próprio, pela conta) ¹¹ | | | | | | | | | | |
 | Início: férias por gozar, próximo turno, pedidos em aberto e anúncios recentes | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Anúncios em vigor, os fixados primeiro | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Assiduidade: marcações por período; justificar uma falta | — | — | — | — | — | — | — | — | ✓ ¹ | — |
-| Férias e ausências: saldo por ano; pedidos e o estado; pedir (vai a aprovação); retirar um pedido por decidir | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Férias e ausências: saldo por ano; pedidos e o estado; pedir (vai a aprovação); retirar um pedido por decidir ⁵⁹ | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Turnos: escala por período (até 93 dias); pedir para sair de um turno; cancelar o pedido | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Recibos de vencimento: ver os meses e descarregar o PDF | — | — | — | — | — | — | — | — | ✓ ¹ | — |
+| Recibo de vencimento com o adiantamento de salário descontado e o que se recebe ⁵⁸ | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Documentos da ficha: ver e descarregar | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Declarações: emitir em PDF (fica registada, com código de verificação) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Pedidos internos: abrir, acompanhar a conversa e responder | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Adiantamento de salário: pedir (vai a aprovação) e ver o estado ⁴⁸ | — | — | — | — | — | — | — | — | ✓ | — |
+| Adiantamento de salário: retirar o pedido antes de pago; pedi-lo a partir de um pedido interno «Adiantamento» ao RH ⁵⁷ | — | — | — | — | — | — | — | — | ✓ | — |
 | Formação: acções, horas, nota e certificado | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Objectivos: progresso e resultados-chave; registar o valor actual (ciclo aberto) | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Conquistas recebidas e pontos | — | — | — | — | — | — | — | — | ✓ ¹ | — |
@@ -295,6 +302,7 @@ AM = AssetManager.
 | Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, o IRT e o INSS, só um colaborador que não decidiu a folha ³⁴ ⁴⁵; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: ver os pedidos (com o estado) e os pagos (com os por descontar) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Adiantamentos de salário: pagar os aprovados (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto; quem decidiu não paga) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Adiantamentos de salário: anular um devolvido, antes de descontado (volta ao banco, estorna o lançamento e sai da folha) ⁵⁷ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: pedir em nome de um colaborador (vai a aprovação ⁴⁸; escolhe-o da lista dos colaboradores activos da tesouraria, sem ler os RH ⁵¹) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -345,7 +353,7 @@ AM = AssetManager.
 | **Organograma:** departamentos, responsável e pessoas com o cargo | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Contratos:** ver; celebrar (o tipo manda na data de fim) e cessar | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Assiduidade:** marcações por período e colaborador, só anomalias; marcar ponto e registar falta | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
-| **Férias e ausências:** pedidos; pedir em nome, retirar, ver a decisão; saldos e direito por ano | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Férias e ausências:** pedidos; pedir em nome, retirar ⁵⁹, ver a decisão; saldos e direito por ano | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Benefícios:** catálogo (criar), adesões (aderir, cancelar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Validades de imigração:** documentos a caducar em 30 ou 90 dias, ou todos | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Recrutamento:** vagas (abrir, fechar) e candidatos de cada vaga | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -506,23 +514,52 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
 
-⁵⁶ PR #173 (ADR-130), em revisão a 2026-11-14.
+⁶⁰ PR #177 (ADR-134), no `main` desde 2026-11-15.
+- **Anular o reembolso:** o motivo e o dia em que o dinheiro voltou. Entra na conta de onde saiu, e o reembolso e a diferença de câmbio estornam-se nesse dia.
+- **A despesa volta a aprovada,** e reembolsa-se outra vez. O colaborador da despesa não anula o reembolso dela.
+- **No front:** na ficha da despesa reembolsada, a quem reembolsa (`finance.expenses.write`) e não é o dono dela, «Anular reembolso»: o motivo e o «Dia em que o dinheiro voltou» (hoje por omissão, não futuro, não antes do reembolso); o diálogo diz para que conta volta o dinheiro. Depois, a ficha mostra «Reembolso anulado» com o dia e o motivo, e «Marcar reembolsada» volta a aparecer. Um `400` no motivo ou no dia fica no campo.
+
+⁵⁹ PR #176 (ADR-133), no `main` desde 2026-11-15.
+- **Retirar um pedido de férias por decidir**, pelo próprio ou pelos RH, fecha também o processo de aprovação. Antes, ficava pendente na caixa de quem aprova.
+- **No front:** nada a mudar. O processo aparece como «Cancelado» em Aprovações.
+
+⁵⁸ PR #175 (ADR-132), no `main` desde 2026-11-15.
+- **O recibo** mostra o líquido, cada adiantamento que a folha descontou (com o dia em que se recebeu) e o líquido a receber.
+- **No front:** em «Recibos», com adiantamentos descontados, por baixo do líquido: «Adiantamentos descontados: −…» e «A receber: …», em destaque. Sem adiantamentos, fica como estava. O PDF gerado já os mostra.
+
+⁵⁷ PR #174 (ADR-131), no `main` desde 2026-11-15.
+- **Retirar:** só o próprio, antes de pago. Por decidir, o processo de aprovação cancela-se.
+- **Anular:** a tesouraria, quando o colaborador devolve o dinheiro e nenhuma folha o descontou ainda. Entra no banco no dia da devolução, e o lançamento do adiantamento estorna-se.
+- **O pedido interno «Adiantamento» ao RH** liga-se ao pedido, e a conversa recebe uma mensagem.
+- **No front:**
+  - **portal:** «Retirar» nos pedidos por aprovar e nos aprovados por pagar, com confirmação; os estados «Retirado» e «Anulado»; num pedido interno da área «Adiantamento salarial» ainda aberto, «Pedir adiantamento» abre o formulário já ligado a ele;
+  - **tesouraria:** «Anular» nos pagos que nenhuma folha descontou, a quem executa pagamentos, com o motivo e o dia da devolução (não antes do pagamento); os anulados ficam riscados, com o dia e o motivo; um pedido retirado não mostra «Pagar».
+
+⁵⁶ PR #173 (ADR-130), no `main` desde 2026-11-15.
 - **O prazo** conta de quando o passo começa, em horas corridas (sem dias úteis).
 - **O lembrete** sai passados 75% do prazo, a quem tem o passo e a quem o substitui por delegação.
 - **No fim:** os ocupantes do cargo de escalonamento passam também a poder decidir, e quem tinha o passo mantém-no. Cada aviso sai uma vez por passo.
 - **Num pedido de esclarecimento** não há avisos.
-- **Só na API por agora:** os ecrãs estão na NOVIDADES, secção 48.
+- **No front:**
+  - **políticas:** em cada passo, «Escalar para o cargo (opcional)», só com prazo e sem o cargo do próprio passo (entre os cargos com autoridade); a lista diz «escala para …»;
+  - **caixa e ficha:** «Prazo: DD/MM/AAAA HH:mm», a vermelho e com «passou» quando acabou, e «Escalado»; no histórico, quem entrou «(por escalonamento)»;
+  - **notificações:** o lembrete, o prazo passado e o escalonamento com ícone e etiqueta próprios («Prazo a acabar», «Prazo passado», «Escalado»).
+  - A vigilância corre sozinha de 15 em 15 minutos; correr já (`POST /approval/deadlines/evaluation`) não tem botão.
 
-⁵⁵ PR #172 (ADR-129), em revisão a 2026-11-14.
+⁵⁵ PR #172 (ADR-129), no `main` desde 2026-11-15.
 - **A delegação:** durante o período, o colega decide os passos que esperam pelo delegante, em nome dele. A decisão regista os dois.
 - **A segregação vale para os dois:** nenhum decide um pedido que submeteu, nem intervém duas vezes no mesmo processo, nem paga o que aprovou.
 - **Uma de cada vez:** um delegante não tem duas delegações para o mesmo período.
-- **Só na API por agora:** os ecrãs estão na NOVIDADES, secção 47.
+- **No front:**
+  - **Aprovações → «Delegações»** (`/aprovacoes/delegacoes`, ao lado de «À minha espera» e «Todos»): as em vigor e por começar (quem delega, em quem, período, motivo, «Em vigor» ou «Por começar») e «Revogar» (o delegante, o delegado ou o admin);
+  - **«Delegar»:** o colega (da lista de candidatos, sem a própria pessoa; a ajuda lembra que só decide quem tem o perfil e a ficha), o fim (obrigatório, depois de agora), o início (opcional, por omissão agora) e o motivo; quem administra as políticas vê todas e escolhe também quem delega (por omissão, a própria pessoa);
+  - **na caixa:** «Por delegação de …» nos pedidos que esperam por quem me delegou;
+  - **na ficha:** «Aprovar», «Rejeitar» e «Pedir esclarecimento» também por delegação, «Em nome de …»; com vários delegantes no passo, escolhe-se em nome de quem; as decisões dizem «Fulano, em nome de Sicrano».
 
-⁵⁴ PR #171 (ADR-128), em revisão a 2026-11-14.
+⁵⁴ PR #171 (ADR-128), no `main` desde 2026-11-15.
 - **Ganha o último login:** a sessão anterior termina, com um `401` que diz `superseded`.
 - **Abrange** quem decide aprovações, e só com `SESSION_SINGLE_SESSION=true` no servidor.
-- **No front:** falta a mensagem própria no ecrã de entrar (NOVIDADES, secção 46).
+- **No front:** com `superseded`, o ecrã de entrar diz «A sessão terminou porque a sua conta entrou noutro sítio.», em vez da mensagem genérica.
 
 ⁵³ PR #170 (ADR-127), no `main` desde 2026-11-14.
 - **O segundo factor** é um código de 6 dígitos de uma app autenticadora, com 10 códigos de recuperação de uso único.
@@ -572,8 +609,9 @@ Recursos Humanos.»
   de entrar.
 - **Prazo absoluto da sessão:** aviso antes do fim.
 - **Sessão única** ⁵⁴: quem decide aprovações só tem uma sessão aberta;
-  entrar noutro sítio termina a anterior. **Desligada no servidor por
-  agora.**
+  entrar noutro sítio termina a anterior, que volta ao ecrã de entrar com «A
+  sessão terminou porque a sua conta entrou noutro sítio.». **Desligada no
+  servidor por agora.**
 - **Sem ligação ao servidor:** faixa no topo, com nova tentativa.
 
 ### A minha conta
@@ -597,7 +635,9 @@ Recursos Humanos.»
 - **Sino** no topo com a contagem por ler, actualizada a cada minuto enquanto
   a pessoa está a usar a Rivo (nunca mantém viva uma sessão parada).
 - **Página de notificações:** lista paginada, filtro «Só as por ler», marcar
-  uma como lida, marcar todas como lidas.
+  uma como lida, marcar todas como lidas. Os avisos dos prazos das
+  aprovações ⁵⁶ têm ícone e etiqueta próprios: «Prazo a acabar», «Prazo
+  passado» e «Escalado».
 
 ### Aparência e acessibilidade
 - Tema claro, escuro ou o do sistema, lembrado no browser.
@@ -709,19 +749,25 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     o contexto; o texto para rever e **copiar**.
 
 **Aprovações**
-- Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso),
-  **todos**, e filtro por tipo (atribuição de cargo, férias, pedido de
-  pagamento, requisição de compra, folha de salários, contagem de inventário).
+- Caixa: **à minha espera** (os pedidos em que é aprovador do passo em curso,
+  e os de quem lhe delegou, com «Por delegação de …» ⁵⁵), **todos**, e filtro
+  por tipo (atribuição de cargo, férias, pedido de pagamento, adiantamento de
+  salário, requisição de compra, folha de salários, contagem de inventário).
+  Nos abertos, o **prazo** do passo, a vermelho quando passou, e «Escalado»
+  ⁵⁶.
 - Ficha: estado, o resumo do pedido (o que se aprova), quem pediu, passos com o modo (basta um ou todos os ocupantes
   do cargo) e o prazo, aprovadores e decisões com notas e, nos passos de
   validação, as respostas ao checklist (✓ conforme, ✗ não conforme, — não
-  aplicável). Num pedido de pagamento cujo acumulado de 30 dias (mesmo
+  aplicável); o prazo do passo em curso e «Escalado» ⁵⁶; quem entrou «(por
+  escalonamento)»; as decisões por delegação, «Fulano, em nome de Sicrano»
+  ⁵⁵. Num pedido de pagamento cujo acumulado de 30 dias (mesmo
   fornecedor e rubrica) passa do valor, a ficha mostra-o: foi por ele que se
   escolheu a alçada ⁵².
 - **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
   motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
   mostra o estado actual. Numa atribuição de cargo aprovada, o cargo fica em
-  vigor de imediato.
+  vigor de imediato. Por delegação ⁵⁵, decide «Em nome de» quem lhe delegou
+  (com vários no mesmo passo, escolhe em nome de quem).
 - **Validar** num passo de validação (a caixa marca-o com «Validação»):
   responder ao checklist item a item (conforme, não conforme ou não
   aplicável, este só nos itens não obrigatórios, marcados com «*» os
@@ -731,12 +777,19 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   quem aprova; quem validou não aprova o mesmo pedido.
 - **Cancelar** os próprios pedidos enquanto estão abertos.
 - O contador «Aprovações à sua espera» do Início abre a caixa.
+- **Delegações** ⁵⁵: ver **todas** as em vigor e por começar; **delegar**,
+  escolhendo quem delega (por omissão, a própria pessoa: assim delega por
+  quem está ausente), o colega, o fim, o início (opcional) e o motivo;
+  **revogar** qualquer uma.
 
 **Políticas de aprovação**
 - Ver as políticas (processo, departamento, faixa de valores, verificação de
   orçamento, passos por cargo).
 - **Criar** (passos por ordem, cada um com cargo com autoridade, modo e prazo
-  em horas) e **desactivar**.
+  em horas) e **desactivar**. Com prazo, o passo pode **escalar para outro
+  cargo** ⁵⁶: no fim do prazo, quem o ocupa também passa a poder decidir; a
+  lista diz «escala para …». O adiantamento de salário está entre os
+  processos.
 - Cada passo é de **aprovação** ou de **validação** (checklist de
   conformidade): na validação, escrever de 1 a 30 itens e marcar os
   obrigatórios. Na lista, «Validação · N itens» e o checklist por extenso.
@@ -1255,6 +1308,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   noutra moeda, pela 43.2, com a diferença de câmbio ³⁸) e **descarregar o
   comprovativo**. A ficha mostra a conta do custo. A própria despesa não se
   decide.
+- **Anular o reembolso** ⁶⁰ de uma despesa reembolsada (não a própria): o
+  motivo e o dia em que o dinheiro voltou; volta à conta de onde saiu, os
+  lançamentos estornam-se e a despesa volta a aprovada (pode reembolsar-se
+  outra vez). A ficha mostra «Reembolso anulado», com o dia e o motivo.
 
 **Contas bancárias**
 - Lista com saldos (com ou sem fechadas); **abrir** (nome, banco, moeda, IBAN
@@ -1292,6 +1349,11 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   409 do servidor mostram o motivo.
 - **Pagos:** valor, data, folha, descontado e por descontar, referência; o
   filtro «Só os por descontar».
+- **Anular** ⁵⁷ um pago que nenhuma folha descontou, quando o colaborador
+  devolveu o dinheiro: o motivo e o dia da devolução; entra no banco nesse
+  dia e o lançamento estorna-se. Os anulados ficam riscados, com o dia e o
+  motivo. Os pedidos retirados pelo colaborador aparecem «Retirado», sem
+  «Pagar».
 
 **Caixa pequena**
 - Fundos com fundo fixo, saldo e o que falta repor; **abrir** e **rever**
@@ -1750,7 +1812,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Aprovações**
 - Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
-  com o resumo do pedido e os nomes.
+  com o resumo do pedido e os nomes, o prazo e o escalonamento ⁵⁶.
+- **Delegações** ⁵⁵: as suas (feitas e recebidas); **delegar** as suas num
+  colega e **revogar**; decide por delegação, em nome de quem lhe delegou.
+  Não vê as dos outros nem delega por eles.
 
 **Alertas**
 - Ver alertas e regras.
@@ -1803,8 +1868,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Despesas**
 - Resumo, lista e ficha; **aprovar** (com a conta do custo do PGC, opcional,
-  com sugestões ⁴⁴), **rejeitar**, **marcar reembolsada** e **registar** em
-  seu nome; **abre o comprovativo** pela despesa.
+  com sugestões ⁴⁴), **rejeitar**, **marcar reembolsada**, **anular o
+  reembolso** ⁶⁰ (não o da própria) e **registar** em seu nome; **abre o
+  comprovativo** pela despesa.
 
 **Contas bancárias**
 - Ver saldos e extracto (pela data-valor); **reconciliação** completa;
@@ -1813,8 +1879,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Adiantamentos de salário**
 - Ver os pedidos e os pagos, **pedir em nome de…** um colaborador (escolhido
-  da lista da tesouraria, sem ler os RH ⁵¹) e **pagar** os aprovados, como o
-  Admin.
+  da lista da tesouraria, sem ler os RH ⁵¹), **pagar** os aprovados e
+  **anular** os devolvidos antes de descontados ⁵⁷, como o Admin.
 
 **Caixa pequena**, **Letras e livranças**, **Câmbios** e **Fluxo de caixa**
 - Tudo o que o Admin faz. Nas letras a receber escolhe o cliente da lista de
@@ -1863,7 +1929,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Aprovações**
 - Caixa, ficha, **decidir** e **cancelar** os próprios pedidos, como o Admin,
-  com o resumo do pedido e os nomes.
+  com o resumo do pedido e os nomes, o prazo e o escalonamento ⁵⁶.
+- **Delegações** ⁵⁵: as suas (feitas e recebidas); **delegar** as suas num
+  colega e **revogar**; decide por delegação, em nome de quem lhe delegou.
+  Não vê as dos outros nem delega por eles.
 
 **Alertas**
 - Ver, **resolver**; regras: **criar**, **rever**, **desactivar** e
@@ -2033,8 +2102,10 @@ decide pela conta, nunca por um id escolhido no ecrã.
   pedidos de troca com o estado e a decisão; **cancelar** os que estão por
   decidir.
 - **Recibos:** os meses processados com o bruto (e os subsídios que inclui),
-  IRT, segurança social e líquido; **descarregar o PDF** (o anexado pelos
-  Recursos Humanos ou, sem anexo, o da folha aprovada).
+  IRT, segurança social e líquido; com adiantamentos de salário descontados
+  nessa folha ⁵⁸, o desconto e, em destaque, o que se recebe; **descarregar o
+  PDF** (o anexado pelos Recursos Humanos ou, sem anexo, o da folha
+  aprovada).
 - **Documentos e declarações:** os documentos da ficha (nome, categoria, data,
   tamanho) e **descarregar**; **emitir** uma declaração dos modelos
   disponíveis, depois de confirmar (fica registada, com código de verificação).
@@ -2067,8 +2138,12 @@ decide pela conta, nunca por um id escolhido no ecrã.
   decididas.
 - **Adiantamentos de salário** ⁴⁸: **pedir** (valor, o mês da folha que o
   desconta, o corrente por omissão, e o motivo) e acompanhar o estado (por
-  aprovar, aprovado por pagar, recusado, pago). Nos pedidos internos, a área
-  «Adiantamento salarial» aponta para aqui: lá é só uma conversa com os RH.
+  aprovar, aprovado por pagar, recusado, pago, retirado, anulado);
+  **retirar** ⁵⁷ um pedido por aprovar ou aprovado e ainda por pagar, depois
+  de confirmar. Ao abrir um pedido interno, a área «Adiantamento salarial»
+  aponta para aqui; num pedido interno dessa área ainda aberto, **«Pedir
+  adiantamento»** ⁵⁷ pede-o já ligado a ele, e a conversa com os RH recebe
+  uma mensagem.
 - Funcionalidades comuns (conta, sessões, notificações).
 - Sem ficha ligada, o portal explica que a conta ainda não está ligada e pede
   para falar com os Recursos Humanos.

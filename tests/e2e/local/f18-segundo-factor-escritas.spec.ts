@@ -162,3 +162,24 @@ test("F18: obrigatoriedade ligada — a sessão restrita só liga o segundo fact
   await expect(page.getByText("O seu perfil é obrigado ao segundo factor: não se desliga.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Desligar" })).toHaveCount(0);
 });
+
+/**
+ * Sessão única reforçada (ADR-128). Só com a API local levantada com
+ * `SESSION_SINGLE_SESSION=true` e `RIVO_SESSAO_UNICA=1`: o SuperAdmin entra em
+ * dois browsers, e o primeiro volta ao login com a mensagem própria.
+ */
+test("F18: sessão única — a sessão anterior volta ao login a dizer que a conta entrou noutro sítio", async ({ browser }) => {
+  test.skip(process.env.RIVO_SESSAO_UNICA !== "1", "Só com a API local em SESSION_SINGLE_SESSION=true.");
+  const primeiro = await novaPagina(browser);
+  await passoPassword(primeiro, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "");
+  await primeiro.waitForURL((u) => !u.pathname.startsWith("/entrar"));
+  const segundo = await novaPagina(browser);
+  await passoPassword(segundo, process.env.RIVO_LOCAL_EMAIL ?? "", process.env.RIVO_LOCAL_PASSWORD ?? "");
+  await segundo.waitForURL((u) => !u.pathname.startsWith("/entrar"));
+  // Sem recarregar (a mensagem vive na memória da página): o próximo pedido da
+  // primeira sessão, do relógio ou de uma navegação, recebe o 401 «superseded».
+  const notificacoes = primeiro.getByRole("link", { name: /^Notificações/ });
+  if (await notificacoes.isVisible()) await notificacoes.click();
+  await expect(primeiro).toHaveURL(/\/entrar/);
+  await expect(primeiro.getByText("A sessão terminou porque a sua conta entrou noutro sítio.")).toBeVisible();
+});
