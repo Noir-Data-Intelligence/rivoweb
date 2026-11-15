@@ -79,6 +79,19 @@ export function useReembolsar(id: string) {
   });
 }
 
+/**
+ * Anular o reembolso (ADR-134): o dinheiro volta à conta de onde saiu no dia
+ * `returnedOn`, os lançamentos estornam-se, e a despesa volta a aprovada.
+ */
+export function useAnularReembolso(id: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: { reason: string; returnedOn: string }) =>
+      enviar(api.POST("/finance/expenses/{expenseId}/reimbursement-cancellation", { params: { path: { expenseId: id } }, body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance"] }),
+  });
+}
+
 // Portal do colaborador
 
 export function useMinhasDespesas() {

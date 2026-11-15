@@ -5,7 +5,7 @@ import { useId, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { eApiError } from "@/lib/api/problem";
+import { erroDoCampo } from "@/lib/api/problem";
 import { formatarData, formatarDataHora } from "@/lib/format/data";
 import { formatarMoeda } from "@/lib/format/numero";
 import { dinheiro, lerDinheiroDigitado, paraApi, type Dinheiro } from "@/lib/money/money";
@@ -114,13 +114,6 @@ function PedirPagamento({ f, maximo }: { f: TipoFactura; maximo: Dinheiro }) {
       </Confirmar>
     </>
   );
-}
-
-/** A mensagem do 400 para um campo (`errors.nonDeductibleTax`, `errors.reason`), se o servidor a deu. */
-function erroDoCampo(e: unknown, campo: string): string | undefined {
-  if (!eApiError(e) || e.status !== 400) return undefined;
-  const m = e.errors[campo] ?? e.errors[campo.charAt(0).toUpperCase() + campo.slice(1)];
-  return m ? m.join(" ") : undefined;
 }
 
 const mesDaFactura = (f: Pick<TipoFactura, "issuedOn">) => `${f.issuedOn.slice(5, 7)}/${f.issuedOn.slice(0, 4)}`;

@@ -109,6 +109,23 @@ test.describe("sessão", () => {
     expect(api.pedidos.find((p) => p.caminho === "/identity/login")?.autorizacao).toBeNull();
   });
 
+  test("sessão única (ADR-128): o 401 com superseded diz que a conta entrou noutro sítio", async ({ page, api }) => {
+    let substituida = false;
+    await api
+      .comConta()
+      .em("GET", "/identity/me/sessions", () =>
+        substituida ? { status: 401, cabecalhos: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="superseded"' } } : { status: 200, corpo: [] },
+      )
+      .ligar();
+    await entrar(page);
+    await expect(page.getByRole("heading", { name: /Olá/ })).toBeVisible();
+    substituida = true;
+    await page.goto("/conta");
+    await expect(page).toHaveURL(/\/entrar\?voltar=%2Fconta$/);
+    await expect(page.getByText("A sessão terminou porque a sua conta entrou noutro sítio.")).toBeVisible();
+    await expect(page.getByText("A sessão terminou por inactividade.")).toHaveCount(0);
+  });
+
   test("um 401 termina a sessão e volta ao login (S3)", async ({ page, api }) => {
     let revogada = false;
     await api

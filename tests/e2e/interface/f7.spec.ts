@@ -224,6 +224,28 @@ test.describe("portal do colaborador", () => {
     expect(api.pedidos.filter((p) => p.caminho === `/portal/me/declarations/${IDF7.modelo}`)).toHaveLength(1);
   });
 
+  test("recibo com adiantamentos descontados: o desconto e o que se recebe (PR #175)", async ({ page, api }) => {
+    const [r] = recibos();
+    await comPortal(api)
+      .em("GET", "/portal/me/payslips", { status: 200, corpo: [{ ...r!, advancesDeducted: 100000, netPaid: 288429 }] })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/recibos");
+    await expect(page.getByText("388 429,00 Kz")).toBeVisible();
+    await expect(page.getByText("Adiantamentos descontados: −100 000,00 Kz")).toBeVisible();
+    await expect(page.getByText("A receber: 288 429,00 Kz")).toBeVisible();
+    await verificarPagina(page);
+  });
+
+  test("recibo sem adiantamentos fica como estava", async ({ page, api }) => {
+    await comPortal(api).ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/recibos");
+    await expect(page.getByText("388 429,00 Kz")).toBeVisible();
+    await expect(page.getByText("Adiantamentos descontados", { exact: false })).toHaveCount(0);
+    await expect(page.getByText("A receber", { exact: false })).toHaveCount(0);
+  });
+
   test("recibo sem PDF disponível explica o motivo do servidor", async ({ page, api }) => {
     await comPortal(api).em("GET", `/portal/me/payslips/${IDF7.recibo}/document`, problema(404, { title: "Not Found", detail: "Recibo não disponível." })).ligar();
     await entrar(page, meColaborador.email);

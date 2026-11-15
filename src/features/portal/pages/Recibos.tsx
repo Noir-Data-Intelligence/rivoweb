@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import { useState } from "react";
 import { moeda } from "@/features/facturacao";
 import { nomeMes } from "@/lib/format/periodo";
+import { dinheiro } from "@/lib/money/money";
 import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
@@ -24,6 +25,21 @@ function subsidios(r: Recibo): string {
     .filter(([, v]) => Number(v) > 0)
     .map(([n, v]) => `${n} ${moeda(v)}`)
     .join(" · ");
+}
+
+/**
+ * O líquido da folha e, se ela descontou adiantamentos de salário (PR #175),
+ * o desconto e o que se recebe (`netPaid`), em destaque.
+ */
+function Liquido({ r }: { r: Recibo }) {
+  if (!dinheiro(r.advancesDeducted).gt(0)) return <span className="font-medium">{valor(r.netSalary)}</span>;
+  return (
+    <div className="flex flex-col items-end">
+      <span>{valor(r.netSalary)}</span>
+      <span className="text-sm text-muted-foreground">Adiantamentos descontados: −{moeda(r.advancesDeducted)}</span>
+      {r.netPaid === null || r.netPaid === undefined ? null : <span className="font-semibold text-foreground">A receber: {moeda(r.netPaid)}</span>}
+    </div>
+  );
 }
 
 function Descarregar({ r, aoFalhar }: { r: Recibo; aoFalhar: (e: unknown) => void }) {
@@ -53,7 +69,7 @@ export default function Recibos() {
     { id: "bruto", cabecalho: "Bruto", alinhar: "direita", esconderAte: "md", celula: (r) => moeda(r.grossSalary) },
     { id: "irt", cabecalho: "IRT", alinhar: "direita", esconderAte: "lg", celula: (r) => valor(r.withholdingTax) },
     { id: "inss", cabecalho: "Segurança social", alinhar: "direita", esconderAte: "lg", celula: (r) => valor(r.socialSecurityContribution) },
-    { id: "liquido", cabecalho: "Líquido", alinhar: "direita", celula: (r) => <span className="font-medium">{valor(r.netSalary)}</span> },
+    { id: "liquido", cabecalho: "Líquido", alinhar: "direita", celula: (r) => <Liquido r={r} /> },
     { id: "pdf", cabecalho: "", alinhar: "direita", celula: (r) => <Descarregar r={r} aoFalhar={setErro} /> },
   ];
   return (

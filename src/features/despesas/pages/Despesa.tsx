@@ -1,5 +1,5 @@
 /** Ficha de uma despesa (§5.6): aprovar, rejeitar (com motivo), reembolsar. */
-import { ArrowLeft, Check, Download, Wallet, X } from "lucide-react";
+import { ArrowLeft, Check, Download, Undo2, Wallet, X } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useParams } from "react-router";
 import { useMeuPainel } from "@/features/dashboard";
@@ -14,6 +14,7 @@ import { Button } from "@/ui/Button";
 import { Card, CardTitle } from "@/ui/Card";
 import { Confirmar } from "@/ui/Confirmar";
 import { ConfirmarComMotivo } from "@/ui/ConfirmarComMotivo";
+import { ConfirmarComMotivoEData } from "@/ui/ConfirmarComMotivoEData";
 import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
@@ -22,7 +23,7 @@ import { useContasRazao } from "@/features/contabilidade";
 import { eApiError } from "@/lib/api/problem";
 import { normalizarTexto } from "@/lib/validation/text";
 import { Textarea } from "@/ui/Controlos";
-import { useDecidirDespesa, useDespesa, useReembolsar, type Despesa as TipoDespesa } from "../api";
+import { useAnularReembolso, useDecidirDespesa, useDespesa, useReembolsar, type Despesa as TipoDespesa } from "../api";
 import { EstadoDespesa } from "../comum";
 
 function Linha({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
@@ -99,6 +100,35 @@ function Reembolsar({ d }: { d: TipoDespesa }) {
         </form>
       </Confirmar>
     </>
+  );
+}
+
+/** Anular o reembolso (ADR-134), a quem reembolsa e não é o dono da despesa. */
+function AnularReembolso({ d }: { d: TipoDespesa }) {
+  const { pode } = useUtilizador();
+  const anular = useAnularReembolso(d.expenseId);
+  const contas = useContasAbertas(d.reimbursedFromAccountId !== null && pode("finance.payables.read"));
+  const conta = contas.data?.items.find((c) => c.accountId === d.reimbursedFromAccountId)?.name;
+  const volta =
+    d.reimbursedFromAccountId === null
+      ? "O reembolso não saiu de nenhuma conta: só os lançamentos do reembolso são estornados."
+      : `O valor volta à conta ${conta ?? "de onde saiu"} e os lançamentos do reembolso são estornados.`;
+  return (
+    <ConfirmarComMotivoEData
+      rotuloBotao="Anular reembolso"
+      icone={<Undo2 strokeWidth={1.75} aria-hidden />}
+      titulo={`Anular o reembolso de ${moeda(d.amount, d.currency)} a ${d.employeeName}?`}
+      descricao={`${volta} A despesa volta a aprovada e pode reembolsar-se outra vez.`}
+      rotuloConfirmar="Anular reembolso"
+      rotuloData="Dia em que o dinheiro voltou"
+      desde={d.reimbursedOn}
+      aCarregar={anular.isPending}
+      erro={anular.error}
+      aoConfirmar={(corpo, fechar) => {
+        anular.reset();
+        anular.mutate(corpo, { onSuccess: fechar });
+      }}
+    />
   );
 }
 
@@ -218,6 +248,10 @@ export default function Despesa() {
   const minha = eu !== null && eu === d.employeeId;
   const porDecidir = d.status === "Submitted";
   const podeDecidir = porDecidir && pode("finance.expenses.approve") && !minha;
+  const podeReembolsar = d.status === "Approved" && pode("finance.expenses.write");
+  // A do próprio não (409 no servidor): escondido.
+  const podeAnularReembolso = d.status === "Reimbursed" && pode("finance.expenses.write") && !minha;
+  const anulacoes = Number(d.reimbursementCancellations);
   return (
     <>
       {voltar}
@@ -232,7 +266,7 @@ export default function Despesa() {
           </span>
         }
         accao={
-          podeDecidir || (d.status === "Approved" && pode("finance.expenses.write")) ? (
+          podeDecidir || podeReembolsar || podeAnularReembolso ? (
             <div className="flex flex-wrap gap-2">
               {podeDecidir ? (
                 <>
@@ -252,7 +286,8 @@ export default function Despesa() {
                   />
                 </>
               ) : null}
-              {d.status === "Approved" && pode("finance.expenses.write") ? <Reembolsar d={d} /> : null}
+              {podeReembolsar ? <Reembolsar d={d} /> : null}
+              {podeAnularReembolso ? <AnularReembolso d={d} /> : null}
             </div>
           ) : undefined
         }
@@ -300,6 +335,13 @@ export default function Despesa() {
             <Linha rotulo="Reembolsada em">
               {d.reimbursedOn ? formatarData(d.reimbursedOn) : "—"}
               {d.reimbursementReference ? ` · ${d.reimbursementReference}` : ""}
+            </Linha>
+          ) : null}
+          {anulacoes > 0 && d.reimbursementCancelledOn ? (
+            <Linha rotulo="Reembolso anulado">
+              {anulacoes > 1 ? `${anulacoes} vezes; a última a ` : "a "}
+              {formatarData(d.reimbursementCancelledOn)}
+              {d.reimbursementCancellationReason ? <span className="text-muted-foreground">: «{d.reimbursementCancellationReason}»</span> : null}
             </Linha>
           ) : null}
         </dl>

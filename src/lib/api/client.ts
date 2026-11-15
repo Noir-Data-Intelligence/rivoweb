@@ -55,13 +55,21 @@ export function eInscricaoMfaPendente(r: Response): boolean {
   return r.status === 401 && (r.headers.get("WWW-Authenticate") ?? "").includes("mfa_enrolment_required");
 }
 
+/**
+ * Sessão única reforçada (ADR-128): a mesma conta entrou noutro sítio, e o
+ * 401 traz `error_description=superseded`.
+ */
+export function eSessaoSubstituida(r: Response): boolean {
+  return r.status === 401 && (r.headers.get("WWW-Authenticate") ?? "").includes("superseded");
+}
+
 const sessao: Middleware = {
   onResponse({ request, response, schemaPath }) {
     if (!request.headers.has("Authorization")) return response;
     if (eInscricaoMfaPendente(response)) {
       marcarMfaPendente(true);
     } else if (eFimDeSessao(response) && !ROTAS_SEM_SESSAO.test(schemaPath)) {
-      terminarSessaoLocal("terminada");
+      terminarSessaoLocal(eSessaoSubstituida(response) ? "substituida" : "terminada");
     } else if (response.ok) {
       registarPedidoAutenticado();
     }

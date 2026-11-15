@@ -39,6 +39,7 @@ const MENSAGEM_FIM: Readonly<Record<MotivoFim, string | null>> = {
   inactividade: "A sessão terminou por inactividade.",
   expirada: "A sessão chegou ao fim do prazo. Entre de novo.",
   terminada: "A sessão terminou. Entre de novo.",
+  substituida: "A sessão terminou porque a sua conta entrou noutro sítio.",
 };
 
 /** Código da app: 6 dígitos, com ou sem o espaço do meio. Código de recuperação: como vier, sem espaços. */

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { eFimDeSessao, eInscricaoMfaPendente } from "@/lib/api/client";
+import { eFimDeSessao, eInscricaoMfaPendente, eSessaoSubstituida } from "@/lib/api/client";
 import { lerPaginacao } from "@/lib/api/pagination";
 import { eTransitorio, paraApiError } from "@/lib/api/problem";
 import { avaliarRelogio } from "@/lib/auth/actividade";
@@ -76,6 +76,16 @@ describe("segundo factor por ligar (ADR-127)", () => {
     expect(eInscricaoMfaPendente(r)).toBe(true);
     expect(eInscricaoMfaPendente(new Response(null, { status: 401, headers: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="revoked"' } }))).toBe(false);
     expect(eInscricaoMfaPendente(new Response(null, { status: 403 }))).toBe(false);
+  });
+});
+
+describe("sessão única (ADR-128)", () => {
+  it("o 401 com superseded é fim de sessão, com motivo próprio", () => {
+    const r = new Response(null, { status: 401, headers: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="superseded"' } });
+    expect(eFimDeSessao(r)).toBe(true);
+    expect(eSessaoSubstituida(r)).toBe(true);
+    expect(eSessaoSubstituida(new Response(null, { status: 401, headers: { "WWW-Authenticate": 'Bearer error="invalid_token", error_description="idle_timeout"' } }))).toBe(false);
+    expect(eSessaoSubstituida(new Response(null, { status: 403 }))).toBe(false);
   });
 });
 

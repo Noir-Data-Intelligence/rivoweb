@@ -22,6 +22,8 @@ export type MotivoFim =
   | "expirada"
   /** 401 sem motivo legível (B3): revogada, expirada no servidor ou perfil retirado. */
   | "terminada"
+  /** 401 com `superseded` (ADR-128): a mesma conta entrou noutro sítio, e o perfil só admite uma sessão. */
+  | "substituida"
   | "outra-aba";
 
 const CHAVE = "rivo.sessao";

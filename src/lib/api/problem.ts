@@ -82,6 +82,17 @@ export function eApiError(e: unknown): e is ApiError {
   return e instanceof ApiError;
 }
 
+/**
+ * A mensagem de um 400 para um campo (`errors.reason`, `errors.returnedOn`…),
+ * para ficar junto dele; aceita a chave com maiúscula inicial. Sem ela,
+ * `undefined`, e o erro mostra-se no painel.
+ */
+export function erroDoCampo(e: unknown, campo: string): string | undefined {
+  if (!eApiError(e) || e.status !== 400) return undefined;
+  const m = e.errors[campo] ?? e.errors[campo.charAt(0).toUpperCase() + campo.slice(1)];
+  return m && m.length > 0 ? m.join(" ") : undefined;
+}
+
 /** Falhas transitórias em que uma leitura pode ser repetida (§2, middleware 6). */
 export function eTransitorio(e: unknown): boolean {
   if (!eApiError(e)) return false;

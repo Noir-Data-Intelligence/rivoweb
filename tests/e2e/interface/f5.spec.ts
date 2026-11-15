@@ -489,6 +489,59 @@ test.describe("despesas", () => {
     expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement`).map((p) => p.corpo)).toEqual([{ on: "2026-10-14", fromAccountId: IDF5.conta, reference: "TRF-9" }]);
   });
 
+  test("anular o reembolso (ADR-134): motivo e dia no cliente, 400 no campo; volta a aprovada com a nota", async ({ page, api, violacoes }) => {
+    let tentativas = 0;
+    let anulada = false;
+    const reembolsada = { ...despesa("Reimbursed"), reimbursedFromAccountId: IDF5.conta };
+    const depois = { ...despesa("Approved"), reimbursementCancellations: 1, reimbursementCancelledOn: "2026-10-20", reimbursementCancellationReason: "Transferência devolvida pelo banco" };
+    await comDespesas(api, meFinancasF5)
+      .em("GET", `/finance/expenses/${IDF5D.despesa}`, () => ({ status: 200, corpo: anulada ? depois : reembolsada }))
+      .em("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement-cancellation`, () => {
+        if (++tentativas === 1) {
+          return { status: 400, corpo: { status: 400, title: "Pedido inválido", errors: { returnedOn: ["O dia não pode ser antes do reembolso."] } }, cabecalhos: { "Content-Type": "application/problem+json" } };
+        }
+        anulada = true;
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    await expect(page.getByRole("button", { name: "Marcar reembolsada" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Anular reembolso" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d).toContainText("O valor volta à conta Conta à ordem BAI e os lançamentos do reembolso são estornados. A despesa volta a aprovada");
+    await d.getByRole("button", { name: "Anular reembolso" }).click();
+    await expect(d.getByText("Indique o motivo.")).toBeVisible();
+    await d.getByLabel("Dia em que o dinheiro voltou").fill("2026-10-13");
+    await expect(d.getByText("Não pode ser antes de 14/10/2026.")).toBeVisible();
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement-cancellation`)).toHaveLength(0);
+    await d.getByLabel("Motivo").fill("Transferência devolvida pelo banco");
+    await d.getByLabel("Dia em que o dinheiro voltou").fill("2026-10-20");
+    expect(await violacoes()).toEqual([]);
+    await d.getByRole("button", { name: "Anular reembolso" }).click();
+    await expect(d.getByText("O dia não pode ser antes do reembolso.")).toBeVisible();
+    await expect(d.getByLabel("Dia em que o dinheiro voltou")).toHaveAttribute("aria-invalid", "true");
+    await d.getByRole("button", { name: "Anular reembolso" }).click();
+    await expect(d).toHaveCount(0);
+    await expect(page.getByText("Transferência devolvida pelo banco", { exact: false })).toBeVisible();
+    await expect(page.getByText("20/10/2026")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Marcar reembolsada" })).toBeVisible();
+    expect(api.escritas("POST", `/finance/expenses/${IDF5D.despesa}/reimbursement-cancellation`).map((p) => p.corpo)).toEqual([
+      { reason: "Transferência devolvida pelo banco", returnedOn: "2026-10-20" },
+      { reason: "Transferência devolvida pelo banco", returnedOn: "2026-10-20" },
+    ]);
+  });
+
+  test("a própria despesa reembolsada não se anula", async ({ page, api }) => {
+    await comDespesas(api, meFinancasF5, painelCarlos())
+      .em("GET", `/finance/expenses/${IDF5D.despesa}`, { status: 200, corpo: despesa("Reimbursed") })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto(`/despesas/${IDF5D.despesa}`);
+    await expect(page.getByText("Reembolsada em")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Anular reembolso" })).toHaveCount(0);
+  });
+
   test("portal: submeter com comprovativo e retirar", async ({ page, api, violacoes }) => {
     const colaborador = { ...meColaborador, permissions: ["documents.write"] };
     let lista = [minhaDespesa()];
