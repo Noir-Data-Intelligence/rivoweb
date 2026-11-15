@@ -73,8 +73,8 @@ export const historico = (id = IDF4.pedido, requerente = OUTRO): S["ApprovalHist
   currentStep: 1,
   totalSteps: 2,
   assignments: [
-    { step: 1, mode: "AnyApprover", approverEmployeeId: requerente === EU ? OUTRO : EU, approverName: requerente === EU ? "Carlos Teste" : "Ana Teste", slaHours: 48 },
-    { step: 2, mode: "AllApprovers", approverEmployeeId: ID.emp2, approverName: "Carlos Teste", slaHours: null },
+    { step: 1, mode: "AnyApprover", approverEmployeeId: requerente === EU ? OUTRO : EU, approverName: requerente === EU ? "Carlos Teste" : "Ana Teste", slaHours: 48, isEscalation: false },
+    { step: 2, mode: "AllApprovers", approverEmployeeId: ID.emp2, approverName: "Carlos Teste", slaHours: null, isEscalation: false },
   ],
   decisions: [],
 });

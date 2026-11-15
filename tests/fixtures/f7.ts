@@ -60,6 +60,8 @@ export const recibos = (): S["OwnPayslip"][] => [
     withholdingTax: 67471.0,
     socialSecurityContribution: 14100.0,
     documentId: null,
+    advancesDeducted: 0,
+    netPaid: 388429.0,
   },
 ];
 

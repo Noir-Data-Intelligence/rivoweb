@@ -203,6 +203,7 @@ export const despesa = (estado = "Submitted", colaborador = ID.emp2, nome = "Car
   reimbursedOn: estado === "Reimbursed" ? "2026-10-14" : null,
   reimbursedFromAccountId: null,
   reimbursementReference: estado === "Reimbursed" ? "TRF-9" : null,
+  reimbursementCancellations: 0,
 });
 
 export const resumoDespesas = (): S["ExpenseSummary"][] => [{ currency: "AOA", submitted: 7500, approved: 996500, reimbursed: 3260500, rejected: 599500 }];

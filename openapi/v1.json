@@ -11620,6 +11620,81 @@
         ]
       }
     },
+    "/finance/treasury/salary-advances/{advanceId}/cancellation": {
+      "post": {
+        "tags": [
+          "TreasuryEndpoints"
+        ],
+        "summary": "Anula um adiantamento pago (ADR-131): o colaborador devolveu-o. Entra no banco no dia `returnedOn` (omitido, hoje) e o lançamento estorna-se nesse dia. Motivo obrigatório (400). Já descontado por uma folha, já anulado, adiantamento ao próprio, conta fechada ou período fechado: 409.",
+        "parameters": [
+          {
+            "name": "advanceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalaryAdvanceCancellationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/finance/treasury/tax-payments": {
       "post": {
         "tags": [
@@ -14649,6 +14724,81 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/expenses/{expenseId}/reimbursement-cancellation": {
+      "post": {
+        "tags": [
+          "SpendingEndpoints"
+        ],
+        "summary": "Anula o reembolso (ADR-134): o dinheiro voltou à conta de onde saiu, no dia `returnedOn` (omitido, hoje). O reembolso e a diferença de câmbio estornam-se nesse dia, e a despesa volta a aprovada, para se reembolsar outra vez. Motivo obrigatório (400). Não reembolsada, despesa do próprio, conta fechada ou período fechado: 409.",
+        "parameters": [
+          {
+            "name": "expenseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReimbursementCancellationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -29613,6 +29763,244 @@
         ]
       }
     },
+    "/approval/deadlines/evaluation": {
+      "post": {
+        "tags": [
+          "ApprovalModuleEndpoints"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadlineRunResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/approval/delegations": {
+      "get": {
+        "tags": [
+          "ApprovalModuleEndpoints"
+        ],
+        "parameters": [
+          {
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApprovalDelegationView"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ApprovalModuleEndpoints"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDelegationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalDelegationView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/approval/delegations/candidates": {
+      "get": {
+        "tags": [
+          "ApprovalModuleEndpoints"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DelegationCandidateView"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/approval/delegations/{delegationId}/revocation": {
+      "post": {
+        "tags": [
+          "ApprovalModuleEndpoints"
+        ],
+        "parameters": [
+          {
+            "name": "delegationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/payroll/runs": {
       "get": {
         "tags": [
@@ -38438,7 +38826,7 @@
         "tags": [
           "EmployeePortalModuleEndpoints"
         ],
-        "summary": "Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o.",
+        "summary": "Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o. Com `internalRequestId`, liga-o ao pedido interno ao RH da categoria SalaryAdvance, que recebe uma mensagem (ADR-131).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -38472,6 +38860,68 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/portal/me/salary-advance-applications/{applicationId}/withdrawal": {
+      "post": {
+        "tags": [
+          "EmployeePortalModuleEndpoints"
+        ],
+        "summary": "Retira o próprio pedido de adiantamento antes de ser pago (ADR-131). Por decidir, o processo de aprovação cancela-se. Já pago, recusado ou retirado: 409.",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -42228,6 +42678,10 @@
               "null",
               "string"
             ]
+          },
+          "isEscalation": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -42334,6 +42788,81 @@
             "items": {
               "$ref": "#/components/schemas/ApprovalChecklistAnswerView"
             }
+          },
+          "onBehalfOfEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "onBehalfOfName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ApprovalDelegationView": {
+        "required": [
+          "delegationId",
+          "delegatorEmployeeId",
+          "delegatorName",
+          "delegateEmployeeId",
+          "delegateName",
+          "startsAt",
+          "endsAt",
+          "reason",
+          "active",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "delegationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegatorEmployeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegatorName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "delegateEmployeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegateName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -42467,6 +42996,20 @@
               "string"
             ],
             "format": "double"
+          },
+          "currentStepDueAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "escalatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -42628,6 +43171,20 @@
               "string"
             ],
             "format": "double"
+          },
+          "currentStepDueAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "escalatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -46980,6 +47537,49 @@
           }
         }
       },
+      "CreateDelegationRequest": {
+        "required": [
+          "delegateEmployeeId",
+          "endsAt"
+        ],
+        "type": "object",
+        "properties": {
+          "delegateEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "endsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "startsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "delegatorEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "CreateDepartmentRequest": {
         "required": [
           "name",
@@ -48447,6 +49047,40 @@
           }
         }
       },
+      "DeadlineRunResult": {
+        "required": [
+          "watched",
+          "reminders",
+          "escalations"
+        ],
+        "type": "object",
+        "properties": {
+          "watched": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "reminders": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "escalations": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "DecideRequest": {
         "required": [
           "action",
@@ -48471,6 +49105,13 @@
             "items": {
               "$ref": "#/components/schemas/ChecklistAnswerRequest"
             }
+          },
+          "onBehalfOfEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -48516,6 +49157,22 @@
               "null",
               "boolean"
             ]
+          }
+        }
+      },
+      "DelegationCandidateView": {
+        "required": [
+          "employeeId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -50458,6 +51115,28 @@
             ]
           },
           "expenseAccountCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reimbursementCancellations": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 0
+          },
+          "reimbursementCancelledOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "reimbursementCancellationReason": {
             "type": [
               "null",
               "string"
@@ -56779,6 +57458,13 @@
               "null",
               "string"
             ]
+          },
+          "internalRequestId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -58816,6 +59502,24 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "advancesDeducted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double",
+            "default": 0
+          },
+          "netPaid": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
           }
         }
       },
@@ -59021,6 +59725,13 @@
           },
           "status": {
             "type": "string"
+          },
+          "internalRequestId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -61006,6 +61717,13 @@
             "items": {
               "$ref": "#/components/schemas/PolicyChecklistItemRequest"
             }
+          },
+          "escalationPositionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -61054,6 +61772,13 @@
             "items": {
               "$ref": "#/components/schemas/PolicyChecklistItemView"
             }
+          },
+          "escalationPositionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -64025,6 +64750,27 @@
           }
         }
       },
+      "ReimbursementCancellationRequest": {
+        "required": [
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "returnedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "ReimbursementRequest": {
         "required": [
           "on",
@@ -65040,6 +65786,34 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "internalRequestId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "SalaryAdvanceCancellationRequest": {
+        "required": [
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "returnedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -65177,6 +65951,26 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "cancelledAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "returnedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "cancellationReason": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

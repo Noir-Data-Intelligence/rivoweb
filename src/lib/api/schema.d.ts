@@ -12038,6 +12038,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/finance/treasury/salary-advances/{advanceId}/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anula um adiantamento pago (ADR-131): o colaborador devolveu-o. Entra no banco no dia `returnedOn` (omitido, hoje) e o lançamento estorna-se nesse dia. Motivo obrigatório (400). Já descontado por uma folha, já anulado, adiantamento ao próprio, conta fechada ou período fechado: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    advanceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SalaryAdvanceCancellationRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/finance/treasury/tax-payments": {
         parameters: {
             query?: never;
@@ -15129,6 +15210,87 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/expenses/{expenseId}/reimbursement-cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anula o reembolso (ADR-134): o dinheiro voltou à conta de onde saiu, no dia `returnedOn` (omitido, hoje). O reembolso e a diferença de câmbio estornam-se nesse dia, e a despesa volta a aprovada, para se reembolsar outra vez. Motivo obrigatório (400). Não reembolsada, despesa do próprio, conta fechada ou período fechado: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    expenseId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReimbursementCancellationRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
                 };
                 /** @description Sem sessão válida. */
                 401: {
@@ -30432,6 +30594,283 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/approval/deadlines/evaluation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeadlineRunResult"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval/delegations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    scope?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApprovalDelegationView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateDelegationRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApprovalDelegationView"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval/delegations/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DelegationCandidateView"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval/delegations/{delegationId}/revocation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    delegationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll/runs": {
         parameters: {
             query?: never;
@@ -39496,7 +39935,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o. */
+        /** Pede um adiantamento de salário (ADR-123). Vai ao motor de aprovação; aprovado, a tesouraria paga-o, e a folha indicada (omitida, a do mês corrente) desconta-o. Com `internalRequestId`, liga-o ao pedido interno ao RH da categoria SalaryAdvance, que recebe uma mensagem (ADR-131). */
         post: {
             parameters: {
                 query?: never;
@@ -39537,6 +39976,76 @@ export interface paths {
                 };
                 /** @description Forbidden */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/me/salary-advance-applications/{applicationId}/withdrawal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retira o próprio pedido de adiantamento antes de ser pago (ADR-131). Por decidir, o processo de aprovação cancela-se. Já pago, recusado ou retirado: 409. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    applicationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -42210,6 +42719,8 @@ export interface components {
             /** Format: int32 */
             slaHours: null | number | string;
             approverName?: null | string;
+            /** @default false */
+            isEscalation: boolean;
         };
         ApprovalChecklistAnswerView: {
             /** Format: uuid */
@@ -42237,6 +42748,27 @@ export interface components {
             notes: null | string;
             decidedByName?: null | string;
             checklist?: null | components["schemas"]["ApprovalChecklistAnswerView"][];
+            /** Format: uuid */
+            onBehalfOfEmployeeId?: null | string;
+            onBehalfOfName?: null | string;
+        };
+        ApprovalDelegationView: {
+            /** Format: uuid */
+            delegationId: string;
+            /** Format: uuid */
+            delegatorEmployeeId: string;
+            delegatorName: null | string;
+            /** Format: uuid */
+            delegateEmployeeId: string;
+            delegateName: null | string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            reason: null | string;
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
         };
         ApprovalHistoryView: {
             /** Format: uuid */
@@ -42267,6 +42799,10 @@ export interface components {
             checklist?: null | components["schemas"]["ApprovalChecklistItemView"][];
             /** Format: double */
             cumulativeAmount?: null | number | string;
+            /** Format: date-time */
+            currentStepDueAt?: null | string;
+            /** Format: date-time */
+            escalatedAt?: null | string;
         };
         ApprovalRuleGroup: {
             module: string;
@@ -42304,6 +42840,10 @@ export interface components {
             currentChecklist?: null | components["schemas"]["ApprovalChecklistItemView"][];
             /** Format: double */
             cumulativeAmount?: null | number | string;
+            /** Format: date-time */
+            currentStepDueAt?: null | string;
+            /** Format: date-time */
+            escalatedAt?: null | string;
         };
         ApproveBudgetRequest: {
             /** Format: uuid */
@@ -43398,6 +43938,17 @@ export interface components {
             /** Format: date */
             effectiveTo: null | string;
         };
+        CreateDelegationRequest: {
+            /** Format: uuid */
+            delegateEmployeeId: null | string;
+            /** Format: date-time */
+            endsAt: null | string;
+            /** Format: date-time */
+            startsAt?: null | string;
+            reason?: null | string;
+            /** Format: uuid */
+            delegatorEmployeeId?: null | string;
+        };
         CreateDepartmentRequest: {
             name: string;
             /** Format: uuid */
@@ -43757,10 +44308,20 @@ export interface components {
             customerName: null | string;
             visibleToCustomer: boolean;
         };
+        DeadlineRunResult: {
+            /** Format: int32 */
+            watched: number | string;
+            /** Format: int32 */
+            reminders: number | string;
+            /** Format: int32 */
+            escalations: number | string;
+        };
         DecideRequest: {
             action: string;
             notes: null | string;
             checklist?: null | components["schemas"]["ChecklistAnswerRequest"][];
+            /** Format: uuid */
+            onBehalfOfEmployeeId?: null | string;
         };
         DeclarationTemplateCreatedResponse: {
             /** Format: uuid */
@@ -43772,6 +44333,11 @@ export interface components {
             body: string;
             selfService: null | boolean;
             active: null | boolean;
+        };
+        DelegationCandidateView: {
+            /** Format: uuid */
+            employeeId: string;
+            name: string;
         };
         DepartmentCreatedResponse: {
             /** Format: uuid */
@@ -44268,6 +44834,14 @@ export interface components {
             reimbursedFromAccountId: null | string;
             reimbursementReference: null | string;
             expenseAccountCode?: null | string;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            reimbursementCancellations: number | string;
+            /** Format: date */
+            reimbursementCancelledOn?: null | string;
+            reimbursementCancellationReason?: null | string;
         };
         ExpenseDecisionRequest: {
             notes: null | string;
@@ -45809,6 +46383,8 @@ export interface components {
             /** Format: int32 */
             payrollMonth?: null | number | string;
             reason?: null | string;
+            /** Format: uuid */
+            internalRequestId?: null | string;
         };
         MySalaryAdvanceResponse: {
             /** Format: uuid */
@@ -46316,6 +46892,13 @@ export interface components {
             socialSecurityContribution: null | number | string;
             /** Format: uuid */
             documentId: null | string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            advancesDeducted: number | string;
+            /** Format: double */
+            netPaid?: null | number | string;
         };
         OwnPersonalData: {
             email: null | string;
@@ -46355,6 +46938,8 @@ export interface components {
             /** Format: date-time */
             submittedAt: string;
             status: string;
+            /** Format: uuid */
+            internalRequestId?: null | string;
         };
         OwnShift: {
             /** Format: uuid */
@@ -46834,6 +47419,8 @@ export interface components {
             slaHours: null | number | string;
             kind?: null | string;
             checklist?: null | components["schemas"]["PolicyChecklistItemRequest"][];
+            /** Format: uuid */
+            escalationPositionId?: null | string;
         };
         PolicyStepView: {
             /** Format: int32 */
@@ -46846,6 +47433,8 @@ export interface components {
             /** @default Approval */
             kind: string;
             checklist?: null | components["schemas"]["PolicyChecklistItemView"][];
+            /** Format: uuid */
+            escalationPositionId?: null | string;
         };
         PolicyView: {
             /** Format: uuid */
@@ -47592,6 +48181,11 @@ export interface components {
             code: null | string;
             name: string;
         };
+        ReimbursementCancellationRequest: {
+            reason: null | string;
+            /** Format: date */
+            returnedOn?: null | string;
+        };
         ReimbursementRequest: {
             /** Format: date */
             on: null | string;
@@ -47854,6 +48448,13 @@ export interface components {
             status: string;
             /** Format: uuid */
             advanceId: null | string;
+            /** Format: uuid */
+            internalRequestId?: null | string;
+        };
+        SalaryAdvanceCancellationRequest: {
+            reason: null | string;
+            /** Format: date */
+            returnedOn?: null | string;
         };
         SalaryAdvanceLookups: {
             employees: components["schemas"]["LookupEntry"][];
@@ -47890,6 +48491,11 @@ export interface components {
             outstanding: number | string;
             /** Format: uuid */
             applicationId?: null | string;
+            /** Format: date-time */
+            cancelledAt?: null | string;
+            /** Format: date */
+            returnedOn?: null | string;
+            cancellationReason?: null | string;
         };
         SalesInvoiceIssuedResponse: {
             /** Format: uuid */
