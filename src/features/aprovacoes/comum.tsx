@@ -1,7 +1,10 @@
 /** Peças partilhadas pelos ecrãs de aprovações. */
+import { NavLink } from "react-router";
 import { useMeuPainel } from "@/features/dashboard";
+import { cn } from "@/ui/cn";
 import { formatarDataHora } from "@/lib/format/data";
 import { Badge } from "@/ui/Badge";
+import { useDelegacoes } from "./api";
 
 /** Tipos de processo (Facto: `ApprovalContracts.cs`). */
 export const PROCESSOS: Readonly<Record<string, string>> = {
@@ -97,4 +100,39 @@ export function PrazoDoPasso({ ate, escaladoEm, agora = new Date() }: { ate?: st
       {escaladoEm ? <Badge tom="aviso">Escalado</Badge> : null}
     </span>
   );
+}
+
+const separador = (activo: boolean) =>
+  cn(
+    "inline-flex h-9 items-center border-b-2 px-3 text-base pointer-coarse:h-11",
+    activo ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+  );
+
+/** As vistas de Aprovações: a caixa, todos os pedidos e as delegações (ADR-129). */
+export function VistasAprovacoes({ actual }: { actual: "para-mim" | "todos" | "delegacoes" }) {
+  return (
+    <nav aria-label="Vistas de aprovações" className="mb-4 flex gap-1 overflow-x-auto border-b border-border">
+      <NavLink to="/aprovacoes" end className={() => separador(actual === "para-mim")} aria-current={actual === "para-mim" ? "page" : undefined}>
+        À minha espera
+      </NavLink>
+      <NavLink to="/aprovacoes?vista=todos" className={() => separador(actual === "todos")} aria-current={actual === "todos" ? "page" : undefined}>
+        Todos
+      </NavLink>
+      <NavLink to="/aprovacoes/delegacoes" className={() => separador(actual === "delegacoes")} aria-current={actual === "delegacoes" ? "page" : undefined}>
+        Delegações
+      </NavLink>
+    </nav>
+  );
+}
+
+/**
+ * Quem me delegou, com delegação em vigor (ADR-129): id → nome. Serve para
+ * decidir em nome dessas pessoas os passos que esperam por elas.
+ */
+export function useQuemMeDelegou(): ReadonlyMap<string, string> {
+  const eu = useEuColaborador();
+  const minhas = useDelegacoes(false, eu !== null);
+  const m = new Map<string, string>();
+  for (const d of minhas.data ?? []) if (d.active && d.delegateEmployeeId === eu) m.set(d.delegatorEmployeeId, d.delegatorName ?? "Colaborador");
+  return m;
 }

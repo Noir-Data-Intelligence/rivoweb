@@ -1,6 +1,6 @@
 /** Caixa de aprovações (§5.5): por omissão, os pedidos à espera da própria pessoa. */
 import { useId } from "react";
-import { Link, NavLink, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { formatarDataHora } from "@/lib/format/data";
 import { Alert } from "@/ui/Alert";
 import { Badge } from "@/ui/Badge";
@@ -9,10 +9,9 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
 import { Paginacao } from "@/ui/Paginacao";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { cn } from "@/ui/cn";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
 import { usePedidos, type Pedido } from "../api";
-import { EstadoPedido, nomeProcesso, PrazoDoPasso, PROCESSOS, useEuColaborador, useNomeColaborador } from "../comum";
+import { EstadoPedido, nomeProcesso, PrazoDoPasso, PROCESSOS, useEuColaborador, useNomeColaborador, useQuemMeDelegou, VistasAprovacoes } from "../comum";
 
 export default function Caixa() {
   const [params, setParams] = useSearchParams();
@@ -21,11 +20,12 @@ export default function Caixa() {
   const { pagina, tamanho, mudar } = usePaginacaoUrl();
   const eu = useEuColaborador();
   const nome = useNomeColaborador();
+  const quemMeDelegou = useQuemMeDelegou();
+  /** Quem me delegou e espera neste pedido, quando eu não estou no passo (ADR-129). */
+  const porDelegacao = (p: Pedido) => (eu !== null && !p.pendingApprovers.includes(eu) ? p.pendingApprovers.flatMap((id) => (quemMeDelegou.has(id) ? [quemMeDelegou.get(id) ?? "Colaborador"] : [])) : []);
   const idTipo = useId();
   // «Para mim» precisa do colaborador da conta; sem ficha ligada, não há caixa própria.
   const pedidos = usePedidos({ pagina, tamanho, tipo, para: vista === "para-mim" ? eu : null }, vista === "todos" || eu !== null);
-  const sep = (a: boolean) =>
-    cn("inline-flex h-9 items-center border-b-2 px-3 text-base pointer-coarse:h-11", a ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground");
   const colunas: Coluna<Pedido>[] = [
     {
       id: "processo",
@@ -59,6 +59,7 @@ export default function Caixa() {
         <span className="flex flex-col items-start gap-1">
           <EstadoPedido estado={p.status} />
           {p.status === "InProgress" || p.status === "ClarificationRequested" ? <PrazoDoPasso ate={p.currentStepDueAt} escaladoEm={p.escalatedAt} /> : null}
+          {porDelegacao(p).length > 0 ? <span className="text-xs text-muted-foreground">Por delegação de {porDelegacao(p).join(", ")}</span> : null}
         </span>
       ),
     },
@@ -66,14 +67,7 @@ export default function Caixa() {
   return (
     <>
       <PageHeader titulo="Aprovações" descricao="Pedidos que passam por decisão: atribuições de cargo, férias, pagamentos, compras, salários." />
-      <nav aria-label="Vistas de aprovações" className="mb-4 flex gap-1 border-b border-border">
-        <NavLink to="/aprovacoes" end className={() => sep(vista === "para-mim")} aria-current={vista === "para-mim" ? "page" : undefined}>
-          À minha espera
-        </NavLink>
-        <NavLink to="/aprovacoes?vista=todos" className={() => sep(vista === "todos")} aria-current={vista === "todos" ? "page" : undefined}>
-          Todos
-        </NavLink>
-      </nav>
+      <VistasAprovacoes actual={vista} />
       <div className="mb-4 flex flex-col gap-1.5 sm:w-72">
         <label htmlFor={idTipo} className="text-sm font-medium text-foreground">
           Tipo

@@ -83,6 +83,7 @@ export const PAGINAS = {
   aprovacoes: () => import("@/features/aprovacoes/pages/Caixa"),
   pedidoAprovacao: () => import("@/features/aprovacoes/pages/Pedido"),
   politicas: () => import("@/features/aprovacoes/pages/Politicas"),
+  delegacoes: () => import("@/features/aprovacoes/pages/Delegacoes"),
   // F5
   fornecedores: () => import("@/features/pagar/pages/Fornecedores"),
   fornecedor: () => import("@/features/pagar/pages/Fornecedor"),

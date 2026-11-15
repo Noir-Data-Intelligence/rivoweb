@@ -55,9 +55,9 @@ export function useHistorico(id: string) {
 export function useDecidir(antecipar: boolean) {
   const qc = useQueryClient();
   return useEscrita({
-    mutationFn: async ({ requestId, action, notes, checklist }: { requestId: string; action: Accao; notes: string | null; checklist?: RespostaItem[] }) => {
-      // Num passo de aprovação o checklist não vai (o servidor recusa-o).
-      const corpo = checklist ? { action, notes, checklist } : { action, notes };
+    mutationFn: async ({ requestId, action, notes, checklist, emNomeDe }: { requestId: string; action: Accao; notes: string | null; checklist?: RespostaItem[]; emNomeDe?: string | null }) => {
+      // Num passo de aprovação o checklist não vai (o servidor recusa-o). Em nome de quem delegou (ADR-129), `onBehalfOfEmployeeId`.
+      const corpo = { action, notes, ...(checklist ? { checklist } : {}), ...(emNomeDe ? { onBehalfOfEmployeeId: emNomeDe } : {}) };
       const r = await ler(api.POST("/approval/requests/{requestId}/decisions", { params: { path: { requestId } }, body: corpo }));
       const final = r.status === "Approved" || r.status === "Rejected";
       if (antecipar && final && r.processType === "hr.position_assignment") {
@@ -106,5 +106,51 @@ export function useDesactivarPolitica() {
       void qc.invalidateQueries({ queryKey: chaves.politicas });
       void qc.invalidateQueries({ queryKey: ["settings", "overview"] });
     },
+  });
+}
+
+// Delegações (ADR-129): quem aprova delega num colega por um período, e o colega decide em nome dele.
+
+export type Delegacao = components["schemas"]["ApprovalDelegationView"];
+export type NovaDelegacao = components["schemas"]["CreateDelegationRequest"];
+
+const chavesDelegacao = {
+  todas: ["approval", "delegations"] as const,
+  lista: (todas: boolean) => ["approval", "delegations", todas ? "all" : "mine"] as const,
+  candidatos: ["approval", "delegations", "candidates"] as const,
+};
+
+/** As minhas (como delegante ou delegado), em vigor ou por começar; `todas` só para quem administra as políticas. */
+export function useDelegacoes(todas = false, activo = true) {
+  return useQuery({
+    queryKey: chavesDelegacao.lista(todas),
+    queryFn: ({ signal }) => ler(api.GET("/approval/delegations", { params: { query: todas ? { scope: "all" } : {} }, signal })),
+    enabled: activo,
+  });
+}
+
+/** Os colaboradores activos em quem se pode delegar, sem ler os RH. */
+export function useCandidatosDelegacao(activo = true) {
+  return useQuery({
+    queryKey: chavesDelegacao.candidatos,
+    queryFn: ({ signal }) => ler(api.GET("/approval/delegations/candidates", { signal })),
+    staleTime: 5 * 60_000,
+    enabled: activo,
+  });
+}
+
+export function useDelegar() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: NovaDelegacao) => ler(api.POST("/approval/delegations", { body: b })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: chavesDelegacao.todas }),
+  });
+}
+
+export function useRevogarDelegacao() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (id: string) => enviar(api.POST("/approval/delegations/{delegationId}/revocation", { params: { path: { delegationId: id } } })),
+    onSettled: () => qc.invalidateQueries({ queryKey: chaves.todos }),
   });
 }

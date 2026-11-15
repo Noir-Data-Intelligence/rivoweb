@@ -74,6 +74,8 @@ export class ApiSimulada {
       // ADR-127: «A minha conta» lê o estado do segundo factor; por omissão, desligado e sem obrigação.
       .em("GET", "/identity/me/mfa", { status: 200, corpo: { enabled: false, required: false, enforced: false, recoveryCodesLeft: 0 } })
       .em("POST", "/identity/logout", { status: 204 })
+      // ADR-129: a caixa e a ficha das aprovações lêem as delegações; por omissão, nenhuma.
+      .em("GET", "/approval/delegations", { status: 200, corpo: [] })
       // F2: o sino e o painel pedem isto em todas as páginas; por omissão, vazio.
       .em("GET", "/notifications/me", { status: 200, corpo: [], cabecalhos: { "X-Page": "1", "X-Page-Size": "1", "X-Total-Count": "0" } })
       .em("GET", "/dashboard/me", { status: 200, corpo: { employeeId: null, displayName: null, unreadNotifications: 0, pendingApprovals: 0, announcements: [] } })

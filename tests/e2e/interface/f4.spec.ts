@@ -5,9 +5,12 @@
  * K4: passo de validação com checklist (política, decisão e histórico).
  */
 import { colaboradores, departamentos } from "../../fixtures/f1";
-import { cargos, EU, historico, historicoValidado, IDF4, meAdminF4, meFinancasF4, meuPedido, painelComFicha, pedido, pedidoValidacao, politicas } from "../../fixtures/f4";
+import { cargos, EU, historico, historicoValidado, IDF4, meAdminF4, meFinancasF4, meuPedido, OUTRO, painelComFicha, pedido, pedidoValidacao, politicas } from "../../fixtures/f4";
+import type { components } from "@/lib/api/schema";
 import type { Page } from "@playwright/test";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test, type ApiSimulada } from "../apoio";
+
+type S = components["schemas"];
 
 const pag = <T,>(itens: T[]) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": String(itens.length) } });
 
@@ -227,6 +230,154 @@ test.describe("prazos e escalonamento (ADR-130)", () => {
     await page.goto(`/aprovacoes/${IDF4.pedido}`);
     await expect(page.getByText("Prazo: 13/10/2026 10:00 · passou")).toBeVisible();
     await expect(page.getByText("Rui Administrador (por escalonamento)", { exact: false })).toBeVisible();
+  });
+});
+
+test.describe("delegações (ADR-129)", () => {
+  const RUI = "00000000-0000-4000-8000-000000000098";
+  const delegacao = (id: string, de: string, deNome: string, em: string, emNome: string, activa = true): S["ApprovalDelegationView"] => ({
+    delegationId: id,
+    delegatorEmployeeId: de,
+    delegatorName: deNome,
+    delegateEmployeeId: em,
+    delegateName: emNome,
+    startsAt: "2026-11-10T08:00:00+01:00",
+    endsAt: "2099-11-20T18:00:00+01:00",
+    reason: "Férias",
+    active: activa,
+    createdAt: "2026-11-09T10:00:00Z",
+  });
+  const candidatos = [
+    { employeeId: EU, name: "Ana Teste" },
+    { employeeId: OUTRO, name: "Carlos Teste" },
+    { employeeId: RUI, name: "Rui Teste" },
+  ];
+
+  test("quem decide: as suas delegações, delegar (validação no cliente, 409 do servidor) e revogar", async ({ page, api, violacoes }) => {
+    let tentativas = 0;
+    await comF4(api, meFinancasF4)
+      .em("GET", "/approval/delegations", { status: 200, corpo: [delegacao("00000000-0000-4000-8000-000000000901", EU, "Ana Teste", OUTRO, "Carlos Teste", false)] })
+      .em("GET", "/approval/delegations/candidates", { status: 200, corpo: candidatos })
+      .em("POST", "/approval/delegations", () =>
+        ++tentativas === 1
+          ? { status: 409, corpo: { status: 409, title: "Conflito", detail: "Já tem uma delegação para parte deste período." }, cabecalhos: { "Content-Type": "application/problem+json" } }
+          : { status: 201, corpo: delegacao("00000000-0000-4000-8000-000000000902", EU, "Ana Teste", RUI, "Rui Teste") },
+      )
+      .em("POST", "/approval/delegations/00000000-0000-4000-8000-000000000901/revocation", { status: 204 })
+      .ligar();
+    await entrar(page, "financas4@teste.local");
+    await page.goto("/aprovacoes");
+    await page.getByRole("link", { name: "Delegações" }).click();
+    await expect(page).toHaveURL(/\/aprovacoes\/delegacoes$/);
+    const linha = page.getByRole("row").filter({ hasText: "Carlos Teste" });
+    await expect(linha).toContainText("Ana Teste (você)");
+    await expect(linha).toContainText("Por começar");
+    expect(api.pedidos.some((p) => p.caminho === "/approval/delegations" && p.query.includes("scope=all"))).toBe(false);
+    await page.getByRole("button", { name: "Delegar" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Quem delega")).toHaveCount(0);
+    // Não se delega em si próprio: a própria pessoa não aparece.
+    await expect(d.getByLabel("Colega").locator("option")).toHaveText(["Escolha…", "Carlos Teste", "Rui Teste"]);
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d.getByText("Escolha o colega.")).toBeVisible();
+    await expect(d.getByText("Indique até quando.")).toBeVisible();
+    await d.getByLabel("Colega").selectOption({ label: "Rui Teste" });
+    await d.getByLabel("Início (opcional)").fill("2099-11-21T08:00");
+    await d.getByLabel("Fim").fill("2099-11-20T18:00");
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d.getByText("O fim tem de ser depois do início.")).toBeVisible();
+    await d.getByLabel("Fim").fill("2020-01-01T18:00");
+    await d.getByLabel("Início (opcional)").fill("");
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d.getByText("O fim tem de ser depois de agora.")).toBeVisible();
+    expect(api.escritas("POST", "/approval/delegations")).toHaveLength(0);
+    await d.getByLabel("Fim").fill("2099-11-30T18:00");
+    await d.getByLabel("Motivo (opcional)").fill("  Férias ");
+    expect(await violacoes()).toEqual([]);
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d.getByText("Já tem uma delegação para parte deste período.")).toBeVisible();
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", "/approval/delegations").map((p) => p.corpo)).toEqual([
+      { delegateEmployeeId: RUI, endsAt: "2099-11-30T18:00:00+01:00", reason: "Férias" },
+      { delegateEmployeeId: RUI, endsAt: "2099-11-30T18:00:00+01:00", reason: "Férias" },
+    ]);
+    await page.getByRole("button", { name: "Revogar a delegação de Ana Teste em Carlos Teste" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Revogar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", "/approval/delegations/00000000-0000-4000-8000-000000000901/revocation")).toHaveLength(1);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await semScrollHorizontal(page);
+  });
+
+  test("o admin vê todas e delega por quem está ausente", async ({ page, api }) => {
+    await comF4(api)
+      .em("GET", "/approval/delegations", (route) =>
+        new URL(route.request().url()).searchParams.get("scope") === "all"
+          ? { status: 200, corpo: [delegacao("00000000-0000-4000-8000-000000000903", OUTRO, "Carlos Teste", RUI, "Rui Teste")] }
+          : { status: 200, corpo: [] },
+      )
+      .em("GET", "/approval/delegations/candidates", { status: 200, corpo: candidatos })
+      .em("POST", "/approval/delegations", { status: 201, corpo: delegacao("00000000-0000-4000-8000-000000000904", OUTRO, "Carlos Teste", EU, "Ana Teste") })
+      .ligar();
+    await entrar(page);
+    await page.goto("/aprovacoes/delegacoes");
+    await expect(page.getByRole("row").filter({ hasText: "Rui Teste" })).toContainText("Em vigor");
+    await expect(page.getByRole("button", { name: "Revogar a delegação de Carlos Teste em Rui Teste" })).toBeVisible();
+    await page.getByRole("button", { name: "Delegar" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d.getByLabel("Quem delega")).toHaveValue(EU);
+    await d.getByLabel("Quem delega").selectOption({ label: "Carlos Teste" });
+    await d.getByLabel("Colega").selectOption({ label: "Ana Teste" });
+    await d.getByLabel("Fim").fill("2099-12-01T18:00");
+    await d.getByRole("button", { name: "Delegar" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", "/approval/delegations").map((p) => p.corpo)).toEqual([{ delegateEmployeeId: EU, endsAt: "2099-12-01T18:00:00+01:00", delegatorEmployeeId: OUTRO }]);
+  });
+
+  test("decidir por delegação: a caixa diz de quem; com um delegante vai em nome dele; a decisão mostra os dois", async ({ page, api }) => {
+    const doCarlos = { ...pedido(), pendingApprovers: [OUTRO], requestedByEmployeeId: RUI, requestedByName: "Rui Teste" };
+    const h = { ...historico(IDF4.pedido, RUI), decisions: [{ decidedByEmployeeId: EU, decidedByName: "Ana Teste", onBehalfOfEmployeeId: RUI, onBehalfOfName: "Rui Teste", action: "Approved", decidedAt: "2026-11-12T10:00:00Z", step: 1, notes: null, checklist: null }] };
+    await comF4(api, meFinancasF4)
+      .em("GET", "/approval/delegations", { status: 200, corpo: [delegacao("00000000-0000-4000-8000-000000000905", OUTRO, "Carlos Teste", EU, "Ana Teste")] })
+      .em("GET", "/approval/requests", pag([doCarlos]))
+      .em("GET", `/approval/requests/${IDF4.pedido}`, { status: 200, corpo: doCarlos })
+      .em("GET", `/approval/requests/${IDF4.pedido}/history`, { status: 200, corpo: h })
+      .em("POST", `/approval/requests/${IDF4.pedido}/decisions`, { status: 200, corpo: { ...doCarlos, status: "Approved" } })
+      .ligar();
+    await entrar(page, "financas4@teste.local");
+    await page.goto("/aprovacoes");
+    await expect(page.getByRole("row").filter({ hasText: "Rui Teste" })).toContainText("Por delegação de Carlos Teste");
+    await page.goto(`/aprovacoes/${IDF4.pedido}`);
+    await expect(page.getByText("Em nome de Carlos Teste, que lhe delegou as aprovações.")).toBeVisible();
+    await expect(page.getByText("Ana Teste (você), em nome de Rui Teste,", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    await expect(page.getByRole("dialog")).toContainText("Em nome de Carlos Teste.");
+    await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
+    await expect.poll(() => api.escritas("POST", `/approval/requests/${IDF4.pedido}/decisions`).length).toBe(1);
+    expect(api.escritas("POST", `/approval/requests/${IDF4.pedido}/decisions`)[0]?.corpo).toEqual({ action: "Approved", notes: null, onBehalfOfEmployeeId: OUTRO });
+  });
+
+  test("com dois delegantes no mesmo passo, pergunta em nome de quem", async ({ page, api }) => {
+    const deDois = { ...pedido(), pendingApprovers: [OUTRO, RUI], requestedByEmployeeId: "00000000-0000-4000-8000-000000000097", requestedByName: "Joana Teste" };
+    await comF4(api, meFinancasF4)
+      .em("GET", "/approval/delegations", {
+        status: 200,
+        corpo: [delegacao("00000000-0000-4000-8000-000000000906", OUTRO, "Carlos Teste", EU, "Ana Teste"), delegacao("00000000-0000-4000-8000-000000000907", RUI, "Rui Teste", EU, "Ana Teste")],
+      })
+      .em("GET", `/approval/requests/${IDF4.pedido}`, { status: 200, corpo: deDois })
+      .em("POST", `/approval/requests/${IDF4.pedido}/decisions`, { status: 200, corpo: { ...deDois, status: "Approved" } })
+      .ligar();
+    await entrar(page, "financas4@teste.local");
+    await page.goto(`/aprovacoes/${IDF4.pedido}`);
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    await expect(page.getByText("Vários colegas lhe delegaram este passo: escolha em nome de quem decide.")).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByLabel("Em nome de").selectOption({ label: "Rui Teste" });
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
+    await expect.poll(() => api.escritas("POST", `/approval/requests/${IDF4.pedido}/decisions`).length).toBe(1);
+    expect(api.escritas("POST", `/approval/requests/${IDF4.pedido}/decisions`)[0]?.corpo).toMatchObject({ onBehalfOfEmployeeId: RUI });
   });
 });
 

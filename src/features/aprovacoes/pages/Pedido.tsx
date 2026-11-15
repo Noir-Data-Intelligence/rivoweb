@@ -16,12 +16,12 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Card, CardTitle } from "@/ui/Card";
 import { Confirmar } from "@/ui/Confirmar";
-import { Textarea } from "@/ui/Controlos";
+import { Select, Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { cn } from "@/ui/cn";
 import { useCancelar, useDecidir, useHistorico, usePedido, type Accao, type ItemChecklist, type Pedido } from "../api";
-import { EstadoPedido, estadoChecklist, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, PrazoDoPasso, RESPOSTAS_CHECKLIST, useEuColaborador, useNomeColaborador, type RespostaChecklist } from "../comum";
+import { EstadoPedido, estadoChecklist, NOME_ACCAO, NOME_MODO, nomeModulo, nomeProcesso, PrazoDoPasso, RESPOSTAS_CHECKLIST, useEuColaborador, useNomeColaborador, useQuemMeDelegou, type RespostaChecklist } from "../comum";
 
 const ACCOES: readonly { accao: Accao; rotulo: string; titulo: string; icone: typeof Check; variante: "primary" | "destructive" | "secondary"; notasObrigatorias: boolean }[] = [
   { accao: "Approved", rotulo: "Aprovar", titulo: "Aprovar o pedido?", icone: Check, variante: "primary", notasObrigatorias: false },
@@ -72,14 +72,25 @@ function ItemChecklistResposta({ item, resposta, mudar }: { item: ItemChecklist;
   );
 }
 
-function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => void; aoConflito: (detalhe: string | null) => void }) {
+type Delegante = { readonly id: string; readonly nome: string };
+
+/**
+ * `delegantes`: quem me delegou e espera neste passo (ADR-129), quando eu não
+ * estou nele; vazio, decido em meu nome. Com mais de um, escolho em nome de
+ * quem (sem isso, o servidor responde 400).
+ */
+function Decidir({ p, delegantes, aoDecidir, aoConflito }: { p: Pedido; delegantes: readonly Delegante[]; aoDecidir: () => void; aoConflito: (detalhe: string | null) => void }) {
   const { pode } = useUtilizador();
   const decidir = useDecidir(pode("hr.positions.assign"));
   const [aberta, setAberta] = useState<(typeof ACCOES)[number] | null>(null);
   const [notas, setNotas] = useState("");
   const [tentou, setTentou] = useState(false);
   const [respostas, setRespostas] = useState<Record<string, RespostaChecklist>>({});
+  const [emNome, setEmNome] = useState(delegantes.length === 1 ? (delegantes[0]?.id ?? "") : "");
+  const [faltaEmNome, setFaltaEmNome] = useState(false);
   const id = useId();
+  const idEmNome = useId();
+  const nomeDelegante = delegantes.find((d) => d.id === emNome)?.nome ?? null;
   const outro = eApiError(decidir.error) && decidir.error.status === 409;
   // Passo de validação (K4): só vem preenchido com o pedido aberto e o passo em curso a validar.
   const itens = p.currentChecklist && p.currentChecklist.length > 0 ? [...p.currentChecklist].sort((a, b) => Number(a.order) - Number(b.order)) : null;
@@ -99,7 +110,7 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
     if (itens && aberta.accao === "Approved" && !estado?.podeValidar) return;
     const checklist = itens ? itens.flatMap((i) => (respostas[i.itemId] ? [{ itemId: i.itemId, response: respostas[i.itemId] as RespostaChecklist }] : [])) : undefined;
     decidir.mutate(
-      { requestId: p.requestId, action: aberta.accao, notes: n || null, ...(checklist ? { checklist } : {}) },
+      { requestId: p.requestId, action: aberta.accao, notes: n || null, ...(checklist ? { checklist } : {}), ...(emNome ? { emNomeDe: emNome } : {}) },
       {
         onSuccess: () => {
           fechar();
@@ -123,8 +134,37 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
       <p className="mt-1 text-sm text-muted-foreground">
         {itens
           ? "Este passo é de validação: confirme a conformidade item a item. Validar não é aprovar; com tudo conforme, o pedido segue para quem aprova."
-          : "Está atribuído ao passo em curso. A decisão fica na trilha e não se desfaz."}
+          : delegantes.length > 0
+            ? "Decide por delegação, em nome de quem lha fez. A decisão fica na trilha com os dois nomes e não se desfaz."
+            : "Está atribuído ao passo em curso. A decisão fica na trilha e não se desfaz."}
       </p>
+      {delegantes.length === 1 ? <p className="mt-2 text-sm text-foreground">Em nome de {delegantes[0]?.nome}, que lhe delegou as aprovações.</p> : null}
+      {delegantes.length > 1 ? (
+        <div className="mt-3 flex flex-col gap-1.5 sm:w-80">
+          <label htmlFor={idEmNome} className="text-sm font-medium text-foreground">
+            Em nome de
+          </label>
+          <Select
+            id={idEmNome}
+            value={emNome}
+            aria-invalid={faltaEmNome && emNome === "" ? true : undefined}
+            aria-describedby={faltaEmNome && emNome === "" ? `${idEmNome}-erro` : undefined}
+            onChange={(e) => setEmNome(e.target.value)}
+          >
+            <option value="">Escolha…</option>
+            {delegantes.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.nome}
+              </option>
+            ))}
+          </Select>
+          {faltaEmNome && emNome === "" ? (
+            <p id={`${idEmNome}-erro`} className="text-xs text-danger" role="alert">
+              Vários colegas lhe delegaram este passo: escolha em nome de quem decide.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       {itens ? (
         <div className="mt-3" role="group" aria-label="Checklist de conformidade">
           {itens.map((i) => (
@@ -140,7 +180,18 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
       ) : null}
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         {ACCOES.map((a) => (
-          <Button key={a.accao} variante={a.variante} disabled={a.accao === "Approved" && estado !== null && !estado.podeValidar} onClick={() => setAberta(a)}>
+          <Button
+            key={a.accao}
+            variante={a.variante}
+            disabled={a.accao === "Approved" && estado !== null && !estado.podeValidar}
+            onClick={() => {
+              if (delegantes.length > 1 && emNome === "") {
+                setFaltaEmNome(true);
+                return;
+              }
+              setAberta(a);
+            }}
+          >
             <a.icone strokeWidth={1.75} aria-hidden />
             {rotulo(a)}
           </Button>
@@ -151,7 +202,7 @@ function Decidir({ p, aoDecidir, aoConflito }: { p: Pedido; aoDecidir: () => voi
         aberto={aberta !== null}
         aoMudar={(v) => (v ? undefined : fechar())}
         titulo={itens && aberta?.accao === "Approved" ? "Validar a conformidade?" : (aberta?.titulo ?? "")}
-        descricao={`${nomeProcesso(p.processType)} · passo ${String(p.currentStep)} de ${String(p.totalSteps)}.`}
+        descricao={`${nomeProcesso(p.processType)} · passo ${String(p.currentStep)} de ${String(p.totalSteps)}.${nomeDelegante ? ` Em nome de ${nomeDelegante}.` : ""}`}
         rotuloConfirmar={aberta ? rotulo(aberta) : ""}
         variante={aberta?.variante === "destructive" ? "destructive" : "primary"}
         aCarregar={decidir.isPending}
@@ -246,6 +297,7 @@ export default function PedidoPagina() {
   const { pode } = useUtilizador();
   const eu = useEuColaborador();
   const nome = useNomeColaborador();
+  const quemMeDelegou = useQuemMeDelegou();
   const [conflito, setConflito] = useState<{ detalhe: string | null } | null>(null);
   const recarregar = () => {
     void pedido.refetch();
@@ -271,6 +323,8 @@ export default function PedidoPagina() {
   const p = pedido.data;
   const aberto = p.status === "InProgress" || p.status === "ClarificationRequested";
   const souAprovador = eu !== null && p.pendingApprovers.includes(eu);
+  // Por delegação (ADR-129): quem me delegou e espera neste passo, se eu não estiver nele.
+  const delegantes: Delegante[] = souAprovador ? [] : p.pendingApprovers.flatMap((id) => (quemMeDelegou.has(id) ? [{ id, nome: quemMeDelegou.get(id) ?? "Colaborador" }] : []));
   const souRequerente = eu !== null && p.requestedByEmployeeId === eu;
   const h = historico.data;
   return (
@@ -298,7 +352,9 @@ export default function PedidoPagina() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
           {/* Quem pediu nunca decide (BR-2), mesmo ocupando o cargo aprovador. */}
-          {aberto && souAprovador && !souRequerente && pode("approval.requests.decide") ? <Decidir p={p} aoDecidir={recarregar} aoConflito={(detalhe) => setConflito({ detalhe })} /> : null}
+          {aberto && (souAprovador || delegantes.length > 0) && !souRequerente && pode("approval.requests.decide") ? (
+            <Decidir key={delegantes.map((d) => d.id).join()} p={p} delegantes={delegantes} aoDecidir={recarregar} aoConflito={(detalhe) => setConflito({ detalhe })} />
+          ) : null}
           {aberto && souRequerente ? (
             <Alert tom="info" titulo="É o seu pedido.">
               Quem submete não decide (BR-2). Pode cancelá-lo enquanto estiver aberto.
@@ -333,7 +389,8 @@ export default function PedidoPagina() {
                         <ul className="mt-2 flex flex-col gap-1 text-sm">
                           {decisoes.map((d) => (
                             <li key={`${d.decidedByEmployeeId}-${d.decidedAt}`}>
-                              <span className="font-medium">{nome(d.decidedByEmployeeId, d.decidedByName)}</span> {(NOME_ACCAO[d.action] ?? d.action).toLowerCase()} · {formatarDataHora(d.decidedAt)}
+                              <span className="font-medium">{nome(d.decidedByEmployeeId, d.decidedByName)}</span>
+                              {d.onBehalfOfEmployeeId ? <span>, em nome de {nome(d.onBehalfOfEmployeeId, d.onBehalfOfName)},</span> : null} {(NOME_ACCAO[d.action] ?? d.action).toLowerCase()} · {formatarDataHora(d.decidedAt)}
                               {d.notes ? <span className="block whitespace-pre-line text-muted-foreground">«{d.notes}»</span> : null}
                               {d.checklist && d.checklist.length > 0 ? <RespostasDadas respostas={d.checklist} itens={h?.checklist ?? []} /> : null}
                             </li>

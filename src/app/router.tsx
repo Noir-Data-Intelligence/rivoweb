@@ -170,6 +170,7 @@ export const rotas: RouteObject[] = [
               { path: "facturacao", element: protegido(R["/facturacao"], pagina("configuracaoFacturacao")) },
               // F4 — aprovações (§5.5).
               { path: "aprovacoes", element: protegido(R["/aprovacoes"], pagina("aprovacoes")) },
+              { path: "aprovacoes/delegacoes", element: protegido(R["/aprovacoes"], pagina("delegacoes")) },
               { path: "aprovacoes/:requestId", element: protegido(R["/aprovacoes"], pagina("pedidoAprovacao")) },
               { path: "politicas-aprovacao", element: protegido(R["/politicas-aprovacao"], pagina("politicas")) },
               // F5 — contas a pagar, despesas e tesouraria (§5.6).
