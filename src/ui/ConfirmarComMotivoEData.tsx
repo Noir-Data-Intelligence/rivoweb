@@ -19,6 +19,8 @@ export function ConfirmarComMotivoEData({
   rotuloBotao,
   icone,
   varianteBotao = "ghost",
+  tamanhoBotao,
+  rotuloAcessivel,
   titulo,
   descricao,
   rotuloConfirmar,
@@ -27,10 +29,14 @@ export function ConfirmarComMotivoEData({
   aCarregar,
   erro,
   aoConfirmar,
+  aoFechar,
 }: {
   rotuloBotao: string;
   icone?: ReactNode;
   varianteBotao?: ButtonProps["variante"];
+  tamanhoBotao?: ButtonProps["tamanho"];
+  /** O nome do botão para leitores de ecrã, quando há um por linha. */
+  rotuloAcessivel?: string;
   titulo: string;
   descricao: ReactNode;
   rotuloConfirmar: string;
@@ -41,6 +47,8 @@ export function ConfirmarComMotivoEData({
   /** O erro do pedido, cru: os 400 de campo vão para o campo. */
   erro: unknown;
   aoConfirmar: (corpo: { reason: string; returnedOn: string }, fechar: () => void) => void;
+  /** Ao fechar (cancelar ou depois do sucesso): por exemplo, limpar o erro do pedido. */
+  aoFechar?: () => void;
 }) {
   const [aberto, setAberto] = useState(false);
   const [motivo, setMotivo] = useState("");
@@ -63,10 +71,11 @@ export function ConfirmarComMotivoEData({
     setMotivo("");
     setDia(hojeIso());
     setTentou(false);
+    aoFechar?.();
   };
   return (
     <>
-      <Button variante={varianteBotao} onClick={() => setAberto(true)}>
+      <Button variante={varianteBotao} {...(tamanhoBotao ? { tamanho: tamanhoBotao } : {})} {...(rotuloAcessivel ? { "aria-label": rotuloAcessivel } : {})} onClick={() => setAberto(true)}>
         {icone}
         {rotuloBotao}
       </Button>

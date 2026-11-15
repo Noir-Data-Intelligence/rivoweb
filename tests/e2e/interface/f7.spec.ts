@@ -225,9 +225,8 @@ test.describe("portal do colaborador", () => {
   });
 
   test("recibo com adiantamentos descontados: o desconto e o que se recebe (PR #175)", async ({ page, api }) => {
-    const [r] = recibos();
     await comPortal(api)
-      .em("GET", "/portal/me/payslips", { status: 200, corpo: [{ ...r!, advancesDeducted: 100000, netPaid: 288429 }] })
+      .em("GET", "/portal/me/payslips", { status: 200, corpo: recibos().map((r) => ({ ...r, advancesDeducted: 100000, netPaid: 288429 })) })
       .ligar();
     await entrar(page, meColaborador.email);
     await page.goto("/eu/recibos");

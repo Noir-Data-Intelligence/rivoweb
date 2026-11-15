@@ -6,7 +6,7 @@
  * e lança 36.3 contra 43.1. A folha do mês indicado desconta-o, até ao líquido
  * de cada um; o que não cabe passa à folha seguinte.
  */
-import { HandCoins, Plus } from "lucide-react";
+import { HandCoins, Plus, Undo2 } from "lucide-react";
 import { useId, useState } from "react";
 import { Link } from "react-router";
 import { usePedidoAprovacao } from "@/features/aprovacoes";
@@ -20,12 +20,13 @@ import { Alert } from "@/ui/Alert";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
 import { Checkbox, Select, Textarea } from "@/ui/Controlos";
+import { ConfirmarComMotivoEData } from "@/ui/ConfirmarComMotivoEData";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { EstadoAdiantamento, errosAdiantamento, folhaDe, valorAdiantamento } from "../Adiantamento";
-import { useAdiantamentos, useColaboradoresAdiantamento, useContasAbertas, usePagarAdiantamento, usePedidosAdiantamento, usePedirAdiantamento, type Adiantamento, type PedidoAdiantamento } from "../api";
+import { useAdiantamentos, useAnularAdiantamento, useColaboradoresAdiantamento, useContasAbertas, usePagarAdiantamento, usePedidosAdiantamento, usePedirAdiantamento, type Adiantamento, type PedidoAdiantamento } from "../api";
 import { erroDataValor } from "../regras";
 
 /** Os colaboradores activos, da lista da tesouraria: quem pede não precisa de ler os RH (PR #167). */
@@ -210,6 +211,35 @@ function PagarAdiantamento({ p }: { p: PedidoAdiantamento }) {
   );
 }
 
+/**
+ * Anular um adiantamento pago que nenhuma folha descontou (ADR-131): o
+ * colaborador devolveu o dinheiro, que entra na conta no dia indicado, e o
+ * lançamento estorna-se. Depois de uma folha o descontar, o servidor recusa.
+ */
+function AnularAdiantamento({ a }: { a: Adiantamento }) {
+  const anular = useAnularAdiantamento(a.advanceId);
+  return (
+    <ConfirmarComMotivoEData
+      rotuloBotao="Anular"
+      tamanhoBotao="sm"
+      rotuloAcessivel={`Anular o adiantamento de ${a.employeeName ?? "colaborador"}`}
+      icone={<Undo2 strokeWidth={1.75} aria-hidden />}
+      titulo={`Anular o adiantamento de ${a.employeeName ?? "colaborador"}?`}
+      descricao={`${moeda(a.amount)} devolvidos pelo colaborador: entram na conta de onde saíram no dia indicado, e o lançamento do adiantamento estorna-se. A folha de ${folhaDe(a.payrollYear, a.payrollMonth)} já não o desconta.`}
+      rotuloConfirmar="Anular adiantamento"
+      rotuloData="Dia em que o dinheiro voltou"
+      desde={a.paidOn}
+      aCarregar={anular.isPending}
+      erro={anular.error}
+      aoConfirmar={(corpo, fechar) => anular.mutate(corpo, { onSuccess: fechar })}
+      aoFechar={() => anular.reset()}
+    />
+  );
+}
+
+const anulado = (a: Adiantamento) => Boolean(a.cancelledAt);
+const podeAnular = (a: Adiantamento) => !anulado(a) && Number(a.settledAmount) === 0;
+
 export default function Adiantamentos() {
   const { pode } = useUtilizador();
   const pedidos = usePedidosAdiantamento();
@@ -239,13 +269,28 @@ export default function Adiantamentos() {
     { id: "accao", cabecalho: "", alinhar: "direita", celula: (p) => (p.status === "Approved" && paga ? <PagarAdiantamento p={p} /> : null) },
   ];
   const colunasPagos: Coluna<Adiantamento>[] = [
-    { id: "colaborador", cabecalho: "Colaborador", celula: (a) => <span className="font-medium">{a.employeeName}</span> },
-    { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (a) => moeda(a.amount) },
+    {
+      id: "colaborador",
+      cabecalho: "Colaborador",
+      celula: (a) => (
+        <span className="flex flex-col items-start gap-1">
+          <span className={anulado(a) ? "font-medium line-through" : "font-medium"}>{a.employeeName}</span>
+          {anulado(a) ? (
+            <span className="text-xs text-muted-foreground">
+              Anulado{a.returnedOn ? `; devolvido a ${formatarData(a.returnedOn)}` : ""}
+              {a.cancellationReason ? `: «${a.cancellationReason}»` : ""}
+            </span>
+          ) : null}
+        </span>
+      ),
+    },
+    { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (a) => <span className={anulado(a) ? "line-through" : undefined}>{moeda(a.amount)}</span> },
     { id: "pago", cabecalho: "Pago em", esconderAte: "sm", celula: (a) => formatarData(a.paidOn) },
     { id: "folha", cabecalho: "Folha", esconderAte: "md", celula: (a) => folhaDe(a.payrollYear, a.payrollMonth) },
     { id: "descontado", cabecalho: "Descontado", alinhar: "direita", esconderAte: "md", celula: (a) => moeda(a.settledAmount) },
     { id: "falta", cabecalho: "Por descontar", alinhar: "direita", celula: (a) => moeda(a.outstanding) },
     { id: "referencia", cabecalho: "Referência", esconderAte: "lg", celula: (a) => a.reference ?? "—" },
+    { id: "accao", cabecalho: "", alinhar: "direita", celula: (a) => (paga && podeAnular(a) ? <AnularAdiantamento a={a} /> : null) },
   ];
   return (
     <>

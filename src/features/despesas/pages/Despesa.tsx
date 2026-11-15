@@ -124,10 +124,8 @@ function AnularReembolso({ d }: { d: TipoDespesa }) {
       desde={d.reimbursedOn}
       aCarregar={anular.isPending}
       erro={anular.error}
-      aoConfirmar={(corpo, fechar) => {
-        anular.reset();
-        anular.mutate(corpo, { onSuccess: fechar });
-      }}
+      aoConfirmar={(corpo, fechar) => anular.mutate(corpo, { onSuccess: fechar })}
+      aoFechar={() => anular.reset()}
     />
   );
 }

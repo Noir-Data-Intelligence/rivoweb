@@ -370,6 +370,20 @@ export function usePedirAdiantamento() {
   });
 }
 
+/**
+ * Anular um adiantamento pago que nenhuma folha descontou (ADR-131): o
+ * colaborador devolveu o dinheiro, que entra no banco nesse dia, e o
+ * lançamento estorna-se.
+ */
+export function useAnularAdiantamento(id: string) {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (b: { reason: string; returnedOn: string }) =>
+      enviar(api.POST("/finance/treasury/salary-advances/{advanceId}/cancellation", { params: { path: { advanceId: id } }, body: b })),
+    onSuccess: () => invalidarTudo(qc),
+  });
+}
+
 /** Paga um pedido aprovado: sai da conta em kwanzas e lança 36.3 contra 43.1. */
 export function usePagarAdiantamento() {
   const qc = useQueryClient();

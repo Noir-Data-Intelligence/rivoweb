@@ -3,87 +3,48 @@
  * salário antes do fim do mês. O pedido vai a Aprovações; aprovado, a
  * tesouraria paga-o, e a folha do mês indicado desconta-o.
  */
-import { Plus } from "lucide-react";
-import { useId, useState } from "react";
+import { Undo2 } from "lucide-react";
+import { useState } from "react";
 import { moeda } from "@/features/facturacao";
-import { EstadoAdiantamento, errosAdiantamento, folhaDe, valorAdiantamento } from "@/features/tesouraria";
-import { formatarDataHora, hojeIso } from "@/lib/format/data";
-import { paraApi } from "@/lib/money/money";
-import { normalizarTexto } from "@/lib/validation/text";
-import { Alert } from "@/ui/Alert";
+import { EstadoAdiantamento, folhaDe } from "@/features/tesouraria";
+import { formatarDataHora } from "@/lib/format/data";
 import { Button } from "@/ui/Button";
 import { Confirmar } from "@/ui/Confirmar";
-import { Textarea } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
-import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { useMeusAdiantamentos, usePedirMeuAdiantamento, type MeuAdiantamento } from "../api";
+import { useMeusAdiantamentos, useRetirarMeuAdiantamento, type MeuAdiantamento } from "../api";
+import { PedirAdiantamento } from "../components/PedirAdiantamento";
 
-function PedirAdiantamento() {
-  const hoje = hojeIso();
+/** Retirar o próprio pedido, enquanto não foi pago nem recusado (ADR-131). */
+function Retirar({ a }: { a: MeuAdiantamento }) {
   const [aberto, setAberto] = useState(false);
-  const [v, setV] = useState({ valor: "", folha: hoje.slice(0, 7) });
-  const [motivo, setMotivo] = useState("");
-  const [tentou, setTentou] = useState(false);
-  const pedir = usePedirMeuAdiantamento();
-  const idForm = useId();
-  const erros = errosAdiantamento(v, hoje);
-  const mudar = (a: boolean) => {
-    setAberto(a);
-    if (!a) {
-      pedir.reset();
-      setV({ valor: "", folha: hojeIso().slice(0, 7) });
-      setMotivo("");
-      setTentou(false);
-    }
+  const retirar = useRetirarMeuAdiantamento();
+  const mudar = (v: boolean) => {
+    setAberto(v);
+    if (!v) retirar.reset();
   };
   return (
     <>
-      <Button onClick={() => setAberto(true)}>
-        <Plus strokeWidth={1.75} aria-hidden />
-        Pedir adiantamento
+      <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Retirar o pedido de ${moeda(a.amount)}`}>
+        <Undo2 strokeWidth={1.75} aria-hidden />
+        Retirar
       </Button>
       <Confirmar
         aberto={aberto}
         aoMudar={mudar}
-        titulo="Pedir um adiantamento de salário"
-        descricao="O pedido vai a Aprovações. Aprovado, a tesouraria paga-o, e a folha do mês que escolher desconta-o."
-        rotuloConfirmar={pedir.data ? "Fechar" : "Pedir"}
-        aCarregar={pedir.isPending}
-        erro={pedir.error ? <ErrorPanel erro={pedir.error} /> : undefined}
-        {...(pedir.data ? { aoConfirmar: () => mudar(false) } : { formulario: idForm })}
-      >
-        {pedir.data ? (
-          <Alert tom="sucesso" titulo="Pedido enviado para aprovação.">
-            Acompanhe o estado nesta página.
-          </Alert>
-        ) : (
-          <form
-            id={idForm}
-            noValidate
-            className="grid gap-4 sm:grid-cols-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setTentou(true);
-              const valor = valorAdiantamento(v);
-              if (erros.valor || erros.folha || !valor || pedir.isPending) return;
-              const m = normalizarTexto(motivo);
-              pedir.mutate({ amount: paraApi(valor), payrollYear: Number(v.folha.slice(0, 4)), payrollMonth: Number(v.folha.slice(5, 7)), reason: m === "" ? null : m });
-            }}
-          >
-            <Field rotulo="Valor (Kz)" erro={tentou ? erros.valor : undefined}>
-              {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" autoComplete="off" className="text-right tabular-nums" aria-describedby={descricao} invalido={invalido} value={v.valor} onChange={(e) => setV({ ...v, valor: e.target.value })} />}
-            </Field>
-            <Field rotulo="Desconta na folha de" erro={tentou ? erros.folha : undefined} ajuda="Por omissão, a do mês corrente.">
-              {({ id, descricao, invalido }) => <Input id={id} type="month" min={hoje.slice(0, 7)} aria-describedby={descricao} invalido={invalido} value={v.folha} onChange={(e) => setV({ ...v, folha: e.target.value })} />}
-            </Field>
-            <Field rotulo="Motivo (opcional)" className="sm:col-span-2">
-              {({ id, descricao }) => <Textarea id={id} rows={2} maxLength={500} aria-describedby={descricao} value={motivo} onChange={(e) => setMotivo(e.target.value)} />}
-            </Field>
-          </form>
-        )}
-      </Confirmar>
+        titulo={`Retirar o pedido de ${moeda(a.amount)}?`}
+        descricao={
+          a.status === "Approved"
+            ? "Já foi aprovado, mas ainda não foi pago: retirado, a tesouraria já não o paga. Não se pode desfazer."
+            : "Ainda está em Aprovações: retirado, o processo de aprovação cancela-se. Não se pode desfazer."
+        }
+        rotuloConfirmar="Retirar"
+        variante="destructive"
+        aCarregar={retirar.isPending}
+        erro={retirar.error ? <ErrorPanel erro={retirar.error} /> : undefined}
+        aoConfirmar={() => retirar.mutate(a.applicationId, { onSuccess: () => mudar(false) })}
+      />
     </>
   );
 }
@@ -96,6 +57,7 @@ export default function Adiantamentos() {
     { id: "motivo", cabecalho: "Motivo", esconderAte: "md", celula: (a) => a.reason ?? "—" },
     { id: "pedido", cabecalho: "Pedido em", esconderAte: "sm", celula: (a) => formatarDataHora(a.submittedAt) },
     { id: "estado", cabecalho: "Estado", celula: (a) => <EstadoAdiantamento estado={a.status} /> },
+    { id: "accao", cabecalho: "", alinhar: "direita", celula: (a) => (a.status === "PendingApproval" || a.status === "Approved" ? <Retirar a={a} /> : null) },
   ];
   return (
     <>

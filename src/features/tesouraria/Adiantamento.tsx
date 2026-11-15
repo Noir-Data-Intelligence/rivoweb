@@ -7,12 +7,14 @@ import { nomeMes } from "@/lib/format/periodo";
 import { lerDinheiroDigitado, type Dinheiro } from "@/lib/money/money";
 import { Badge } from "@/ui/Badge";
 
-/** PendingApproval (em Aprovações), Approved (por pagar), Refused, Paid. */
+/** PendingApproval (em Aprovações), Approved (por pagar), Refused, Paid, Withdrawn (retirado pelo próprio), Cancelled (pago e anulado). */
 export function EstadoAdiantamento({ estado }: { estado: string }) {
   if (estado === "PendingApproval") return <Badge tom="aviso">Por aprovar</Badge>;
   if (estado === "Approved") return <Badge tom="info">Aprovado, por pagar</Badge>;
   if (estado === "Refused") return <Badge tom="erro">Recusado</Badge>;
   if (estado === "Paid") return <Badge tom="sucesso">Pago</Badge>;
+  if (estado === "Withdrawn") return <Badge>Retirado</Badge>;
+  if (estado === "Cancelled") return <Badge>Anulado</Badge>;
   return <Badge>{estado}</Badge>;
 }
 

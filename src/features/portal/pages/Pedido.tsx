@@ -17,6 +17,7 @@ import { Field } from "@/ui/Field";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { cn } from "@/ui/cn";
 import { useMeusPedidos, useResponderPedido, type PedidoInterno } from "../api";
+import { PedirAdiantamento } from "../components/PedirAdiantamento";
 import { MAXIMO_MENSAGEM } from "../regras";
 
 function Responder({ p }: { p: PedidoInterno }) {
@@ -107,6 +108,7 @@ export default function Pedido() {
             </span>
           </span>
         }
+        accao={p.category === "SalaryAdvance" && p.status !== "Closed" ? <PedirAdiantamento pedidoInterno={p.ticketId} /> : undefined}
       />
       <ol aria-label="Mensagens" className="mb-6 flex flex-col gap-3">
         {p.messages.map((m) => (

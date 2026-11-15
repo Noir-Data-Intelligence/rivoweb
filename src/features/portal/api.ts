@@ -237,6 +237,22 @@ export function usePedirMeuAdiantamento() {
   const qc = useQueryClient();
   return useEscrita({
     mutationFn: (b: components["schemas"]["MySalaryAdvanceRequest"]) => ler(api.POST("/portal/me/salary-advance-applications", { body: b })),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [...base, "salary-advance-applications"] }),
+    // Ligado a um pedido interno, a conversa com os RH recebe uma mensagem (ADR-131).
+    onSuccess: (_r, b) => {
+      void qc.invalidateQueries({ queryKey: [...base, "salary-advance-applications"] });
+      if (b.internalRequestId) void qc.invalidateQueries({ queryKey: chaves.pedidos });
+    },
+  });
+}
+
+/**
+ * Retirar o próprio pedido (ADR-131): por decidir, o processo de aprovação
+ * cancela-se; aprovado e por pagar, a tesouraria já não o paga.
+ */
+export function useRetirarMeuAdiantamento() {
+  const qc = useQueryClient();
+  return useEscrita({
+    mutationFn: (id: string) => enviar(api.POST("/portal/me/salary-advance-applications/{applicationId}/withdrawal", { params: { path: { applicationId: id } } })),
+    onSettled: () => qc.invalidateQueries({ queryKey: [...base, "salary-advance-applications"] }),
   });
 }

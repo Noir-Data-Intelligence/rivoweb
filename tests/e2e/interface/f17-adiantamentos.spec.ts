@@ -187,4 +187,106 @@ test.describe("adiantamentos de salário", () => {
     await expect(page.getByRole("dialog").getByRole("link", { name: "Adiantamentos de salário" })).toHaveAttribute("href", "/eu/adiantamentos");
     expect(await violacoes()).toEqual([]);
   });
+
+  test("portal: retirar o pedido por aprovar ou aprovado (ADR-131); retirados e anulados com o estado, sem acção", async ({ page, api, violacoes }) => {
+    const proprio = (id: string, status: string, amount: number): S["OwnSalaryAdvanceApplication"] => ({ applicationId: id, amount, payrollYear: 2026, payrollMonth: 11, reason: null, submittedAt: "2026-11-05T09:00:00Z", status });
+    let lista = [
+      proprio(IDS.porAprovar, "PendingApproval", 30000),
+      proprio(IDS.aprovado, "Approved", 50000),
+      proprio(IDS.pago, "Paid", 80000),
+      proprio("00000000-0000-4000-8000-000000000a76", "Withdrawn", 10000),
+      proprio("00000000-0000-4000-8000-000000000a77", "Cancelled", 20000),
+    ];
+    let tentativas = 0;
+    await api
+      .comConta(meColaborador)
+      .em("GET", "/portal/me/salary-advance-applications", () => ({ status: 200, corpo: lista }))
+      .em("POST", `/portal/me/salary-advance-applications/${IDS.aprovado}/withdrawal`, () => {
+        if (++tentativas === 1) return problema(409, "O adiantamento já foi pago: não se retira.");
+        lista = lista.map((a) => (a.applicationId === IDS.aprovado ? { ...a, status: "Withdrawn" } : a));
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto("/eu/adiantamentos");
+    await expect(page.getByRole("row").filter({ hasText: "10 000,00" })).toContainText("Retirado");
+    await expect(page.getByRole("row").filter({ hasText: "20 000,00" })).toContainText("Anulado");
+    await expect(page.getByRole("button", { name: /^Retirar o pedido/ })).toHaveCount(2);
+    await expect(page.getByRole("button", { name: "Retirar o pedido de 80 000,00 Kz" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Retirar o pedido de 50 000,00 Kz" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d).toContainText("a tesouraria já não o paga");
+    await d.getByRole("button", { name: "Retirar", exact: true }).click();
+    await expect(d.getByText("O adiantamento já foi pago: não se retira.")).toBeVisible();
+    await d.getByRole("button", { name: "Retirar", exact: true }).click();
+    await expect(d).toHaveCount(0);
+    await expect(page.getByRole("row").filter({ hasText: "50 000,00" })).toContainText("Retirado");
+    expect(api.escritas("POST", `/portal/me/salary-advance-applications/${IDS.aprovado}/withdrawal`)).toHaveLength(2);
+    expect(await violacoes()).toEqual([]);
+  });
+
+  test("portal: do pedido interno «Adiantamento salarial», pedir o adiantamento ligado a ele", async ({ page, api }) => {
+    const ticket = "00000000-0000-4000-8000-000000000a78";
+    await api
+      .comConta(meColaborador)
+      .em("GET", "/portal/me/tickets", {
+        status: 200,
+        corpo: [{ ticketId: ticket, subject: "Preciso de um adiantamento", category: "SalaryAdvance", priority: "Normal", status: "Open", openedAt: "2026-11-10T09:00:00Z", resolvedAt: null, messages: [] }],
+      })
+      .em("POST", "/portal/me/salary-advance-applications", { status: 201, corpo: { applicationId: "00000000-0000-4000-8000-000000000a79" } })
+      .ligar();
+    await entrar(page, meColaborador.email);
+    await page.goto(`/eu/pedidos/${ticket}`);
+    await page.getByRole("button", { name: "Pedir adiantamento" }).click();
+    const d = page.getByRole("dialog");
+    await expect(d).toContainText("Fica ligado a este pedido interno");
+    await d.getByLabel("Valor (Kz)").fill("40000");
+    await d.getByLabel("Desconta na folha de").fill("2099-03");
+    await d.getByRole("button", { name: "Pedir", exact: true }).click();
+    await expect(d.getByText("Pedido enviado para aprovação.")).toBeVisible();
+    expect(api.escritas("POST", "/portal/me/salary-advance-applications").map((p) => p.corpo)).toEqual([{ amount: "40000.00", payrollYear: 2099, payrollMonth: 3, reason: null, internalRequestId: ticket }]);
+  });
+
+  test("tesouraria: anular o adiantamento por descontar (ADR-131), com motivo e dia; os anulados riscados; os retirados sem «Pagar»", async ({ page, api, violacoes }) => {
+    const porDescontar: S["SalaryAdvanceView"] = { ...(pagos()[0] as S["SalaryAdvanceView"]), advanceId: "00000000-0000-4000-8000-000000000a80", employeeName: "Ana Teste", amount: 40000, paidOn: "2026-11-03", settledAmount: 0, outstanding: 40000 };
+    const anuladoAntes: S["SalaryAdvanceView"] = { ...porDescontar, advanceId: "00000000-0000-4000-8000-000000000a81", employeeName: "Rui Teste", cancelledAt: "2026-11-04T10:00:00Z", returnedOn: "2026-11-04", cancellationReason: "Devolvido em numerário" };
+    let lista = [...pagos(), porDescontar, anuladoAntes];
+    let tentativas = 0;
+    await comAdiantamentos(api)
+      .em("GET", "/dashboard/me", { status: 200, corpo: painelComFicha() })
+      .em("GET", "/finance/treasury/salary-advance-applications", { status: 200, corpo: [pedido(IDS.aprovado, "Withdrawn")] })
+      .em("GET", "/finance/treasury/salary-advances", () => ({ status: 200, corpo: lista }))
+      .em("POST", `/finance/treasury/salary-advances/${porDescontar.advanceId}/cancellation`, () => {
+        if (++tentativas === 1) return { status: 400, corpo: { status: 400, title: "Pedido inválido", errors: { returnedOn: ["O dia não pode ser antes do pagamento."] } }, cabecalhos: { "Content-Type": "application/problem+json" } };
+        lista = lista.map((a) => (a.advanceId === porDescontar.advanceId ? { ...a, cancelledAt: "2026-11-10T10:00:00Z", returnedOn: "2026-11-10", cancellationReason: "Devolveu por transferência" } : a));
+        return { status: 204 };
+      })
+      .ligar();
+    await entrar(page);
+    await page.goto("/adiantamentos");
+    await expect(page.getByRole("row").filter({ hasText: "Carlos Teste" }).first()).toContainText("Retirado");
+    await expect(page.getByRole("button", { name: /^Pagar o adiantamento/ })).toHaveCount(0);
+    // Só o que nenhuma folha descontou, e ainda não anulado.
+    await expect(page.getByRole("button", { name: /^Anular o adiantamento/ })).toHaveCount(1);
+    await expect(page.getByRole("row").filter({ hasText: "Rui Teste" })).toContainText("Anulado; devolvido a 04/11/2026: «Devolvido em numerário»");
+    await page.getByRole("button", { name: "Anular o adiantamento de Ana Teste" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Dia em que o dinheiro voltou").fill("2026-11-02");
+    await d.getByRole("button", { name: "Anular adiantamento" }).click();
+    await expect(d.getByText("Indique o motivo.")).toBeVisible();
+    await expect(d.getByText("Não pode ser antes de 03/11/2026.")).toBeVisible();
+    await d.getByLabel("Motivo").fill("Devolveu por transferência");
+    await d.getByLabel("Dia em que o dinheiro voltou").fill("2026-11-10");
+    await d.getByRole("button", { name: "Anular adiantamento" }).click();
+    await expect(d.getByText("O dia não pode ser antes do pagamento.")).toBeVisible();
+    await d.getByRole("button", { name: "Anular adiantamento" }).click();
+    await expect(d).toHaveCount(0);
+    await expect(page.getByRole("row").filter({ hasText: "Ana Teste" })).toContainText("Anulado; devolvido a 10/11/2026");
+    await expect(page.getByRole("button", { name: /^Anular o adiantamento/ })).toHaveCount(0);
+    expect(api.escritas("POST", `/finance/treasury/salary-advances/${porDescontar.advanceId}/cancellation`).map((p) => p.corpo)).toEqual([
+      { reason: "Devolveu por transferência", returnedOn: "2026-11-10" },
+      { reason: "Devolveu por transferência", returnedOn: "2026-11-10" },
+    ]);
+    expect(await violacoes()).toEqual([]);
+  });
 });
