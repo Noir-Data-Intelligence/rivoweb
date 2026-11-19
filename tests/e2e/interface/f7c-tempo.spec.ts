@@ -41,6 +41,8 @@ test.describe("formação e turnos", () => {
     const linha = page.getByRole("row").filter({ hasText: "Primeiros socorros" });
     await expect(linha).toContainText("1 / 2");
     await expect(linha).toContainText("150 000,00");
+    // Acabou a 03/11/2026: já decorreu, não está «Planeada» (#187).
+    await expect(linha).toContainText("Decorrida");
     await expect(page.getByText("Excel avançado")).toBeVisible();
     await verificar(page);
     await page.getByRole("button", { name: "Planear formação" }).click();

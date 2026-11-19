@@ -13,7 +13,7 @@ import { useClientesActivos } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
 import { CampoContaOndeEntrou, useContaOndeEntrou } from "@/features/tesouraria";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
-import { eApiError } from "@/lib/api/problem";
+import { eApiError, erroDeDataFutura } from "@/lib/api/problem";
 import { formatarData, hojeIso } from "@/lib/format/data";
 import { decimalParaApi, lerDecimalDigitado, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -31,7 +31,7 @@ import { Tabela, type Coluna } from "@/ui/Tabela";
 import { cn } from "@/ui/cn";
 import { useAnularProforma, useConverterProforma, useEmitirProforma, usePautas, useProformas, type ProForma } from "../api";
 import { calcularTotais } from "../calculos";
-import { AVISO_DEFINITIVO, EstadoDocumento, MEIOS, moeda, NATUREZA_LINHA } from "../comum";
+import { AVISO_DEFINITIVO, DATA_FUTURA, EstadoDocumento, MEIOS, moeda, NATUREZA_LINHA } from "../comum";
 import { taxaEmVigor } from "./Rascunho";
 
 function Converter({ p }: { p: ProForma }) {
@@ -47,7 +47,11 @@ function Converter({ p }: { p: ProForma }) {
   const id = useId();
   // Convertida em FR por banco, diz em que conta entrou o dinheiro (B45, PR #135).
   const contaFr = useContaOndeEntrou(aberto && tipo === "FR", p.currency, meio);
-  const ok = IsoDate.safeParse(data).success && (tipo === "FT" || meio !== "") && (venc === "" || IsoDate.safeParse(venc).success) && (!contaFr.pede || conta !== "");
+  const hoje = hojeIso();
+  const erroData = !IsoDate.safeParse(data).success ? "Data inválida." : data > hoje ? DATA_FUTURA : undefined;
+  const dataFuturaDoServidor = erroDeDataFutura(converter.error);
+  const mostrarErroData = (tentou ? erroData : undefined) ?? dataFuturaDoServidor;
+  const ok = erroData === undefined && (tipo === "FT" || meio !== "") && (venc === "" || IsoDate.safeParse(venc).success) && (!contaFr.pede || conta !== "");
   const confirmar = () => {
     setTentou(true);
     if (!ok || contaFr.aCarregar || converter.isPending) return;
@@ -75,7 +79,7 @@ function Converter({ p }: { p: ProForma }) {
         descricao={`O IVA calcula-se à taxa em vigor na data da factura. ${AVISO_DEFINITIVO}`}
         rotuloConfirmar="Emitir factura"
         aCarregar={converter.isPending}
-        erro={converter.error ? <ErrorPanel erro={converter.error} /> : undefined}
+        erro={converter.error && !dataFuturaDoServidor ? <ErrorPanel erro={converter.error} /> : undefined}
         aoConfirmar={confirmar}
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -92,7 +96,20 @@ function Converter({ p }: { p: ProForma }) {
             <label htmlFor={`${id}-d`} className="text-sm font-medium text-foreground">
               Data da factura
             </label>
-            <Input id={`${id}-d`} type="date" value={data} onChange={(e) => setData(e.target.value)} />
+            <Input
+              id={`${id}-d`}
+              type="date"
+              max={hoje}
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              aria-invalid={mostrarErroData ? true : undefined}
+              aria-describedby={mostrarErroData ? `${id}-d-e` : undefined}
+            />
+            {mostrarErroData ? (
+              <p id={`${id}-d-e`} className="text-xs text-danger" role="alert">
+                {mostrarErroData}
+              </p>
+            ) : null}
           </div>
           {tipo === "FR" ? (
             <div className="flex flex-col gap-1.5">

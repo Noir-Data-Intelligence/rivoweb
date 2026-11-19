@@ -47,7 +47,11 @@
 > prazos e o escalonamento dos passos; retirar e anular adiantamentos de
 > salário e pedi-los a partir do pedido interno; o recibo com o adiantamento
 > descontado; anular o reembolso de uma despesa; a mensagem da sessão
-> substituída; o adiantamento de salário entre os processos das políticas).
+> substituída; o adiantamento de salário entre os processos das políticas) ·
+> actualizado a 2026-11-19 (o rascunho reaberto mostra o cliente e a série
+> gravados; Vendas escolhe a conta onde entrou a FR por banco; as datas
+> futuras recusadas no campo; a série do ano por omissão; a renovação
+> prevista dos contratos é só um lembrete; as formações decorridas).
 
 ---
 
@@ -168,7 +172,7 @@ AM = AssetManager.
 | Escolher o responsável de um lead, oportunidade ou actividade | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Contratos de clientes** | | | | | | | | | | |
 | Ver (por estado, tipo e fim próximo), a ficha, os aditamentos e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
-| Registar, corrigir, activar, suspender, renovar, aditar (valor e/ou fim) e terminar com o motivo | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Registar, corrigir, activar, suspender, renovar, aditar (valor e/ou fim) e terminar com o motivo (a «Renovação prevista» é só um lembrete no alerta do fim ⁶¹) | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anexar um ficheiro carregado na hora | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Abrir os anexos (descarregados pelo contrato) | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | — | — |
 | **Cobranças** | | | | | | | | | | |
@@ -203,7 +207,8 @@ AM = AssetManager.
 | Registar, importar CSV, corrigir, desactivar e reactivar, eliminar sem história; gerir contactos (junto ao país, o aviso de que é ele que decide as contas do mercado estrangeiro ³¹) | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | **Facturas** | | | | | | | | | | |
 | Ver as emitidas (filtros por cliente e datas), a ficha, o saldo e o PDF | ✓ | ✓ | — | ✓ | — | — | ✓ | — | — | — |
-| Nova factura: rascunhos FT, FR e ND, e emitir ²⁶ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Nova factura: rascunhos FT, FR e ND, e emitir ²⁶ (ao reabrir, as caixas mostram o cliente, a série e a factura referenciada gravados; data de hoje ou passada ⁶¹) | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
+| Na FR por banco (rascunho, conversão de pró-forma, venda de activo), escolher a conta onde entrou: da lista das contas bancárias, ou, a quem não lê a tesouraria, da lista curta sem saldos nem IBAN ⁶¹ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Ver o IVA e o total previstos antes de emitir | ✓ | ✓ | — | — | — | — | ✓ ⁴ | — | — | — |
 | Enviar facturas, notas de crédito e recibos ao cliente por e-mail | ✓ | ✓ | — | — | — | — | ✓ | — | — | — |
 | Anular facturas, notas de crédito e recibos | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -364,7 +369,7 @@ AM = AssetManager.
 | **Pedidos internos:** fila com filtros e prazos fora; abrir em nome de um colaborador | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Pedido: conversa, responder, atribuir, mudar o estado (fechar com confirmação) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Prazos de resposta e resolução por categoria (SLA): ver e definir | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
-| **Formação:** formações (planear, corrigir, cancelar); inscrever; concluir com avaliação e certificado; cancelar inscrição | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| **Formação:** formações (planear, corrigir, cancelar; estado planeada, decorrida ou cancelada ⁶¹); inscrever; concluir com avaliação e certificado; cancelar inscrição | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Turnos:** escala por período (escalar, tirar); decidir pedidos de troca; tipos de turno (criar, corrigir, desactivar) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | **Declarações:** emitir em nome de um colaborador (regista e descarrega o PDF); emitidas; verificar um código | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
 | Modelos de declaração (criar, corrigir, desactivar; marcadores validados) | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
@@ -513,6 +518,20 @@ Recursos Humanos.»
 - **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
+
+⁶¹ PR #187 (ADR-136), ainda por integrar no `main` a 2026-11-19; e o PR #186.
+- **Série por omissão:** sem série escolhida, a API usa a do ano do documento (`S2026`), se existir activa, senão a `S001`.
+- **Datas futuras:** facturas, emissão de rascunhos, pró-formas e a sua conversão, notas de crédito e recibos dão 400 com uma data futura (dia de Angola).
+- **Contas para a FR:** `GET /finance/accounts/lookups` dá as contas abertas (id, nome, moeda) a quem emite facturas.
+- **Contratos:** `autoRenew` só aparece no alerta do fim; a API não renova nada.
+- **Propostas (#186):** o texto dos modelos e o PDF passam a datas dd/MM/aaaa; o front não muda.
+- **No front:**
+  - **rascunho reaberto:** as caixas «Cliente», «Série», «Factura referenciada» e «Imposto» mostram o valor gravado quando as listas chegam (antes ficavam na primeira opção, «Consumidor final» e «Série por omissão», e quem as «corrigisse» mudava o cliente). Um valor gravado que já não está na lista fica como opção própria («Cliente gravado (inactivo ou fora da lista)», «… (não é uma série activa deste tipo)»);
+  - **conta onde entrou:** quem emite e não lê a tesouraria (Vendas) escolhe-a da lista curta, filtrada pela moeda, ao emitir a FR do rascunho, ao converter a pró-forma em FR e ao vender um activo; o «Registar recebimento» da factura usa a mesma regra. Se a API ainda não tiver a rota, o campo não aparece, como antes;
+  - **datas:** «Data do documento» (emitir), «Data do recebimento», «Data da factura» (converter a pró-forma e vender o activo) não aceitam o futuro (`max` de hoje e «A data não pode ser futura.»); o 400 da API fica no campo e o diálogo continua aberto;
+  - **série:** a opção vazia chama-se «Série do ano ou por omissão», com a ajuda «Sem escolha, usa a série do ano (se existir) ou a série por omissão.»;
+  - **contratos:** a caixa chama-se «Renovação prevista (lembrete)», com a ajuda de que o Rivo não renova sozinho e se renova com «Renovar»; a ficha diz «Renovação prevista»;
+  - **formação:** o estado é «Decorrida» quando o fim (ou o início, sem fim) já passou.
 
 ⁶⁰ PR #177 (ADR-134), em produção desde 2026-11-17.
 - **Anular o reembolso:** o motivo e o dia em que o dinheiro voltou. Entra na conta de onde saiu, e o reembolso e a diferença de câmbio estornam-se nesse dia.
@@ -955,8 +974,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   valor, estado.
 - **Novo contrato** (rascunho): referência única, cliente, título, tipo
   (comercial ou jurídico), início, fim, aviso de renovação (dias), valor e
-  moeda, SLA de resposta e de resolução (horas), renovação automática,
-  notas.
+  moeda, SLA de resposta e de resolução (horas), **renovação prevista** (só
+  um lembrete no alerta do fim: o Rivo não renova sozinho), notas.
 - Ficha: dados (notas como texto), **activar** (rascunho ou suspenso),
   **suspender**, **renovar** (o novo fim tem de estender o actual),
   **corrigir**, **terminar** com a data e o motivo (não volta atrás);
@@ -1067,9 +1086,12 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   factura em vigor do mesmo cliente); série; moeda (AOA, USD, EUR);
   vencimento; condições; retenção na fonte; linhas (descrição, quantidade,
   preço, **natureza** — bens ou serviço —, imposto); notas internas. Totais
-  previstos com a taxa em vigor. **Guardar rascunho**, **eliminar rascunho**,
-  **emitir** com confirmação («fica registado e não se apaga») e escolha da
-  data; numa FR por banco, a **conta onde entrou** o dinheiro. Para vender
+  previstos com a taxa em vigor. Sem série, a do ano (se existir) ou a por
+  omissão. Ao reabrir um rascunho, as caixas mostram o que foi gravado (um
+  cliente ou uma série que já não estão na lista ficam como opção própria).
+  **Guardar rascunho**, **eliminar rascunho**, **emitir** com confirmação
+  («fica registado e não se apaga») e escolha da data (hoje ou passada); numa
+  FR por banco, a **conta onde entrou** o dinheiro. Para vender
   um bem do activo, a página aponta para «Vender pela factura» na ficha do
   activo.
 - Ficha: linhas e totais do servidor, saldo (facturado, creditado, recebido em
@@ -1619,7 +1641,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Formação**
 - Formações com a entidade, as datas, as horas, o custo, os inscritos (e a
-  lotação), as concluídas e o estado; as canceladas só a pedido.
+  lotação), as concluídas e o estado (planeada, decorrida quando o fim já
+  passou, cancelada); as canceladas só a pedido.
 - **Planear** e **corrigir** (título, entidade, início e fim, horas, custo e
   moeda, lotação, validade do certificado em meses, descrição); **cancelar**
   (deixa de aceitar inscrições; não se desfaz).
@@ -2036,6 +2059,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 **Facturas**
 - Ver; **nova factura** (rascunhos FT, FR, ND) e **emitir**. Vê o IVA e o
   total previstos pelo servidor depois de guardar o rascunho.
+- Numa **FR por banco**, escolhe a **conta onde entrou** da lista curta das
+  contas abertas da moeda (sem saldos nem IBAN, porque não lê a tesouraria);
+  também ao converter uma pró-forma em FR.
 - **PDF** e **enviar ao cliente**. Não anula, não emite notas de crédito nem
   regista recebimentos.
 

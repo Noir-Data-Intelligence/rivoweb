@@ -1,10 +1,10 @@
-/** Formação na gestão: formações planeadas (e canceladas, a pedido) e planear uma nova. */
+/** Formação na gestão: formações planeadas, decorridas (e canceladas, a pedido) e planear uma nova. */
 import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 import { Link } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { Can } from "@/features/identity";
-import { formatarData } from "@/lib/format/data";
+import { formatarData, hojeIso } from "@/lib/format/data";
 import { decimalParaApi, lerDecimalDigitado, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import { Badge } from "@/ui/Badge";
@@ -15,7 +15,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
-import { errosCurso } from "../regras";
+import { errosCurso, estadoCurso } from "../regras";
 import { useCorrigirCurso, useCursos, usePlanearCurso, type Curso, type PedidoCurso } from "../tempo";
 
 const MOEDAS = ["AOA", "USD", "EUR"] as const;
@@ -155,6 +155,7 @@ export function EditarCurso({ c }: { c?: Curso }) {
 export default function Formacao() {
   const [cancelados, setCancelados] = useState(false);
   const lista = useCursos(cancelados);
+  const hoje = hojeIso();
   const colunas: Coluna<Curso>[] = [
     {
       id: "titulo",
@@ -174,7 +175,14 @@ export default function Formacao() {
     { id: "custo", cabecalho: "Custo", alinhar: "direita", esconderAte: "lg", celula: (c) => (c.cost === null || !c.currency ? "—" : moeda(c.cost, c.currency)) },
     { id: "inscritos", cabecalho: "Inscritos", alinhar: "direita", celula: (c) => (c.capacity === null ? String(c.enrolled) : `${String(c.enrolled)} / ${String(c.capacity)}`) },
     { id: "concluidas", cabecalho: "Concluídas", alinhar: "direita", esconderAte: "md", celula: (c) => String(c.completed) },
-    { id: "estado", cabecalho: "Estado", celula: (c) => (c.cancelled ? <Badge>Cancelada</Badge> : <Badge tom="sucesso">Planeada</Badge>) },
+    {
+      id: "estado",
+      cabecalho: "Estado",
+      celula: (c) => {
+        const e = estadoCurso(c, hoje);
+        return <Badge tom={e === "Planeada" ? "sucesso" : e === "Decorrida" ? "info" : "neutro"}>{e}</Badge>;
+      },
+    },
   ];
   const linhas = lista.data ? [...lista.data].sort((a, b) => b.startsOn.localeCompare(a.startsOn)) : undefined;
   return (

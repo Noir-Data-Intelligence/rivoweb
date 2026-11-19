@@ -361,3 +361,12 @@ export function errosConquista(p: { codigo: string; nome: string; descricao: str
   if (p.pontos.trim() !== "" && !(/^\d{1,5}$/.test(p.pontos.trim()) && Number(p.pontos) <= 10000)) e.pontos = "Os pontos são de 0 a 10 000.";
   return e;
 }
+
+/**
+ * O estado de uma formação: cancelada; decorrida, quando o fim (ou o início,
+ * sem fim) já passou; senão, planeada.
+ */
+export function estadoCurso(c: { cancelled: boolean; startsOn: string; endsOn?: string | null }, hoje: string): "Cancelada" | "Decorrida" | "Planeada" {
+  if (c.cancelled) return "Cancelada";
+  return (c.endsOn ?? c.startsOn) < hoje ? "Decorrida" : "Planeada";
+}

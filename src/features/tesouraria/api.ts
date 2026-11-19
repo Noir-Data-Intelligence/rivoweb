@@ -13,6 +13,7 @@ import type { components } from "@/lib/api/schema";
 
 type S = components["schemas"];
 export type Conta = S["BankAccountView"];
+export type ContaParaFacturar = S["BankAccountLookup"];
 export type Extracto = S["AccountStatementView"];
 export type Movimento = S["BankMovementView"];
 export type ResumoReconciliacao = S["ReconciliationSummary"];
@@ -64,6 +65,21 @@ export function useContas(p: { pagina: number; tamanho: number; fechadas: boolea
 
 /** Lista de apoio (escolher a conta de um pagamento): só abertas, até ao tecto do servidor. */
 export const useContasAbertas = (activo = true) => useContas({ pagina: 1, tamanho: 200, fechadas: false }, activo);
+
+/**
+ * As contas abertas só com o id, o nome e a moeda, para quem emite facturas e
+ * não lê a tesouraria (ADR-136): escolhe a «Conta onde entrou» de uma
+ * factura-recibo por banco sem ver saldos nem IBAN.
+ */
+export function useContasParaFacturar(activo = true) {
+  return useQuery({
+    queryKey: [...chaves.contas, "lookups"] as const,
+    queryFn: ({ signal }) => ler(api.GET("/finance/accounts/lookups", { signal })),
+    enabled: activo,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+}
 
 export function useExtracto(id: string, de: string | null, ate: string | null) {
   return useQuery({

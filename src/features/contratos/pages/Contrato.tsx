@@ -447,7 +447,7 @@ export default function Contrato() {
             {linha("Início", formatarData(c.startsOn))}
             {linha("Fim", <Fim c={c} />)}
             {linha("Aviso de renovação", c.renewalNoticeDays === null ? "—" : `${String(c.renewalNoticeDays)} dias`)}
-            {linha("Renova automaticamente", c.autoRenew ? "Sim" : "Não")}
+            {linha("Renovação prevista", c.autoRenew ? "Sim (lembrete no fim; renova-se com «Renovar»)" : "Não")}
             {linha("SLA de resposta", horas(c.slaResponseHours))}
             {linha("SLA de resolução", horas(c.slaResolutionHours))}
           </dl>

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import { useClientesActivos } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
 import { CampoContaOndeEntrou, useContaOndeEntrou } from "@/features/tesouraria";
+import { erroDeDataFutura } from "@/lib/api/problem";
 import { hojeIso } from "@/lib/format/data";
 import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -19,15 +20,16 @@ import { Select } from "@/ui/Controlos";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { Field, Input } from "@/ui/Field";
 import { usePautas, useSeries, useVenderActivo } from "./api";
-import { AVISO_DEFINITIVO, MEIOS, moeda, NOME_TIPO } from "./comum";
+import { AJUDA_SERIE, AVISO_DEFINITIVO, DATA_FUTURA, MEIOS, moeda, NOME_TIPO } from "./comum";
 
 export type ActivoAVender = { assetId: string; code: string; name: string; currency: string; netBookValue: number | string; acquiredOn: string };
 
 /** Erros do formulário de venda (vazio: pode emitir). */
-export function errosVenda(v: { tipo: string; data: string; meio: string; descricao: string; preco: string; imposto: string }, adquiridoEm: string) {
+export function errosVenda(v: { tipo: string; data: string; meio: string; descricao: string; preco: string; imposto: string }, adquiridoEm: string, hoje: string = hojeIso()) {
   const e: Partial<Record<"data" | "meio" | "descricao" | "preco" | "imposto", string>> = {};
   if (!IsoDate.safeParse(v.data).success) e.data = "Data inválida.";
   else if (v.data < adquiridoEm) e.data = "Não pode ser antes da aquisição.";
+  else if (v.data > hoje) e.data = DATA_FUTURA;
   if (v.tipo === "FR" && v.meio === "") e.meio = "Uma factura-recibo é paga no acto: indique o meio.";
   if (normalizarTexto(v.descricao) === "") e.descricao = "Escreva a descrição.";
   if (!(lerDinheiroDigitado(v.preco, 2)?.gt(0) ?? false)) e.preco = "Preço de venda maior que zero, até 2 casas.";
@@ -50,7 +52,9 @@ export function VenderActivo({ activo }: { activo: ActivoAVender }) {
   const vender = useVenderActivo();
   const contaFr = useContaOndeEntrou(aberto && v.tipo === "FR", activo.currency, v.meio);
   const idForm = useId();
-  const erros = errosVenda(v, activo.acquiredOn);
+  const hoje = hojeIso();
+  const erros = errosVenda(v, activo.acquiredOn, hoje);
+  const dataFuturaDoServidor = erroDeDataFutura(vender.error);
   const erroConta = contaFr.pede && conta === "" ? "Escolha a conta bancária." : undefined;
   const codigosIva = leTaxas ? (pautas.data ?? []).filter((p) => (p.kind === 0 || String(p.kind) === "ValueAdded") && !p.requiresExemptionCode).map((p) => p.code) : ["NOR"];
   const mudar = <K extends keyof typeof inicial>(k: K, x: (typeof inicial)[K]) => setV((y) => ({ ...y, [k]: x }));
@@ -75,7 +79,7 @@ export function VenderActivo({ activo }: { activo: ActivoAVender }) {
         descricao={`Emite uma factura de bens em ${activo.currency} com uma linha. O bem fica abatido na data da factura; a dívida vai para a 37.2 e o resultado para a 68.3 (ganho) ou 78.3 (perda), contra o valor líquido de ${moeda(activo.netBookValue, activo.currency)}. ${AVISO_DEFINITIVO} Anular a factura repõe o bem.`}
         rotuloConfirmar="Emitir factura"
         aCarregar={vender.isPending}
-        erro={vender.error ? <ErrorPanel erro={vender.error} /> : undefined}
+        erro={vender.error && !dataFuturaDoServidor ? <ErrorPanel erro={vender.error} /> : undefined}
         formulario={idForm}
       >
         <form
@@ -131,10 +135,10 @@ export function VenderActivo({ activo }: { activo: ActivoAVender }) {
               </Select>
             )}
           </Field>
-          <Field rotulo="Série" ajuda="Sem escolha, usa a série por omissão do tipo.">
+          <Field rotulo="Série" ajuda={AJUDA_SERIE}>
             {({ id, descricao }) => (
               <Select id={id} aria-describedby={descricao} value={v.serie} onChange={(e) => mudar("serie", e.target.value)}>
-                <option value="">Série por omissão</option>
+                <option value="">Série do ano ou por omissão</option>
                 {(series.data ?? [])
                   .filter((s) => s.type === v.tipo && s.isActive)
                   .map((s) => (
@@ -145,8 +149,8 @@ export function VenderActivo({ activo }: { activo: ActivoAVender }) {
               </Select>
             )}
           </Field>
-          <Field rotulo="Data da factura" erro={tentou ? erros.data : undefined} ajuda="O bem fica abatido nesta data.">
-            {({ id, descricao, invalido }) => <Input id={id} type="date" aria-describedby={descricao} invalido={invalido} value={v.data} onChange={(e) => mudar("data", e.target.value)} />}
+          <Field rotulo="Data da factura" erro={(tentou ? erros.data : undefined) ?? dataFuturaDoServidor} ajuda="O bem fica abatido nesta data.">
+            {({ id, descricao, invalido }) => <Input id={id} type="date" max={hoje} aria-describedby={descricao} invalido={invalido} value={v.data} onChange={(e) => mudar("data", e.target.value)} />}
           </Field>
           {v.tipo === "FR" ? (
             <Field rotulo="Meio de pagamento" erro={tentou ? erros.meio : undefined}>

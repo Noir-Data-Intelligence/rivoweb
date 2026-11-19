@@ -54,6 +54,9 @@ test.describe("contratos de clientes", () => {
 
     await page.getByRole("button", { name: "Novo contrato" }).click();
     const d = page.getByRole("dialog");
+    // O servidor não renova nada: a marca é só um lembrete no alerta do fim (ADR-136).
+    await expect(d.getByLabel("Renovação prevista (lembrete)")).not.toBeChecked();
+    await expect(d.getByText("o Rivo não renova sozinho", { exact: false })).toBeVisible();
     await d.getByLabel("Fim (opcional)").fill("2025-12-31");
     await d.getByLabel("SLA de resposta (horas, opcional)").fill("0");
     await d.getByRole("button", { name: "Registar" }).click();

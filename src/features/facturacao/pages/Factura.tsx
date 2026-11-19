@@ -3,7 +3,8 @@ import { ArrowLeft, FileMinus, HandCoins } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useUtilizador } from "@/features/identity";
-import { MEIOS_POR_BANCO, useContasAbertas } from "@/features/tesouraria";
+import { useContaOndeEntrou } from "@/features/tesouraria";
+import { erroDeDataFutura } from "@/lib/api/problem";
 import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
 import { dinheiro, lerDecimalDigitado, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
@@ -17,7 +18,7 @@ import { Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader, Skeleton } from "@/ui/Layout";
 import { useAnularFactura, useEmitirNota, useEmitirRecibo, useFactura, useNotas, useSaldo, type Factura, type SaldoFactura } from "../api";
 import { calcularTotais } from "../calculos";
-import { Anular, AVISO_DEFINITIVO, DescarregarPdf, EnviarPorEmail, EstadoDocumento, LinhasDocumento, MEIOS, moeda, NOME_TIPO, Totais } from "../comum";
+import { Anular, AVISO_DEFINITIVO, DATA_FUTURA, DescarregarPdf, EnviarPorEmail, EstadoDocumento, LinhasDocumento, MEIOS, moeda, NOME_TIPO, Totais } from "../comum";
 
 /** O valor, ou zero se for negativo. */
 const naoNegativo = (v: Big) => (v.lt(0) ? new Big(0) : v);
@@ -125,19 +126,20 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
   const [conta, setConta] = useState("");
   const [tentou, setTentou] = useState(false);
   const id = useId();
-  const { pode } = useUtilizador();
   // Por banco, o dinheiro entra na conta indicada (ADR-099); em numerário ou cheque fica para depositar.
-  const porBanco = MEIOS_POR_BANCO.includes(meio);
-  const contas = useContasAbertas(aberto && pode("finance.payables.read"));
-  const daMoeda = (contas.data?.items ?? []).filter((c) => c.currency === f.currency);
-  const pedeConta = porBanco && daMoeda.length > 0;
+  const contaRecebida = useContaOndeEntrou(aberto, f.currency, meio);
+  const daMoeda = contaRecebida.contas;
+  const pedeConta = contaRecebida.pede;
   // Enquanto a lista chega, não se emite: sairia sem a conta.
-  const aCarregarContas = porBanco && pode("finance.payables.read") && contas.isPending;
+  const aCarregarContas = contaRecebida.aCarregar;
   const v = lerDinheiroDigitado(valor, 2);
   const r = comRetencao ? lerDinheiroDigitado(retido === "" ? "0" : retido, 2) : new Big(0);
   const retidoOk = r !== null && r.gte(0) && r.lte(porComprovar);
   const somaOk = v !== null && r !== null && v.gte(0) && v.plus(r).gt(0) && v.plus(r).lte(emAberto);
-  const ok = retidoOk && somaOk && meio !== "" && /^\d{4}-\d{2}-\d{2}$/.test(data) && (!pedeConta || conta !== "");
+  const hoje = hojeIso();
+  const erroData = !/^\d{4}-\d{2}-\d{2}$/.test(data) ? "Data inválida." : data > hoje ? DATA_FUTURA : undefined;
+  const dataFuturaDoServidor = erroDeDataFutura(emitir.error);
+  const ok = retidoOk && somaOk && meio !== "" && erroData === undefined && (!pedeConta || conta !== "");
   const confirmar = () => {
     setTentou(true);
     if (!ok || aCarregarContas || emitir.isPending || v === null || r === null) return;
@@ -169,7 +171,7 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
         descricao={`Em aberto: ${moeda(emAberto.toFixed(2), f.currency)}${comRetencao ? `, dos quais ${moeda(porComprovar.toFixed(2), f.currency)} de retenção por comprovar` : ""}. ${AVISO_DEFINITIVO}`}
         rotuloConfirmar="Emitir recibo"
         aCarregar={emitir.isPending}
-        erro={emitir.error ? <ErrorPanel erro={emitir.error} /> : undefined}
+        erro={emitir.error && !dataFuturaDoServidor ? <ErrorPanel erro={emitir.error} /> : undefined}
         aoConfirmar={confirmar}
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -236,7 +238,20 @@ function NovoRecibo({ f, saldo }: { f: Factura; saldo: SaldoFactura }) {
             <label htmlFor={`${id}-d`} className="text-sm font-medium text-foreground">
               Data do recebimento
             </label>
-            <Input id={`${id}-d`} type="date" value={data} onChange={(e) => setData(e.target.value)} />
+            <Input
+              id={`${id}-d`}
+              type="date"
+              max={hoje}
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              aria-invalid={(tentou && erroData) || dataFuturaDoServidor ? true : undefined}
+              aria-describedby={(tentou && erroData) || dataFuturaDoServidor ? `${id}-d-e` : undefined}
+            />
+            {(tentou && erroData) || dataFuturaDoServidor ? (
+              <p id={`${id}-d-e`} className="text-xs text-danger" role="alert">
+                {(tentou ? erroData : undefined) ?? dataFuturaDoServidor}
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
             <label htmlFor={`${id}-n`} className="text-sm font-medium text-foreground">

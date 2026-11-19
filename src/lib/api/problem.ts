@@ -93,6 +93,18 @@ export function erroDoCampo(e: unknown, campo: string): string | undefined {
   return m && m.length > 0 ? m.join(" ") : undefined;
 }
 
+/**
+ * O 400 de um documento de venda datado no futuro (ADR-136): a API põe-no numa
+ * chave genérica («factura», «recibo», «nota»…), e o front leva-o para o campo
+ * da data. Sem ele, `undefined`.
+ */
+export function erroDeDataFutura(e: unknown): string | undefined {
+  if (!eApiError(e) || e.status !== 400) return undefined;
+  return Object.values(e.errors)
+    .flat()
+    .find((m) => m.includes("não pode ser futura"));
+}
+
 /** Falhas transitórias em que uma leitura pode ser repetida (§2, middleware 6). */
 export function eTransitorio(e: unknown): boolean {
   if (!eApiError(e)) return false;

@@ -14,7 +14,7 @@ import { useClientesActivos } from "@/features/clientes";
 import { useUtilizador } from "@/features/identity";
 import { CampoContaOndeEntrou, useContaOndeEntrou } from "@/features/tesouraria";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
-import { eApiError } from "@/lib/api/problem";
+import { eApiError, erroDeDataFutura } from "@/lib/api/problem";
 import { hojeIso } from "@/lib/format/data";
 import { decimalParaApi, lerDecimalDigitado, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { IsoDate, texto } from "@/lib/validation/text";
@@ -28,7 +28,7 @@ import { Field, Input } from "@/ui/Field";
 import { CarregandoPagina, PageHeader } from "@/ui/Layout";
 import { useEliminarRascunho, useEmitirRascunho, useFacturas, useGuardarRascunho, usePautas, useRascunho, useSeries, type PautaImposto, type PedidoRascunho, type Rascunho } from "../api";
 import { calcularTotais, liquidoDaLinha } from "../calculos";
-import { AVISO_DEFINITIVO, MEIOS, moeda, NATUREZA_LINHA, NOME_TIPO } from "../comum";
+import { AJUDA_SERIE, AVISO_DEFINITIVO, DATA_FUTURA, MEIOS, moeda, NATUREZA_LINHA, NOME_TIPO } from "../comum";
 
 const quantidade = z.string().check(z.refine((v) => (lerDecimalDigitado(v, 4)?.gt(0) ?? false), "Quantidade maior que zero, até 4 casas."));
 const preco = z.string().check(z.refine((v) => (lerDinheiroDigitado(v, 2)?.gte(0) ?? false), "Preço válido, até 2 casas (por exemplo 1 250,00)."));
@@ -144,9 +144,28 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
     if (rascunho) form.reset(paraForm(rascunho));
   }, [rascunho, form]);
 
+  // Com `register`, um <select> montado antes de as opções chegarem fica na
+  // primeira opção e não acompanha o valor do formulário: o ecrã mostraria
+  // «Consumidor final» num rascunho com cliente (#187). Quando cada lista
+  // chega, volta a pôr no DOM o valor que o formulário tem.
+  useEffect(() => {
+    const d = form.getValues();
+    form.setValue("customerId", d.customerId);
+    form.setValue("series", d.series);
+    form.setValue("referencedInvoiceId", d.referencedInvoiceId);
+    d.lines.forEach((l, i) => form.setValue(`lines.${i}.taxCode`, l.taxCode));
+  }, [clientes.data, series.data, facturasDoCliente.data, pautas.data, v.documentType, form]);
+
   const codigosIva = leTaxas
     ? (pautas.data ?? []).filter((p) => (p.kind === 0 || String(p.kind) === "ValueAdded") && !p.requiresExemptionCode).map((p) => p.code)
     : ["NOR"];
+  // O valor gravado que não está na lista (cliente inactivo, série de outro
+  // tipo ou fechada, factura fora das 100 mais recentes) fica como opção
+  // própria, em vez de a caixa mostrar outra coisa.
+  const clienteForaDaLista = Boolean(v.customerId) && clientes.isSuccess && !clientes.data.items.some((c) => c.customerId === v.customerId);
+  const seriesDoTipo = (series.data ?? []).filter((s) => s.type === v.documentType && s.isActive);
+  const serieForaDaLista = Boolean(v.series) && series.isSuccess && !seriesDoTipo.some((s) => s.code === v.series);
+  const facturaForaDaLista = Boolean(v.referencedInvoiceId) && facturasDoCliente.isSuccess && !referenciaveis.some((f) => f.invoiceId === v.referencedInvoiceId);
 
   const calc = (v.lines ?? []).map((l) => {
     const q = lerDecimalDigitado(l.quantity ?? "", 4);
@@ -188,9 +207,13 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
     );
   };
 
+  const erroDataEmissao = !IsoDate.safeParse(dataEmissao).success ? "Data inválida." : dataEmissao > hoje ? DATA_FUTURA : undefined;
+  const dataFuturaDoServidor = erroDeDataFutura(emitir.error);
+  const mostrarErroData = (tentouEmitir ? erroDataEmissao : undefined) ?? dataFuturaDoServidor;
+
   const emitirAgora = () => {
     setTentouEmitir(true);
-    if (!draftId || emitir.isPending || !IsoDate.safeParse(dataEmissao).success) return;
+    if (!draftId || emitir.isPending || erroDataEmissao) return;
     if (contaFr.aCarregar || (contaFr.pede && conta === "")) return;
     emitir.mutate(
       { draftId, issuedOn: dataEmissao, bankAccountId: contaFr.pede ? conta : null },
@@ -226,6 +249,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} {...form.register("customerId")}>
                 <option value="">Consumidor final</option>
+                {clienteForaDaLista ? <option value={v.customerId}>Cliente gravado (inactivo ou fora da lista)</option> : null}
                 {(clientes.data?.items ?? []).map((c) => (
                   <option key={c.customerId} value={c.customerId}>
                     {c.name} · NIF {c.taxId}
@@ -245,17 +269,16 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
               </Select>
             )}
           </Field>
-          <Field rotulo="Série" erro={form.formState.errors.series?.message} ajuda="Sem escolha, usa a série por omissão do tipo.">
+          <Field rotulo="Série" erro={form.formState.errors.series?.message} ajuda={AJUDA_SERIE}>
             {({ id, descricao, invalido }) => (
               <Select id={id} aria-describedby={descricao} invalido={invalido} {...form.register("series")}>
-                <option value="">Série por omissão</option>
-                {(series.data ?? [])
-                  .filter((s) => s.type === v.documentType && s.isActive)
-                  .map((s) => (
-                    <option key={s.seriesId} value={s.code}>
-                      {s.type} {s.code} (próximo n.º {String(s.nextSequence)})
-                    </option>
-                  ))}
+                <option value="">Série do ano ou por omissão</option>
+                {serieForaDaLista ? <option value={v.series}>{v.series} (não é uma série activa deste tipo)</option> : null}
+                {seriesDoTipo.map((s) => (
+                  <option key={s.seriesId} value={s.code}>
+                    {s.type} {s.code} (próximo n.º {String(s.nextSequence)})
+                  </option>
+                ))}
               </Select>
             )}
           </Field>
@@ -291,6 +314,7 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
               {({ id, descricao, invalido }) => (
                 <Select id={id} aria-describedby={descricao} invalido={invalido} disabled={!v.customerId} {...form.register("referencedInvoiceId")}>
                   <option value="">{v.customerId ? "Escolha…" : "Escolha primeiro o cliente"}</option>
+                  {facturaForaDaLista ? <option value={v.referencedInvoiceId}>Factura gravada (fora das 100 mais recentes ou já não em vigor)</option> : null}
                   {referenciaveis.map((f) => (
                     <option key={f.invoiceId} value={f.invoiceId}>
                       {f.number} · {moeda(f.grossTotal, f.currency)}
@@ -436,14 +460,28 @@ function Editor({ rascunho }: { rascunho: Rascunho | undefined }) {
         descricao={AVISO_DEFINITIVO}
         rotuloConfirmar="Emitir documento"
         aCarregar={emitir.isPending}
-        erro={emitir.error ? <ErrorPanel erro={emitir.error} /> : undefined}
+        erro={emitir.error && !dataFuturaDoServidor ? <ErrorPanel erro={emitir.error} /> : undefined}
         aoConfirmar={emitirAgora}
       >
         <div className="flex flex-col gap-1.5">
           <label htmlFor={idData} className="text-sm font-medium text-foreground">
             Data do documento
           </label>
-          <Input id={idData} type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} className="max-w-48" />
+          <Input
+            id={idData}
+            type="date"
+            max={hoje}
+            value={dataEmissao}
+            onChange={(e) => setDataEmissao(e.target.value)}
+            className="max-w-48"
+            aria-invalid={mostrarErroData ? true : undefined}
+            aria-describedby={mostrarErroData ? `${idData}-e` : undefined}
+          />
+          {mostrarErroData ? (
+            <p id={`${idData}-e`} className="text-xs text-danger" role="alert">
+              {mostrarErroData}
+            </p>
+          ) : null}
         </div>
         {contaFr.pede ? (
           <div className="mt-3">

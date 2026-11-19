@@ -1,13 +1,14 @@
 /**
  * A conta onde entrou o dinheiro de um recebimento por banco (ADR-099): só
- * as contas abertas na moeda do documento, a quem lê as contas bancárias. Sem
- * essa permissão, ou sem contas da moeda, o campo não aparece e o documento
- * segue sem conta (o servidor aceita).
+ * as contas abertas na moeda do documento. Quem lê as contas bancárias usa a
+ * lista da tesouraria; quem só emite facturas (Vendas), a lista curta sem
+ * saldos (ADR-136). Sem nenhuma das duas, ou sem contas da moeda, o campo não
+ * aparece e o documento segue sem conta (o servidor aceita).
  */
 import { useUtilizador } from "@/features/identity";
 import { Select } from "@/ui/Controlos";
 import { Field } from "@/ui/Field";
-import { useContasAbertas, type Conta } from "./api";
+import { useContasAbertas, useContasParaFacturar, type ContaParaFacturar } from "./api";
 import { MEIOS_POR_BANCO } from "./regras";
 
 /** `pede`: o meio é por banco e há contas da moeda; `aCarregar`: ainda não se sabe (não enviar). */
@@ -15,12 +16,15 @@ export function useContaOndeEntrou(activo: boolean, moeda: string, meio: string)
   const { pode } = useUtilizador();
   const porBanco = MEIOS_POR_BANCO.includes(meio);
   const le = pode("finance.payables.read");
+  const emite = !le && pode("finance.invoices.write");
   const q = useContasAbertas(activo && porBanco && le);
-  const contas: Conta[] = (q.data?.items ?? []).filter((c) => c.currency === moeda);
-  return { contas, pede: porBanco && contas.length > 0, aCarregar: activo && porBanco && le && q.isPending };
+  const curtas = useContasParaFacturar(activo && porBanco && emite);
+  const todas: readonly ContaParaFacturar[] = le ? (q.data?.items ?? []) : (curtas.data ?? []);
+  const contas = todas.filter((c) => c.currency === moeda);
+  return { contas, pede: porBanco && contas.length > 0, aCarregar: activo && porBanco && ((le && q.isPending) || (emite && curtas.isPending)) };
 }
 
-export function CampoContaOndeEntrou({ contas, valor, mudar, erro }: { contas: readonly Conta[]; valor: string; mudar: (v: string) => void; erro?: string | undefined }) {
+export function CampoContaOndeEntrou({ contas, valor, mudar, erro }: { contas: readonly ContaParaFacturar[]; valor: string; mudar: (v: string) => void; erro?: string | undefined }) {
   return (
     <Field rotulo="Conta onde entrou" erro={erro} ajuda="O valor entra no saldo desta conta e fica no extracto.">
       {({ id, descricao, invalido }) => (

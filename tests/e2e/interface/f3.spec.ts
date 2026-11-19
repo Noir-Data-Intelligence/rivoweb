@@ -3,10 +3,18 @@
  * escrita (dinheiro em texto, nunca number), confirmações de emissão e de
  * envio, sem duplo envio, permissões por perfil, axe e CSP.
  */
-import { factura, facturaComRetencao, IDF3, meAdminF3, meFinancas, meVendas, saldoComRetencao } from "../../fixtures/f3";
+import { clientes, factura, facturaComRetencao, IDF3, meAdminF3, meFinancas, meVendas, saldoComRetencao, series } from "../../fixtures/f3";
 import { entrar, expect, semScrollHorizontal, semViolacoesAxe, test } from "../apoio";
 import { comF3 } from "../apoio-f3";
 import { contas, IDF5 } from "../../fixtures/f5";
+
+/** Um rascunho gravado, com o que cada teste mudar. */
+const rascunhoGravado = (extra: Record<string, unknown> = {}) => ({
+  draftId: IDF3.rascunho, customerId: IDF3.cliente, documentType: "FT", series: null, currency: "AOA", dueDate: null, paymentTerms: null, withholdingRate: null,
+  paymentMethod: null, referencedInvoiceId: null, lines: [{ description: "Caixa de papel", quantity: 3, unitPrice: 4500, taxCode: "NOR", kind: "Goods" }], netTotal: 13500, notes: null,
+  createdAt: "2026-11-05T10:00:00Z", updatedAt: "2026-11-05T10:00:00Z", issuedInvoiceId: null, ...extra,
+});
+const paginaDe = <T,>(itens: T[], atrasoMs = 0) => ({ status: 200, corpo: itens, cabecalhos: { "X-Page": "1", "X-Page-Size": "200", "X-Total-Count": String(itens.length) }, atrasoMs });
 
 /** O Admin do F3 com a leitura das contas bancárias (para escolher a conta onde entrou). */
 const meAdminF3Pagaveis = { ...meAdminF3, permissions: [...new Set([...meAdminF3.permissions, "finance.payables.read"])] };
@@ -136,6 +144,65 @@ test.describe("facturas", () => {
     await dialogo.getByRole("button", { name: "Emitir documento" }).click();
     await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
     expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)[0]?.corpo).toMatchObject({ bankAccountId: IDF5.conta });
+  });
+
+  test("rascunho reaberto: as caixas mostram o cliente e a série gravados, mesmo com as listas a chegar depois (#187)", async ({ page, api }) => {
+    // 150 clientes, e o do rascunho é o 121.º; as listas chegam depois do rascunho.
+    const muitos = Array.from({ length: 150 }, (_, i) => ({ ...clientes()[0], customerId: `00000000-0000-4000-8000-${String(100000000000 + i)}`, name: `Cliente ${String(i + 1).padStart(3, "0")}`, taxId: String(5100000000 + i) }));
+    const doRascunho = muitos[120]?.customerId ?? "";
+    await comF3(api)
+      .em("GET", "/commercial/customers", paginaDe(muitos, 800))
+      .em("GET", "/finance/series", paginaDe([...series(), { seriesId: "00000000-0000-4000-8000-000000000729", type: "FT", code: "S2026", nextSequence: 3, isActive: true }], 800))
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 200, corpo: rascunhoGravado({ customerId: doRascunho, series: "S2026" }) })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await expect(page.getByLabel("Cliente").locator("option:checked")).toHaveText("Cliente 121 · NIF 5100000120");
+    await expect(page.getByLabel("Cliente")).toHaveValue(doRascunho);
+    await expect(page.getByLabel("Série").locator("option:checked")).toHaveText("FT S2026 (próximo n.º 3)");
+    await expect(page.getByText("Sem escolha, usa a série do ano (se existir) ou a série por omissão.")).toBeVisible();
+    // O resumo da emissão diz o mesmo cliente que a caixa.
+    await page.getByRole("button", { name: "Emitir…" }).click();
+    await expect(page.getByRole("dialog")).toContainText("Cliente 121");
+  });
+
+  test("rascunho com um cliente que já não está na lista: fica como opção própria, não muda para outro", async ({ page, api }) => {
+    const inactivo = "00000000-0000-4000-8000-000000000799";
+    await comF3(api)
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 200, corpo: rascunhoGravado({ customerId: inactivo, series: "S1999" }) })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await expect(page.getByLabel("Cliente").locator("option:checked")).toHaveText("Cliente gravado (inactivo ou fora da lista)");
+    await expect(page.getByLabel("Série").locator("option:checked")).toHaveText("S1999 (não é uma série activa deste tipo)");
+    await semViolacoesAxe(page);
+  });
+
+  test("emitir com data futura: recusada no campo, sem pedido; o 400 da API também fica no campo (ADR-136)", async ({ page, api }) => {
+    await comF3(api)
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 200, corpo: rascunhoGravado() })
+      .em("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`, {
+        status: 400,
+        corpo: { title: "Pedido inválido", status: 400, errors: { factura: ["A data do documento não pode ser futura (20/11/2026)."] } },
+        cabecalhos: { "Content-Type": "application/problem+json" },
+      })
+      .ligar();
+    await entrar(page);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await page.getByRole("button", { name: "Emitir…" }).click();
+    const d = page.getByRole("dialog");
+    const data = d.getByLabel("Data do documento");
+    await expect(data).toHaveAttribute("max", /^\d{4}-\d{2}-\d{2}$/);
+    await data.fill("2099-01-01");
+    await d.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(d.getByText("A data não pode ser futura.")).toBeVisible();
+    expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)).toHaveLength(0);
+    // Hoje no ecrã, futuro no servidor (por exemplo, à meia-noite de Luanda): a mensagem da API vai para o campo.
+    await data.fill((await data.getAttribute("max")) ?? "");
+    await d.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(d.getByText("A data do documento não pode ser futura (20/11/2026).")).toBeVisible();
+    await expect(data).toHaveAttribute("aria-invalid", "true");
+    await expect(d).toBeVisible();
   });
 
   test("ficha: números do servidor, PDF, envio e anulação confirmados", async ({ page, api }) => {
@@ -351,6 +418,42 @@ test.describe("permissões por perfil", () => {
     await page.getByLabel("Preço unitário").fill("100");
     await expect(page.getByLabel("Totais previstos")).toContainText("Ao guardar");
     expect(api.pedidos.some((p) => p.caminho === "/fiscal/tax-rates")).toBe(false);
+  });
+
+  test("Vendas sem a tesouraria: a FR por banco pede a conta pela lista curta, sem saldos (ADR-136)", async ({ page, api }) => {
+    await comF3(api, meVendas)
+      .em("GET", "/finance/accounts/lookups", { status: 200, corpo: contas().map((c) => ({ accountId: c.accountId, name: c.name, currency: c.currency })) })
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 200, corpo: rascunhoGravado({ documentType: "FR", paymentMethod: "TB", taxTotal: 1890, amountPayable: 15390, taxEstimatedOn: "2026-11-05" }) })
+      .em("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`, { status: 201, corpo: { id: IDF3.factura, number: "FR S2026/1" } })
+      .ligar();
+    await entrar(page, meVendas.email);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await page.getByRole("button", { name: "Emitir…" }).click();
+    const d = page.getByRole("dialog", { name: /Emitir/ });
+    // Só as contas da moeda da factura.
+    await expect(d.getByLabel("Conta onde entrou").locator("option")).toHaveText(["Escolha…", "Conta à ordem BAI"]);
+    await d.getByLabel("Conta onde entrou").selectOption(IDF5.conta);
+    await d.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
+    expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)[0]?.corpo).toMatchObject({ bankAccountId: IDF5.conta });
+    expect(api.pedidos.some((p) => p.caminho === "/finance/accounts")).toBe(false);
+  });
+
+  test("Vendas com a API sem a lista curta (404): a FR segue sem pedir a conta, como antes", async ({ page, api }) => {
+    await comF3(api, meVendas)
+      .em("GET", "/finance/accounts/lookups", { status: 404, corpo: { status: 404 }, cabecalhos: { "Content-Type": "application/problem+json" } })
+      .em("GET", `/finance/invoice-drafts/${IDF3.rascunho}`, { status: 200, corpo: rascunhoGravado({ documentType: "FR", paymentMethod: "TB" }) })
+      .em("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`, { status: 201, corpo: { id: IDF3.factura, number: "FR S001/9" } })
+      .ligar();
+    await entrar(page, meVendas.email);
+    await page.goto(`/facturas/rascunhos/${IDF3.rascunho}`);
+    await page.getByRole("button", { name: "Emitir…" }).click();
+    const d = page.getByRole("dialog", { name: /Emitir/ });
+    await expect.poll(() => api.pedidos.filter((p) => p.caminho === "/finance/accounts/lookups").length).toBeGreaterThan(0);
+    await expect(d.getByLabel("Conta onde entrou")).toHaveCount(0);
+    await d.getByRole("button", { name: "Emitir documento" }).click();
+    await expect(page).toHaveURL(new RegExp(`/facturas/${IDF3.factura}$`));
+    expect(api.escritas("POST", `/finance/invoice-drafts/${IDF3.rascunho}/issue`)[0]?.corpo).toMatchObject({ bankAccountId: null });
   });
 
   test("Finanças: anula, credita e recebe; sem nova factura nem envio", async ({ page, api }) => {

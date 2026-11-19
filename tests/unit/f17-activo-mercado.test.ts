@@ -20,12 +20,15 @@ describe("mercado, compra e venda de imobilizado (ADR-106 a ADR-108)", () => {
     for (const c of ["", "1", "10", "15.1", "18.1", "111", "75.2.12", "31.1"]) expect(eContaImobilizado(c)).toBe(false);
   });
 
-  it("a venda pela factura: data depois da aquisição, meio na FR, descrição, preço maior que zero e imposto", () => {
+  it("a venda pela factura: data depois da aquisição e não futura, meio na FR, descrição, preço maior que zero e imposto", () => {
     const base = { tipo: "FT", data: "2026-10-20", meio: "", descricao: "Venda", preco: "600 000", imposto: "NOR" };
     expect(errosVenda(base, "2026-03-10")).toEqual({});
     expect(errosVenda({ ...base, data: "2026-03-09" }, "2026-03-10").data).toBe("Não pode ser antes da aquisição.");
     expect(errosVenda({ ...base, tipo: "FR" }, "2026-03-10").meio).toBeDefined();
     expect(errosVenda({ ...base, preco: "0" }, "2026-03-10").preco).toBeDefined();
     expect(errosVenda({ ...base, descricao: "  " }, "2026-03-10").descricao).toBeDefined();
+    // Datada no futuro, a API recusa-a (ADR-136).
+    expect(errosVenda(base, "2026-03-10", "2026-10-20")).toEqual({});
+    expect(errosVenda(base, "2026-03-10", "2026-10-19").data).toBe("A data não pode ser futura.");
   });
 });

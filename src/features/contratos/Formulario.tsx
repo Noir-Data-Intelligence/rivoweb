@@ -103,7 +103,12 @@ export function CamposDoContrato({
         {({ id, descricao, invalido }) => <Input id={id} inputMode="numeric" autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.slaResolucao} onChange={campo("slaResolucao")} />}
       </Field>
       <div className="flex items-end pb-2">
-        <Checkbox rotulo="Renova automaticamente" checked={v.autoRenovar} onChange={(e) => setV((x) => ({ ...x, autoRenovar: e.target.checked }))} />
+        <Checkbox
+          rotulo="Renovação prevista (lembrete)"
+          ajuda="Só aparece no alerta do fim do contrato: o Rivo não renova sozinho. Renove com o botão «Renovar» na ficha."
+          checked={v.autoRenovar}
+          onChange={(e) => setV((x) => ({ ...x, autoRenovar: e.target.checked }))}
+        />
       </div>
       <Field rotulo="Notas (opcional)" erro={erros.notas} className="sm:col-span-3">
         {({ id, descricao, invalido }) => <Textarea id={id} rows={3} maxLength={4000} aria-describedby={descricao} invalido={invalido} value={v.notas} onChange={campo("notas")} />}

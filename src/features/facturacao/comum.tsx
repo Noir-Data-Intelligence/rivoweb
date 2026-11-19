@@ -19,6 +19,12 @@ import { useDescarregarPdf, useEnviarDocumento, type TipoDocumento } from "./api
 
 export const AVISO_DEFINITIVO = "Este documento fica registado e não se apaga. Só se pode anular, e a anulação também fica registada.";
 
+/** Sem série escolhida, a API usa a do ano do documento (S2026), se existir activa, senão a por omissão (ADR-136). */
+export const AJUDA_SERIE = "Sem escolha, usa a série do ano (se existir) ou a série por omissão.";
+
+/** Um documento de venda não pode ter data futura (ADR-136); a API recusa-o com 400. */
+export const DATA_FUTURA = "A data não pode ser futura.";
+
 export const NOME_TIPO: Readonly<Record<string, string>> = {
   FT: "Factura",
   FR: "Factura-recibo",

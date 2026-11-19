@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { codigoVerificacaoValido, erroMensagem, errosCiclo, errosConquista, errosModelo, errosObjectivo, errosResultadoChave, lerValorKr, marcadoresDesconhecidos, errosConclusao, errosCurso, errosEscala, errosTipoTurno, horaDaApi, horaParaApi, passaMeiaNoite, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
+import { codigoVerificacaoValido, erroMensagem, errosCiclo, errosConquista, errosModelo, errosObjectivo, errosResultadoChave, lerValorKr, marcadoresDesconhecidos, errosConclusao, errosCurso, errosEscala, estadoCurso, errosTipoTurno, horaDaApi, horaParaApi, passaMeiaNoite, errosAnuncio, errosCandidato, errosProcesso, errosSla, errosVaga, faseAnuncio, horasParaMinutos, minutosParaHoras, proximaEtapa, temErrosProcesso } from "@/features/rh/regras";
 
 describe("funil de recrutamento", () => {
   it("avança um passo de cada vez; da proposta contrata-se, não se avança", () => {
@@ -203,5 +203,16 @@ describe("conquistas", () => {
     expect(errosConquista({ codigo: "PONTUAL", nome: "Pontualidade", descricao: "", icone: "star", pontos: "50", nova: true })).toEqual({});
     expect(errosConquista({ codigo: "", nome: "Pontualidade", descricao: "", icone: "", pontos: "10001", nova: true })).toEqual({ codigo: "Indique o código.", pontos: "Os pontos são de 0 a 10 000." });
     expect(errosConquista({ codigo: "", nome: "Pontualidade", descricao: "", icone: "", pontos: "0", nova: false })).toEqual({});
+  });
+});
+
+describe("estado de uma formação", () => {
+  it("decorrida quando o fim (ou o início, sem fim) já passou; cancelada prevalece", () => {
+    const hoje = "2026-11-19";
+    expect(estadoCurso({ cancelled: false, startsOn: "2026-11-10", endsOn: "2026-11-18" }, hoje)).toBe("Decorrida");
+    expect(estadoCurso({ cancelled: false, startsOn: "2026-11-10", endsOn: "2026-11-19" }, hoje)).toBe("Planeada");
+    expect(estadoCurso({ cancelled: false, startsOn: "2026-11-18", endsOn: null }, hoje)).toBe("Decorrida");
+    expect(estadoCurso({ cancelled: false, startsOn: "2026-12-01", endsOn: null }, hoje)).toBe("Planeada");
+    expect(estadoCurso({ cancelled: true, startsOn: "2026-01-10", endsOn: "2026-01-11" }, hoje)).toBe("Cancelada");
   });
 });
