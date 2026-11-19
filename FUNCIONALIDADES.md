@@ -51,7 +51,9 @@
 > actualizado a 2026-11-19 (o rascunho reaberto mostra o cliente e a série
 > gravados; Vendas escolhe a conta onde entrou a FR por banco; as datas
 > futuras recusadas no campo; a série do ano por omissão; a renovação
-> prevista dos contratos é só um lembrete; as formações decorridas).
+> prevista dos contratos é só um lembrete; as formações decorridas; as
+> contas bancárias movimentam-se com a tesouraria, e a Gestão só as vê; quem
+> pede esclarecimento continua a decidir).
 
 ---
 
@@ -125,7 +127,7 @@ AM = AssetManager.
 | Portal: perguntar ao assistente sobre as próprias facturas e saldo | — | — | — | — | — | — | — | — | — | ✓ |
 | **Aprovações** | | | | | | | | | | |
 | Ver a caixa (à minha espera, todos, por tipo) e a ficha com passos e decisões | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Decidir: aprovar, rejeitar, pedir esclarecimento ⁵ ⁶² | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Validar a conformidade num passo de validação: checklist item a item (conforme, não conforme, N/A nos opcionais) ⁵ | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Cancelar o próprio pedido | ✓ ⁶ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Ver o resumo do pedido e os nomes de quem pediu, aprova e decidiu | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -303,13 +305,13 @@ AM = AssetManager.
 | Dados pessoais: ver (só leitura); pedir a correcção aos RH por um pedido interno | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Tesouraria** | | | | | | | | | | |
 | Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
-| Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir ⁶² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, o IRT e o INSS, só um colaborador que não decidiu a folha ³⁴ ⁴⁵; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: ver os pedidos (com o estado) e os pagos (com os por descontar) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Adiantamentos de salário: pagar os aprovados (sai do banco e lança na 36.3; a folha do mês desconta-o e o pagamento dos salários paga o resto; quem decidiu não paga) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: anular um devolvido, antes de descontado (volta ao banco, estorna o lançamento e sai da folha) ⁵⁷ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: pedir em nome de um colaborador (vai a aprovação ⁴⁸; escolhe-o da lista dos colaboradores activos da tesouraria, sem ler os RH ⁵¹) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
+| Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² ⁶² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -407,7 +409,7 @@ Recursos Humanos.»
 «Esta conta não está associada a um cliente. Fale com a empresa.»
 ³ Excepto em contas SuperAdmin, que só um SuperAdmin gere.
 ⁴ A Sales não lê as taxas de IVA: vê o IVA e o total previstos pelo servidor depois de guardar o rascunho; o Admin vê-os ao escrever.
-⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já interveio não decide outra vez (BR-4).
+⁵ Só quem tem ficha de colaborador ligada à conta e ocupa o cargo do passo em curso; quem pediu nunca decide (BR-2) e quem já aprovou ou rejeitou não decide outra vez (BR-4); quem pediu esclarecimento continua à espera e decide depois ⁶².
 ⁶ O SuperAdmin só decide se a conta estiver ligada a uma ficha de colaborador.
 ⁷ Só com ficha de colaborador ligada à conta: o registo fica em nome de quem o faz. O Finance não lê colaboradores, por isso regista despesas só em seu nome.
 ⁸ Só depois de aprovado (BR-5), e nunca por quem pediu nem por quem aprovou (BR-3); o servidor confirma com 403. O dinheiro sai de uma conta aberta na moeda do pedido.
@@ -518,6 +520,13 @@ Recursos Humanos.»
 - **Onde lança:** se o mês da factura ainda não foi apurado, na data dela, acertando o IVA dedutível (34.5.2); se já foi, hoje, como regularização (34.5.4.2 quando se deduz menos, 34.5.4.1 quando se deduz mais).
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
+
+⁶² ADR-137 e ADR-138 (ramos `fix/seed-gestao` e `fix/esclarecimento`), ainda por integrar no `main` a 2026-11-19.
+- **Contas bancárias (ADR-137):** abrir, depositar, levantar, fechar e reabrir passam a pedir `finance.treasury.write` (antes `finance.payables.write`), como já o depósito de valores (ADR-135). As Finanças movimentam as contas; a Gestão vê-as, mas não as movimenta.
+- **Esclarecimento (ADR-138):** pedir esclarecimento fica na trilha, mas não é uma decisão: quem perguntou continua nos aprovadores do passo e em «À minha espera», e aprova ou rejeita depois. Para BR-3 («quem aprovou não paga»), quem perguntou continua a contar.
+- **No front:**
+  - **contas bancárias:** «Abrir conta» (na lista) e «Depositar», «Levantar», «Depositar valores», «Fechar» e «Reabrir» (na ficha) aparecem a quem tem `finance.treasury.write`. Se a API ainda pedir `finance.payables.write`, as Finanças recebem 403 com o motivo, e a Gestão já não vê os botões;
+  - **aprovações:** nada a mudar. A caixa «À minha espera» e o cartão «A sua decisão» seguem os aprovadores pendentes que a API devolve, sem olhar ao histórico; com o ramo, o pedido em «Esclarecimento pedido» volta a aparecer a quem perguntou, com «Aprovar» e «Rejeitar».
 
 ⁶¹ PR #187 (ADR-136), ainda por integrar no `main` a 2026-11-19; e o PR #186.
 - **Série por omissão:** sem série escolhida, a API usa a do ano do documento (`S2026`), se existir activa, senão a `S001`.
@@ -784,7 +793,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   escolheu a alçada ⁵².
 - **Aprovar**, **rejeitar** ou **pedir esclarecimento** (as duas últimas com
   motivo), com confirmação; se outra pessoa decidiu primeiro, a ficha avisa e
-  mostra o estado actual. Numa atribuição de cargo aprovada, o cargo fica em
+  mostra o estado actual. Quem pede esclarecimento continua com o pedido em
+  «À minha espera» e aprova ou rejeita depois ⁶². Numa atribuição de cargo aprovada, o cargo fica em
   vigor de imediato. Por delegação ⁵⁵, decide «Em nome de» quem lhe delegou
   (com vários no mesmo passo, escolhe em nome de quem).
 - **Validar** num passo de validação (a caixa marca-o com «Validação»):
@@ -1897,8 +1907,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 
 **Contas bancárias**
 - Ver saldos e extracto (pela data-valor); **reconciliação** completa;
-  **pagar salários** e **entregar ao Estado**, como o Admin. Não abre contas
-  nem deposita, levanta ou deposita valores.
+  **pagar salários** e **entregar ao Estado**, como o Admin.
+- **Abrir** contas; na ficha, **depositar** e **levantar** (com a
+  data-valor), **depositar valores** recebidos, **fechar** e **reabrir**, como
+  o Admin ⁶².
 
 **Adiantamentos de salário**
 - Ver os pedidos e os pagos, **pedir em nome de…** um colaborador (escolhido
@@ -2004,9 +2016,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ver os pedidos e os pagos. Não pede em nome de ninguém nem paga.
 
 **Contas bancárias**
-- Ver saldos e extracto; **abrir**, **depositar** e **levantar** (com a
-  data-valor), **depositar valores** recebidos, **fechar** e **reabrir**. Sem
-  reconciliação; não paga salários nem entrega impostos.
+- Ver saldos e extracto. Não abre contas, não deposita nem levanta, não
+  deposita valores, não fecha nem reabre ⁶²; sem reconciliação; não paga
+  salários nem entrega impostos.
 
 **Centros de custo**, **Orçamentos** e **Previsões de custos**
 - Ver tudo, com os nomes. **Cria** e **revê** orçamentos em rascunho; não os

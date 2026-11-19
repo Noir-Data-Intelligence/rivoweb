@@ -135,6 +135,29 @@ test.describe("caixa e decisão", () => {
     expect(api.pedidos.some((p) => p.caminho.includes("approval-outcome"))).toBe(false);
   });
 
+  test("esclarecimento pedido por mim: continua à minha espera e decido depois (ADR-138)", async ({ page, api }) => {
+    const pergunta = { decidedByEmployeeId: EU, decidedByName: "Ana Teste", action: "ClarificationRequested", decidedAt: "2026-10-12T10:00:00Z", step: 1, notes: "Qual é a data de início?", checklist: [] };
+    const esclarecer = { ...pedido("ClarificationRequested"), decisions: [pergunta] };
+    await comF4(api)
+      .em("GET", "/approval/requests", (route) => pag(new URL(route.request().url()).searchParams.get("pendingFor") === EU ? [esclarecer] : [esclarecer, meuPedido()]))
+      .em("GET", `/approval/requests/${IDF4.pedido}`, { status: 200, corpo: esclarecer })
+      .em("GET", `/approval/requests/${IDF4.pedido}/history`, { status: 200, corpo: { ...historico(), status: "ClarificationRequested", decisions: [pergunta] } })
+      .em("POST", `/approval/requests/${IDF4.pedido}/decisions`, { status: 200, corpo: pedido("Approved") })
+      .ligar();
+    await entrar(page);
+    await page.goto("/aprovacoes");
+    await expect(page.getByRole("link", { name: "Atribuição de cargo" })).toHaveCount(1);
+    await expect(page.getByText("Esclarecimento pedido")).toBeVisible();
+    await page.getByRole("link", { name: "Atribuição de cargo" }).click();
+    await expect(page.getByRole("heading", { name: "A sua decisão" })).toBeVisible();
+    await expect(page.getByText("Qual é a data de início?")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Rejeitar" })).toBeEnabled();
+    await page.getByRole("button", { name: "Aprovar" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Aprovar" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(api.escritas("POST", `/approval/requests/${IDF4.pedido}/decisions`)[0]?.corpo).toMatchObject({ action: "Approved" });
+  });
+
   test("sem ficha de colaborador: a caixa própria explica porquê", async ({ page, api }) => {
     await comF4(api).em("GET", "/dashboard/me", { status: 200, corpo: { ...painelComFicha(), employeeId: null } }).ligar();
     await entrar(page);

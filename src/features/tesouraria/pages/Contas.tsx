@@ -154,7 +154,7 @@ export default function Contas() {
               <PagamentoPeloBanco tipo="salarios" />
               <PagamentoPeloBanco tipo="estado" />
             </Can>
-            <Can requer="finance.payables.write">
+            <Can requer="finance.treasury.write">
               <AbrirConta />
             </Can>
           </div>

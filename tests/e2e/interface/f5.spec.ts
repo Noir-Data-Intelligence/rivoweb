@@ -756,18 +756,29 @@ test.describe("tesouraria", () => {
     await expect(page.getByRole("button", { name: "Depositar valores" })).toHaveCount(0);
   });
 
-  test("o Manager vê contas e movimenta, mas não a reconciliação", async ({ page, api }) => {
+  test("o Manager vê as contas, mas não as movimenta nem reconcilia (ADR-137)", async ({ page, api }) => {
     await comTesouraria(api, meGestorF5).ligar();
     await entrar(page, "gestor5@teste.local");
     await page.goto(`/contas/${IDF5.conta}?vista=reconciliacao`);
     await expect(page.getByRole("cell", { name: "Levantamento para caixa" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reconciliação" })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Depositar", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Depositar valores" })).toBeVisible();
+    // `finance.payables.write` já não movimenta contas: é preciso `finance.treasury.write`.
+    for (const b of ["Depositar", "Levantar", "Depositar valores", "Fechar"]) await expect(page.getByRole("button", { name: b, exact: true })).toHaveCount(0);
     // Pagar salários e entregar ao Estado pedem `finance.payments.execute`, que o Manager não tem.
     await page.goto("/contas");
     await expect(page.getByRole("link", { name: "Conta à ordem BAI" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Pagar salários" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Abrir conta" })).toHaveCount(0);
+  });
+
+  test("as Finanças movimentam as contas com `finance.treasury.write`, sem `payables.write` (ADR-137)", async ({ page, api }) => {
+    expect(meFinancasF5.permissions).not.toContain("finance.payables.write");
+    await comTesouraria(api, meFinancasF5).ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/contas");
+    await expect(page.getByRole("button", { name: "Abrir conta" })).toBeVisible();
+    await page.goto(`/contas/${IDF5.conta}`);
+    for (const b of ["Depositar", "Levantar", "Depositar valores", "Fechar"]) await expect(page.getByRole("button", { name: b, exact: true })).toBeVisible();
   });
 
   test("câmbios: lista, taxa com 6 casas em texto e conversão; 404 sem taxa", async ({ page, api, violacoes }) => {

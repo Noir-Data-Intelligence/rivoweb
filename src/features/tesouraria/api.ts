@@ -3,8 +3,10 @@
  * caixa pequena, letras e livranças, fluxo de caixa.
  *
  * Facto (`PayablesEndpoints.cs`): as contas lêem com `finance.payables.read`
- * e escrevem com `finance.payables.write`; o resto da tesouraria usa
- * `finance.treasury.*` e o fluxo realizado e previsto `finance.reports.read`.
+ * e movimentam-se (abrir, depositar, levantar, fechar, reabrir) com
+ * `finance.treasury.write` (ADR-137; antes `finance.payables.write`): a Gestão
+ * vê-as, mas não as movimenta. O resto da tesouraria usa `finance.treasury.*`
+ * e o fluxo realizado e previsto `finance.reports.read`.
  */
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEscrita } from "@/lib/api/escrita";

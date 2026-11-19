@@ -494,7 +494,7 @@ export default function Conta() {
           </span>
         }
         accao={
-          pode("finance.payables.write") ? (
+          pode("finance.treasury.write") ? (
             <div className="flex flex-wrap gap-2">
               {c.isActive ? (
                 <>
