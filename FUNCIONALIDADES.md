@@ -514,20 +514,20 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
 
-⁶⁰ PR #177 (ADR-134), no `main` desde 2026-11-15.
+⁶⁰ PR #177 (ADR-134), em produção desde 2026-11-17.
 - **Anular o reembolso:** o motivo e o dia em que o dinheiro voltou. Entra na conta de onde saiu, e o reembolso e a diferença de câmbio estornam-se nesse dia.
 - **A despesa volta a aprovada,** e reembolsa-se outra vez. O colaborador da despesa não anula o reembolso dela.
 - **No front:** na ficha da despesa reembolsada, a quem reembolsa (`finance.expenses.write`) e não é o dono dela, «Anular reembolso»: o motivo e o «Dia em que o dinheiro voltou» (hoje por omissão, não futuro, não antes do reembolso); o diálogo diz para que conta volta o dinheiro. Depois, a ficha mostra «Reembolso anulado» com o dia e o motivo, e «Marcar reembolsada» volta a aparecer. Um `400` no motivo ou no dia fica no campo.
 
-⁵⁹ PR #176 (ADR-133), no `main` desde 2026-11-15.
+⁵⁹ PR #176 (ADR-133), em produção desde 2026-11-17.
 - **Retirar um pedido de férias por decidir**, pelo próprio ou pelos RH, fecha também o processo de aprovação. Antes, ficava pendente na caixa de quem aprova.
 - **No front:** nada a mudar. O processo aparece como «Cancelado» em Aprovações.
 
-⁵⁸ PR #175 (ADR-132), no `main` desde 2026-11-15.
+⁵⁸ PR #175 (ADR-132), em produção desde 2026-11-17.
 - **O recibo** mostra o líquido, cada adiantamento que a folha descontou (com o dia em que se recebeu) e o líquido a receber.
 - **No front:** em «Recibos», com adiantamentos descontados, por baixo do líquido: «Adiantamentos descontados: −…» e «A receber: …», em destaque. Sem adiantamentos, fica como estava. O PDF gerado já os mostra.
 
-⁵⁷ PR #174 (ADR-131), no `main` desde 2026-11-15.
+⁵⁷ PR #174 (ADR-131), em produção desde 2026-11-17.
 - **Retirar:** só o próprio, antes de pago. Por decidir, o processo de aprovação cancela-se.
 - **Anular:** a tesouraria, quando o colaborador devolve o dinheiro e nenhuma folha o descontou ainda. Entra no banco no dia da devolução, e o lançamento do adiantamento estorna-se.
 - **O pedido interno «Adiantamento» ao RH** liga-se ao pedido, e a conversa recebe uma mensagem.
@@ -535,7 +535,7 @@ Recursos Humanos.»
   - **portal:** «Retirar» nos pedidos por aprovar e nos aprovados por pagar, com confirmação; os estados «Retirado» e «Anulado»; num pedido interno da área «Adiantamento salarial» ainda aberto, «Pedir adiantamento» abre o formulário já ligado a ele;
   - **tesouraria:** «Anular» nos pagos que nenhuma folha descontou, a quem executa pagamentos, com o motivo e o dia da devolução (não antes do pagamento); os anulados ficam riscados, com o dia e o motivo; um pedido retirado não mostra «Pagar».
 
-⁵⁶ PR #173 (ADR-130), no `main` desde 2026-11-15.
+⁵⁶ PR #173 (ADR-130), em produção desde 2026-11-17.
 - **O prazo** conta de quando o passo começa, em horas corridas (sem dias úteis).
 - **O lembrete** sai passados 75% do prazo, a quem tem o passo e a quem o substitui por delegação.
 - **No fim:** os ocupantes do cargo de escalonamento passam também a poder decidir, e quem tinha o passo mantém-no. Cada aviso sai uma vez por passo.
@@ -546,7 +546,7 @@ Recursos Humanos.»
   - **notificações:** o lembrete, o prazo passado e o escalonamento com ícone e etiqueta próprios («Prazo a acabar», «Prazo passado», «Escalado»).
   - A vigilância corre sozinha de 15 em 15 minutos; correr já (`POST /approval/deadlines/evaluation`) não tem botão.
 
-⁵⁵ PR #172 (ADR-129), no `main` desde 2026-11-15.
+⁵⁵ PR #172 (ADR-129), em produção desde 2026-11-17.
 - **A delegação:** durante o período, o colega decide os passos que esperam pelo delegante, em nome dele. A decisão regista os dois.
 - **A segregação vale para os dois:** nenhum decide um pedido que submeteu, nem intervém duas vezes no mesmo processo, nem paga o que aprovou.
 - **Uma de cada vez:** um delegante não tem duas delegações para o mesmo período.
@@ -556,12 +556,12 @@ Recursos Humanos.»
   - **na caixa:** «Por delegação de …» nos pedidos que esperam por quem me delegou;
   - **na ficha:** «Aprovar», «Rejeitar» e «Pedir esclarecimento» também por delegação, «Em nome de …»; com vários delegantes no passo, escolhe-se em nome de quem; as decisões dizem «Fulano, em nome de Sicrano».
 
-⁵⁴ PR #171 (ADR-128), no `main` desde 2026-11-15.
+⁵⁴ PR #171 (ADR-128), em produção desde 2026-11-17.
 - **Ganha o último login:** a sessão anterior termina, com um `401` que diz `superseded`.
 - **Abrange** quem decide aprovações, e só com `SESSION_SINGLE_SESSION=true` no servidor.
 - **No front:** com `superseded`, o ecrã de entrar diz «A sessão terminou porque a sua conta entrou noutro sítio.», em vez da mensagem genérica.
 
-⁵³ PR #170 (ADR-127), no `main` desde 2026-11-14.
+⁵³ PR #170 (ADR-127), em produção desde 2026-11-17.
 - **O segundo factor** é um código de 6 dígitos de uma app autenticadora, com 10 códigos de recuperação de uso único.
 - **Obrigatório** para quem decide (aprovações, orçamentos, despesas) ou movimenta fundos (pagamentos, contas bancárias, tesouraria), mas **ainda desligado no servidor**: liga-se quando o front tiver os ecrãs (NOVIDADES, secção 45).
 - **No front:**
@@ -571,7 +571,7 @@ Recursos Humanos.»
   - **Utilizadores (admin):** «Repor segundo factor» na ficha de outra conta, com a razão.
   - **O QR** desenha-se no browser a partir do `otpauth://` (biblioteca `uqr`, carregada só nesse ecrã): a chave não vai a nenhum serviço externo.
 
-⁵² PR #169 (ADR-126, BR-7), no `main` desde 2026-11-14.
+⁵² PR #169 (ADR-126, BR-7), em produção desde 2026-11-17.
 - **A regra:** ao pedir um pagamento, a alçada escolhe-se pelo valor do pedido somado aos do mesmo fornecedor (NIF) e da mesma rubrica (centro de custo) dos últimos 30 dias, na mesma moeda, que não foram rejeitados nem cancelados. O pedido não é recusado: vai para quem tem alçada sobre o total, e a trilha de auditoria regista-o.
 - **Quem decide** vê o acumulado (`cumulativeAmount`) na ficha. No front, quando passa do valor do pedido, a ficha mostra «Acumulado em 30 dias (mesmo fornecedor e rubrica)» por baixo do valor. A caixa não o mostra: a lista não traz o valor do pedido para comparar (B47).
 - **Só tem efeito com políticas com faixas de valor.** Em produção há uma só, e nada muda.

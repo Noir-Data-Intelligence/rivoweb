@@ -1,6 +1,6 @@
 # Novidades do backend para implementar no front
 
-Data: 2026-10-23, actualizado a 2026-11-09. Repositório: `Noir-Data-Intelligence/rivo-api`.
+Data: 2026-10-23, actualizado a 2026-11-17. Repositório: `Noir-Data-Intelligence/rivo-api`.
 A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 
 | # | Funcionalidade | PR | Estado |
@@ -47,15 +47,19 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
-| 52 | Anular o reembolso de uma despesa: o dinheiro volta, os lançamentos estornam-se e a despesa volta a aprovada | #177 | Em revisão |
-| 51 | Retirar férias por decidir fecha também o processo de aprovação | #176 | Em revisão |
-| 50 | O recibo de vencimento mostra o adiantamento de salário que a folha descontou, e o que se recebe | #175 | Em revisão |
-| 49 | Adiantamentos: o colaborador retira o pedido antes de pago; a tesouraria anula o adiantamento devolvido (volta ao banco e sai da folha); o pedido pelo portal liga-se ao pedido interno ao RH | #174 | Em revisão |
-| 48 | Prazos das aprovações: lembrete antes do fim do prazo do passo e, no fim, escalonamento para um cargo (CFO, CEO…) que passa também a poder decidir; o prazo e o «escalado» na caixa e na ficha | #173 | Em revisão |
-| 47 | Delegação de aprovação: o aprovador (ou o admin, por ele) delega num colega por um período, e o colega decide em nome dele; a decisão mostra os dois | #172 | Em revisão |
-| 46 | Sessão única reforçada: quem decide e entra noutro sítio termina a sessão anterior, que recebe `401` com `superseded`; desligada no servidor | #171 | Em revisão |
-| 45 | Segundo factor (MFA) com a app autenticadora: login em dois passos, inscrição com QR e códigos de recuperação, reposição pelo admin; a obrigatoriedade para quem decide ou movimenta fundos fica desligada até o front ter o ecrã | #170 | Em revisão |
-| 44 | Anti-fraccionamento: a alçada de um pedido de pagamento escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica (BR-7) | #169 | Em revisão |
+| 56 | Propostas com as datas em dd/MM/aaaa; seed de Vendas coerente (pró-formas por ordem, propostas válidas, oportunidades e contratos) | #186 | Em revisão |
+| 55 | Seed dos RH: transitados só para quem já cá estava, acolhimentos a meio, saídas sem férias marcadas depois | #185 | Em revisão |
+| 54 | Achados do manual das Finanças: anular uma factura com recibos ou notas de crédito em vigor dá 409; o pedido de pagamento traz `approvalStatus`; o Finance deposita o numerário; a caixa abre com data | #184 | Em revisão |
+| 53 | Textos em português: o resumo das férias e das contagens na caixa de aprovações; o ponto de um dia passado com a hora (`at`); o script fiscal com acentos; os benefícios do seed em português | #181 | Em revisão |
+| 52 | Anular o reembolso de uma despesa: o dinheiro volta, os lançamentos estornam-se e a despesa volta a aprovada | #177 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o «Hotel em Benguela»: reembolsado, anulado a 08/11 e reembolsado outra vez; Balanços de 2025 e 2026 equilibrados) |
+| 51 | Retirar férias por decidir fecha também o processo de aprovação | #176 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (as férias retiradas pelo colaborador QA ficam «Cancelled», e o processo de aprovação também) |
+| 50 | O recibo de vencimento mostra o adiantamento de salário que a folha descontou, e o que se recebe | #175 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o recibo de 02/2026 do colaborador QA: líquido 388 429, adiantamento 122 000, a receber 266 429) |
+| 49 | Adiantamentos: o colaborador retira o pedido antes de pago; a tesouraria anula o adiantamento devolvido (volta ao banco e sai da folha); o pedido pelo portal liga-se ao pedido interno ao RH | #174 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o colaborador QA tem um pedido retirado e outro a partir do pedido interno, à espera do Director Financeiro; um adiantamento pago a 13/11 e anulado a 17/11) |
+| 48 | Prazos das aprovações: lembrete antes do fim do prazo do passo e, no fim, escalonamento para um cargo (CFO, CEO…) que passa também a poder decidir; o prazo e o «escalado» na caixa e na ficha | #173 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (`currentStepDueAt` nos pendentes; as requisições até 2 milhões e as contagens de stock escalam para o Director Geral) |
+| 47 | Delegação de aprovação: o aprovador (ou o admin, por ele) delega num colega por um período, e o colega decide em nome dele; a decisão mostra os dois | #172 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o Director Geral delega no Director Financeiro de 17/12 a 24/12, «Por começar») |
+| 46 | Sessão única reforçada: quem decide e entra noutro sítio termina a sessão anterior, que recebe `401` com `superseded`; desligada no servidor | #171 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o interruptor continua desligado: as contas QA entram em dois sítios ao mesmo tempo) |
+| 45 | Segundo factor (MFA) com a app autenticadora: login em dois passos, inscrição com QR e códigos de recuperação, reposição pelo admin; a obrigatoriedade para quem decide ou movimenta fundos fica desligada até o front ter o ecrã | #170 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (`/identity/me/mfa` responde; a conta Finance tem `required` verdadeiro e `enforced` falso: a obrigatoriedade continua desligada) |
+| 44 | Anti-fraccionamento: a alçada de um pedido de pagamento escolhe-se pelo acumulado de 30 dias do mesmo fornecedor e da mesma rubrica (BR-7) | #169 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (7 pedidos de pagamento à espera do Director Geral, todos com `cumulativeAmount`; a regra só muda a alçada com faixas, e o seed tem uma política só) |
 | 43 | O Finance escolhe em nome de quem pede o adiantamento de salário, sem ler os RH (B46); o seed volta a ser completo por omissão | #167 | **Em produção** desde 13/11; base recriada com o seed completo e verificada (a conta QA Finance recebe os 63 colaboradores activos na lista nova e continua com 403 em `/hr/employees`; 1453 facturas de venda, 319 de compra, 153 despesas, 25 viaturas, 4 sinistros todos dentro da vigência; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 
 **Antes de começar:** actualizar `openapi/v1.json` a partir do commit
@@ -1324,6 +1328,156 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 56. Achados do manual de Vendas (PR #186)
+
+**API**
+- O texto das propostas gerado de um modelo (`{{validade}}`, `{{data}}`) e
+  o PDF da proposta passam a dd/MM/aaaa. O front não muda.
+- **Seed:**
+  - as pró-formas numeradas pela ordem das datas;
+  - as propostas válidas pelo menos 7 dias;
+  - as oportunidades abertas com fecho previsto no futuro;
+  - nenhum contrato em vigor já acabado.
+
+**Front (por fazer, visto no manual de Vendas)**
+- **Rascunho de factura (`Rascunho.tsx`), importante:** ao abrir um
+  rascunho guardado, a caixa «Cliente» mostra «Consumidor final» e a
+  «Série» mostra «Série por omissão», mesmo com o cliente e a série
+  gravados e já carregados.
+  - O formulário guarda os valores certos: a janela «Emitir» mostra o
+    cliente gravado no resumo, e é esse que se emite.
+  - Mas o ecrã mostra outra coisa, e quem «corrigir» a caixa muda o
+    cliente.
+  - Causa provável: o `<Select {...register}>` é montado antes de
+    chegarem as opções (clientes, séries), e o valor do DOM fica no
+    primeiro `<option>`.
+  - Correcção: `form.reset(paraForm(rascunho))` quando as listas
+    chegam, ou um `Controller` com `value`.
+- **Factura-recibo por banco:** a «Conta onde entrou» só aparece a quem
+  tem `finance.payables.read` (`useContaOndeEntrou`). O perfil Vendas
+  não a tem, e a FR por transferência ou Multicaixa sai sem conta: lança
+  na 43.1, mas não entra no saldo da conta. **Decisão em aberto**
+  (backend): uma leitura das contas abertas (id, nome, moeda) com
+  `finance.invoices.write`, como a do B46, ou deixar as FR por banco às
+  Finanças.
+- **Converter pró-forma:** a janela não pede a série, e a factura sai na
+  série por omissão (S001). No seed, as outras facturas estão nas séries
+  anuais (S2026). Ver também a decisão sobre as séries no PR #186.
+- **Contratos de clientes:** «Renova automaticamente» é só uma marca; a
+  API não renova nada. Vale a pena dizê-lo no ecrã (por exemplo,
+  «Lembrar renovação») ou fazer a renovação no servidor (decisão).
+
+**Como ver**
+- Uma proposta criada de um modelo diz «válida até DD/MM/AAAA».
+- O rascunho: Facturas → Rascunhos → o primeiro. A caixa diz «Consumidor
+  final»; carregue em «Emitir…» e veja o cliente no resumo (sem
+  confirmar).
+
+---
+
+## 55. O seed dos RH (PR #185)
+
+**Seed** (a API não muda):
+- os dias transitados de férias só vão para quem já trabalhava no ano
+  anterior;
+- os acolhimentos dos admitidos recentes: dois concluídos e um a meio;
+- quem sai não tem férias nem licenças marcadas para depois do último dia.
+
+**Front (por fazer, visto no manual dos RH)**
+- **Formação:** a coluna Estado mostra «Planeada» em todas as formações
+  que não foram canceladas, mesmo as que já decorreram (`Formacao.tsx`,
+  `c.cancelled ? Cancelada : Planeada`). Com as datas que já vêm na lista,
+  pode mostrar «Decorrida» quando o fim (ou o início, sem fim) já passou.
+
+**Como ver**
+- Depois do reseed:
+  - Entradas e saídas mostra a entrada da Benvinda em curso;
+  - Férias e ausências → Saldos mostra 0 transitados a quem foi admitido
+    este ano.
+
+---
+
+## 54. Achados do manual das Finanças (PR #184, ADR-135)
+
+**API**
+- **Anular uma factura de venda** com recibos ou notas de crédito em vigor
+  dá `409`, com a mensagem «A factura FT S2026/627 tem documentos em vigor
+  que a liquidam ou corrigem: RG S2026/767. Anule-os primeiro e depois a
+  factura.» Antes anulava-se e o recibo ficava em vigor.
+- **`GET /finance/payment-requests`** e a ficha trazem **`approvalStatus`**,
+  lido em `approval` no momento:
+  - `Pending`: por decidir, ou à espera de esclarecimento;
+  - `Approved`;
+  - `Refused`: rejeitado ou retirado;
+  - `Unknown`: processo não encontrado;
+  - `null` num pedido cancelado.
+  O `status` continua `Eligible`, `Executed` ou `Cancelled`.
+- **`POST /finance/treasury/cash-deposits`** passa a exigir
+  `finance.treasury.write` (antes `finance.payables.write`): o perfil
+  Finanças já deposita o numerário e os cheques que recebeu. A Gestão deixa
+  de o poder fazer.
+- **`POST /finance/petty-cash`** aceita `openedOn`, o dia do fundo inicial.
+  Omitido, é hoje; uma data futura dá `400`.
+- **O seed:**
+  - cada caixa pequena abre no dia da primeira despesa;
+  - a venda do portátil do activo e o recibo dela passam a ser de hoje, e os
+    números ficam por ordem.
+
+**Front (por fazer)**
+- **Pedidos de pagamento:** mostrar o estado com o `approvalStatus` de um
+  `Eligible`, e não só «Por pagar»:
+  - `Pending`: «Por aprovar»;
+  - `Approved`: «Aprovado, por pagar»;
+  - `Refused`: «Rejeitado», sem o botão de executar, e com «Cancelar pedido»
+    para quem o pediu;
+  - `Unknown`: «Sem decisão».
+  Um filtro por estes valores na lista ajuda a tesouraria.
+- **Anular factura:** mostrar a mensagem do `409` tal como vem; ela diz que
+  documentos anular primeiro.
+- **Depositar numerário** (Tesouraria): o botão passa a aparecer a quem tem
+  `finance.treasury.write`, e não `finance.payables.write`.
+- **Abrir caixa pequena:** campo opcional «Data de abertura» (hoje por
+  omissão).
+- **Extracto da conta bancária:** pedir por janela de datas (`from`/`to`, já
+  aceites), por exemplo o mês corrente, com «mês anterior»/«seguinte». Hoje a
+  conta BAI do seed traz cerca de 1300 movimentos numa página.
+
+**Como ver**
+- **Anulação:** anular uma FT paga por um RG dá a mensagem. Anula-se o RG,
+  depois a FT.
+- **Pedidos de pagamento:** os pedidos da Formação mostram
+  `approvalStatus` diferentes.
+
+---
+
+## 53. Textos em português e a hora do ponto num dia passado (PR #181)
+
+**API**
+- **O resumo do pedido de férias** na caixa de aprovações passa de «10 dia(s)
+  de Annual, de 2026-12-28 a 2027-01-06» a «10 dia(s) de férias, de
+  28/12/2026 a 06/01/2027». As contagens de stock também passam a dd/MM/aaaa.
+- **`POST /hr/attendance/clock`** aceita `at` (data e hora com fuso), só para
+  um dia que não é hoje, e aí é obrigatório: sem ele, `409`. A hora tem de
+  cair nesse dia e não pode ser futura. Hoje, sem `at`, continua a hora do
+  servidor.
+- **`configurar-referencia-fiscal.ps1`** grava as descrições com acentos
+  («INSS — contribuição patronal», «Código do IVA»).
+- **O seed** cria os benefícios com o tipo em português («saúde», não
+  «Health») e as presenças com entrada e saída à hora certa.
+
+**Front (nada obrigatório)**
+- **Assiduidade:** o botão continua a enviar `day: null`. Se um dia se quiser
+  lançar um dia passado (o registo em papel), o formulário pede o dia e as
+  horas, e envia `at`.
+- **O slogan do ecrã de entrada** está em inglês («Your Business. Under
+  Control.», em `LayoutPublico.tsx`). Fica à decisão de quem mantém a marca.
+
+**Como ver**
+- Depois do reseed: a caixa de aprovações do Director Geral, as horas na
+  Assiduidade e o tipo em Benefícios.
 
 ---
 
