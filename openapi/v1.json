@@ -12235,7 +12235,7 @@
         "tags": [
           "TreasuryEndpoints"
         ],
-        "summary": "Abre uma caixa com fundo fixo (`floatAmount`), que entra como movimento inicial.",
+        "summary": "Abre uma caixa com fundo fixo (`floatAmount`), que entra como movimento inicial no dia `openedOn` (omitido, hoje; futuro: 400).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -15839,6 +15839,40 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sem sessão válida."
+          },
+          "403": {
+            "description": "Sessão válida, mas sem a permissão exigida."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/finance/accounts/lookups": {
+      "get": {
+        "tags": [
+          "Rivo.Api"
+        ],
+        "summary": "Contas bancárias abertas (id, nome, moeda), sem saldo nem IBAN, para escolher onde entrou o que uma factura-recibo recebeu (ADR-136).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BankAccountLookup"
+                  }
                 }
               }
             }
@@ -44432,6 +44466,26 @@
           }
         }
       },
+      "BankAccountLookup": {
+        "required": [
+          "accountId",
+          "name",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
       "BankAccountOpenedResponse": {
         "required": [
           "accountId"
@@ -45959,6 +46013,13 @@
               "null",
               "boolean"
             ]
+          },
+          "at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -52226,6 +52287,13 @@
               "null",
               "boolean"
             ]
+          },
+          "openedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -60425,6 +60493,12 @@
             "format": "date-time"
           },
           "cancellationReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "approvalStatus": {
             "type": [
               "null",
               "string"

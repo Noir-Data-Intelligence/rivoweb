@@ -12696,7 +12696,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** Abre uma caixa com fundo fixo (`floatAmount`), que entra como movimento inicial. */
+        /** Abre uma caixa com fundo fixo (`floatAmount`), que entra como movimento inicial no dia `openedOn` (omitido, hoje; futuro: 400). */
         post: {
             parameters: {
                 query?: never;
@@ -16351,6 +16351,56 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/accounts/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contas bancárias abertas (id, nome, moeda), sem saldo nem IBAN, para escolher onde entrou o que uma factura-recibo recebeu (ADR-136). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BankAccountLookup"][];
+                    };
+                };
+                /** @description Sem sessão válida. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sessão válida, mas sem a permissão exigida. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -43158,6 +43208,12 @@ export interface components {
             equity: components["schemas"]["StatementSection"][];
             unmapped: components["schemas"]["StatementAccount"][];
         };
+        BankAccountLookup: {
+            /** Format: uuid */
+            accountId: string;
+            name: string;
+            currency: string;
+        };
         BankAccountOpenedResponse: {
             /** Format: uuid */
             accountId: string;
@@ -43545,6 +43601,8 @@ export interface components {
             /** Format: date */
             day: null | string;
             late: null | boolean;
+            /** Format: date-time */
+            at?: null | string;
         };
         CloseMaintenanceRequest: {
             /** Format: date */
@@ -45088,6 +45146,8 @@ export interface components {
             /** Format: double */
             floatAmount: number | string;
             active: null | boolean;
+            /** Format: date */
+            openedOn?: null | string;
         };
         GanttMilestone: {
             /** Format: uuid */
@@ -47127,6 +47187,7 @@ export interface components {
             /** Format: date-time */
             cancelledAt: null | string;
             cancellationReason: null | string;
+            approvalStatus?: null | string;
         };
         PayrollItemAddedResponse: {
             /** Format: uuid */

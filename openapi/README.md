@@ -8,9 +8,9 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-11-15 |
-| Commit do backend | `300c994` (`main`, merge do PR #177: anular o reembolso de uma despesa; inclui o #171, a sessão única, o #172, a delegação de aprovação, o #173, os prazos e o escalonamento, o #174, retirar e anular adiantamentos, o #175, o recibo com o adiantamento descontado, e o #176, as férias retiradas; antes, o #170, o segundo factor com a app autenticadora; inclui o #169, o anti-fraccionamento, e o #168; antes, o #167, a lista dos colaboradores para pedir o adiantamento em nome de alguém; inclui o #166, a correcção do IVA não dedutível, e o #165, o pró-rata do IVA; inclui o #149 a #164 — órgãos sociais, IVA não dedutível, reembolso e adiantamentos de salário, actualização cambial das despesas, nota de crédito ao câmbio da factura, regularização de existências, imposto industrial, conta do custo na despesa, BR-3 no IRT e no INSS, quebras e sobras —, o #148, o seed com o IVA em duas prestações, o #147, os salários e as entregas ao Estado em partes, o #146, quem aprova a folha não paga os salários, o #145, a compra de imobilizado nas contas próprias, o #144, a factura que vende um activo, o #141, actualização cambial dos clientes e fornecedores, o #142, mercado nacional e estrangeiro, e o #143, a FR em moeda estrangeira ao cêntimo; antes, o #134 a #140) |
-| Operações | 545 caminhos |
+| Data | 2026-11-19 |
+| Commit do backend | `c0c4f99` (cabeça do PR #187, **ainda aberto**: a série do ano por omissão, as datas futuras recusadas e `GET /finance/accounts/lookups`, ADR-136; por cima do `main` em `a596151`, com o #178 a #185: `ClockRequest.at`, `FundRequest.openedOn`, `PaymentRequestView.approvalStatus`). Antes, `300c994` (`main`, merge do PR #177). Depois do merge do #187, gerar outra vez do `main` publicado. |
+| Operações | 546 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 
 O OpenAPI está desligado em produção (`GET https://syyt.tech/openapi/v1.json` →
