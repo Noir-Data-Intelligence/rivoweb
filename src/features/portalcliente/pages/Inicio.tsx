@@ -15,6 +15,7 @@ import { Kpi } from "@/ui/Kpi";
 import { PageHeader, Skeleton } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import type { FacturaCliente } from "../api";
+import { temEmFalta } from "../comum";
 
 export default function Inicio() {
   const portal = usePortalCliente();
@@ -26,13 +27,14 @@ export default function Inicio() {
     { id: "numero", cabecalho: "Factura", celula: (f) => <span className="font-medium text-foreground">{f.number}</span> },
     { id: "data", cabecalho: "Emitida a", esconderAte: "sm", celula: (f) => formatarData(f.issuedOn) },
     { id: "estado", cabecalho: "Estado", esconderAte: "md", celula: (f) => <EstadoDocumento estado={f.status} /> },
-    { id: "total", cabecalho: "Total", alinhar: "direita", celula: (f) => moeda(f.grossTotal, f.currency) },
+    { id: "total", cabecalho: "Total", alinhar: "direita", esconderAte: "sm", celula: (f) => moeda(f.grossTotal, f.currency) },
+    { id: "falta", cabecalho: "Em falta", alinhar: "direita", celula: (f) => (f.status === "Normal" ? moeda(f.outstanding, f.currency) : "—") },
     {
       id: "accao",
       cabecalho: "",
       alinhar: "direita",
       celula: (f) =>
-        f.status === "Normal" ? (
+        temEmFalta(f) ? (
           <Button asChild variante="ghost" tamanho="sm">
             <Link to={`/cliente/pagamentos?factura=${encodeURIComponent(f.invoiceId)}`} aria-label={`Enviar o comprovativo da factura ${f.number}`}>
               <Upload strokeWidth={1.75} aria-hidden />

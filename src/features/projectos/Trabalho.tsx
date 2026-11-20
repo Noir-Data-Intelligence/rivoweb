@@ -62,7 +62,7 @@ function RegistarTempo({ p }: { p: Projecto }) {
   const accao = useAcaoProjecto(p.projectId);
   const { pessoas } = useEscolhas();
   const idForm = useId();
-  const erros = errosTempo(v, hojeIso());
+  const erros = errosTempo(v, hojeIso(), p.startDate);
   const campo = (k: keyof CamposTempo) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
   const fechar = (a: boolean) => {
     setAberto(a);
@@ -117,7 +117,7 @@ function RegistarTempo({ p }: { p: Projecto }) {
             )}
           </Field>
           <Field rotulo="Dia" erro={tentou ? erros.dia : undefined}>
-            {({ id, descricao, invalido }) => <Input id={id} type="date" max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={v.dia} onChange={campo("dia")} />}
+            {({ id, descricao, invalido }) => <Input id={id} type="date" min={p.startDate} max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={v.dia} onChange={campo("dia")} />}
           </Field>
           <Field rotulo="Horas" erro={tentou ? erros.horas : undefined}>
             {({ id, descricao, invalido }) => <Input id={id} inputMode="decimal" autoComplete="off" aria-describedby={descricao} invalido={invalido} value={v.horas} onChange={campo("horas")} />}
@@ -663,6 +663,8 @@ export function ClienteDoProjecto({ p }: { p: Projecto }) {
   const { pode } = useUtilizador();
   const { clientes } = useEscolhas();
   const escreve = pode("projects.projects.write") && p.status !== "Closed";
+  // Fechado, já não se liga a outro cliente, mas ainda se esconde do portal (ADR-140).
+  const esconde = pode("projects.projects.write") && p.status === "Closed";
   const accao = useAcaoProjecto(p.projectId);
   const [cliente, setCliente] = useState<string | null>(null);
   const id = useId();
@@ -714,6 +716,13 @@ export function ClienteDoProjecto({ p }: { p: Projecto }) {
               </Button>
             </div>
           ) : null}
+        </div>
+      ) : null}
+      {esconde && v.customerId && v.visibleToCustomer ? (
+        <div className="mt-4">
+          <Button aCarregar={accao.isPending} onClick={() => accao.mutate({ acto: "visibilidade", corpo: { customerId: v.customerId, visible: false } }, depois)}>
+            Esconder do portal do cliente
+          </Button>
         </div>
       ) : null}
     </Card>

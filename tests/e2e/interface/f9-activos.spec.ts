@@ -186,6 +186,21 @@ test.describe("activos fixos", () => {
     expect(await violacoes()).toEqual([]);
   });
 
+  test("manutenção agendada com o dia passado: «Em atraso», como na frota", async ({ page, api }) => {
+    const base = fichaActivo();
+    const m0 = base.maintenance[0];
+    if (!m0) throw new Error("fixture sem manutenção");
+    const futura = { ...m0, maintenanceId: "00000000-0000-4000-8000-000000000c99", description: "Revisão anual", scheduledOn: "2099-01-10" };
+    const ficha = { ...base, maintenance: [{ ...m0, scheduledOn: "2020-01-10" }, futura] };
+    await comActivos(api).em("GET", `/finance/assets/${IDF9C.portatil}`, { status: 200, corpo: ficha }).ligar();
+    await entrar(page);
+    await page.goto(`/activos/${IDF9C.portatil}`);
+    await page.getByRole("link", { name: "Manutenção", exact: true }).click();
+    const tabela = page.getByRole("table", { name: "Manutenção do activo" });
+    await expect(tabela.getByRole("row").filter({ hasText: "Limpeza interna" })).toContainText("Em atraso");
+    await expect(tabela.getByRole("row").filter({ hasText: "Revisão anual" })).not.toContainText("Em atraso");
+  });
+
   test("activo sem amortização registada: corrigir envia tudo", async ({ page, api }) => {
     await comActivos(api)
       .em("GET", `/finance/assets/${IDF9C.portatil}`, { status: 200, corpo: fichaActivo(false) })

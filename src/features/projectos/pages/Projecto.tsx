@@ -25,7 +25,7 @@ import { useAcaoProjecto, useComentariosMarcos, useProjecto, type Marco, type Pr
 import { EstadoMarco, EstadoProjecto } from "../comum";
 import { GanttDoProjecto } from "../GanttProjecto";
 import { QuadroDoProjecto } from "../Quadro";
-import { erroFecho, errosComentarioMarco, errosMarco, errosOrcamento, orcamentoParaApi, temErros } from "../regras";
+import { erroAlcancado, erroFecho, errosComentarioMarco, errosMarco, errosOrcamento, orcamentoParaApi, temErros } from "../regras";
 import { TarefasDoProjecto } from "../Tarefas";
 import { ClienteDoProjecto, FicheirosDoProjecto, OrcamentoDoProjecto, RecursosDoProjecto, TempoDoProjecto } from "../Trabalho";
 
@@ -115,7 +115,7 @@ function FecharProjecto({ p }: { p: TipoP }) {
         }}
       >
         <Field rotulo="Data de fecho" erro={tentou ? erro : undefined}>
-          {({ id, descricao, invalido }) => <Input id={id} type="date" min={p.startDate} aria-describedby={descricao} invalido={invalido} value={fim} onChange={(e) => setFim(e.target.value)} />}
+          {({ id, descricao, invalido }) => <Input id={id} type="date" min={p.startDate} max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={fim} onChange={(e) => setFim(e.target.value)} />}
         </Field>
       </Confirmar>
     </>
@@ -171,7 +171,7 @@ function Alcancar({ p, m }: { p: TipoP; m: Marco }) {
   const [aberto, setAberto] = useState(false);
   const [dia, setDia] = useState(hojeIso());
   const accao = useAcaoProjecto(p.projectId);
-  const erro = dia === "" ? "Indique a data." : undefined;
+  const erro = erroAlcancado(dia, p.startDate);
   return (
     <>
       <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Marcar alcançado: ${m.name}`}>
@@ -191,7 +191,7 @@ function Alcancar({ p, m }: { p: TipoP; m: Marco }) {
         aoConfirmar={() => (erro || accao.isPending ? undefined : accao.mutate({ acto: "alcancar", marco: m.milestoneId, corpo: { reachedOn: dia } }, { onSuccess: () => setAberto(false) }))}
       >
         <Field rotulo="Alcançado a" erro={erro}>
-          {({ id, descricao, invalido }) => <Input id={id} type="date" aria-describedby={descricao} invalido={invalido} value={dia} onChange={(e) => setDia(e.target.value)} />}
+          {({ id, descricao, invalido }) => <Input id={id} type="date" min={p.startDate} max={hojeIso()} aria-describedby={descricao} invalido={invalido} value={dia} onChange={(e) => setDia(e.target.value)} />}
         </Field>
       </Confirmar>
     </>

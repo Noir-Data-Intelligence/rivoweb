@@ -206,6 +206,8 @@ test.describe("frota", () => {
     await expect(d).toHaveCount(0);
     expect(api.escritas("PUT", A)[0]?.corpo).toMatchObject({ insurer: "ENSA", policyNumber: "AUTO-2026-001", coverage: "Danos próprios", premium: "260000.00", insuredValue: "18000000.00" });
 
+    // Um sinistro aberto, no singular.
+    await expect(page.getByRole("button", { name: "Sinistros da apólice AUTO-2026-001" })).toHaveText("Sinistros (1 aberto)");
     await page.getByRole("button", { name: "Sinistros da apólice AUTO-2026-001" }).click();
     await expect(d.getByRole("list", { name: "Sinistros" })).toContainText("<script>x</script>");
     expect(await page.locator("[role=dialog] script").count()).toBe(0);

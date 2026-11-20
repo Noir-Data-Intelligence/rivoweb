@@ -106,6 +106,9 @@ test.describe("trabalho do projecto", () => {
     await verificar(page);
     await page.getByRole("button", { name: "Registar tempo" }).click();
     await d.getByLabel("Colaborador").selectOption({ label: "Ana Teste" });
+    await d.getByLabel("Dia").fill("2026-01-31");
+    await d.getByRole("button", { name: "Registar" }).click();
+    await expect(d.getByText("Não se regista tempo antes do início do projecto (01/02/2026).")).toBeVisible();
     await d.getByLabel("Dia").fill("2026-10-20");
     await d.getByLabel("Horas").fill("2");
     await d.getByRole("button", { name: "Registar" }).click();
@@ -243,6 +246,20 @@ test.describe("trabalho do projecto", () => {
     await expect(page).toHaveURL(/de=2026-03-01/);
     await expect.poll(() => api.pedidos.some((p) => p.caminho === "/projects/time-entries" && p.query.includes("from=2026-03-01"))).toBe(true);
     await verificar(page);
+  });
+
+  test("projecto fechado e visível: só «Esconder do portal do cliente» (ADR-140)", async ({ page, api }) => {
+    await comTrabalho(api, meGestorProjectos, true)
+      .em("GET", `/projects/${IDF12.projecto}`, { status: 200, corpo: { ...projecto(), status: "Closed", endDate: "2026-10-31" } })
+      .em("GET", `/projects/${IDF12.projecto}/customer-visibility`, { status: 200, corpo: { ...visibilidade(true), visibleToCustomer: true } })
+      .em("PUT", `/projects/${IDF12.projecto}/customer-visibility`, { status: 204 })
+      .ligar();
+    await entrar(page, meGestorProjectos.email);
+    await page.goto(`/projectos/${IDF12.projecto}?vista=cliente`);
+    await expect(page.getByRole("button", { name: "Guardar cliente" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Mostrar no portal do cliente" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Esconder do portal do cliente" }).click();
+    await expect.poll(() => api.escritas("PUT", `/projects/${IDF12.projecto}/customer-visibility`)[0]?.corpo).toEqual({ customerId: "00000000-0000-4000-8000-000000000701", visible: false });
   });
 });
 

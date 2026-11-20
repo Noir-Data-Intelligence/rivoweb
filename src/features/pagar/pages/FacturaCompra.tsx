@@ -293,7 +293,7 @@ export default function FacturaCompra() {
       ),
     },
     { id: "valor", cabecalho: "Valor", alinhar: "direita", celula: (p) => moeda(p.amount, p.currency) },
-    { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoPedidoPagamento estado={p.status} /> },
+    { id: "estado", cabecalho: "Estado", celula: (p) => <EstadoPedidoPagamento p={p} /> },
   ];
   return (
     <>

@@ -1,5 +1,6 @@
 /** Peças comuns ao portal do cliente e à equipa que lhe responde. */
 import { formatarDataHora } from "@/lib/format/data";
+import { dinheiro } from "@/lib/money/money";
 import { Badge, type TomBadge } from "@/ui/Badge";
 import { Card } from "@/ui/Card";
 import { cn } from "@/ui/cn";
@@ -11,6 +12,13 @@ function estado(mapa: Record<string, { texto: string; tom: TomBadge }>) {
     return <Badge tom={x?.tom ?? "neutro"}>{x?.texto ?? e}</Badge>;
   };
 }
+
+/** Os nomes das categorias que o sistema dá aos ficheiros (o comprovativo vem como `finance.payment-proof`, ADR-141). */
+const CATEGORIAS_FICHEIRO: Record<string, string> = { "finance.payment-proof": "Comprovativo de pagamento" };
+export const nomeCategoria = (c: string | null | undefined) => (c ? (CATEGORIAS_FICHEIRO[c] ?? c) : null);
+
+/** Uma factura ainda por pagar: em vigor e com valor em falta (`outstanding`, ADR-141). */
+export const temEmFalta = (f: { status: string; outstanding: number | string }) => f.status === "Normal" && dinheiro(f.outstanding).gt(0);
 
 export const ESTADOS_COMPROVATIVO: Record<string, string> = { Pending: "Por confirmar", Confirmed: "Confirmado", Rejected: "Rejeitado" };
 export const EstadoComprovativo = estado({

@@ -25,7 +25,7 @@ import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useVista, Vistas, type Vista } from "@/ui/Vistas";
 import { useActivos, useApolices, useCorrerAmortizacao, useCustodias, useManutencoes, useRegistarActivo, type Activo, type Apolice, type Custodia, type Manutencao, type PedidoActivo } from "../api";
-import { EstadoActivo, EstadoManutencao, TIPO_MANUTENCAO } from "../comum";
+import { EstadoActivo, EstadoDaManutencao, TIPO_MANUTENCAO } from "../comum";
 import { CONTAS_PGC_ACTIVO, errosActivo, METODOS, type CamposActivo, type MetodoAmortizacao } from "../regras";
 
 const opc = (v: string) => {
@@ -455,7 +455,7 @@ function TodasManutencoes() {
     },
     { id: "tipo", cabecalho: "Tipo", esconderAte: "sm", celula: (m) => TIPO_MANUTENCAO[m.kind as keyof typeof TIPO_MANUTENCAO] ?? m.kind },
     { id: "descricao", cabecalho: "Descrição", esconderAte: "md", celula: (m) => m.description },
-    { id: "estado", cabecalho: "Estado", celula: (m) => <EstadoManutencao estado={m.status} /> },
+    { id: "estado", cabecalho: "Estado", celula: (m) => <EstadoDaManutencao m={m} /> },
   ];
   return (
     <>

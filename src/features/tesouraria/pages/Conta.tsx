@@ -3,12 +3,12 @@
  * fechar e reabrir, extracto por período e reconciliação com o extracto do
  * banco (importar CSV, conciliar automático e à mão, ignorar).
  */
-import { ArrowDownLeft, ArrowLeft, ArrowUpRight, FileUp, Lock, Unlock, Wand2 } from "lucide-react";
+import { ArrowDownLeft, ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, FileUp, Lock, Unlock, Wand2 } from "lucide-react";
 import { useId, useState } from "react";
 import { Link, NavLink, useParams, useSearchParams } from "react-router";
 import { moeda } from "@/features/facturacao";
 import { useUtilizador } from "@/features/identity";
-import { formatarData, formatarDataHora, hojeIso } from "@/lib/format/data";
+import { formatarData, formatarDataHora, formatarMes, hojeIso, mesDe } from "@/lib/format/data";
 import { dinheiro, lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { IsoDate, normalizarTexto } from "@/lib/validation/text";
 import { Alert } from "@/ui/Alert";
@@ -170,18 +170,52 @@ function Extracto({ c }: { c: TipoConta }) {
   const idDe = useId();
   const idAte = useId();
   const data = (k: string) => (IsoDate.safeParse(params.get(k) ?? "").success ? (params.get(k) as string) : null);
-  const de = data("de");
-  const ate = data("ate");
+  const hoje = hojeIso();
+  // Sem janela no endereço, o mês corrente: o histórico todo pode ter milhares de movimentos (nota 54).
+  const semJanela = data("de") === null && data("ate") === null;
+  const mesActual = mesDe(hoje);
+  const de = semJanela ? mesActual.de : data("de");
+  const ate = semJanela ? mesActual.ate : data("ate");
   const e = useExtracto(c.accountId, de, ate);
   const filtrar = (k: string, v: string) =>
     setParams((a) => {
       const n = new URLSearchParams(a);
+      if (semJanela) {
+        n.set("de", mesActual.de);
+        n.set("ate", mesActual.ate);
+      }
       if (v) n.set(k, v);
       else n.delete(k);
       return n;
     });
+  // O mês mostrado: o de «De», ou o de «Até» sem «De».
+  const base = de ?? ate ?? hoje;
+  const mes = mesDe(base);
+  const eUmMes = de === mes.de && ate === mes.ate;
+  const irPara = (deslocar: number) => {
+    const m = mesDe(base, deslocar);
+    setParams((a) => {
+      const n = new URLSearchParams(a);
+      n.set("de", m.de);
+      n.set("ate", m.ate);
+      return n;
+    });
+  };
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variante="secondary" tamanho="sm" onClick={() => irPara(-1)}>
+          <ChevronLeft strokeWidth={1.75} aria-hidden />
+          Mês anterior
+        </Button>
+        <p className="min-w-[10rem] text-center text-sm font-medium text-foreground" aria-live="polite">
+          {eUmMes ? formatarMes(mes.de) : "Período escolhido"}
+        </p>
+        <Button variante="secondary" tamanho="sm" disabled={mesDe(base, 1).de > hoje} onClick={() => irPara(1)}>
+          Mês seguinte
+          <ChevronRight strokeWidth={1.75} aria-hidden />
+        </Button>
+      </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1.5">
           <label htmlFor={idDe} className="text-sm font-medium text-foreground">

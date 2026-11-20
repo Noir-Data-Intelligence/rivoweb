@@ -81,6 +81,9 @@ function RegistarRecepcao({ o }: { o: OrdemCompra }) {
             registar.mutate({ receivedOn: data === "" ? null : data, deliveryNote: g === "" ? null : g, lines: linhas }, { onSuccess: () => mudar(false) });
           }}
         >
+          <Alert tom="info" className="sm:col-span-2" titulo="A recepção regista o que chegou.">
+            A entrada no stock faz-se em Inventário → Artigos.
+          </Alert>
           <Field rotulo="Recebida a">
             {({ id, descricao }) => <Input id={id} type="date" max={hojeIso()} aria-describedby={descricao} value={data} onChange={(e) => setData(e.target.value)} />}
           </Field>

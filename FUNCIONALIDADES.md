@@ -53,7 +53,11 @@
 > futuras recusadas no campo; a série do ano por omissão; a renovação
 > prevista dos contratos é só um lembrete; as formações decorridas; as
 > contas bancárias movimentam-se com a tesouraria, e a Gestão só as vê; quem
-> pede esclarecimento continua a decidir).
+> pede esclarecimento continua a decidir) · actualizado a 2026-11-20 (o
+> estado dos pedidos de pagamento pela decisão, com filtro; a data de abertura
+> da caixa pequena; o extracto por mês; «Em atraso» na manutenção dos activos;
+> a recepção diz onde entra o stock; as datas do trabalho dos projectos; o
+> valor em falta no portal do cliente; o slogan em português).
 
 ---
 
@@ -104,9 +108,9 @@ AM = AssetManager.
 | Indicadores de vendas (com gráficos) | ✓ | ✓ | — | — | ✓ | — | ✓ | — | — | — |
 | Nome do cliente associado à conta | — | — | — | — | — | — | — | — | — | ✓ ² |
 | **Portal do cliente** (o próprio, pela conta) ² | | | | | | | | | | |
-| Em dívida hoje, facturado no mês e as facturas | — | — | — | — | — | — | — | — | — | ✓ |
+| Em dívida hoje, facturado no mês e as facturas, com o valor em falta de cada uma ⁶³ | — | — | — | — | — | — | — | — | — | ✓ |
 | Extracto de um período (facturas, notas de crédito, recibos, saldos) | — | — | — | — | — | — | — | — | — | ✓ |
-| Enviar o comprovativo de uma transferência (ficheiro carregado) e ver o estado de cada um | — | — | — | — | — | — | — | — | — | ✓ |
+| Enviar o comprovativo de uma transferência (ficheiro carregado) de uma factura com valor em falta ⁶³ e ver o estado de cada um | — | — | — | — | — | — | — | — | — | ✓ |
 | Descarregar os documentos partilhados e os ficheiros que carregou | — | — | — | — | — | — | — | — | — | ✓ |
 | Mensagens à equipa comercial (uma conversa de cada vez) | — | — | — | — | — | — | — | — | — | ✓ |
 | Pedidos de suporte: abrir, responder; avaliar um fechado | — | — | — | — | — | — | — | — | — | ✓ |
@@ -184,12 +188,12 @@ AM = AssetManager.
 | **Projectos** | | | | | | | | | | |
 | Ver os projectos (activos e fechados), o progresso, o orçamento, os marcos com os comentários, as tarefas, o quadro, o Gantt e as dependências | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Abrir e fechar projectos; definir e rever o orçamento | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
-| Marcos: criar, marcar alcançado, comentar (o cliente vê, se o projecto lhe for visível) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Marcos: criar, marcar alcançado (entre o início e hoje ⁶³), comentar (o cliente vê, se o projecto lhe for visível) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tarefas: criar, planear (datas, horas, prioridade, progresso), mover no quadro, concluir, cancelar, dependências | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Atribuir tarefas e ver a quem estão atribuídas ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tarefas: comentários e checklist (juntar, marcar, tirar passos) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Tempo: ver os registos e os totais (por projecto e no registo de tempo global) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
-| Tempo: registar e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
+| Tempo: registar (não antes do início do projecto ⁶³) e apagar; ver por colaborador ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Orçamento por linhas: ver, juntar, corrigir e apagar linhas (previsto, gasto, desvio) | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Ficheiros do projecto: ver, juntar, abrir e retirar ¹⁷ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
 | Recursos (colaboradores e viaturas): ver; alocar e terminar ¹⁶ | ✓ | ✓ | — | — | — | — | — | ✓ | — | — |
@@ -258,7 +262,7 @@ AM = AssetManager.
 | Abrir o lançamento da amortização e do abate no razão | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Vender um activo pela factura («Vender pela factura» na ficha do activo, só com a conta do PGC): FT ou FR de bens com uma linha, na moeda do activo; abate-o e lança a dívida na 37.2 e o resultado na 68.3/78.3; anular a factura repõe o bem ³² | ✓ | ✓ | — | — | — | — | — | — | — | — |
 | Comprar um activo pela factura de compra classificada na conta do bem: a dívida fica na 37.1 e o IVA na 34.5.2.2, e o pagamento salda a 37.1 ³³; o IVA que não se deduz entra no valor do bem ³⁷ (corrige-se depois do registo ⁵⁰) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
-| Manutenção: agendar, concluir, cancelar | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
+| Manutenção: agendar, concluir, cancelar; as agendadas com o dia passado «Em atraso» ⁶³ | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Custódia: entregar a um colaborador e registar a devolução | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | Seguros: registar, corrigir, cancelar; a caducar em 30, 60 ou 90 dias | ✓ | ✓ | — | ✓ | — | ✓ | — | — | — | — |
 | **Frota** | | | | | | | | | | |
@@ -270,7 +274,7 @@ AM = AssetManager.
 | Documentos da viatura: ver, juntar, abrir e retirar ¹⁹ | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | Seguros de frota: contratar, corrigir, anular; a caducar em 30, 60 ou 90 dias; sinistros — abrir, pagar, recusar | ✓ | ✓ | — | — | — | ✓ | — | — | — | — |
 | **Pedidos de pagamento** | | | | | | | | | | |
-| Ver a lista e a ficha, com o estado da aprovação e a lista de anexos | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Ver a lista e a ficha, com o estado da aprovação (por aprovar, aprovado, rejeitado, sem decisão), o filtro por estado e a lista de anexos ⁶³ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Pedir pagamento a partir da factura (vai para aprovação) e cancelar ⁷ | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Anexar documentos ao pedido (carregar ficheiro) | ✓ | ✓ | — | — | ✓ | — | — | — | — | — |
 | Executar o pagamento, com a data em que o dinheiro saiu ²⁴ ⁷ ⁸ | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -304,7 +308,7 @@ AM = AssetManager.
 | O meu contrato: o mais recente em destaque (tipo, datas, salário, estado) e os anteriores | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | Dados pessoais: ver (só leitura); pedir a correcção aos RH por um pedido interno | — | — | — | — | — | — | — | — | ✓ ¹ | — |
 | **Tesouraria** | | | | | | | | | | |
-| Contas bancárias: ver saldos e extracto por período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
+| Contas bancárias: ver saldos e extracto por mês (o corrente por omissão, ⁶³) ou período (pela data-valor ²⁴) | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 | Contas bancárias: abrir, depositar, levantar (com a data-valor ²⁴), fechar (com saldo zero) e reabrir ⁶² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Pagar os salários de um mês e entregar ao Estado o IRT, o INSS e o IVA (o valor vem da folha e do apuramento; lança no razão; com a data do pagamento ²⁴; os salários, o IRT e o INSS, só um colaborador que não decidiu a folha ³⁴ ⁴⁵; de uma vez ou em partes ³⁵) ²² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Adiantamentos de salário: ver os pedidos (com o estado) e os pagos (com os por descontar) ³⁹ ⁴⁸ | ✓ | ✓ | — | ✓ | ✓ | — | — | — | — | — |
@@ -314,7 +318,7 @@ AM = AssetManager.
 | Depositar numerário e cheques recebidos (sai dos valores para depositar e lança no razão; com a data do talão ²⁴) ²² ⁶² | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Reconciliação: ver; importar o extracto CSV, conciliar automático e à mão, desfazer, ignorar | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Câmbios: ver, converter e registar taxas | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
-| Caixa pequena: ver fundos e movimentos; abrir e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
+| Caixa pequena: ver fundos e movimentos; abrir (com a data de abertura ⁶³) e rever fundos; despesa, reposição e ajuste | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Letras e livranças: ver; registar; aceite, desconto, endosso, pagamento, protesto, anulação | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Letras a receber: ligar ao cliente, escolhido da lista de clientes activos (sem ler o cadastro) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
 | Fluxo de caixa: previsto e realizado; previsões manuais (criar, rever, apagar) | ✓ | ✓ | — | ✓ | — | — | — | — | — | — |
@@ -521,14 +525,30 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
 
-⁶² ADR-137 e ADR-138 (ramos `fix/seed-gestao` e `fix/esclarecimento`), ainda por integrar no `main` a 2026-11-19.
+⁶³ Notas 54 do backend (PR #184, ADR-135), PR #192 (ADR-140) e PR #193 (ADR-141), no `main` desde 2026-11-20; tipos gerados do `main` em `18d2372`.
+- **Pedidos de pagamento:** a lista e a ficha trazem `approvalStatus`, a decisão em Aprovações lida no momento.
+- **Caixa pequena:** `openedOn` na abertura (omitido, hoje; futuro, recusado).
+- **Projectos (ADR-140):** não se regista tempo antes do início do projecto; um marco não se alcança antes do início nem no futuro; o fecho não é futuro, e as últimas horas e o último marco confere-os o servidor (`409` com o motivo). Um projecto fechado ainda se esconde do portal.
+- **Portal do cliente (ADR-141):** cada factura traz `outstanding`, o valor em falta.
+- **No front:**
+  - **pedidos de pagamento:** o estado de um pedido por pagar diz-se pela decisão: «Por aprovar», «Aprovado, por pagar», «Rejeitado» (sem «Executar pagamento», com o aviso e «Cancelar pedido») e «Sem decisão» (não se executa); sem `approvalStatus`, «Por pagar», como antes. Na lista, o filtro «Estado» (estes, «Pago» e «Cancelado», no URL); a API não filtra pela decisão, por isso o filtro lê os 200 pedidos mais recentes e avisa se houver mais;
+  - **caixa pequena:** «Data de abertura (opcional)», hoje por omissão, nunca futura;
+  - **extracto da conta:** sem datas no URL, o mês corrente (antes, o histórico todo; a conta BAI do seed tem cerca de 1300 movimentos), com «Mês anterior» e «Mês seguinte» (este, até ao mês corrente) e o nome do mês; «De» e «Até» continuam para outro período;
+  - **activos:** uma manutenção agendada com o dia passado mostra «Em atraso», na ficha e na lista, como na frota;
+  - **seguros de frota:** «Sinistros (1 aberto)», no singular;
+  - **recepções:** a janela de registar diz «A recepção regista o que chegou. A entrada no stock faz-se em Inventário → Artigos.»;
+  - **projectos:** «Dia» do tempo com mínimo no início do projecto e a mensagem «Não se regista tempo antes do início do projecto (dd/mm/aaaa).»; «Alcançado a» entre o início e hoje, com «A data em que o marco foi alcançado não pode ser futura.» e «Um marco não pode ser alcançado antes do início do projecto.»; «Data de fecho» até hoje, com «A data de fecho não pode ser futura.»; num projecto fechado e visível, a vista Cliente mostra «Esconder do portal do cliente»;
+  - **portal do cliente:** no Início, a coluna «Em falta», e «Enviar comprovativo» só nas facturas com valor em falta (antes também nas pagas e nas facturas-recibo); em Pagamentos, a lista «Factura» só com essas, com o valor em falta no texto, e o «Valor pago» começa nele; em Documentos, «Comprovativo de pagamento» em vez de `finance.payment-proof`;
+  - **entrada:** o slogan passa a «O seu negócio. Sob controlo.», como o resto da página (`pt-AO`).
+
+⁶² ADR-137 e ADR-138 (PR #188 e #189), no `main` desde 2026-11-19.
 - **Contas bancárias (ADR-137):** abrir, depositar, levantar, fechar e reabrir passam a pedir `finance.treasury.write` (antes `finance.payables.write`), como já o depósito de valores (ADR-135). As Finanças movimentam as contas; a Gestão vê-as, mas não as movimenta.
 - **Esclarecimento (ADR-138):** pedir esclarecimento fica na trilha, mas não é uma decisão: quem perguntou continua nos aprovadores do passo e em «À minha espera», e aprova ou rejeita depois. Para BR-3 («quem aprovou não paga»), quem perguntou continua a contar.
 - **No front:**
-  - **contas bancárias:** «Abrir conta» (na lista) e «Depositar», «Levantar», «Depositar valores», «Fechar» e «Reabrir» (na ficha) aparecem a quem tem `finance.treasury.write`. Se a API ainda pedir `finance.payables.write`, as Finanças recebem 403 com o motivo, e a Gestão já não vê os botões;
-  - **aprovações:** nada a mudar. A caixa «À minha espera» e o cartão «A sua decisão» seguem os aprovadores pendentes que a API devolve, sem olhar ao histórico; com o ramo, o pedido em «Esclarecimento pedido» volta a aparecer a quem perguntou, com «Aprovar» e «Rejeitar».
+  - **contas bancárias:** «Abrir conta» (na lista) e «Depositar», «Levantar», «Depositar valores», «Fechar» e «Reabrir» (na ficha) aparecem a quem tem `finance.treasury.write`;
+  - **aprovações:** nada a mudar. A caixa «À minha espera» e o cartão «A sua decisão» seguem os aprovadores pendentes que a API devolve, sem olhar ao histórico: o pedido em «Esclarecimento pedido» aparece a quem perguntou, com «Aprovar» e «Rejeitar».
 
-⁶¹ PR #187 (ADR-136), ainda por integrar no `main` a 2026-11-19; e o PR #186.
+⁶¹ PR #187 (ADR-136) e PR #186, no `main` desde 2026-11-19.
 - **Série por omissão:** sem série escolhida, a API usa a do ano do documento (`S2026`), se existir activa, senão a `S001`.
 - **Datas futuras:** facturas, emissão de rascunhos, pró-formas e a sua conversão, notas de crédito e recibos dão 400 com uma data futura (dia de Angola).
 - **Contas para a FR:** `GET /finance/accounts/lookups` dá as contas abertas (id, nome, moeda) a quem emite facturas.
@@ -619,8 +639,8 @@ Recursos Humanos.»
   recuperação; o pedido dura 5 minutos e, ao acabar, volta-se ao primeiro.
   A password pode mostrar-se e esconder-se. Não há registo nem conta de
   demonstração: o acesso é dado por convite. Os ecrãs públicos (entrar,
-  convite, recuperação) têm o tema da marca: painel escuro com «Your
-  Business. Under Control.» em ecrãs largos e o formulário ao lado.
+  convite, recuperação) têm o tema da marca: painel escuro com «O seu
+  negócio. Sob controlo.» ⁶³ em ecrãs largos e o formulário ao lado.
 - **Aceitar convite** pela ligação do e-mail (`/convite`): define a password e
   entra. A ligação é lida e retirada do endereço logo ao abrir.
 - **Recuperar password** (`/recuperar-password`): a resposta é sempre a mesma,
@@ -1013,11 +1033,13 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ficha com quatro vistas (no URL):
   - **Resumo:** progresso, tarefas feitas, marcos alcançados, orçamento
     aprovado, visível ao cliente; **definir ou rever o orçamento** (a moeda
-    não muda numa revisão), **fechar** com a data (não volta atrás); marcos
+    não muda numa revisão), **fechar** com a data (não futura; não volta
+    atrás; as recusas do servidor dizem porquê ⁶³); marcos
     (data alvo, alcançado, comentários da equipa e do cliente, sempre como
     texto) — **novo marco** (não antes do início do projecto), **marcar
     alcançado** com a data, **comentar** assinando com o nome (por omissão,
-    o da conta; vazio, «Equipa»).
+    o da conta; vazio, «Equipa»). A data de alcançado fica entre o início do
+    projecto e hoje ⁶³.
   - **Tarefas:** título, descrição, etapa ou estado, prioridade, a quem está
     atribuída, prazo, progresso e horas; **nova tarefa** (título, prazo,
     atribuição), **planear** (título, descrição, início, prazo, horas
@@ -1033,8 +1055,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     marcos no tempo.
   - **Tempo:** horas registadas, facturáveis e por colaborador; os registos
     (dia, colaborador, tarefa, descrição, horas, facturável); **registar**
-    (colaborador, tarefa, dia não futuro, horas até 24 por dia, descrição,
-    facturável) e **apagar**.
+    (colaborador, tarefa, dia não futuro nem antes do início do projecto ⁶³,
+    horas até 24 por dia, descrição, facturável) e **apagar**.
   - **Orçamento:** aprovado, previsto nas linhas, gasto e desvio, com aviso
     quando o previsto passa o aprovado; **linhas** (categoria, descrição,
     previsto, gasto) — juntar, corrigir, apagar.
@@ -1046,7 +1068,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     (não antes do início do projecto; o mesmo recurso uma vez em aberto) e
     **terminar** com a data.
   - **Cliente:** o cliente ligado e se o projecto aparece no portal;
-    **ligar a um cliente** e **mostrar ou esconder no portal do cliente**.
+    **ligar a um cliente** e **mostrar ou esconder no portal do cliente**;
+    fechado o projecto, só **esconder do portal do cliente** ⁶³.
 - Na lista de tarefas, cada tarefa tem **comentários** (lista e novo, com o
   autor para quem lê as contas) e **checklist** (passos, feitos, juntar,
   marcar e tirar).
@@ -1151,7 +1174,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   recebida, cancelada).
 - **Ordem:** por linha, o encomendado, o recebido, o que falta, o preço e o
   total; as recepções; **registar uma recepção** (data, guia de remessa e a
-  quantidade que chegou por linha, sem passar o que falta); **anular** uma
+  quantidade que chegou por linha, sem passar o que falta; a janela lembra
+  que a entrada no stock se faz em Inventário → Artigos ⁶³); **anular** uma
   recepção com motivo; **cancelar** a ordem com motivo (só sem mercadoria
   recebida).
 
@@ -1218,7 +1242,7 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   do activo, e abre-a: a dívida vai para a 37.2 e o resultado para a 68.3
   (ganho) ou 78.3 (perda). Anular a factura repõe o bem.
 - **Manutenção:** de cada activo e de todos (agendadas, concluídas,
-  canceladas); **agendar** (tipo — preventiva, correctiva, inspecção —,
+  canceladas; uma agendada com o dia passado mostra «Em atraso» ⁶³); **agendar** (tipo — preventiva, correctiva, inspecção —,
   descrição, data, prestador, custo estimado), **concluir** (data, custo,
   notas), **cancelar**.
 - **Custódia:** quem tem o activo e o histórico; **entregar** a um
@@ -1263,7 +1287,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
     faltam, caducada, anulada); **contratar** e **corrigir** (seguradora,
     número, cobertura — vazia, responsabilidade civil —, vigência, prémio,
     moeda, capital seguro, notas), **anular** com a data; **sinistros** de
-    cada apólice (data, referência, descrição, reclamado, pago, estado):
+    cada apólice (o botão diz quantos estão abertos, «1 aberto» no singular
+    ⁶³; data, referência, descrição, reclamado, pago, estado):
     **abrir** (dentro da vigência; descrição, valor reclamado, referência),
     **pagar** (valor pago, proposto o reclamado) e **recusar**.
 - **Manutenção prevista:** os planos activos de toda a frota a vencer em 7,
@@ -1314,7 +1339,10 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   **anular** com motivo.
 
 **Pedidos de pagamento**
-- Lista paginada (factura, beneficiário, data, valor, estado).
+- Lista paginada (factura, beneficiário, data, valor, estado); o estado de um
+  pedido por pagar diz-se pela decisão em Aprovações: «Por aprovar»,
+  «Aprovado, por pagar», «Rejeitado» ou «Sem decisão» ⁶³; **filtrar** por
+  estado (também «Pago» e «Cancelado»), entre os 200 pedidos mais recentes.
 - **Pedir** a partir da factura (valor até ao que falta pedir, notas): vai
   para aprovação.
 - Ficha: beneficiário, valor, quem pediu, o estado da aprovação com ligação ao
@@ -1323,7 +1351,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   pedido (com o saldo à vista), o meio de pagamento, a referência e a **data**
   em que o dinheiro saiu (não futura nem antes do pedido); aviso com o saldo
   da conta depois do pagamento. Quem pediu e quem aprovou não vêem o
-  botão e a ficha explica porquê (BR-3).
+  botão e a ficha explica porquê (BR-3). Rejeitado ou sem decisão, não se
+  executa, e a ficha diz porquê ⁶³.
 - **Cancelar** com motivo; **anexar** documentos (factura, proposta, contrato)
   e **descarregá-los**.
 
@@ -1360,7 +1389,8 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
 - Ficha: saldo, **depositar** e **levantar** (com a data-valor), **depositar
   valores** (numerário e cheques recebidos, nas contas em kwanzas: valor e
   referência do talão, data), **fechar** (só com saldo zero) e **reabrir**;
-  **extracto** por período (saldo inicial, entradas, saídas, saldo final,
+  **extracto** do mês corrente por omissão, com «Mês anterior» e «Mês
+  seguinte», ou de outro período ⁶³ (saldo inicial, entradas, saídas, saldo final,
   movimentos pela data-valor, com o dia em que se registou quando é outro),
   com aviso se não bater com o saldo.
 - **Reconciliação:** resumo (saldo contabilístico, linhas conciliadas,
@@ -1388,8 +1418,9 @@ Tem tudo o que o **Admin** tem (abaixo) e ainda:
   «Pagar».
 
 **Caixa pequena**
-- Fundos com fundo fixo, saldo e o que falta repor; **abrir** e **rever**
-  fundos (responsável, fundo fixo, activo).
+- Fundos com fundo fixo, saldo e o que falta repor; **abrir** (com a data de
+  abertura, opcional, hoje por omissão, nunca futura ⁶³) e **rever** fundos
+  (responsável, fundo fixo, activo).
 - Ficha do fundo: movimentos por período e **registar** despesa, reposição
   (vazia repõe o que falta) ou ajuste de contagem.
 
@@ -2191,19 +2222,22 @@ Entra no **portal do cliente** (`/cliente`). Tudo é do próprio cliente, pela
 conta; nenhum pedido diz de que cliente é.
 - **Início:** nome do cliente, o que está **em dívida hoje** (já descontados
   recibos e notas de crédito), o **facturado este mês** (sem impostos) e todas
-  as facturas (número, data, estado, total), com «Enviar comprovativo» nas que
-  estão em vigor.
+  as facturas (número, data, estado, total, **em falta** ⁶³), com «Enviar
+  comprovativo» só nas que têm valor em falta (não nas pagas nem nas
+  facturas-recibo).
 - **Extracto:** facturas, notas de crédito e recibos de um período (por
   omissão, do início do ano a hoje; o período fica no URL), com débito,
   crédito e o saldo depois de cada movimento; saldo inicial e final.
 - **Pagamentos:** os comprovativos enviados (factura, data do pagamento, data
   do envio, valor, estado — por confirmar, confirmado, rejeitado com o
-  motivo); **enviar um comprovativo**: factura em vigor, valor pago (até ao
-  que falta pagar, o servidor confere), data do pagamento (não futura),
+  motivo); **enviar um comprovativo**: factura com valor em falta (a lista
+  mostra-o ⁶³), valor pago (começa no que falta; até ao que falta pagar, o
+  servidor confere), data do pagamento (não futura),
   ficheiro (PDF, imagem, documento de escritório ou texto, até 10 MB, até 20
   por dia; o servidor confirma o tipo pelo conteúdo) e notas.
 - **Documentos:** os que a empresa partilhou (título, categoria, data,
-  tamanho) e os ficheiros que carregou; descarregar, sempre em anexo.
+  tamanho) e os ficheiros que carregou (o comprovativo como «Comprovativo de
+  pagamento» ⁶³); descarregar, sempre em anexo.
 - **Projectos:** os projectos que a empresa lhe mostra, com o período, o
   progresso e o próximo marco; em cada projecto, os marcos (data, alcançado)
   com os comentários da equipa e os seus (como texto), e **comentar** um

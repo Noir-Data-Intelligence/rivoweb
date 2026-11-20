@@ -20,13 +20,18 @@ import { Field, Input } from "@/ui/Field";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
 import { useComprovativos, useEnviarComprovativo, type Comprovativo, type FacturaCliente } from "../api";
-import { EstadoComprovativo } from "../comum";
+import { EstadoComprovativo, temEmFalta } from "../comum";
 import { comprovativoParaApi, errosComprovativo, MAXIMO_NOTAS, temErros } from "../regras";
 
+/** O valor em falta, como se escreve no campo (vírgula decimal). */
+const emFaltaDigitado = (f: FacturaCliente | undefined) => (f ? String(f.outstanding).replace(".", ",") : "");
+
+/** Envia o comprovativo de uma factura com valor em falta (ADR-141); o valor pago começa no que falta. */
 function Enviar({ facturas, inicial, aoFechar }: { facturas: readonly FacturaCliente[]; inicial: string; aoFechar: () => void }) {
+  const daLista = (id: string) => facturas.find((f) => f.invoiceId === id);
   const [aberto, setAberto] = useState(inicial !== "");
-  const [factura, setFactura] = useState(facturas.some((f) => f.invoiceId === inicial) ? inicial : "");
-  const [valor, setValor] = useState("");
+  const [factura, setFactura] = useState(daLista(inicial) ? inicial : "");
+  const [valor, setValor] = useState(emFaltaDigitado(daLista(inicial)));
   const [pagoA, setPagoA] = useState(hojeIso());
   const [documento, setDocumento] = useState<Documento | null>(null);
   const [notas, setNotas] = useState("");
@@ -78,11 +83,21 @@ function Enviar({ facturas, inicial, aoFechar }: { facturas: readonly FacturaCli
         >
           <Field rotulo="Factura" erro={mostrar("factura")}>
             {({ id, descricao, invalido }) => (
-              <Select id={id} aria-describedby={descricao} invalido={invalido} value={factura} onChange={(e) => setFactura(e.target.value)}>
+              <Select
+                id={id}
+                aria-describedby={descricao}
+                invalido={invalido}
+                value={factura}
+                onChange={(e) => {
+                  // O valor pago segue a factura enquanto não foi escrito à mão.
+                  if (valor === "" || valor === emFaltaDigitado(daLista(factura))) setValor(emFaltaDigitado(daLista(e.target.value)));
+                  setFactura(e.target.value);
+                }}
+              >
                 <option value="">Escolha…</option>
                 {facturas.map((f) => (
                   <option key={f.invoiceId} value={f.invoiceId}>
-                    {f.number} · {formatarData(f.issuedOn)} · {moeda(f.grossTotal, f.currency)}
+                    {f.number} · {formatarData(f.issuedOn)} · em falta {moeda(f.outstanding, f.currency)}
                   </option>
                 ))}
               </Select>
@@ -125,7 +140,7 @@ export default function Pagamentos() {
   const lista = useComprovativos();
   const facturas = portal.data?.invoices ?? [];
   const daFactura = (id: string) => facturas.find((f) => f.invoiceId === id);
-  const abertas = facturas.filter((f) => f.status === "Normal").sort((a, b) => b.issuedOn.localeCompare(a.issuedOn));
+  const abertas = facturas.filter(temEmFalta).sort((a, b) => b.issuedOn.localeCompare(a.issuedOn));
   const inicial = params.get("factura") ?? "";
   const ordenada = [...(lista.data ?? [])].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
   const colunas: Coluna<Comprovativo>[] = [

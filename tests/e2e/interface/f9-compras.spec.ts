@@ -168,6 +168,8 @@ test.describe("compras", () => {
     await verificar(page);
     await page.getByRole("button", { name: "Registar recepção" }).click();
     const d = page.getByRole("dialog");
+    // A recepção não mexe no stock: diz-se onde se faz a entrada.
+    await expect(d.getByText("A entrada no stock faz-se em Inventário → Artigos.")).toBeVisible();
     await expect(d.getByLabel("Papel A4 (faltam 6)")).toHaveValue("6");
     await d.getByLabel("Papel A4 (faltam 6)").fill("7");
     await d.getByLabel("Toner (faltam 2)").fill("");

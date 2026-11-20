@@ -48,7 +48,7 @@ import {
   type FichaActivo,
   type Manutencao,
 } from "../api";
-import { EstadoActivo, EstadoManutencao, TIPO_MANUTENCAO } from "../comum";
+import { EstadoActivo, EstadoDaManutencao, TIPO_MANUTENCAO } from "../comum";
 import { erroDevolucao, errosAbate, errosActivo, errosApolice, errosManutencao, METODOS, textoContaPgc, type CamposActivo, type CamposApolice } from "../regras";
 import { CamposDoActivo, camposDe, corpoActivo } from "./Activos";
 
@@ -338,7 +338,7 @@ function ManutencaoDoActivo({ f }: { f: FichaActivo }) {
       ),
     },
     { id: "custo", cabecalho: "Custo", alinhar: "direita", esconderAte: "md", celula: (m) => (m.cost === null ? "—" : moeda(m.cost, a.currency)) },
-    { id: "estado", cabecalho: "Estado", celula: (m) => <EstadoManutencao estado={m.status} /> },
+    { id: "estado", cabecalho: "Estado", celula: (m) => <EstadoDaManutencao m={m} /> },
     {
       id: "accao",
       cabecalho: "",

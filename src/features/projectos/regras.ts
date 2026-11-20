@@ -1,4 +1,5 @@
 /** Regras dos projectos iguais às do servidor (`Project.cs`, `ProjectTask.cs`, `ProjectWork.cs`). */
+import { formatarData, hojeIso } from "@/lib/format/data";
 import { lerDecimalDigitado, lerDinheiroDigitado, paraApi, decimalParaApi, type Dinheiro } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/normalizar";
 import { IsoDate } from "@/lib/validation/text";
@@ -15,7 +16,19 @@ export function errosProjecto(v: { nome: string; inicio: string }) {
   return { nome: nome === "" ? "Indique o nome." : max(nome, 200), inicio: data(v.inicio) ? undefined : "Indique a data de início." };
 }
 
-export const erroFecho = (fim: string, inicio: string) => (!data(fim) ? "Indique a data de fecho." : fim < inicio ? "A data de fecho não pode ser anterior à de início." : undefined);
+/** A data de fecho (ADR-140): nem antes do início nem futura. As últimas horas e o último marco confere-os o servidor. */
+export const erroFecho = (fim: string, inicio: string, hoje = hojeIso()) =>
+  !data(fim) ? "Indique a data de fecho." : fim < inicio ? "A data de fecho não pode ser anterior à de início." : fim > hoje ? "A data de fecho não pode ser futura." : undefined;
+
+/** O dia em que um marco foi alcançado (ADR-140): entre o início do projecto e hoje. */
+export const erroAlcancado = (dia: string, inicio: string, hoje = hojeIso()) =>
+  !data(dia)
+    ? "Indique a data."
+    : dia > hoje
+      ? "A data em que o marco foi alcançado não pode ser futura."
+      : dia < inicio
+        ? "Um marco não pode ser alcançado antes do início do projecto."
+        : undefined;
 
 export function errosOrcamento(v: { valor: string; moeda: string }) {
   const valor = lerDinheiroDigitado(v.valor);
@@ -113,11 +126,17 @@ export interface CamposTempo {
   facturavel: boolean;
 }
 
-export function errosTempo(v: CamposTempo, hoje: string) {
+export function errosTempo(v: CamposTempo, hoje: string, inicioProjecto?: string) {
   const h = lerDecimalDigitado(v.horas, 2);
   return {
     pessoa: v.pessoa === "" ? "Escolha o colaborador." : undefined,
-    dia: !data(v.dia) ? "Indique o dia." : v.dia > hoje ? "Não se regista tempo num dia futuro." : undefined,
+    dia: !data(v.dia)
+      ? "Indique o dia."
+      : v.dia > hoje
+        ? "Não se regista tempo num dia futuro."
+        : inicioProjecto && v.dia < inicioProjecto
+          ? `Não se regista tempo antes do início do projecto (${formatarData(inicioProjecto)}).`
+          : undefined,
     horas: h === null || !h.gt(0) || h.gt(24) ? "Horas entre 0 e 24 (até 2 casas decimais)." : undefined,
     descricao: max(normalizarTexto(v.descricao), 500),
   };

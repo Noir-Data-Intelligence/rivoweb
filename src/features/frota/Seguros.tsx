@@ -275,7 +275,7 @@ function SinistrosDaApolice({ p, escreve }: { p: Apolice; escreve: boolean }) {
   return (
     <>
       <Button variante="ghost" tamanho="sm" onClick={() => setAberto(true)} aria-label={`Sinistros da apólice ${p.policyNumber}`}>
-        Sinistros{Number(p.openClaims) > 0 ? ` (${String(p.openClaims)} abertos)` : ""}
+        Sinistros{Number(p.openClaims) > 0 ? ` (${String(p.openClaims)} ${Number(p.openClaims) === 1 ? "aberto" : "abertos"})` : ""}
       </Button>
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent titulo={`Sinistros · ${p.insurer} ${p.policyNumber}`} descricao={`Vigência de ${formatarData(p.startsOn)} a ${formatarData(p.endsOn)}.`} className="max-w-2xl">

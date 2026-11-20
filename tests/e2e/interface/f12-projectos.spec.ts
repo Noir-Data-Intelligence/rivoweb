@@ -87,6 +87,13 @@ test.describe("projectos", () => {
     expect(api.escritas("POST", `/projects/${IDF12.projecto}/milestones`)[0]?.corpo).toEqual({ name: "Testes", targetDate: "2026-05-15" });
 
     await page.getByRole("button", { name: "Marcar alcançado: Go-live" }).click();
+    // Entre o início do projecto e hoje (ADR-140).
+    await d.getByLabel("Alcançado a").fill("2099-01-01");
+    await expect(d.getByText("A data em que o marco foi alcançado não pode ser futura.")).toBeVisible();
+    await d.getByLabel("Alcançado a").fill("2026-01-31");
+    await expect(d.getByText("Um marco não pode ser alcançado antes do início do projecto.")).toBeVisible();
+    await d.getByRole("button", { name: "Registar" }).click();
+    expect(api.escritas("POST", `/projects/${IDF12.projecto}/milestones/${IDF12.marco2}/reached`)).toHaveLength(0);
     await d.getByLabel("Alcançado a").fill("2026-06-28");
     await d.getByRole("button", { name: "Registar" }).click();
     await expect(d).toHaveCount(0);

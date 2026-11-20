@@ -290,7 +290,11 @@ export default function PedidoPagamento() {
   const p = q.data;
   const porPagar = p.status === "Eligible";
   const souRequerente = eu.id !== null && eu.id === p.requestedByEmployeeId;
-  const aprovado = aprovacao.data?.status === "Approved";
+  // A decisão vem no pedido (`approvalStatus`, nota 54); sem ela (API antiga), lê-se o processo.
+  const decisao = p.approvalStatus ?? null;
+  const aprovado = decisao ? decisao === "Approved" : aprovacao.data?.status === "Approved";
+  const rejeitado = porPagar && decisao === "Refused";
+  const porAprovar = decisao ? decisao === "Pending" : podeLerAprovacao && aprovacao.data !== undefined && !aprovado;
   // Quem aprovou também não paga (BR-3): o servidor recusa com 403.
   const souAprovador = eu.id !== null && (aprovacao.data?.decisions ?? []).some((d) => d.decidedByEmployeeId === eu.id);
   const quemPediu = souRequerente ? "Você" : (aprovacao.data?.requestedByName ?? "Colaborador");
@@ -302,7 +306,7 @@ export default function PedidoPagamento() {
         titulo={`Pagamento de ${p.supplierInvoiceNumber}`}
         descricao={
           <span className="inline-flex flex-wrap items-center gap-2">
-            <EstadoPedidoPagamento estado={p.status} />
+            <EstadoPedidoPagamento p={p} />
             <span>
               {moeda(p.amount, p.currency)} a {p.payeeName}
             </span>
@@ -311,7 +315,7 @@ export default function PedidoPagamento() {
         accao={
           porPagar ? (
             <div className="flex flex-wrap gap-2">
-              {podeExecutar && eu.id && !souRequerente && !souAprovador && (aprovado || !podeLerAprovacao) ? <Executar p={p} aoExecutar={setSaldoDepois} /> : null}
+              {podeExecutar && eu.id && !souRequerente && !souAprovador && (aprovado || (decisao === null && !podeLerAprovacao)) ? <Executar p={p} aoExecutar={setSaldoDepois} /> : null}
               {pode("finance.payments.request") ? (
                 <ConfirmarComMotivo
                   rotuloBotao="Cancelar pedido"
@@ -349,7 +353,17 @@ export default function PedidoPagamento() {
           Quem aprova não paga (BR-3): outra pessoa com a tesouraria tem de o executar.
         </Alert>
       ) : null}
-      {podeExecutar && !souRequerente && !souAprovador && podeLerAprovacao && aprovacao.data && !aprovado ? (
+      {rejeitado ? (
+        <Alert tom="aviso" className="mb-6" titulo="Rejeitado em Aprovações.">
+          Não se paga. {souRequerente ? "Cancele o pedido para o fechar; se ainda for de pagar, peça outra vez a partir da factura." : "Quem o pediu pode cancelá-lo."}
+        </Alert>
+      ) : null}
+      {decisao === "Unknown" && porPagar ? (
+        <Alert tom="aviso" className="mb-6" titulo="Sem decisão.">
+          O pedido de aprovação deste pagamento não foi encontrado, por isso não se executa. Avise quem gere as aprovações.
+        </Alert>
+      ) : null}
+      {podeExecutar && !souRequerente && !souAprovador && porAprovar ? (
         <Alert tom="info" className="mb-6" titulo="Ainda não está aprovado.">
           Só se executa depois de aprovado (BR-5). Acompanhe a decisão no pedido de aprovação.
         </Alert>

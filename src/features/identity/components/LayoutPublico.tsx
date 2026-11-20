@@ -21,9 +21,9 @@ function PainelMarca({ destaque }: { destaque?: ReactNode }) {
         {destaque ?? (
           <>
             <p className="text-5xl font-bold leading-none tracking-[-0.025em]">
-              Your Business.
+              O seu negócio.
               <br />
-              <span className={GRADIENTE_TEXTO}>Under Control.</span>
+              <span className={GRADIENTE_TEXTO}>Sob controlo.</span>
             </p>
             <p className="mt-6 max-w-md text-lg text-[var(--entrada-painel-suave)]">Finanças, Recursos Humanos e Operações unificados num único sistema empresarial.</p>
           </>

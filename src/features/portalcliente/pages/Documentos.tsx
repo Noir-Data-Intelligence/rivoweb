@@ -11,6 +11,7 @@ import { Button } from "@/ui/Button";
 import { ErrorPanel } from "@/ui/ErrorPanel";
 import { PageHeader } from "@/ui/Layout";
 import { Tabela, type Coluna } from "@/ui/Tabela";
+import { nomeCategoria } from "../comum";
 import { useDescarregarFicheiro, useDescarregarPartilhado, useMeusFicheiros, usePartilhados, type Ficheiro, type Partilhado } from "../api";
 
 function DescarregarPartilhado({ d, aoFalhar }: { d: Partilhado; aoFalhar: (e: unknown) => void }) {
@@ -45,7 +46,7 @@ export default function Documentos() {
       celula: (d) => (
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-medium text-foreground">{d.title}</span>
-          <span className="truncate text-sm text-muted-foreground">{[d.category, d.fileName].filter(Boolean).join(" · ")}</span>
+          <span className="truncate text-sm text-muted-foreground">{[nomeCategoria(d.category), d.fileName].filter(Boolean).join(" · ")}</span>
         </div>
       ),
     },
@@ -61,7 +62,7 @@ export default function Documentos() {
       celula: (d) => (
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-medium text-foreground">{d.fileName}</span>
-          <span className="truncate text-sm text-muted-foreground">{d.category}</span>
+          <span className="truncate text-sm text-muted-foreground">{nomeCategoria(d.category)}</span>
         </div>
       ),
     },

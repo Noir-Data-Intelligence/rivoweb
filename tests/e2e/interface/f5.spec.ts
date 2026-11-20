@@ -296,6 +296,58 @@ test.describe("pedidos de pagamento", () => {
     expect(await violacoes()).toEqual([]);
   });
 
+  test("lista: o estado pela decisão em Aprovações e o filtro por estado (nota 54)", async ({ page, api }) => {
+    const com = (id: string, numero: string, approvalStatus: string | null, estado = "Eligible") => ({ ...pedidoPagamento(estado), paymentRequestId: id, supplierInvoiceNumber: numero, approvalStatus });
+    const lista = [
+      com("00000000-0000-4000-8000-000000000a01", "FT A/1", "Pending"),
+      com("00000000-0000-4000-8000-000000000a02", "FT A/2", "Approved"),
+      com("00000000-0000-4000-8000-000000000a03", "FT A/3", "Refused"),
+      com("00000000-0000-4000-8000-000000000a04", "FT A/4", "Unknown"),
+      com("00000000-0000-4000-8000-000000000a05", "FT A/5", null, "Cancelled"),
+    ];
+    await comF5(api, meFinancasF5).em("GET", "/finance/payment-requests", pag(lista)).ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/pedidos-pagamento");
+    const linha = (n: string) => page.getByRole("row").filter({ hasText: n });
+    await expect(linha("FT A/1")).toContainText("Por aprovar");
+    await expect(linha("FT A/2")).toContainText("Aprovado, por pagar");
+    await expect(linha("FT A/3")).toContainText("Rejeitado");
+    await expect(linha("FT A/4")).toContainText("Sem decisão");
+    await expect(linha("FT A/5")).toContainText("Cancelado");
+    await semViolacoesAxe(page);
+    await page.getByLabel("Estado").selectOption({ label: "Rejeitado" });
+    await expect(page).toHaveURL(/estado=Rejeitado/);
+    await expect(page.getByRole("link", { name: /^FT A\// })).toHaveText(["FT A/3"]);
+    // A API não filtra pela decisão: lê-se a página maior e filtra-se aqui.
+    expect(api.pedidos.some((p) => p.caminho === "/finance/payment-requests" && p.query.includes("pageSize=200"))).toBe(true);
+    await page.getByLabel("Estado").selectOption({ label: "Por aprovar" });
+    await expect(page.getByRole("link", { name: /^FT A\// })).toHaveText(["FT A/1"]);
+  });
+
+  test("rejeitado em Aprovações: sem executar, e quem pediu cancela (nota 54)", async ({ page, api }) => {
+    await comF5(api, meGestorF5, painelCarlos())
+      .em("GET", `/finance/payment-requests/${IDF5.pedido}`, { status: 200, corpo: { ...pedidoPagamento(), approvalStatus: "Refused" } })
+      .ligar();
+    await entrar(page, "gestor5@teste.local");
+    await page.goto(`/pedidos-pagamento/${IDF5.pedido}`);
+    await expect(page.getByText("Rejeitado em Aprovações.")).toBeVisible();
+    await expect(page.getByText("Rejeitado", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Executar pagamento" })).toHaveCount(0);
+    await expect(page.getByText("Cancele o pedido para o fechar", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Cancelar pedido" })).toBeVisible();
+  });
+
+  test("aprovado pelo approvalStatus: executa mesmo sem ler o processo", async ({ page, api }) => {
+    await comF5(api, meFinancasF5)
+      .em("GET", `/finance/payment-requests/${IDF5.pedido}`, { status: 200, corpo: { ...pedidoPagamento(), approvalStatus: "Approved" } })
+      .em("GET", `/approval/requests/${IDF5.aprovacao}`, { status: 403, corpo: { title: "Forbidden", status: 403 }, cabecalhos: { "Content-Type": "application/problem+json" } })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto(`/pedidos-pagamento/${IDF5.pedido}`);
+    await expect(page.getByText("Aprovado, por pagar")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Executar pagamento" })).toBeVisible();
+  });
+
   test("quem pediu não vê executar (BR-3)", async ({ page, api }) => {
     await comF5(api, meFinancasF5, painelCarlos())
       .ligar();
@@ -807,6 +859,46 @@ test.describe("tesouraria", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(api.escritas("POST", "/finance/exchange-rates")[0]?.corpo).toMatchObject({ currency: "USD", rate: "1021.1668", source: "BNA" });
     expect(await violacoes()).toEqual([]);
+  });
+
+  test("abrir caixa pequena: data de abertura opcional, hoje por omissão e nunca futura (nota 54)", async ({ page, api }) => {
+    await comTesouraria(api, meFinancasF5)
+      .em("POST", "/finance/petty-cash", { status: 201, corpo: { id: "00000000-0000-4000-8000-000000000a11" } })
+      .ligar();
+    await entrar(page, "financas5@teste.local");
+    await page.goto("/caixa-pequena");
+    await page.getByRole("button", { name: "Abrir fundo" }).click();
+    const d = page.getByRole("dialog");
+    await d.getByLabel("Nome").fill("Caixa da loja");
+    await d.getByLabel("Fundo fixo").fill("50 000");
+    await d.getByLabel("Data de abertura (opcional)").fill("2099-01-01");
+    await d.getByRole("button", { name: "Abrir fundo" }).click();
+    await expect(d.getByText("A data de abertura não pode ser futura.")).toBeVisible();
+    expect(api.escritas("POST", "/finance/petty-cash")).toHaveLength(0);
+    await d.getByLabel("Data de abertura (opcional)").fill("2026-11-02");
+    await d.getByRole("button", { name: "Abrir fundo" }).click();
+    await expect(d).toHaveCount(0);
+    expect(api.escritas("POST", "/finance/petty-cash")[0]?.corpo).toMatchObject({ name: "Caixa da loja", floatAmount: "50000.00", openedOn: "2026-11-02" });
+  });
+
+  test("extracto: o mês corrente por omissão, com o anterior e o seguinte (nota 54)", async ({ page, api }) => {
+    await comTesouraria(api).ligar();
+    await entrar(page);
+    await page.goto(`/contas/${IDF5.conta}`);
+    const agora = new Date();
+    const dois = (n: number) => String(n).padStart(2, "0");
+    const ultimo = (a: number, m: number) => new Date(Date.UTC(a, m, 0)).getUTCDate();
+    const [a, m] = [agora.getFullYear(), agora.getMonth() + 1];
+    const extractos = () => api.pedidos.filter((p) => p.caminho === `/finance/accounts/${IDF5.conta}/statement`).map((p) => p.query);
+    await expect.poll(extractos).toContainEqual(`?from=${String(a)}-${dois(m)}-01&to=${String(a)}-${dois(m)}-${dois(ultimo(a, m))}`);
+    expect(extractos().some((q) => q === "")).toBe(false);
+    await expect(page.getByRole("button", { name: "Mês seguinte" })).toBeDisabled();
+    await page.getByRole("button", { name: "Mês anterior" }).click();
+    const [pa, pm] = m === 1 ? [a - 1, 12] : [a, m - 1];
+    await expect(page).toHaveURL(new RegExp(`de=${String(pa)}-${dois(pm)}-01&ate=${String(pa)}-${dois(pm)}-${dois(ultimo(pa, pm))}`));
+    await expect(page.getByRole("button", { name: "Mês seguinte" })).toBeEnabled();
+    await page.getByRole("button", { name: "Mês seguinte" }).click();
+    await expect(page).toHaveURL(new RegExp(`de=${String(a)}-${dois(m)}-01`));
   });
 
   test("caixa pequena: reposição sem valor repõe o que falta", async ({ page, api }) => {

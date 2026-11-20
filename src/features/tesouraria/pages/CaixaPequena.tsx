@@ -6,6 +6,7 @@ import { moeda } from "@/features/facturacao";
 import { Can, useUtilizador } from "@/features/identity";
 import { useTodosColaboradores } from "@/features/rh";
 import { aplicarErrosDoServidor } from "@/lib/api/formulario";
+import { hojeIso } from "@/lib/format/data";
 import { lerDinheiroDigitado, paraApi } from "@/lib/money/money";
 import { normalizarTexto } from "@/lib/validation/text";
 import { Alert } from "@/ui/Alert";
@@ -32,17 +33,25 @@ export function GuardarFundo({ fundo }: { fundo?: FundoCaixa }) {
   const [moedaFundo, setMoedaFundo] = useState(fundo?.currency ?? "AOA");
   const [valor, setValor] = useState(fundo ? String(fundo.floatAmount).replace(".", ",") : "");
   const [activo, setActivo] = useState(fundo?.isActive ?? true);
+  const hoje = hojeIso();
+  // Só na abertura: o dia do fundo inicial (ADR-135). Vazio, a API usa hoje.
+  const [abertura, setAbertura] = useState(hoje);
   const [tentou, setTentou] = useState(false);
   const [soltas, setSoltas] = useState<string[]>([]);
   const idForm = useId();
   const v = lerDinheiroDigitado(valor, 2);
-  const erros = { nome: normalizarTexto(nome) === "" ? "Dê um nome ao fundo." : undefined, valor: !v || v.lte(0) ? "Indique o fundo fixo." : undefined };
+  const erros = {
+    nome: normalizarTexto(nome) === "" ? "Dê um nome ao fundo." : undefined,
+    valor: !v || v.lte(0) ? "Indique o fundo fixo." : undefined,
+    abertura: !fundo && abertura > hoje ? "A data de abertura não pode ser futura." : undefined,
+  };
   const fechar = (a: boolean) => {
     setAberto(a);
     if (!a) {
       guardar.reset();
       setTentou(false);
       setSoltas([]);
+      setAbertura(hojeIso());
     }
   };
   return (
@@ -75,12 +84,12 @@ export function GuardarFundo({ fundo }: { fundo?: FundoCaixa }) {
           onSubmit={(e) => {
             e.preventDefault();
             setTentou(true);
-            if (erros.nome || erros.valor || !v || guardar.isPending) return;
+            if (erros.nome || erros.valor || erros.abertura || !v || guardar.isPending) return;
             setSoltas([]);
             guardar.mutate(
               {
                 fundId: fundo?.fundId ?? null,
-                corpo: { name: normalizarTexto(nome), custodianEmployeeId: responsavel === "" ? null : responsavel, currency: fundo ? null : moedaFundo, floatAmount: paraApi(v), active: activo },
+                corpo: { name: normalizarTexto(nome), custodianEmployeeId: responsavel === "" ? null : responsavel, currency: fundo ? null : moedaFundo, floatAmount: paraApi(v), active: activo, ...(fundo ? {} : { openedOn: abertura === "" ? null : abertura }) },
               },
               {
                 onSuccess: () => fechar(false),
@@ -127,6 +136,11 @@ export function GuardarFundo({ fundo }: { fundo?: FundoCaixa }) {
               <Input id={id} inputMode="decimal" autoComplete="off" className="text-right tabular-nums" aria-describedby={descricao} invalido={invalido} value={valor} onChange={(e) => setValor(e.target.value)} />
             )}
           </Field>
+          {fundo ? null : (
+            <Field rotulo="Data de abertura (opcional)" erro={tentou ? erros.abertura : undefined} ajuda="O dia em que o fundo inicial entrou na caixa. Sem data, hoje.">
+              {({ id, descricao, invalido }) => <Input id={id} type="date" max={hoje} aria-describedby={descricao} invalido={invalido} value={abertura} onChange={(e) => setAbertura(e.target.value)} />}
+            </Field>
+          )}
           {fundo ? <Checkbox className="sm:col-span-2" rotulo="Activo (aceita movimentos)" checked={activo} onChange={(e) => setActivo(e.target.checked)} /> : null}
         </form>
       </Confirmar>

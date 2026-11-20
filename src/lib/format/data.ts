@@ -65,6 +65,25 @@ export function hojeIso(agora: Date = new Date()): string {
   return p ? `${p.year}-${p.month}-${p.day}` : "";
 }
 
+/**
+ * O mês de uma data `YYYY-MM-DD`, deslocado `deslocar` meses: o primeiro e o
+ * último dia, como `YYYY-MM-DD`. Datas de calendário, sem fuso.
+ */
+export function mesDe(iso: string, deslocar = 0): { de: string; ate: string } {
+  const [a, m] = iso.split("-").map(Number) as [number, number];
+  const inicio = new Date(Date.UTC(a, m - 1 + deslocar, 1));
+  const fim = new Date(Date.UTC(inicio.getUTCFullYear(), inicio.getUTCMonth() + 1, 0));
+  const txt = (d: Date) => d.toISOString().slice(0, 10);
+  return { de: txt(inicio), ate: txt(fim) };
+}
+
+/** «Novembro de 2026» a partir de `YYYY-MM-DD`. */
+export function formatarMes(iso: string): string {
+  const [a, m] = iso.split("-").map(Number) as [number, number];
+  const t = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(a, m - 1, 1)));
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 /** «12/10/2026» a partir de um instante (data-hora da API), em Africa/Luanda. */
 export function formatarDataDeInstante(instante: string | Date): string {
   const p = partesDataHora(instante);

@@ -3,11 +3,44 @@ import { useMeuPainel } from "@/features/dashboard";
 import { Alert } from "@/ui/Alert";
 import { Badge } from "@/ui/Badge";
 
-export function EstadoPedidoPagamento({ estado }: { estado: string }) {
-  if (estado === "Eligible") return <Badge tom="aviso">Por pagar</Badge>;
-  if (estado === "Executed") return <Badge tom="sucesso">Pago</Badge>;
-  if (estado === "Cancelled") return <Badge>Cancelado</Badge>;
-  return <Badge>{estado}</Badge>;
+/**
+ * O estado de um pedido de pagamento para quem o lê (nota 54, ADR-135): um
+ * `Eligible` diz-se pela decisão em Aprovações (`approvalStatus`), lida no
+ * momento. Sem ela (API antiga), «Por pagar», como antes.
+ */
+export type EstadoPagamento = "PorAprovar" | "Aprovado" | "Rejeitado" | "SemDecisao" | "PorPagar" | "Pago" | "Cancelado" | "Outro";
+
+export function estadoPagamento(p: { status: string; approvalStatus?: string | null }): EstadoPagamento {
+  if (p.status === "Executed") return "Pago";
+  if (p.status === "Cancelled") return "Cancelado";
+  if (p.status !== "Eligible") return "Outro";
+  if (p.approvalStatus === "Pending") return "PorAprovar";
+  if (p.approvalStatus === "Approved") return "Aprovado";
+  if (p.approvalStatus === "Refused") return "Rejeitado";
+  if (p.approvalStatus === "Unknown") return "SemDecisao";
+  return "PorPagar";
+}
+
+/** Os estados que o filtro da lista oferece, pela ordem do trabalho. */
+export const ESTADOS_PAGAMENTO: readonly { valor: EstadoPagamento; rotulo: string }[] = [
+  { valor: "PorAprovar", rotulo: "Por aprovar" },
+  { valor: "Aprovado", rotulo: "Aprovado, por pagar" },
+  { valor: "Rejeitado", rotulo: "Rejeitado" },
+  { valor: "SemDecisao", rotulo: "Sem decisão" },
+  { valor: "Pago", rotulo: "Pago" },
+  { valor: "Cancelado", rotulo: "Cancelado" },
+];
+
+export function EstadoPedidoPagamento({ p }: { p: { status: string; approvalStatus?: string | null } }) {
+  const e = estadoPagamento(p);
+  if (e === "PorAprovar") return <Badge tom="info">Por aprovar</Badge>;
+  if (e === "Aprovado") return <Badge tom="aviso">Aprovado, por pagar</Badge>;
+  if (e === "Rejeitado") return <Badge tom="erro">Rejeitado</Badge>;
+  if (e === "SemDecisao") return <Badge>Sem decisão</Badge>;
+  if (e === "PorPagar") return <Badge tom="aviso">Por pagar</Badge>;
+  if (e === "Pago") return <Badge tom="sucesso">Pago</Badge>;
+  if (e === "Cancelado") return <Badge>Cancelado</Badge>;
+  return <Badge>{p.status}</Badge>;
 }
 
 /** Categorias de anexo de um pedido de pagamento (texto livre na API). */

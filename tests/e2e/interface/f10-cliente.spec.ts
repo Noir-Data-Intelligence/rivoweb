@@ -53,10 +53,15 @@ test.describe("portal do cliente", () => {
     for (const n of ["Extracto", "Pagamentos", "Documentos", "Mensagens", "Suporte", "Ajuda"]) await expect(menu.getByRole("link", { name: n })).toBeVisible();
     await expect(page.getByRole("row").filter({ hasText: "FT 2026/12" }).getByText("Anulado")).toBeVisible();
     await expect(page.getByRole("link", { name: "Enviar o comprovativo da factura FT 2026/12" })).toHaveCount(0);
+    // Em falta (ADR-141): a factura-recibo paga não pede comprovativo.
+    await expect(page.getByRole("columnheader", { name: "Em falta" })).toBeVisible();
+    await expect(page.getByRole("row").filter({ hasText: "FR 2026/60" })).toContainText(/0,00\sKz/);
+    await expect(page.getByRole("link", { name: "Enviar o comprovativo da factura FR 2026/60" })).toHaveCount(0);
     await verificar(page);
     await page.getByRole("link", { name: "Enviar o comprovativo da factura FT 2026/57" }).click();
     await expect(page).toHaveURL(new RegExp(`/cliente/pagamentos\\?factura=${IDF10.factura2}`));
     await expect(page.getByRole("dialog").getByLabel("Factura")).toHaveValue(IDF10.factura2);
+    await expect(page.getByRole("dialog").getByLabel("Valor pago")).toHaveValue("500000");
     semIdDeCliente(api);
     expect(await violacoes()).toEqual([]);
   });
@@ -76,7 +81,8 @@ test.describe("portal do cliente", () => {
 
     await page.getByRole("button", { name: "Enviar comprovativo" }).click();
     const d = page.getByRole("dialog");
-    await expect(d.getByLabel("Factura").locator("option")).toHaveText(["Escolha…", /FT 2026\/57/, /FT 2026\/41/]);
+    // Só as facturas com valor em falta, com ele no texto (ADR-141).
+    await expect(d.getByLabel("Factura").locator("option")).toHaveText(["Escolha…", /FT 2026\/57 · .* · em falta 500\s000,00\sKz/, /FT 2026\/41/]);
     await d.getByLabel("Pago a").fill("2099-01-01");
     await d.getByRole("button", { name: "Enviar" }).click();
     await expect(d.getByText("Escolha a factura.")).toBeVisible();
@@ -86,6 +92,7 @@ test.describe("portal do cliente", () => {
     expect(api.escritas("POST", "/customer-portal/me/payment-claims")).toHaveLength(0);
 
     await d.getByLabel("Factura").selectOption(IDF10.factura1);
+    await expect(d.getByLabel("Valor pago")).toHaveValue("750000,5");
     await d.getByLabel("Valor pago").fill("750 000,50");
     await d.getByLabel("Pago a").fill("2026-10-12");
     await d.getByLabel("Comprovativo").setInputFiles({ name: "programa.exe", mimeType: "application/octet-stream", buffer: Buffer.from("MZ") });
@@ -123,6 +130,9 @@ test.describe("portal do cliente", () => {
     await page.goto("/cliente/documentos");
     await expect(page.getByRole("table", { name: "Documentos partilhados" })).toContainText("Contrato de prestação de serviços");
     await expect(page.getByRole("table", { name: "Ficheiros carregados" })).toContainText("transferencia-outubro.pdf");
+    // A categoria do sistema diz-se em português (ADR-141).
+    await expect(page.getByRole("table", { name: "Ficheiros carregados" })).toContainText("Comprovativo de pagamento");
+    await expect(page.getByRole("table", { name: "Ficheiros carregados" })).not.toContainText("finance.payment-proof");
     const descarga = page.waitForEvent("download");
     await page.getByRole("button", { name: "Descarregar Contrato de prestação de serviços" }).click();
     expect((await descarga).suggestedFilename()).toBe("contrato-2026.pdf");
