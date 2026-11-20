@@ -1,6 +1,6 @@
 # Novidades do backend para implementar no front
 
-Data: 2026-10-23, actualizado a 2026-11-17. Repositório: `Noir-Data-Intelligence/rivo-api`.
+Data: 2026-10-23, actualizado a 2026-11-20. Repositório: `Noir-Data-Intelligence/rivo-api`.
 A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 
 | # | Funcionalidade | PR | Estado |
@@ -47,10 +47,17 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
-| 56 | Propostas com as datas em dd/MM/aaaa; seed de Vendas coerente (pró-formas por ordem, propostas válidas, oportunidades e contratos) | #186 | Em revisão |
-| 55 | Seed dos RH: transitados só para quem já cá estava, acolhimentos a meio, saídas sem férias marcadas depois | #185 | Em revisão |
-| 54 | Achados do manual das Finanças: anular uma factura com recibos ou notas de crédito em vigor dá 409; o pedido de pagamento traz `approvalStatus`; o Finance deposita o numerário; a caixa abre com data | #184 | Em revisão |
-| 53 | Textos em português: o resumo das férias e das contagens na caixa de aprovações; o ponto de um dia passado com a hora (`at`); o script fiscal com acentos; os benefícios do seed em português | #181 | Em revisão |
+| 63 | Achados do manual do Cliente: a factura-recibo no extracto (débito e crédito), o valor em falta de cada factura no portal (`outstanding`), o comprovativo sem data futura nem repetido | #193 | No `main` desde 20/11 (`18d2372`); front feito (`436aae1`, `138819b`) |
+| 62 | Datas do trabalho dos projectos: horas e marcos não antes do início, marco e fecho não futuros, fecho depois do último trabalho; um projecto fechado já não muda, excepto a visibilidade no portal | #192 | No `main` desde 20/11; front feito (`138819b`) |
+| 61 | Seed: as contagens com o esperado do armazém, e as manutenções dos activos concluídas só depois de agendadas | #191 | No `main` desde 19/11; o front não muda |
+| 60 | A lista de alertas só traz os tipos cuja permissão quem pede tem | #190 | No `main` desde 19/11; o front não muda |
+| 59 | Pedir esclarecimento não é decidir: quem perguntou continua à espera e decide depois | #189 | No `main` desde 19/11; o front não muda (teste em `5249c01`) |
+| 58 | As contas bancárias movimentam-se com `finance.treasury.write`; a Gestão só as vê | #188 | No `main` desde 19/11; front feito (`5249c01`) |
+| 57 | Achados do manual de Vendas: a série do ano por omissão, as datas futuras recusadas, as contas para a FR (`/finance/accounts/lookups`), a renovação dos contratos só como lembrete | #187 | No `main` desde 19/11; front feito (`07e1fa2`, `1ceb5f6`) |
+| 56 | Propostas com as datas em dd/MM/aaaa; seed de Vendas coerente (pró-formas por ordem, propostas válidas, oportunidades e contratos) | #186 | No `main` desde 19/11; front feito (`1ceb5f6`) |
+| 55 | Seed dos RH: transitados só para quem já cá estava, acolhimentos a meio, saídas sem férias marcadas depois | #185 | No `main` desde 18/11; front feito (`1ceb5f6`) |
+| 54 | Achados do manual das Finanças: anular uma factura com recibos ou notas de crédito em vigor dá 409; o pedido de pagamento traz `approvalStatus`; o Finance deposita o numerário; a caixa abre com data | #184 | No `main` desde 18/11; front feito (`5249c01`, `138819b`) |
+| 53 | Textos em português: o resumo das férias e das contagens na caixa de aprovações; o ponto de um dia passado com a hora (`at`); o script fiscal com acentos; os benefícios do seed em português | #181 | No `main` desde 18/11; o front só traduziu o slogan (`138819b`) |
 | 52 | Anular o reembolso de uma despesa: o dinheiro volta, os lançamentos estornam-se e a despesa volta a aprovada | #177 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o «Hotel em Benguela»: reembolsado, anulado a 08/11 e reembolsado outra vez; Balanços de 2025 e 2026 equilibrados) |
 | 51 | Retirar férias por decidir fecha também o processo de aprovação | #176 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (as férias retiradas pelo colaborador QA ficam «Cancelled», e o processo de aprovação também) |
 | 50 | O recibo de vencimento mostra o adiantamento de salário que a folha descontou, e o que se recebe | #175 | **Em produção** desde 17/11; base recriada com o seed do #178 e verificada (o recibo de 02/2026 do colaborador QA: líquido 388 429, adiantamento 122 000, a receber 266 429) |
@@ -1331,6 +1338,126 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
 
 ---
 
+## 63. Achados do manual do Cliente (PR #193, ADR-141)
+
+**API**
+- **Extracto do cliente:** a factura-recibo entra duas vezes, no mesmo dia e
+  com o mesmo número: a débito como `Factura` (o total) e a crédito como
+  `Recibo` (o que se recebeu no acto). O saldo final é o que está em dívida.
+- **`CustomerInvoiceView.outstanding`:** cada factura do portal traz o que
+  falta pagar (zero numa anulada ou numa FR paga).
+- **Comprovativo de pagamento:** uma data futura dá `400`; os comprovativos
+  ainda por confirmar da mesma factura descontam-se (`409` com o motivo).
+
+**Front (feito: `436aae1`, `138819b`)**
+- Início: a coluna «Em falta», e «Enviar comprovativo» só nas facturas com
+  valor em falta.
+- Pagamentos: a lista «Factura» só com essas, com o valor em falta no texto;
+  o «Valor pago» começa nele. O `409` aparece no diálogo, tal como vem.
+- Documentos: «Comprovativo de pagamento» em vez de `finance.payment-proof`.
+- O extracto não muda: as duas linhas da FR usam os tipos que já conhece.
+
+---
+
+## 62. Datas do trabalho dos projectos (PR #192, ADR-140)
+
+**API**
+- Horas antes do início do projecto: `400`.
+- Marco alcançado: nem futuro nem antes do início (`409`).
+- Fechar: não futuro, nem antes das últimas horas ou do último marco
+  alcançado (`409` com o motivo em `erro`).
+- Um projecto fechado já não muda (`409`, «O projecto está fechado.»), excepto
+  a ligação ao cliente e a visibilidade no portal.
+- O seed fecha os projectos acabados e põe as horas dentro das datas.
+
+**Front (feito: `138819b`)**
+- «Dia» do tempo com mínimo no início, e «Não se regista tempo antes do
+  início do projecto (dd/mm/aaaa).».
+- «Alcançado a» entre o início e hoje, com as duas mensagens; «Data de fecho»
+  até hoje. As outras recusas do servidor aparecem no diálogo.
+- Num projecto fechado e visível, a vista Cliente mostra «Esconder do portal
+  do cliente».
+
+---
+
+## 61. Seed: contagens e manutenções dos activos (PR #191)
+
+**Seed** (a API não muda):
+- as contagens lêem o esperado do armazém (`quantityOnHand`): a contagem
+  fechada já não leva o stock dos artigos contados a zero;
+- as manutenções dos activos só se concluem depois do dia agendado.
+
+**Front:** não muda. A ficha do activo mostra «Em atraso» nas agendadas com o
+dia passado (`138819b`), como a frota.
+
+---
+
+## 60. Alertas por permissão (PR #190, ADR-139)
+
+**API**
+- **`GET /alerts/events`** só devolve os tipos de alerta cuja permissão quem
+  pede tem (a tabela do ADR-092), filtrados antes do `limit`.
+- As regras (`GET /alerts/rules`) e a resolução (`alerts.alerts.write`) não
+  mudam.
+
+**Front:** não muda; o ecrã de Alertas recebe menos linhas.
+
+---
+
+## 59. Pedir esclarecimento não é decidir (PR #189, ADR-138)
+
+**API**
+- Um `ClarificationRequested` fica na trilha, mas não fecha a atribuição:
+  quem perguntou continua em `pendingApprovers` e em `pendingFor`, e aprova ou
+  rejeita depois (não conta para BR-4).
+- Num passo de todos, o passo só fecha quando quem perguntou também decidir.
+- Para BR-3 («quem aprovou não paga»), quem perguntou continua a contar.
+
+**Front:** não muda. A caixa e o cartão «A sua decisão» seguem
+`pendingApprovers`, sem olhar ao histórico. Há um teste que o prova
+(`5249c01`, `f4.spec.ts`).
+
+---
+
+## 58. Contas bancárias da tesouraria (PR #188, ADR-137)
+
+**API**
+- Abrir, depositar, levantar, fechar e reabrir uma conta bancária pedem
+  `finance.treasury.write` (antes `finance.payables.write`). As Finanças
+  movimentam as contas; a Gestão vê-as, mas não as movimenta.
+- O seed: as férias das Operações decididas pelo Director de Operações.
+
+**Front (feito: `5249c01`)**
+- «Abrir conta», «Depositar», «Levantar», «Depositar valores», «Fechar» e
+  «Reabrir» aparecem a quem tem `finance.treasury.write`.
+
+---
+
+## 57. Achados do manual de Vendas (PR #187, ADR-136)
+
+**API**
+- **Série por omissão:** sem série escolhida, a do ano do documento (`S2026`),
+  se existir activa; senão, a por omissão.
+- **Datas futuras:** facturas, emissão de rascunhos, pró-formas e a sua
+  conversão, notas de crédito e recibos dão `400`, «A data do documento não
+  pode ser futura (dd/MM/aaaa).».
+- **`GET /finance/accounts/lookups`** (`finance.invoices.write`): as contas
+  abertas, só com `accountId`, `name` e `currency`, para a FR por banco.
+- **Contratos:** `autoRenew` só aparece no alerta do fim; a API não renova.
+
+**Front (feito: `07e1fa2`, `1ceb5f6`)**
+- O rascunho reaberto mostra o cliente, a série, a factura referenciada e o
+  imposto gravados.
+- Vendas escolhe a conta onde entrou a FR por banco na lista curta, pela
+  moeda (rascunho, conversão da pró-forma, venda de activo e «Registar
+  recebimento»).
+- As datas dos documentos de venda com `max` de hoje, e o `400` junto ao
+  campo.
+- «Série do ano ou por omissão»; «Renovação prevista (lembrete)»; a formação
+  «Decorrida».
+
+---
+
 ## 56. Achados do manual de Vendas (PR #186)
 
 **API**
@@ -1342,7 +1469,7 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - as oportunidades abertas com fecho previsto no futuro;
   - nenhum contrato em vigor já acabado.
 
-**Front (por fazer, visto no manual de Vendas)**
+**Front (feito: `1ceb5f6`; ver a secção 57)**
 - **Rascunho de factura (`Rascunho.tsx`), importante:** ao abrir um
   rascunho guardado, a caixa «Cliente» mostra «Consumidor final» e a
   «Série» mostra «Série por omissão», mesmo com o cliente e a série
@@ -1386,7 +1513,7 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
 - os acolhimentos dos admitidos recentes: dois concluídos e um a meio;
 - quem sai não tem férias nem licenças marcadas para depois do último dia.
 
-**Front (por fazer, visto no manual dos RH)**
+**Front (feito: `1ceb5f6`)**
 - **Formação:** a coluna Estado mostra «Planeada» em todas as formações
   que não foram canceladas, mesmo as que já decorreram (`Formacao.tsx`,
   `c.cancelled ? Cancelada : Planeada`). Com as datas que já vêm na lista,
@@ -1426,7 +1553,7 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - a venda do portátil do activo e o recibo dela passam a ser de hoje, e os
     números ficam por ordem.
 
-**Front (por fazer)**
+**Front (feito: `5249c01` o depósito de valores; `138819b` o resto)**
 - **Pedidos de pagamento:** mostrar o estado com o `approvalStatus` de um
   `Eligible`, e não só «Por pagar»:
   - `Pending`: «Por aprovar»;
@@ -1472,8 +1599,9 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
 - **Assiduidade:** o botão continua a enviar `day: null`. Se um dia se quiser
   lançar um dia passado (o registo em papel), o formulário pede o dia e as
   horas, e envia `at`.
-- **O slogan do ecrã de entrada** está em inglês («Your Business. Under
-  Control.», em `LayoutPublico.tsx`). Fica à decisão de quem mantém a marca.
+- **O slogan do ecrã de entrada** estava em inglês («Your Business. Under
+  Control.», em `LayoutPublico.tsx`). Passou a «O seu negócio. Sob
+  controlo.» (`138819b`).
 
 **Como ver**
 - Depois do reseed: a caixa de aprovações do Director Geral, as horas na
