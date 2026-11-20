@@ -8,8 +8,8 @@ gera-se dele com `npm run api:types` e **nunca se edita à mão** (o CI corre
 
 | | |
 |---|---|
-| Data | 2026-11-19 |
-| Commit do backend | `c0c4f99` (cabeça do PR #187, **ainda aberto**: a série do ano por omissão, as datas futuras recusadas e `GET /finance/accounts/lookups`, ADR-136; por cima do `main` em `a596151`, com o #178 a #185: `ClockRequest.at`, `FundRequest.openedOn`, `PaymentRequestView.approvalStatus`). Antes, `300c994` (`main`, merge do PR #177). Depois do merge do #187, gerar outra vez do `main` publicado. |
+| Data | 2026-11-20 |
+| Commit do backend | `18d2372` (`main`, merge do PR #193): com o #186 a #193 (ADR-136 a ADR-141). Entram `CustomerInvoiceView.outstanding` (o valor em falta de cada factura no portal do cliente) e os `409` das rotas dos projectos (ADR-140). Antes, `c0c4f99` (cabeça do PR #187). |
 | Operações | 546 caminhos |
 | Como | API local em Docker construída a partir de um `git worktree` do `origin/main` (`EXPOSE_OPENAPI=true`); `curl http://localhost:5080/openapi/v1.json` |
 

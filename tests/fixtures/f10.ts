@@ -23,6 +23,7 @@ export const IDF10 = {
   ticketAvaliado: "00000000-0000-4000-8000-000000000f63",
   artigo: "00000000-0000-4000-8000-000000000f71",
   equipa: "00000000-0000-4000-8000-000000000f81",
+  paga: "00000000-0000-4000-8000-000000000f82",
 };
 
 export const resumo = (de = "2026-10-01", ate = "2026-10-17"): S["MyOverviewView"] => ({
@@ -34,9 +35,11 @@ export const resumo = (de = "2026-10-01", ate = "2026-10-17"): S["MyOverviewView
   netRevenue: 438596.49,
   outstanding: 1250000.5,
   invoices: [
-    { invoiceId: IDF10.factura1, number: "FT 2026/41", issuedOn: "2026-09-30", status: "Normal", currency: "AOA", grossTotal: 750000.5 },
-    { invoiceId: IDF10.factura2, number: "FT 2026/57", issuedOn: "2026-10-10", status: "Normal", currency: "AOA", grossTotal: 500000 },
-    { invoiceId: IDF10.anulada, number: "FT 2026/12", issuedOn: "2026-03-02", status: "Cancelled", currency: "AOA", grossTotal: 80000 },
+    { invoiceId: IDF10.factura1, number: "FT 2026/41", issuedOn: "2026-09-30", status: "Normal", currency: "AOA", grossTotal: 750000.5, outstanding: 750000.5 },
+    { invoiceId: IDF10.factura2, number: "FT 2026/57", issuedOn: "2026-10-10", status: "Normal", currency: "AOA", grossTotal: 500000, outstanding: 500000 },
+    // Factura-recibo: paga ao emitir, nada em falta (ADR-141).
+    { invoiceId: IDF10.paga, number: "FR 2026/60", issuedOn: "2026-10-14", status: "Normal", currency: "AOA", grossTotal: 120000, outstanding: 0 },
+    { invoiceId: IDF10.anulada, number: "FT 2026/12", issuedOn: "2026-03-02", status: "Cancelled", currency: "AOA", grossTotal: 80000, outstanding: 0 },
   ],
 });
 
@@ -117,7 +120,7 @@ export const partilhados = (): S["CustomerDocumentShare"][] => [
 ];
 
 export const ficheiros = (): S["DocumentDescriptor"][] => [
-  { documentId: IDF10.ficheiro, fileName: "transferencia-outubro.pdf", contentType: "application/pdf", sizeInBytes: 102400, category: "Comprovativo de pagamento", contentHash: "ab12", uploadedBy: meCliente.userId, uploadedAt: "2026-10-12T15:29:00Z" },
+  { documentId: IDF10.ficheiro, fileName: "transferencia-outubro.pdf", contentType: "application/pdf", sizeInBytes: 102400, category: "finance.payment-proof", contentHash: "ab12", uploadedBy: meCliente.userId, uploadedAt: "2026-10-12T15:29:00Z" },
 ];
 
 export const artigos = (): S["KnowledgeArticleSummary"][] => [
