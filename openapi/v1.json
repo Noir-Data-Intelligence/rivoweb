@@ -57864,6 +57864,18 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "actionUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "actionLabel": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

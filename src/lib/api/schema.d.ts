@@ -46592,6 +46592,8 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             readAt: null | string;
+            actionUrl?: null | string;
+            actionLabel?: null | string;
         };
         NumberedCreatedResponse: {
             /** Format: uuid */
