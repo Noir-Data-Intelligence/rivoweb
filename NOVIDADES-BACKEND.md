@@ -1,6 +1,6 @@
 # Novidades do backend para implementar no front
 
-Data: 2026-10-23, actualizado a 2026-11-20. Repositório: `Noir-Data-Intelligence/rivo-api`.
+Data: 2026-10-23, actualizado a 2026-11-21. Repositório: `Noir-Data-Intelligence/rivo-api`.
 A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 
 | # | Funcionalidade | PR | Estado |
@@ -47,6 +47,7 @@ A referência completa de cada rota está em `rivo-api/API-FRONTEND.md`.
 | 40 | O adiantamento de salário pede-se (portal ou finanças), aprova-se no motor (`finance.salary_advance`) e só depois se paga, por quem não o decidiu | #163, #164 | **Em produção** desde 13/11; base recriada e verificada (6 pedidos, de Fevereiro, Junho e Outubro, todos aprovados pelo Director Financeiro e pagos, cada um com o seu `ADT-…`; as folhas de Fevereiro e Junho descontaram-nos; os 204 000 de Outubro estão na 36.3 à espera da folha de Outubro, ainda por aprovar; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 41 | Regularização anual do IVA pelo pró-rata, indicada pelo contabilista (34.5.4.3 contra a 75.3.1.2, a 63.5 ou o imobilizado), corrigida por ajuste | #165 | **Em produção** desde 13/11; base recriada e verificada (2025 com a regularização indicada pelo seed: `PRT-2025` a 31/12, DIV, 238 403,27 na 75.3.1.2 contra a 34.5.4.3; o `IVA-2025-12` levou-a e a 34.5.4.3 ficou a zero; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
 | 42 | Corrigir o IVA não dedutível de uma factura de compra já registada, sem a anular (na 34.5.2 antes do apuramento do mês, na 34.5.4 depois) | #166 | **Em produção** desde 13/11; base recriada e verificada (duas compras com metade do IVA corrigida: a FT 2026/46248 de 21/09, antes do apuramento, com o `ND1-…` nessa data, 75.2.39 contra a 34.5.2.3; a FT 2026/92629 de 30/08, já apurada, com o `ND1-…` de hoje, 21.1 contra a 34.5.4.2; `nonDeductibleTaxCorrections` 1 em ambas; Balanços equilibrados e 43.1 igual às contas em kwanzas) |
+| 64 | Avisos ao cliente: comprovativo confirmado ou rejeitado, resposta da equipa e pedido de suporte fechado; as notificações trazem `actionUrl` e `actionLabel` | #194 | No `main` desde 20/11 (`f14cd7f`); front feito (o botão nas notificações) |
 | 63 | Achados do manual do Cliente: a factura-recibo no extracto (débito e crédito), o valor em falta de cada factura no portal (`outstanding`), o comprovativo sem data futura nem repetido | #193 | No `main` desde 20/11 (`18d2372`); front feito (`436aae1`, `138819b`) |
 | 62 | Datas do trabalho dos projectos: horas e marcos não antes do início, marco e fecho não futuros, fecho depois do último trabalho; um projecto fechado já não muda, excepto a visibilidade no portal | #192 | No `main` desde 20/11; front feito (`138819b`) |
 | 61 | Seed: as contagens com o esperado do armazém, e as manutenções dos activos concluídas só depois de agendadas | #191 | No `main` desde 19/11; o front não muda |
@@ -1335,6 +1336,28 @@ A DR passa a ter o custo das mercadorias vendidas e das matérias consumidas.
   - o lançamento «REX-2025» está em Lançamentos;
   - a DR de 2025 tem o custo das matérias consumidas na rubrica 27;
   - o Balanço de 2026 tem nas existências (22.x) o stock de 31/12/2025.
+
+---
+
+## 64. Avisos ao cliente e o botão das notificações (PR #194, ADR-142)
+
+**API**
+- **`GET /notifications/me`:** cada notificação pode trazer `actionUrl`
+  (absoluto, o endereço do front mais o caminho) e `actionLabel`. O convite e
+  a recuperação da password vêm sempre sem eles (a ligação leva o token).
+- **Avisos ao cliente**, na aplicação e por e-mail se a conta quiser:
+  - `finance.payment_claim.confirmed`: comprovativo confirmado, com o recibo;
+  - `finance.payment_claim.rejected`: rejeitado, com o motivo;
+  - `messaging.conversation.reply_received`: resposta da equipa, com o texto;
+  - `messaging.ticket.closed`: pedido de suporte fechado, para o avaliar.
+  Fechar uma conversa directa não avisa.
+
+**Front (feito)**
+- Em `/notificacoes`, `/eu/notificacoes` e `/cliente/notificacoes` (a mesma
+  página), um botão com o `actionLabel` quando há `actionUrl`.
+- Na origem do front, navega pelo router com o caminho, sem recarregar; noutra
+  origem, ligação normal. Só `http` e `https`.
+- Ao carregar, marca a notificação como lida.
 
 ---
 

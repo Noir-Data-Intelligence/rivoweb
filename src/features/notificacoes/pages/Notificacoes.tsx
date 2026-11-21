@@ -1,5 +1,5 @@
 import { AlarmClock, ArrowUpRight, CheckCheck, Clock } from "lucide-react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { formatarDataHora } from "@/lib/format/data";
 import { Badge, type TomBadge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
@@ -9,6 +9,7 @@ import { ErrorPanel } from "@/ui/ErrorPanel";
 import { EmptyState, PageHeader, Skeleton } from "@/ui/Layout";
 import { Paginacao } from "@/ui/Paginacao";
 import { usePaginacaoUrl } from "@/ui/usePaginacaoUrl";
+import { destinoDaAccao } from "../accao";
 import { useMarcarLida, useMarcarTodasLidas, useNotificacoes, type Notificacao } from "../api";
 
 /** Os avisos dos prazos das aprovações (ADR-130): ícone e etiqueta próprios; a etiqueta diz o tipo, a cor só reforça. */
@@ -21,6 +22,12 @@ const PRAZOS: Readonly<Record<string, { Icone: typeof Clock; tom: TomBadge; rotu
 function Linha({ n }: { n: Notificacao }) {
   const prazo = PRAZOS[n.type];
   const marcar = useMarcarLida();
+  // O botão da acção (ADR-142): só com `actionUrl`; o convite e a password reposta vêm sem ele.
+  const destino = destinoDaAccao(n.actionUrl, window.location.origin);
+  const rotulo = n.actionLabel?.trim() || "Abrir";
+  const aoAbrir = () => {
+    if (!n.read && !marcar.isPending) marcar.mutate(n.notificationId);
+  };
   return (
     <li className="flex flex-col gap-2 py-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
@@ -40,6 +47,19 @@ function Linha({ n }: { n: Notificacao }) {
         {/* Texto simples: nunca interpretado como HTML (S10). */}
         <p className="mt-0.5 whitespace-pre-line break-words text-sm text-muted-foreground">{n.message}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">{formatarDataHora(n.createdAt)}</p>
+        {destino ? (
+          <Button asChild variante="secondary" tamanho="sm" className="mt-2">
+            {destino.tipo === "interno" ? (
+              <Link to={destino.caminho} onClick={aoAbrir}>
+                {rotulo}
+              </Link>
+            ) : (
+              <a href={destino.href} rel="noopener noreferrer" onClick={aoAbrir}>
+                {rotulo}
+              </a>
+            )}
+          </Button>
+        ) : null}
         {marcar.error ? <ErrorPanel erro={marcar.error} className="mt-2" /> : null}
       </div>
       {!n.read ? (

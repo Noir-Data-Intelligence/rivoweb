@@ -57,7 +57,9 @@
 > estado dos pedidos de pagamento pela decisão, com filtro; a data de abertura
 > da caixa pequena; o extracto por mês; «Em atraso» na manutenção dos activos;
 > a recepção diz onde entra o stock; as datas do trabalho dos projectos; o
-> valor em falta no portal do cliente; o slogan em português).
+> valor em falta no portal do cliente; o slogan em português) · actualizado a
+> 2026-11-21 (o botão das notificações leva ao que a notificação diz; o
+> cliente é avisado do comprovativo, das respostas e do pedido fechado).
 
 ---
 
@@ -99,7 +101,7 @@ AM = AssetManager.
 | **Comum** | | | | | | | | | | |
 | Entrar, sair, aceitar convite, recuperar password | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | A minha conta: mudar password, sessões activas, preferência de e-mail | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Notificações: sino, lista, marcar como lidas | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Notificações: sino, lista, marcar como lidas; o botão que leva ao que a notificação diz ⁶⁴ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Tema claro, escuro ou do sistema | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | **Início** | | | | | | | | | | |
 | Resumo pessoal: notificações por ler, aprovações à espera, anúncios | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ ¹ | — |
@@ -525,6 +527,11 @@ Recursos Humanos.»
 - **Anular depois** estorna também as correcções.
 - **No front:** na ficha da factura de compra em vigor, a quem a regista (`finance.payables.write`), «Corrigir IVA não dedutível»: o novo valor (o actual por omissão; de zero ao IVA da factura, e diferente do actual) e o motivo; o diálogo diz que vai para o mês da factura se esse IVA ainda não foi apurado, ou para hoje, como regularização. Depois, o aviso diz onde ficou (pelo `postedAs`), com o número do lançamento («ND1-…») e os `notes` do servidor. Com correcções, a ficha diz quantas («corrigido uma vez depois do registo»). Um `400` no valor ou no motivo fica no campo.
 
+⁶⁴ PR #194 (ADR-142), no `main` desde 2026-11-20; tipos gerados do `main` em `f14cd7f`.
+- **Ligação nas notificações:** `GET /notifications/me` traz `actionUrl` (absoluto, para o front publicado) e `actionLabel`, menos no convite e na recuperação da password.
+- **Avisos ao cliente** (na aplicação e, se a conta quiser, por e-mail): comprovativo confirmado, com o número do recibo (`finance.payment_claim.confirmed`); rejeitado, com o motivo (`finance.payment_claim.rejected`); resposta da equipa, com o texto (`messaging.conversation.reply_received`); pedido de suporte fechado, para o avaliar (`messaging.ticket.closed`).
+- **No front:** em `/notificacoes`, `/eu/notificacoes` e `/cliente/notificacoes` (a mesma página), o botão com o `actionLabel`. Na mesma origem do front, abre pelo router com o caminho, sem recarregar; noutra origem (por exemplo, um ambiente que não é o publicado), é uma ligação normal. Só `http` e `https`: outro esquema não dá botão. Ao carregar, a notificação fica lida.
+
 ⁶³ Notas 54 do backend (PR #184, ADR-135), PR #192 (ADR-140) e PR #193 (ADR-141), no `main` desde 2026-11-20; tipos gerados do `main` em `18d2372`.
 - **Pedidos de pagamento:** a lista e a ficha trazem `approvalStatus`, a decisão em Aprovações lida no momento.
 - **Caixa pequena:** `openedOn` na abertura (omitido, hoje; futuro, recusado).
@@ -686,6 +693,10 @@ Recursos Humanos.»
   uma como lida, marcar todas como lidas. Os avisos dos prazos das
   aprovações ⁵⁶ têm ícone e etiqueta próprios: «Prazo a acabar», «Prazo
   passado» e «Escalado».
+- **O botão da notificação** ⁶⁴: quando a notificação traz uma ligação, um
+  botão com o texto dela («Abrir no portal», «Avaliar o atendimento», «Ver os
+  pagamentos») abre a página e marca a notificação como lida. O convite e a
+  password reposta não têm botão.
 
 ### Aparência e acessibilidade
 - Tema claro, escuro ou o do sistema, lembrado no browser.

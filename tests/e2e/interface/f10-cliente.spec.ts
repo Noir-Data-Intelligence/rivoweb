@@ -43,6 +43,37 @@ function semIdDeCliente(api: ApiSimulada) {
 const espacos = (s: string) => s.replace(/[\u00A0\u202F]/g, " ");
 
 test.describe("portal do cliente", () => {
+  test("notificações: o botão da acção abre pelo router e marca como lida (ADR-142)", async ({ page, api }) => {
+    const n = (id: string, type: string, title: string, actionUrl: string | null, actionLabel: string | null) => ({ notificationId: id, type, title, message: "Texto do aviso.", read: false, createdAt: "2026-11-20T09:00:00Z", readAt: null, actionUrl, actionLabel });
+    const lista = [
+      n("00000000-0000-4000-8000-000000000491", "finance.payment_claim.confirmed", "Comprovativo confirmado", "http://localhost:4173/cliente/pagamentos", "Ver os pagamentos"),
+      n("00000000-0000-4000-8000-000000000492", "messaging.ticket.closed", "Pedido de suporte fechado", `https://rivoweb-coral.vercel.app/cliente/suporte/${IDF10.ticketAberto}`, "Avaliar o atendimento"),
+      n("00000000-0000-4000-8000-000000000493", "UserInvited", "Convite", null, null),
+      n("00000000-0000-4000-8000-000000000494", "Alert", "Ligação perigosa", "javascript:alert(1)", "Abrir"),
+    ];
+    await comPortal(api)
+      .em("GET", "/notifications/me", { status: 200, corpo: lista, cabecalhos: { "X-Page": "1", "X-Page-Size": "25", "X-Total-Count": "4" } })
+      .em("POST", "/notifications/00000000-0000-4000-8000-000000000491/read", { status: 204 })
+      .ligar();
+    await entrar(page, meCliente.email);
+    await page.goto("/cliente/notificacoes");
+    const item = (t: string) => page.getByRole("listitem").filter({ hasText: t });
+    // Noutra origem (o front publicado), uma ligação normal.
+    await expect(item("Pedido de suporte fechado").getByRole("link", { name: "Avaliar o atendimento" })).toHaveAttribute("href", `https://rivoweb-coral.vercel.app/cliente/suporte/${IDF10.ticketAberto}`);
+    // Sem actionUrl, ou com um esquema que não é http(s), não há botão.
+    await expect(item("Convite").getByRole("link")).toHaveCount(0);
+    await expect(item("Ligação perigosa").getByRole("link")).toHaveCount(0);
+    await semViolacoesAxe(page);
+    await page.evaluate(() => {
+      (window as unknown as { semRecarregar?: boolean }).semRecarregar = true;
+    });
+    await item("Comprovativo confirmado").getByRole("link", { name: "Ver os pagamentos" }).click();
+    await expect(page).toHaveURL(/\/cliente\/pagamentos$/);
+    await expect.poll(() => api.escritas("POST", "/notifications/00000000-0000-4000-8000-000000000491/read").length).toBe(1);
+    // Pelo router: a página não recarregou.
+    expect(await page.evaluate(() => (window as unknown as { semRecarregar?: boolean }).semRecarregar)).toBe(true);
+  });
+
   test("início: em dívida, facturas e o caminho para enviar o comprovativo", async ({ page, api, violacoes }) => {
     await comPortal(api).ligar();
     await entrar(page, meCliente.email);
